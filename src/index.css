@@ -98,13 +98,35 @@
 
   body {
     @apply font-sans antialiased;
-    min-width: 1024px;
     background: var(--pulse-canvas);
     color: var(--pulse-ink);
     font-size: 15px;
     line-height: 1.5;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
+  }
+
+  /* The desktop layout needs 1024px of room, but the floor must apply ONLY
+     where the layout is actually shown. Applied unconditionally it also
+     inflated the MOBILE layout viewport to 1024px x full-document-height,
+     and a fixed inset-0 element resolves against that viewport — so
+     DesktopOnlyGate became a ~1024x2200 box that centred its message
+     hundreds of px right of and below the fold. Hence: floor above lg,
+     scroll lock below it (the gate covers the app, nothing underneath is
+     meant to be reachable). */
+  @media (min-width: 1024px) {
+    body {
+      min-width: 1024px;
+    }
+  }
+
+  @media (max-width: 1023.98px) {
+    html,
+    body {
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
   }
 
   :focus-visible {

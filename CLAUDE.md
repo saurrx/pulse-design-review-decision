@@ -112,8 +112,15 @@ checks silently broke during the rename once.
   as "@domain.com" — adapter strips the @), OverviewTab (defensive prop
   defaults — undefined team/history once crashed the page)
 - DesktopOnlyGate.tsx — <1024px overlay (pure CSS visibility, app stays
-  mounted: cannot cause state bugs). Mobile layout is NOT built (known 634px
-  overflow beneath the gate).
+  mounted: cannot cause state bugs). Mobile layout is NOT built, but the gate
+  itself now fits: `body{min-width:1024px}` is scoped to `@media(min-width:
+  1024px)` and html/body scroll-lock below it (index.css). Unscoped, that
+  floor inflated the mobile LAYOUT VIEWPORT to 1024px x full-doc-height —
+  which is what a `fixed inset-0` element sizes against — so the gate became
+  a ~1024x2200 box centring its message off-screen (the old "634px overflow";
+  users had to pan right and down to read it). The gate is its own scroll
+  container (min-h-full inner flex) so the message stays reachable on short
+  landscape viewports. Keep the floor desktop-only.
 
 ## 6. Harnesses & testing law
 Playwright scripts must live in repo root (module resolution). Durable set:
