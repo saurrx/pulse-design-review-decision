@@ -314,25 +314,48 @@ const RULES: Rule[] = [
         event_date: r.due_at,
         days_to_deadline: r.daysRemaining,
         patent: r.patent,
+        // action_status and request_status are two real axes now (the client's
+        // submission state and Photon's queue position), so both come from the
+        // API. This used to hardcode "SUBMITTED", which made UPDATED — a client
+        // revising an instruction already in the queue — impossible to render.
         patent_action: r.instruction ? {
           id: r.id,
-          action_template: { id: r.id, label: r.instruction },
-          action_status: r.status === "NO_ACTION" ? null : "SUBMITTED",
+          action_template: r.template_id
+            ? { id: r.template_id, label: r.instruction }
+            : { id: r.id, label: r.instruction },
+          action_status: r.submission_state ?? null,
           request_status: r.status,
+          selected_countries: r.selected_countries ?? [],
+          version: r.version ?? 1,
           notes: r.note ?? "",
           submitted_at: r.requested_at,
         } : null,
         action_request_id: r.id,
       })) }) }) },
+  // Photon moving an action along its queue. This previously mapped onto the
+  // instruction PATCH, so changing a status rewrote the instruction text.
   { m: /^\/api\/v1\/actions\/request-status$/, method: "PUT",
-    to: (_m, b) => ({ url: `/v1/actions/${b?.id ?? b?.action_id}`, method: "PATCH",
-      body: { instruction: b?.instruction ?? b?.action, note: b?.note }, wrap: p => ({ data: p }) }) },
+    to: (_m, b) => ({ url: `/v1/actions/${b?.id ?? b?.action_id}/request-status`, method: "PATCH",
+      body: { status: b?.request_status ?? b?.status }, wrap: p => ({ data: p }) }) },
+  // The client choosing an instruction: template id and countries travel too.
+  { m: /^\/api\/v1\/actions\/save$/, method: "PUT",
+    to: (_m, b) => ({ url: `/v1/actions/${b?.id ?? b?.action_request_id}`, method: "PATCH",
+      body: {
+        template_id: b?.action_template_id, instruction: b?.instruction ?? b?.action,
+        selected_countries: b?.selected_countries, note: b?.notes ?? b?.note,
+      }, wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/actions\/submit-all$/, method: "POST",
     to: () => ({ url: "/v1/actions/submit-all", method: "POST", wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/actions\/oc\/queue/,
     to: () => ({ url: "/v1/actions/queue", method: "GET", wrap: p => ({ data: p }) }) },
+  // 94% of real deadline names contain a slash ("3 1/2 Year Maintenance Fee
+  // Due"), so the event type travels as a query parameter — in a path segment
+  // it splits the route and 404s.
   { m: /^\/api\/v1\/actions\/templates\/event\/(.+)$/,
-    to: m => ({ url: `/v1/actions/templates/${m[1]}`, method: "GET", wrap: p => ({ data: p }) }) },
+    to: m => ({
+      url: `/v1/actions/templates?event_type=${encodeURIComponent(decodeURIComponent(m[1]))}`,
+      method: "GET", wrap: p => ({ data: p }),
+    }) },
 
   // -- clients / workspace -----------------------------------------------------
   { m: /^\/api\/v1\/clients$/, method: "POST",
