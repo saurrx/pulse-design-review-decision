@@ -1,0 +1,549 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Pulse Design Tokens — v4 Photon Brand (DOC PL-TKN-004) */
+  :root {
+    --pulse-canvas: #f7f7f5;
+    --pulse-surface: #ffffff;
+    --pulse-surface-subtle: #fafafa;
+    --pulse-ink: #252642;
+    --pulse-ink-secondary: #555867;
+    --pulse-ink-muted: #7b7e8c;
+    --pulse-line: #e6e7eb;
+    --pulse-line-strong: #ccd0d9;
+    --pulse-shadow-card: 0 8px 24px rgba(17, 16, 60, 0.06);
+    --pulse-shadow-elevated: 0 18px 44px rgba(17, 16, 60, 0.12);
+
+    /* Photon brand: yellow is the signature, navy carries authority. */
+    --pulse-brand: #f9b418;
+    --pulse-brand-hover: #e2a113;
+    --pulse-brand-soft: #fff6dc;
+    --pl-amber: #f9b418;
+    --pl-slate: #64748b;
+    --pulse-navy: #11103c;
+    --pulse-navy-soft: #eeeeF5;
+    --pulse-focus: #4351c0;
+
+    /* Functional colors are reserved for meaning, never decoration alone. */
+    --pulse-data-primary: #11103c;
+    --pulse-data-accent: #f9b418;
+    --pulse-data-success: #2f8d70;
+    --pulse-data-cyan: #25a9b8;
+    --pulse-data-risk: #c96558;
+    --pulse-data-ai: #7057c7;
+    --pulse-danger: #a5443c;
+    --pulse-danger-soft: #fff1ef;
+    --pulse-success: #2f8d70;
+    --pulse-success-soft: #edf8f3;
+    --pulse-info: #7057c7;
+    --pulse-info-soft: #f2effb;
+
+    /* pl-bg / pl-ink */
+    --background: 0 0% 100%;
+    --foreground: 238 28% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 238 28% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 238 28% 20%;
+
+    /* pl-brand #F9B418 — ink text on brand */
+    --primary: 42 95% 54%;
+    --primary-foreground: 238 28% 20%;
+
+    /* pl-bg-muted #F5F5F5 */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 238 28% 20%;
+
+    /* pl-bg-muted / pl-text-3 #727272 */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    /* pl-brand-tint #FDF3DC / pl-amber-text #7E5A00 */
+    --accent: 42 89% 93%;
+    --accent-foreground: 43 100% 25%;
+
+    /* pl-red #B3362F */
+    --destructive: 3 58% 44%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* pl-border #E8E8E8 */
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+    /* pl-blue #4351C0 — focus rings */
+    --ring: 233 49% 51%;
+
+    /* Shared product radius; dense status markers stay square for scanability. */
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 238 28% 20%;
+    --sidebar-primary: 42 95% 54%;
+    --sidebar-primary-foreground: 238 28% 20%;
+    --sidebar-accent: 42 89% 93%;
+    --sidebar-accent-foreground: 43 100% 25%;
+    --sidebar-border: 0 0% 91%;
+    --sidebar-ring: 233 49% 51%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    min-width: 1024px;
+    background: var(--pulse-canvas);
+    color: var(--pulse-ink);
+    font-size: 15px;
+    line-height: 1.5;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--pulse-focus);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: #ffe3a0;
+    color: var(--pulse-ink);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 0px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  /* 
+    By default, show scrollbar thumb as normal. 
+    For small screens, make scrollbar thumb transparent except while scrolling ("active").
+    We'll use ::-webkit-scrollbar-thumb:active for visibility while scrolling.
+  */
+  ::-webkit-scrollbar-thumb {
+    @apply bg-photon-gray-300 rounded-full hover:bg-photon-gray-400 transition-colors;
+  }
+  @media (max-width: 640px) {
+    ::-webkit-scrollbar-thumb {
+      transition: background 0.2s;
+    }
+  
+  }
+
+  /* Glass effect classes */
+  .glass {
+    @apply bg-white/70 backdrop-blur-lg border border-white/20;
+  }
+  
+  /* Resizable handle styling */
+  [data-panel-group-direction="horizontal"] > [data-panel-handle] {
+    width: 1px;
+    @apply bg-gray-200 transition-all;
+  }
+  
+  [data-panel-group-direction="horizontal"] > [data-panel-handle]:hover, 
+  [data-panel-group-direction="horizontal"] > [data-panel-handle][data-panel-handle-active="true"] {
+    width: 2px;
+    @apply bg-primary/30;
+  }
+  
+  /* Textarea focus styling */
+  .textarea-focus-ring {
+    @apply focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200;
+  }
+  
+  /* Animated status badges */
+  .pulse-badge {
+    @apply animate-pulse;
+  }
+}
+
+@layer components {
+  .pulse-product-page {
+    @apply relative min-h-full font-sans;
+    background: var(--pulse-canvas);
+    color: var(--pulse-ink);
+  }
+
+  .pulse-product-page .animate-blob {
+    display: none !important;
+  }
+
+  .pulse-page-header {
+    @apply flex min-h-[108px] items-center justify-between gap-6 border-b px-6 py-5;
+    background: color-mix(in srgb, var(--pulse-surface) 94%, transparent);
+    border-color: var(--pulse-line);
+  }
+
+  .pulse-page-title {
+    @apply truncate text-2xl font-semibold tracking-[-0.03em];
+    color: var(--pulse-ink);
+  }
+
+  .pulse-page-description {
+    @apply mt-1 text-sm;
+    color: var(--pulse-ink-secondary);
+  }
+
+  .pulse-toolbar {
+    @apply mx-6 my-5 flex min-h-[66px] flex-wrap items-center gap-3 rounded-2xl border p-3;
+    background: var(--pulse-surface);
+    border-color: var(--pulse-line);
+    box-shadow: var(--pulse-shadow-card);
+  }
+
+  .pulse-table-frame {
+    @apply mx-6 mb-6 overflow-hidden rounded-2xl border;
+    background: var(--pulse-surface);
+    border-color: var(--pulse-line);
+    box-shadow: var(--pulse-shadow-card);
+  }
+
+  .pulse-table-page input:not([type="checkbox"]):not([type="radio"]),
+  .pulse-table-page select,
+  .pulse-table-page [role="combobox"] {
+    border-radius: 10px !important;
+    border-color: var(--pulse-line) !important;
+    background: var(--pulse-surface) !important;
+    color: var(--pulse-ink) !important;
+    box-shadow: none !important;
+  }
+
+  .pulse-table-page input::placeholder {
+    color: var(--pulse-ink-muted) !important;
+  }
+
+  .pulse-table-page table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--pulse-surface);
+  }
+
+  .pulse-data-table {
+    font-family: "Instrument Sans", sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .pulse-table-page thead {
+    background: var(--pulse-surface-subtle) !important;
+  }
+
+  .pulse-table-page th {
+    height: 48px !important;
+    padding: 0 16px !important;
+    border-color: var(--pulse-line) !important;
+    color: var(--pulse-ink-muted) !important;
+    font-family: "Instrument Sans", sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em !important;
+    text-transform: none !important;
+  }
+
+  .pulse-table-page td {
+    height: 48px !important;
+    padding: 0 16px !important;
+    border-color: var(--pulse-line) !important;
+    color: var(--pulse-ink-secondary);
+    font-size: 14px;
+  }
+
+  .pulse-table-page tbody tr {
+    transition: background-color 140ms ease;
+  }
+
+  .pulse-table-page tbody tr:hover {
+    background: var(--pulse-surface-subtle) !important;
+  }
+
+  .pulse-filter-control {
+    @apply inline-flex h-10 items-center gap-2 rounded-xl border px-3.5 text-sm font-medium transition-colors;
+    border-color: var(--pulse-line) !important;
+    background: var(--pulse-surface) !important;
+    color: var(--pulse-ink-secondary) !important;
+  }
+
+  .pulse-filter-control:hover {
+    border-color: var(--pulse-line-strong) !important;
+    color: var(--pulse-ink) !important;
+  }
+
+  .pulse-content-card {
+    @apply rounded-2xl border;
+    background: var(--pulse-surface);
+    border-color: var(--pulse-line);
+    box-shadow: var(--pulse-shadow-card);
+  }
+
+  .pulse-segmented-control {
+    @apply inline-flex rounded-xl border p-1;
+    background: var(--pulse-surface-subtle);
+    border-color: var(--pulse-line);
+  }
+
+  .pulse-pagination-bar {
+    @apply border-t px-4 py-3;
+    border-color: var(--pulse-line);
+    background: color-mix(in srgb, var(--pulse-surface) 96%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  .pulse-auth-shell {
+    background: #f6f6f8 !important;
+  }
+
+  .pulse-auth-shell .animate-blob,
+  .pulse-auth-shell .animate-float {
+    animation: none !important;
+  }
+
+  .pulse-auth-shell > .absolute.inset-0.pointer-events-none {
+    display: none;
+  }
+
+  .pulse-auth-shell > :nth-last-child(2) {
+    background: #f6f6f8;
+  }
+
+  .pulse-auth-shell > :nth-last-child(2) > div:not(:last-child) {
+    display: none;
+  }
+
+  .pulse-auth-shell > :nth-last-child(2) > div:last-child {
+    max-width: 480px;
+    padding: 32px;
+    border: 1px solid #e3e2e8;
+    border-radius: 24px;
+    background: #ffffff;
+    box-shadow: var(--pulse-shadow-elevated);
+  }
+
+  .pulse-auth-shell > :nth-last-child(2) h1,
+  .pulse-auth-shell > :nth-last-child(2) .text-white {
+    color: #17161d !important;
+  }
+
+  .pulse-auth-shell > :nth-last-child(2) .text-neutral-300 {
+    color: #45434c !important;
+  }
+
+  .pulse-auth-shell > :nth-last-child(2) .text-neutral-400,
+  .pulse-auth-shell > :nth-last-child(2) .text-neutral-500 {
+    color: #6f6d77 !important;
+  }
+
+  .pulse-auth-shell > :nth-last-child(2) .text-neutral-600,
+  .pulse-auth-shell > :nth-last-child(2) .text-neutral-700 {
+    color: #96949d !important;
+  }
+
+  .pulse-auth-shell > :nth-last-child(2) input {
+    border-color: #d9d8df !important;
+    background: #ffffff !important;
+    color: #17161d !important;
+  }
+
+  .pulse-auth-shell > :nth-last-child(2) input::placeholder {
+    color: #aaa8b0 !important;
+  }
+
+  .pulse-auth-shell > :nth-last-child(2) button[class*="bg-white/5"] {
+    border-color: #dedde3 !important;
+    background: #ffffff !important;
+  }
+
+  .pulse-auth-shell > :nth-last-child(2) button[class*="bg-white/5"]:hover {
+    border-color: #c9c7d0 !important;
+    background: #f8f8fa !important;
+  }
+
+  .pulse-auth-shell > :nth-last-child(2) .h-px.bg-neutral-900 {
+    background: #e5e4e9 !important;
+  }
+
+  .pulse-auth-brand-panel .text-white {
+    color: #ffffff !important;
+  }
+
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2 rounded-md text-photon-gray-600 hover:text-photon-primary hover:bg-photon-gray-100 transition-all;
+  }
+
+  .nav-item.active {
+    @apply bg-photon-primary/10 text-photon-primary font-medium;
+  }
+
+  .metric-card {
+    @apply bg-white rounded-xl p-5 border border-photon-gray-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col;
+  }
+
+  .map-tooltip {
+    @apply absolute z-10 bg-white rounded-lg shadow-lg p-3 border border-photon-gray-200 text-sm max-w-[250px] pointer-events-none;
+  }
+  
+  /* New components for the draft page */
+  .section-button {
+    @apply w-full text-left px-3 py-2 rounded-md flex items-center justify-between transition-all;
+  }
+  
+  .section-button.active {
+    @apply bg-primary/10 text-primary font-medium border-l-2 border-primary;
+  }
+  
+  .question-card {
+    @apply bg-gray-50 p-4 rounded-lg border border-gray-100 transition-all duration-200 hover:border-gray-200;
+  }
+  
+  /* Table styling to match sidebar */
+  .sidebar-styled-table {
+    @apply bg-sidebar-background border border-sidebar-border rounded-md overflow-hidden;
+  }
+  
+  .sidebar-styled-table thead {
+    @apply bg-sidebar-background border-b border-sidebar-border;
+  }
+  
+  .sidebar-styled-table thead th {
+    @apply text-sidebar-foreground font-medium text-sm py-3 px-4;
+  }
+  
+  .sidebar-styled-table tbody tr {
+    @apply border-b border-sidebar-border hover:bg-sidebar-accent transition-colors;
+  }
+  
+  .sidebar-styled-table tbody tr:last-child {
+    @apply border-b-0;
+  }
+  
+  .sidebar-styled-table tbody td {
+    @apply py-3 px-4 text-sidebar-foreground;
+  }
+
+  /* Card elevated light style from Figma */
+  .card-elevated-light {
+    @apply bg-white rounded-xl border border-zinc-200 shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  /* Card elevated dark style */
+  .card-elevated-dark {
+    @apply bg-[linear-gradient(135deg,#1e1e1eb3_0%,#1a1a1a99_100%)] rounded-xl border border-zinc-800 shadow-sm hover:shadow-md hover:bg-[#1a1a1a99] transition-all duration-300;
+  }
+
+  /* Icon glow effects */
+  .icon-glow-blue {
+    @apply bg-blue-50;
+  }
+  .icon-glow-blue svg {
+    color: rgb(59, 130, 246);
+  }
+
+  .icon-glow-green {
+    @apply bg-green-50;
+  }
+  .icon-glow-green svg {
+    color: rgb(16, 185, 129);
+  }
+
+  .icon-glow-yellow {
+    @apply bg-yellow-50;
+  }
+  .icon-glow-yellow svg {
+    color: rgb(249, 180, 24);
+  }
+
+  .icon-glow-red {
+    @apply bg-red-50;
+  }
+  .icon-glow-red svg {
+    color: rgb(239, 68, 68);
+  }
+
+  .icon-glow-purple {
+    @apply bg-purple-50;
+  }
+  .icon-glow-purple svg {
+    color: rgb(139, 92, 246);
+  }
+
+  /* Label muted style */
+  .label-muted {
+    @apply text-zinc-500;
+  }
+
+  /* Scrollbar modern light style */
+  .scrollbar-modern-light {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
+  }
+
+  .scrollbar-modern-light::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  
+  .scrollbar-modern-light::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-modern-light::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.3);
+    border-radius: 3px;
+  }
+
+  .scrollbar-modern-light::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(156, 163, 175, 0.5);
+  }
+
+  /* Sidebar modern dark style */
+  .sidebar-modern-dark {
+    @apply bg-[linear-gradient(135deg,#121212f0_0%,#0c0c0ce6_100%)] border-r border-zinc-800;
+  }
+
+  /* Sidebar modern light style */
+  .sidebar-modern-light {
+    @apply bg-white border-r border-zinc-200;
+  }
+
+  /* Scrollbar modern dark style */
+  .scrollbar-modern-dark {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(113, 113, 122, 0.3) transparent;
+  }
+
+  .scrollbar-modern-dark::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-modern-dark::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-modern-dark::-webkit-scrollbar-thumb {
+    background-color: rgba(113, 113, 122, 0.3);
+    border-radius: 3px;
+  }
+
+  .scrollbar-modern-dark::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(113, 113, 122, 0.5);
+  }
+
+  /* Dark mode base styles */
+  .dark {
+    color-scheme: dark;
+  }
+}
