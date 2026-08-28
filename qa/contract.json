@@ -1,0 +1,98 @@
+{
+  "_doc": [
+    "THE SHARED QA CONTRACT. This file is byte-identical in patent-agent,",
+    "pulse-backend and pulse-frontend, and a test in each repo fails if they",
+    "diverge. Edit it in one repo and you must copy it to the other two in the",
+    "same change — that is the whole point: the three repos are separate git",
+    "repos, so nothing else keeps their vocabulary aligned.",
+    "",
+    "JSON rather than YAML on purpose: patent-agent has no YAML parser and this",
+    "must be readable with zero dependencies in all three.",
+    "",
+    "A test declares its tags in its name or via qa/cli.mjs metadata, e.g.",
+    "  @area:ideas @role:INVENTOR @tier:journey @sec:idor @cp:smoke",
+    "One corpus, sliced four ways. 'Run the security suite', 'run the inventor",
+    "journeys' and 'run everything touching ideas' are all the same filter."
+  ],
+
+  "version": 1,
+
+  "areas": {
+    "_doc": "Feature areas: the unit of 'is this relevant to my change'. Shared across all three repos so a backend diff can name a frontend test.",
+    "values": [
+      "auth", "ideas", "drafts", "review", "patents", "duedates", "actions",
+      "clients", "workspace", "files", "invites", "dashboard", "notifications",
+      "agent-eval", "retrieval", "scoring", "infra"
+    ]
+  },
+
+  "roles": {
+    "_doc": "Journey actors. Mirrors UserRole in pulse-backend/prisma/schema.prisma; the drift test in pulse-backend asserts they match, so a new role cannot be added to the product without appearing here.",
+    "values": [
+      "INVENTOR", "TECH_COMMITTEE", "LEGAL_COUNSEL", "CASE_OWNER",
+      "PHOTON_ADMIN", "PHOTON_SUPERADMIN"
+    ]
+  },
+
+  "tiers": {
+    "_doc": "What kind of claim a test makes. Where each runs is in the CI table in each repo's CLAUDE.md.",
+    "values": {
+      "unit":        "Pure logic, no IO. policy.ts, review-chain.ts, scoring math.",
+      "contract":    "The API spec is current, has no breaking diff, and every adapter rule resolves to a real route.",
+      "behaviour":   "Declared state machines are complete AND enforced: legal transitions work, illegal ones are refused, no enum value is unreachable.",
+      "security":    "Authz matrix, IDOR, tenant isolation, payloads, headers, the privacy invariant.",
+      "journey":     "Role-driven feature loops end to end, across repo boundaries.",
+      "invariant":   "DOM geometry rules: overflow, clipping, overlap, unbounded lists, a11y.",
+      "conformance": "ARIA + computed-style structure against the committed snapshot."
+    }
+  },
+
+  "security": {
+    "_doc": "Security concern tags. A test may carry more than one.",
+    "values": [
+      "authz", "idor", "tenant-isolation", "injection", "xss", "upload",
+      "rate-limit", "secrets", "headers", "privacy", "csrf", "authn"
+    ]
+  },
+
+  "compliance": {
+    "_doc": "Control references, so a CI artifact can be cited as evidence. Only tags that a test actually evidences from code — not aspirational.",
+    "soc2": {
+      "CC6.1": "Logical access controls restrict who may reach what.",
+      "CC6.2": "Access is granted through a registration/authorisation process.",
+      "CC6.3": "Access is modified and removed as roles change.",
+      "CC6.6": "Access from outside the boundary is restricted.",
+      "CC6.7": "Data in transit and at rest is protected; retention is bounded.",
+      "CC7.2": "Anomalies are detected and logged.",
+      "CC8.1": "Changes are authorised, tested and approved before deployment."
+    },
+    "gdpr": {
+      "art5-1c": "Data minimisation — only what is necessary is collected.",
+      "art5-1e": "Storage limitation — data is kept no longer than necessary.",
+      "art15":   "Right of access.",
+      "art17":   "Right to erasure.",
+      "art32":   "Security of processing."
+    }
+  },
+
+  "checkpoints": {
+    "_doc": "Named subsets, for whole-application runs.",
+    "values": {
+      "smoke":       "One journey per role plus health. Target under 3 minutes.",
+      "pre-deploy":  "Everything that can run without a deployed build: unit, contract, behaviour, security-static.",
+      "post-deploy": "journey + invariant + conformance against the deployed environment.",
+      "nightly":     "Everything, plus scanners and DAST."
+    }
+  },
+
+  "environments": {
+    "_doc": "Browser tiers run against the deployed demo environment, by decision — an MR's code is not deployed anywhere, so E2E on an MR would test the previous release. E2E therefore runs post-deploy, nightly, and on demand.",
+    "demo": {
+      "app": "https://demo.photonpulse.ai",
+      "api": "https://demo-api.photonpulse.ai",
+      "agent": "https://demo-agent.photonpulse.ai"
+    },
+    "_login_throttle": "5 logins / 5 min / IP. Log in ONCE per role and reuse storageState; do not log in per spec.",
+    "_writes": "Journeys that mutate must namespace what they create with a run id and clean up in teardown. Demo carries real imported data."
+  }
+}

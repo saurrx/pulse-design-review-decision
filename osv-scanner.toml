@@ -1,0 +1,44 @@
+# Deliberately deferred vulnerabilities.
+#
+# The point of this file is that `dependencies` can be a BLOCKING gate. An
+# allow_failure job that is permanently amber teaches everyone to ignore the
+# colour; an explicit, dated deferral means a NEW vulnerability fails the
+# pipeline and has to be looked at.
+#
+# In-range `npm update` already took this repo from 65 vulnerabilities (27
+# High) to these 7. Every one that remains needs a MAJOR version bump.
+
+[[IgnoredVulns]]
+id = "GHSA-337j-9hxr-rhxg"
+ignoreUntil = 2027-03-01
+reason = "react-router 6.30.6 -> 7.18.0 is a major migration (data routers, loader API). Not something to fold into a QA change. Open redirect / URL handling; the app has no user-controlled redirect targets."
+
+[[IgnoredVulns]]
+id = "GHSA-wrjc-x8rr-h8h6"
+ignoreUntil = 2027-03-01
+reason = "Same react-router v7 migration as GHSA-337j-9hxr-rhxg."
+
+[[IgnoredVulns]]
+id = "GHSA-fx2h-pf6j-xcff"
+ignoreUntil = 2027-03-01
+reason = "vite is a devDependency; nothing from it ships. This is a dev-server file-read issue and our dev server binds locally. Fixing needs vite 6, which is a major bump affecting the whole build."
+
+[[IgnoredVulns]]
+id = "GHSA-4w7w-66w2-5vf9"
+ignoreUntil = 2027-03-01
+reason = "vite dev-only, as above."
+
+[[IgnoredVulns]]
+id = "GHSA-v6wh-96g9-6wx3"
+ignoreUntil = 2027-03-01
+reason = "vite dev-only, as above."
+
+[[IgnoredVulns]]
+id = "GHSA-67mh-4wv8-2f99"
+ignoreUntil = 2027-03-01
+reason = "esbuild is a transitive devDependency of vite; it goes when vite 6 lands. Dev-server CORS issue, not shipped."
+
+[[IgnoredVulns]]
+id = "GHSA-36jr-mh4h-2g58"
+ignoreUntil = 2027-03-01
+reason = "d3-color 2.0.0 arrives transitively through the map/chart stack. ReDoS on colour strings we never take from user input."

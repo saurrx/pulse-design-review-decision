@@ -276,3 +276,69 @@ unreferenced public assets (scraped "Photon Pulse - OC_files" page, spare
 world geojsons — the map uses world-india-pov.json — placeholder/6sense
 svgs). lovable-uploads and public/fonts are now deleted — the fonts had a
 single consumer, the dead pdfGenerator.ts.
+
+## QA — the test corpus and how to run only what matters
+
+`qa/` holds one tagged corpus, sliced by filter. There is no separate "security
+suite" or "journey suite" to keep in step — they are views over the same tests.
+
+    node qa/cli.mjs affected          # areas touched by your diff, and their tests
+    node qa/cli.mjs run --tier security --area ideas
+    node qa/cli.mjs checkpoint smoke
+    node qa/cli.mjs contract          # the shared contract has not drifted
+    node qa/cli.mjs exceptions        # the exception register is still honest
+    node qa/cli.mjs list              # every test and its tags
+
+**Tags** live in a test's doc comment: `@tier:` `@area:` `@role:` `@sec:`
+`@soc2:` `@gdpr:` `@cp:`. An **untagged test always runs** — absence of a tag
+must never mean "skip", or a test silently stops being selected the day someone
+forgets the annotation.
+
+**`qa/contract.json` is byte-identical in all three repos** and `qa/cli.mjs
+contract` fails if it drifts. Edit it in one repo and you must copy it to the
+other two and update `contractSha256` in each `areas.json`. That duplication is
+the price of three separate git repos; the gate is what makes it safe. Same pattern as patent-agent's
+`env-drift.test.ts`.
+
+**`qa/areas.json`** maps source globs to feature areas. A path matching **no**
+glob escalates to a full run — "I don't know what this affects" must never mean
+"run less". Add new top-level paths to the map.
+
+**`qa/exceptions.json`** suppresses a known test failure, and requires a reason,
+an owner and an expiry. An expired or unmatched entry **fails the build**: a
+suppression that has outlived its reason hides a real failure that nobody is
+looking at any more.
+
+**`docs/qa/findings.md`** is different — it tracks *design* questions where
+intent and code disagree, each to a resolution (fix code / fix doc / accept).
+It lives in `pulse-backend/docs/qa/findings.md` (cross-repo by nature). Read it
+before concluding something is a bug; twelve are already recorded.
+
+### The rule that makes any of this worth having
+**Every gate must be proved to bite.** Plant the violation, watch the test fail,
+restore. patent-agent has done this since day one via
+`tools/gates/redaction-bites.mjs`. The layout invariants were checked the same
+way: a clean /patents reports 0, and injecting `overflow-x: hidden` on the
+table's container makes the rule name that exact element. A green test that cannot fail is worse than no test,
+because it is believed.
+
+### The invariant tier, and why it is not a screenshot diff
+`qa/invariant/layout.qa.mjs` walks every page as every role at 1280x720 and
+1440x900 and asserts rules that are true of any correct page — no reference
+image anywhere.
+
+That is deliberate. A pixel baseline tells you a page *changed*; every layout
+bug this project actually shipped — the 64px overhang, the patents table wider
+than the viewport, the unbounded awaiting-action list — was wrong the day it
+was written. A baseline would have captured the bug and then defended it.
+
+The rule that matters is **clipped-horizontal**: `overflow-x: hidden` with
+`scrollWidth > clientWidth`, i.e. content that is cut off and unreachable. The
+first version fired on any overflow at all and produced 402 violations across
+62 pages, which is worse than useless. `overflow-x: visible` paints outside the
+box and loses nothing; `auto`/`scroll` can be scrolled to; `text-overflow:
+ellipsis` and `line-clamp` are deliberate truncation. Only `hidden` hides.
+
+Sessions are cached in `qa/.sessions/` (gitignored, never artifacted — they are
+live cookies). The login throttle is 5/5min/IP and there are exactly 5 roles,
+so without caching any re-run inside the window fails every role.
