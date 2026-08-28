@@ -15,5 +15,8 @@ include:
 - template: Security/Secret-Detection.gitlab-ci.yml
 variables:
   SECRET_DETECTION_ENABLED: 'true'
+  # Full history: change-based test selection needs a merge base, and the
+  # default shallow clone degrades it silently rather than failing.
+  GIT_DEPTH: 0
 secret_detection:
   stage: secret-detection
