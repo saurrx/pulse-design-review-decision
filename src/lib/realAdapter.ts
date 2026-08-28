@@ -1,0 +1,547 @@
+import type { AxiosInstance } from "axios";
+import Cookies from "js-cookie";
+
+/**
+ * ANTI-CORRUPTION LAYER between the design's screens and the Pulse API.
+ *
+ * This is a deliberate architectural boundary, not temporary scaffolding. The
+ * 152 call sites across 48 files speak the previous backend's dialect —
+ * `/api/v1/...` paths and a `{ data, message, pagination }` envelope — and many
+ * sit inside 2,000-to-2,600-line components. The new API is clean `/v1/...`
+ * with plain payloads.
+ *
+ * Rewriting every call site would mean changing 152 paths AND ~60 response-shape
+ * reads inside those giant components, under a hard constraint that the design
+ * must not change. That is the high-risk path. Isolating the two dialects behind
+ * one translation table is the low-risk one, and it is the textbook use of an
+ * anti-corruption layer: the legacy client and the clean core each keep their
+ * own vocabulary, and exactly one file knows both.
+ *
+ * The boundary is one-directional. NEW code (e.g. real file upload in
+ * s3Upload.ts) talks to `/v1` directly via `rawApi` and never passes through
+ * here — there is nothing to translate. Only the inherited screens sit behind
+ * the adapter.
+ *
+ * Unmapped routes fail with a named 501 and a console.warn: a silent
+ * passthrough would turn every unported screen into a mystery bug, whereas a
+ * named failure is a to-do list that writes itself.
+ */
+
+type Rule = {
+  m: RegExp;
+  method?: string;
+  to: (match: RegExpMatchArray, body: any) => {
+    url: string; method: string; body?: any;
+    /** Reshape the new API's payload into what the screen expects. */
+    wrap?: (payload: any) => any;
+  };
+};
+
+const PHOTON_SENTINEL = "photon-legal";
+const isUuid = (v: unknown) =>
+  typeof v === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+/** Photon roles have no tenant; the design's queries gate on client_id, so
+ *  they get the same sentinel the original app used. Real ids pass through. */
+const asUser = (p: any) => {
+  const u = p?.user ?? {};
+  const cid = u.client_id ?? u.clientId ?? null;
+  const photon = ["PHOTON_ADMIN", "PHOTON_SUPERADMIN", "CASE_OWNER"].includes(u.role);
+  return { data: { user: { ...u, client_id: cid ?? (photon ? PHOTON_SENTINEL : null) } } };
+};
+const list = (p: any) => ({ data: p?.data ?? p, pagination: p?.pagination });
+
+// -- idea dialect translation ------------------------------------------------
+// The design was written against the old API's idea shape: `status` codes like
+// IN_DRAFT/UNDER_REVIEW, `created_by_id`, `submission_date`. The clean API
+// speaks `state`, `author_id`, `submitted_at`. Every idea that crosses the
+// boundary gets BOTH dialects, so no component needs to know which era its
+// field names came from.
+const STATE_TO_STATUS: Record<string, string> = {
+  DRAFT: "IN_DRAFT",
+  TECH_REVIEW: "UNDER_REVIEW",
+  LEGAL_REVIEW: "SENT_TO_IHC",
+  CHANGES_REQUESTED: "UPDATE_REQUEST",
+  REJECTED: "REJECT_BY_IHC",
+  SENT_TO_PHOTON: "SEND_TO_OC",
+  FILED: "FILED",
+};
+const STATUS_TO_STATE: Record<string, string[]> = {
+  IN_DRAFT: ["DRAFT"],
+  UNDER_REVIEW: ["TECH_REVIEW"],
+  SENT_TO_IHC: ["LEGAL_REVIEW"],
+  UPDATE_REQUEST: ["CHANGES_REQUESTED"],
+  REJECT_BY_IHC: ["REJECTED"],
+  REJECT_BY_OC: ["REJECTED"],
+  SEND_TO_OC: ["SENT_TO_PHOTON"],
+  FILED: ["FILED"],
+};
+
+const oldIdea = (i: any) => i && ({
+  ...i,
+  status: STATE_TO_STATUS[i.state] ?? i.state,
+  created_by_id: i.author_id,
+  created_by: i.author,
+  summary: i.body,
+  submission_date: i.submitted_at ?? i.created_at,
+  dateSubmitted: i.submitted_at ?? i.created_at,
+  sent_to_ip_committee_at: i.submitted_at,
+  createdAt: i.created_at,
+  updatedAt: i.updated_at,
+  IdeaInventor: (i.inventors ?? []).map((r: any) => ({
+    id: r.id, role: r.role, inventor: r.inventor,
+  })),
+  IdeaPatentLink: i.patent_link ? [i.patent_link] : (i.IdeaPatentLink ?? []),
+});
+
+// -- patent dialect translation ---------------------------------------------
+const PSTATUS_TO_LEGAL: Record<string, string> = {
+  GRANTED: "ACTIVE_GRANTED", APPLIED: "ACTIVE_APPLIED", EXAMINATION: "ACTIVE_EXAMINATION",
+  EXPIRED: "INACTIVE_EXPIRED", WITHDRAWN: "INACTIVE_WITHDRAWN",
+  REJECTED: "INACTIVE_REJECTED", ABANDONED: "INACTIVE_ABANDONED",
+};
+const LEGAL_TO_PSTATUS: Record<string, string> = Object.fromEntries(
+  Object.entries(PSTATUS_TO_LEGAL).map(([k, v]) => [v, k]));
+
+const oldPatent = (r: any) => r && ({
+  ...r,
+  legal_current_status: PSTATUS_TO_LEGAL[r.status] ?? r.status,
+  publication_country: r.jurisdiction,
+  application_date: r.filing_date ?? r.created_at,
+  IdeaPatentLink: r.idea_link ? [r.idea_link] : [],
+  inventors: (r.idea_link?.idea?.inventors ?? []).map((x: any) =>
+    x?.inventor?.name || x?.inventor?.email?.split("@")[0]).filter(Boolean),
+});
+// -- draft dialect translation ----------------------------------------------
+// The design's draft cards read title, completion and score-log fields the
+// clean API does not store. Derive them from the questionnaire itself.
+const DRAFT_SECTIONS = ["background", "problem", "solution", "novelty", "application"];
+const oldDraft = (d: any, idx = 0) => {
+  if (!d) return d;
+  const a = (d.answers ?? {}) as Record<string, unknown>;
+  const stored = (a as any).__meta_data;
+  const storedPct = (a as any).__completion;
+  const plain = Object.entries(a).filter(([k]) => !k.startsWith("__"));
+  const filled = plain.filter(([, v]) =>
+    typeof v === "string" ? v.trim().length > 0 : v != null).length;
+  return {
+    ...d,
+    title: d.title ?? d.idea?.title ?? `Draft ${idx + 1}`,
+    completion_percentage: d.completion_percentage ?? storedPct ??
+      (plain.length ? Math.round((filled / plain.length) * 100) : 0),
+    meta_data: d.meta_data ?? stored ?? plain.map(([k, v]) => ({
+      id: k,
+      title: k.charAt(0).toUpperCase() + k.slice(1),
+      questions: [{ id: k, question: k.charAt(0).toUpperCase() + k.slice(1),
+        answer: typeof v === "string" ? v : JSON.stringify(v) }],
+    })),
+    CheckDraftSoreLog: d.CheckDraftSoreLog ??
+      (d.score != null ? [{ score: d.score, score_meta_data: d.report ?? null }] : []),
+    // The reviewer workspace branch keys off the draft's parent idea.
+    idea: d.idea ? {
+      ...d.idea,
+      status: STATE_TO_STATUS[d.idea.state] ?? d.idea.state,
+      clientId: d.idea.client_id,
+      created_by_id: d.idea.author_id,
+    } : d.idea,
+  };
+};
+
+const patentList = (p: any) => ({
+  data: (Array.isArray(p) ? p : p?.data ?? []).map(oldPatent),
+  pagination: p?.pagination,
+});
+
+/**
+ * fetch-by-user carried search/status/sort/pagination as query params that the
+ * old backend applied server-side. The clean /v1/ideas returns the caller's
+ * full scope; the old contract is honoured here so the design's search box,
+ * status filter and pager keep working unchanged.
+ */
+const ideaListWrap = (query: string) => (p: any) => {
+  const q = new URLSearchParams(query);
+  let ideas: any[] = (Array.isArray(p) ? p : p?.data ?? []).map(oldIdea);
+
+  const search = (q.get("search") ?? "").trim().toLowerCase();
+  if (search) {
+    ideas = ideas.filter(i =>
+      `${i.title ?? ""} ${i.summary ?? ""}`.toLowerCase().includes(search));
+  }
+  const status = (q.get("status") ?? "").split(",").filter(Boolean);
+  if (status.length) {
+    const states = new Set(status.flatMap(s => STATUS_TO_STATE[s] ?? [s]));
+    ideas = ideas.filter(i => states.has(i.state));
+  }
+  const clientIds = (q.get("filter_client_id") ?? "").split(",").filter(Boolean);
+  if (clientIds.length) ideas = ideas.filter(i => clientIds.includes(i.client_id));
+
+  const sort = q.get("sort") ?? "createdAt";
+  const order = q.get("order") === "asc" ? 1 : -1;
+  const key = sort === "submission_date" ? "submission_date"
+    : sort === "updatedAt" ? "updatedAt" : "createdAt";
+  ideas.sort((a, b) => order * (new Date(a[key] ?? 0).getTime() - new Date(b[key] ?? 0).getTime()));
+
+  const limit = Math.max(1, Number(q.get("limit")) || 10);
+  const page = Math.max(1, Number(q.get("page")) || 1);
+  const total = ideas.length;
+  return {
+    data: ideas.slice((page - 1) * limit, page * limit),
+    pagination: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) },
+  };
+};
+
+const RULES: Rule[] = [
+  // -- auth -----------------------------------------------------------------
+  { m: /^\/api\/v1\/auth\/(?:ihc\/)?login$/, method: "POST",
+    to: (_m, b) => ({ url: "/v1/auth/login", method: "POST", body: b, wrap: asUser }) },
+  { m: /^\/api\/v1\/auth\/social-login$/, method: "POST",
+    to: (_m, b) => ({
+      url: "/v1/auth/google", method: "POST",
+      body: { access_token: b?.access_token ?? b?.googleAccessToken ?? b?.token },
+      wrap: asUser,
+    }) },
+  { m: /^\/api\/v1\/auth\/email-signup$/, method: "POST",
+    to: (_m, b) => ({ url: "/v1/auth/signup", method: "POST",
+      body: { email: b?.email, password: b?.password, name: b?.name }, wrap: asUser }) },
+  { m: /^\/api\/v1\/auth\/logout$/, method: "POST",
+    to: () => ({ url: "/v1/auth/logout", method: "POST" }) },
+  { m: /^\/api\/v1\/auth\/forgot-password$/, method: "POST",
+    to: (_m, b) => ({ url: "/v1/auth/password-reset/request", method: "POST", body: b }) },
+  { m: /^\/api\/v1\/auth\/ihc\/invite-user$/, method: "POST",
+    to: (_m, b) => ({ url: "/v1/invites", method: "POST",
+      body: { role: b?.role ?? "INVENTOR", emails: b?.email ?? b?.emails } }) },
+
+  // -- ideas ----------------------------------------------------------------
+  { m: /^\/api\/v1\/idea\/fetch-by-user(?:\?(.*))?$/,
+    to: m => ({ url: "/v1/ideas", method: "GET", wrap: ideaListWrap(m[1] ?? "") }) },
+  { m: /^\/api\/v1\/idea\/fetch\/([^/]+)$/,
+    to: m => ({ url: `/v1/ideas/${m[1]}`, method: "GET",
+      wrap: (idea: any) => ({ data: oldIdea(idea) }) }) },
+  { m: /^\/api\/v1\/idea\/create$/, method: "POST",
+    to: (_m, b) => ({ url: "/v1/ideas", method: "POST",
+      body: { title: b?.title, body: b?.description ?? b?.body }, wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/idea\/update-idea\/([^/]+)$/,
+    to: (m, b) => ({ url: `/v1/ideas/${m[1]}`, method: "PATCH",
+      body: { title: b?.title, body: b?.description ?? b?.body }, wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/idea\/fetch-drafts\/([^/]+)$/,
+    to: m => ({ url: `/v1/ideas/${m[1]}/drafts`, method: "GET",
+      wrap: (p: any) => ({ data: (Array.isArray(p) ? p : p?.data ?? []).map(oldDraft) }) }) },
+  { m: /^\/api\/v1\/idea\/create-new\/draft$/, method: "POST",
+    to: (_m, b) => ({ url: `/v1/ideas/${b?.idea_id ?? b?.ideaId}/drafts`, method: "POST",
+      body: { answers: b?.answers }, wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/idea\/single-draft\/([^/]+)$/,
+    to: m => ({ url: `/v1/drafts/${m[1]}`, method: "GET", wrap: p => ({ data: oldDraft(p) }) }) },
+  { m: /^\/api\/v1\/idea\/update\/draft\/([^/]+)$/, method: "POST",
+    // The workspace speaks meta_data (sections -> questions -> answers); the
+    // clean API stores one answers object. Flatten for storage and keep the
+    // full structure under a reserved key so the workspace round-trips.
+    to: (m, b) => {
+      let body: any = b;
+      if (b?.meta_data) {
+        const flat: Record<string, unknown> = {};
+        for (const s of b.meta_data ?? []) for (const q of s?.questions ?? []) {
+          if (q?.id != null) flat[q.id] = q.answer ?? "";
+        }
+        body = { answers: { ...flat, __meta_data: b.meta_data,
+          __completion: b.completion_percentage ?? null } };
+      }
+      return { url: `/v1/drafts/${m[1]}`, method: "PATCH", body, wrap: p => ({ data: p }) };
+    } },
+  { m: /^\/api\/v1\/idea\/draft\/([^/]+)$/, method: "DELETE",
+    to: m => ({ url: `/v1/drafts/${m[1]}`, method: "DELETE" }) },
+  { m: /^\/api\/v1\/idea\/send-to-ihc\/([^/]+)\//, method: "POST",
+    to: (m, b) => ({ url: `/v1/drafts/${m[1]}/submit`, method: "POST",
+      body: { comment: b?.comment ?? undefined } }) },
+  { m: /^\/api\/v1\/idea\/send-latest-draft-to-ihc\/([^/]+)$/, method: "POST",
+    to: m => ({ url: `/v1/ideas/${m[1]}/submit`, method: "POST", body: {} }) },
+  { m: /^\/api\/v1\/idea\/send-to-oc\/([^/]+)\/oc$/, method: "POST",
+    to: m => ({ url: `/v1/drafts/${m[1]}/review`, method: "POST",
+      body: { decision: "APPROVED" } }) },
+  { m: /^\/api\/v1\/idea\/reject-from-ihc\/([^/]+)$/, method: "POST",
+    to: (m, b) => ({ url: `/v1/ideas/${m[1]}/review`, method: "POST",
+      body: { decision: "REJECTED", comment: b?.reject_reason ?? b?.reason ?? b?.comment ?? "Rejected" } }) },
+  { m: /^\/api\/v1\/idea\/add-update-request\/([^/]+)$/, method: "POST",
+    to: (m, b) => ({ url: `/v1/ideas/${m[1]}/review`, method: "POST",
+      body: { decision: "CHANGES_REQUESTED", comment: b?.message ?? b?.comment ?? "Changes requested" } }) },
+
+  // -- patents / due dates --------------------------------------------------
+  { m: /^\/api\/v1\/patent\/(?:fetch-all-patents\/)?client\/([^/?]+)(\?.*)?$/,
+    to: (m) => ({ url: `/v1/patents?${isUuid(m[1]) ? `client_id=${m[1]}` : ""}${(m[2] ?? "").replace("?", "&")
+      .replace(/status=([A-Z_]+)/g, (_s: string, v: string) => `status=${LEGAL_TO_PSTATUS[v] ?? v}`)}`,
+      method: "GET", wrap: patentList }) },
+  { m: /^\/api\/v1\/patent\/distinct-tags\/client\/([^/?]+)/,
+    to: m => ({ url: `/v1/patents/tags${isUuid(m[1]) ? `?client_id=${m[1]}` : ""}`, method: "GET", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/patent\/all-stats\/client/,
+    // The world map wants per-country rows in the old shape.
+    to: () => ({ url: "/v1/patents/stats", method: "GET", wrap: (p: any) => ({ data:
+      (p?.byJurisdiction ?? []).map((r: any) => ({
+        publication_country: r.jurisdiction,
+        granted_patents: r.granted ?? 0,
+        pending_patents: r.pending ?? 0,
+        total: r.count,
+      })) }) }) },
+  { m: /^\/api\/v1\/patent\/fetch\/(upcoming-due-dates|all-due-dates)/,
+    to: () => ({ url: "/v1/due-dates", method: "GET", wrap: (p: any) => ({
+      data: (Array.isArray(p) ? p : p?.data ?? []).map((r: any) => ({
+        ...r,
+        event_date: r.due_at,
+        event_name: r.title,
+        patent: r.patent ? { ...oldPatent(r.patent), assignee_original: r.patent?.client?.name ?? null } : r.patent,
+      })) }) }) },
+  { m: /^\/api\/v1\/patent\/fetch\/([^/]+)$/,
+    to: m => ({ url: `/v1/patents/${m[1]}`, method: "GET", wrap: p => ({ data: oldPatent(p) }) }) },
+  { m: /^\/api\/v1\/patent\/update(?:-single)?\/([^/]+)$/,
+    to: (m, b) => ({ url: `/v1/patents/${m[1]}`, method: "PATCH", body: b, wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/patent\/import$/, method: "POST",
+    to: (_m, b) => ({ url: "/v1/patents/import", method: "POST", body: b, wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/patent\/client\/([^/]+)$/, method: "POST",
+    to: (m, b) => ({ url: "/v1/patents", method: "POST",
+      body: { ...b, client_id: m[1] }, wrap: p => ({ data: p }) }) },
+
+  // -- actions ----------------------------------------------------------------
+  { m: /^\/api\/v1\/actions\/ihc\/client\/([^/?]+)/,
+    to: m => ({ url: `/v1/actions?client_id=${m[1]}`, method: "GET",
+      // The screen was written against the old event-row dialect
+      // (event_name / event_date / days_to_deadline / patent_action) — translate
+      // rather than teach the screen a second vocabulary.
+      wrap: (rows: any[]) => ({ data: (rows ?? []).map(r => ({
+        id: r.due_date_id,
+        event_name: r.title,
+        event_date: r.due_at,
+        days_to_deadline: r.daysRemaining,
+        patent: r.patent,
+        patent_action: r.instruction ? {
+          id: r.id,
+          action_template: { id: r.id, label: r.instruction },
+          action_status: r.status === "NO_ACTION" ? null : "SUBMITTED",
+          request_status: r.status,
+          notes: r.note ?? "",
+          submitted_at: r.requested_at,
+        } : null,
+        action_request_id: r.id,
+      })) }) }) },
+  { m: /^\/api\/v1\/actions\/request-status$/, method: "PUT",
+    to: (_m, b) => ({ url: `/v1/actions/${b?.id ?? b?.action_id}`, method: "PATCH",
+      body: { instruction: b?.instruction ?? b?.action, note: b?.note }, wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/actions\/submit-all$/, method: "POST",
+    to: () => ({ url: "/v1/actions/submit-all", method: "POST", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/actions\/oc\/queue/,
+    to: () => ({ url: "/v1/actions/queue", method: "GET", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/actions\/templates\/event\/(.+)$/,
+    to: m => ({ url: `/v1/actions/templates/${m[1]}`, method: "GET", wrap: p => ({ data: p }) }) },
+
+  // -- clients / workspace -----------------------------------------------------
+  { m: /^\/api\/v1\/clients$/, method: "POST",
+    // Onboarding: create the workspace, then the admins are invited server-side.
+    to: (_m, b) => ({ url: "/v1/clients", method: "POST",
+      body: { name: b?.name, domain: String(b?.allowed_domain ?? "").replace(/^@/, "") || undefined,
+        admin_emails: (b?.admin_users ?? []).filter(Boolean) },
+      wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/clients(\?.*)?$/, method: "GET",
+    to: () => ({ url: "/v1/clients", method: "GET", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/patent\/fetch-lastet\/client\/([^/?]+)/,
+    to: m => ({ url: `/v1/patents?${isUuid(m[1]) ? `client_id=${m[1]}&` : ""}limit=5`, method: "GET", wrap: patentList }) },
+  { m: /^\/api\/v1\/clients\/lookup/, to: () => ({ url: "/v1/clients", method: "GET", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/case-owners$/, to: () => ({ url: "/v1/case-owners", method: "GET", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/case-owners\/([^/]+)\/assignments$/, method: "PUT",
+    to: (m, b) => ({ url: `/v1/case-owners/${m[1]}/assignments`, method: "PUT",
+      // The screen speaks camelCase; the API validates snake_case and rejects
+      // unknown keys — translate rather than loosen the validator.
+      body: {
+        client_ids: b?.client_ids ?? b?.clientIds ?? [],
+        ...(b?.kind ? { kind: b.kind } : {}),
+        ...(b?.reason ? { reason: b.reason } : {}),
+        ...(b?.expires_at ?? b?.expiresAt ? { expires_at: b?.expires_at ?? b?.expiresAt } : {}),
+      },
+      wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/clients\/fetch-all-inventors\/([^/?]+)/,
+    // The co-inventor picker needs a minimal roster, not the admin member list.
+    to: m => ({ url: `/v1/ideas/colleagues?client_id=${m[1]}`, method: "GET", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/idea\/add\/inventor\/([^/]+)\/([^/]+)$/, method: "POST",
+    to: m => ({ url: `/v1/ideas/${m[1]}/inventors/${m[2]}`, method: "POST", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/idea\/remove\/inventor\/([^/]+)$/, method: "DELETE",
+    // The old path carries the IdeaInventor CREDIT id, not the user id — the
+    // clean API has a credit-addressed route for exactly this shape.
+    to: m => ({ url: `/v1/ideas/inventor-credits/${m[1]}`, method: "DELETE",
+      wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/clients\/([0-9a-f-]{36})$/,
+    to: m => ({ url: `/v1/clients/${m[1]}`, method: "GET", wrap: (c: any) => ({ data: {
+      ...c,
+      // The screen speaks the old field names; translate rather than teach it new ones.
+      allowed_domain: c?.domain ? `x@${c.domain}` : "",
+      about: c?.about ?? "",
+      plan: c?.plan ?? "STANDARD",
+      logo: c?.logo ?? null,
+      logo_file: c?.logo_file ?? null,
+      // Old dialect: members ride as `User` with active/verified booleans.
+      User: (c?.users ?? []).map((u: any) => ({
+        ...u, active: u.status === "ACTIVE", verified: u.status === "ACTIVE",
+        suspended: u.status === "SUSPENDED",
+      })),
+    } }) }) },
+  { m: /^\/api\/v1\/clients\/([^/]+)\/invite-user$/, method: "POST",
+    to: (m, b) => ({ url: "/v1/invites", method: "POST",
+      body: { role: b?.role ?? "INVENTOR", emails: b?.email ?? b?.emails, client_id: m[1] },
+      wrap: p => ({ data: p }) }) },
+
+  // -- misc ---------------------------------------------------------------------
+  { m: /^\/api\/v1\/dashboard/, to: () => ({ url: "/v1/dashboard", method: "GET",
+    wrap: (p: any) => ({ data: {
+      ...p,
+      // Old dialect: flat counters. Granted comes from PATENTS (D5) — an idea
+      // never carries it; the link makes it a dashboard number.
+      granted_patents: p?.patents?.granted ?? 0,
+      pending_patents: (p?.patents?.applied ?? 0) + (p?.patents?.examination ?? 0),
+      inactive_patents: p?.patents?.inactive ?? 0,
+      total_patents: p?.patents?.total ?? 0,
+    } }) }) },
+  // -- idea lifecycle actions ----------------------------------------------
+  { m: /^\/api\/v1\/idea\/remove\/([^/]+)$/, method: "DELETE",
+    to: m => ({ url: `/v1/ideas/${m[1]}`, method: "DELETE", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/idea\/clone\/([^/]+)$/, method: "POST",
+    to: m => ({ url: `/v1/ideas/${m[1]}/clone`, method: "POST", wrap: p => ({ data: oldIdea(p) }) }) },
+  { m: /^\/api\/v1\/idea\/clone-draft\/([^/]+)$/, method: "POST",
+    to: m => ({ url: `/v1/ideas/${m[1]}/clone`, method: "POST", wrap: p => ({ data: oldIdea(p) }) }) },
+  // The update-request views are the CHANGES_REQUESTED slice of the history.
+  { m: /^\/api\/v1\/idea\/fetch-update-requests\/([^/]+)$/,
+    to: m => ({ url: `/v1/ideas/${m[1]}/transitions`, method: "GET", wrap: (ts: any[]) => ({ data: (ts ?? [])
+      .filter((t: any) => t.decision === "CHANGES_REQUESTED")
+      .map((t: any) => ({ id: t.id, message: t.comment, comment: t.comment,
+        created_at: t.created_at, createdAt: t.created_at,
+        requested_by: t.actor, User: t.actor, status: "PENDING" })) }) }) },
+  { m: /^\/api\/v1\/idea\/fetch-recent-update-request\/([^/]+)$/,
+    to: m => ({ url: `/v1/ideas/${m[1]}/transitions`, method: "GET", wrap: (ts: any[]) => {
+      const t = (ts ?? []).find((x: any) => x.decision === "CHANGES_REQUESTED");
+      return { data: t ? { id: t.id, message: t.comment, comment: t.comment,
+        created_at: t.created_at, requested_by: t.actor, User: t.actor } : null };
+    } }) },
+  { m: /^\/api\/v1\/idea\/([^/]+)\/oc-workflow-status$/,
+    to: m => ({ url: `/v1/ideas/${m[1]}`, method: "GET",
+      wrap: (i: any) => ({ data: { status: oldIdea(i)?.status, state: i?.state } }) }) },
+
+  // -- scoring (agent behind the API; 503 when not configured) --------------
+  { m: /^\/api\/v1\/idea\/check-score\/([^/]+)$/, method: "POST",
+    to: m => ({ url: `/v1/drafts/${m[1]}/evaluate`, method: "POST", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/idea\/fetch-score\/([^/]+)$/,
+    to: m => ({ url: `/v1/drafts/${m[1]}/evaluation`, method: "GET", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/idea\/preliminary-signal\/([^/]+)$/,
+    to: m => ({ url: `/v1/drafts/${m[1]}/evaluation`, method: "GET", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/idea\/re-evaluate\/([^/]+)$/, method: "POST",
+    to: m => ({ url: `/v1/drafts/${m[1]}/re-evaluate`, method: "POST", wrap: p => ({ data: p }) }) },
+
+  // -- people management ----------------------------------------------------
+  { m: /^\/api\/v1\/users\/([^/]+)$/, method: "DELETE",
+    to: m => ({ url: `/v1/users/${m[1]}`, method: "DELETE", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/auth\/update-profile\/([^/]+)$/,
+    to: (m, b) => ({ url: `/v1/users/${m[1]}`, method: "PATCH", body: b, wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/auth\/user\/([^/]+)$/,
+    to: () => ({ url: "/v1/auth/me", method: "GET", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/case-owners\/invite$/, method: "POST",
+    to: (_m, b) => ({ url: "/v1/invites", method: "POST",
+      body: { role: "CASE_OWNER", emails: b?.email ?? b?.emails }, wrap: p => ({ data: p }) }) },
+
+  // -- shareable invite links ----------------------------------------------
+  { m: /^\/api\/v1\/clients\/([^/]+)\/invite-link\/([^/]+)$/, method: "DELETE",
+    to: m => ({ url: `/v1/invites/${m[2]}`, method: "DELETE", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/clients\/([^/]+)\/invite-link/,
+    to: m => ({ url: `/v1/invites/share-link?client_id=${m[1]}`, method: "GET",
+      wrap: (p: any) => ({ data: { ...p, link: p?.url, invite_link: p?.url } }) }) },
+
+  // -- client detail extras -------------------------------------------------
+  { m: /^\/api\/v1\/clients\/personal-info\/([^/]+)$/,
+    to: (m, b) => ({ url: `/v1/clients/${m[1]}`, method: "PATCH", body: b, wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/clients\/update-business-scope\/([^/]+)$/,
+    to: (m, b) => ({ url: `/v1/clients/${m[1]}`, method: "PATCH",
+      body: { business_scope: b?.business_scope ?? b }, wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/clients\/remove-business-scope-file\/([^/]+)\/([^/]+)$/, method: "DELETE",
+    to: m => ({ url: `/v1/files/${m[2]}`, method: "DELETE", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/clients\/patent-metrics\/([^/]+)/,
+    to: m => ({ url: `/v1/patents/stats${isUuid(m[1]) ? `?client_id=${m[1]}` : ""}`, method: "GET",
+      wrap: (p: any) => ({ data: {
+        ...p,
+        total_patents: p?.total ?? 0,
+        granted_patents: p?.granted ?? 0,
+        pending_patents: (p?.applied ?? 0) + (p?.examination ?? 0),
+        inactive_patents: p?.inactive ?? 0,
+      } }) }) },
+
+  // -- files ----------------------------------------------------------------
+  { m: /^\/api\/v1\/idea\/remove-idea-file\/([^/]+)$/, method: "DELETE",
+    to: m => ({ url: `/v1/files/${m[1]}`, method: "DELETE", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/patent\/delete-doc\/([^/]+)$/, method: "DELETE",
+    to: m => ({ url: `/v1/files/${m[1]}`, method: "DELETE", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/remove-file\/([^/]+)$/, method: "DELETE",
+    to: m => ({ url: `/v1/files/${m[1]}`, method: "DELETE", wrap: p => ({ data: p }) }) },
+
+  // -- patents extras -------------------------------------------------------
+  { m: /^\/api\/v1\/patent\/export\/client\/([^/?]+)(\?.*)?$/,
+    to: m => ({ url: `/v1/patents/export${isUuid(m[1]) ? `?client_id=${m[1]}` : ""}`, method: "GET", wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/patent\/events\/([^/]+)\/remind$/, method: "POST",
+    to: m => ({ url: `/v1/due-dates/${m[1]}/remind`, method: "POST", wrap: p => ({ data: p }) }) },
+
+  // A "removed" client is deactivated, never deleted — its portfolio and
+  // review history must survive (the schema restricts hard deletes anyway).
+  { m: /^\/api\/v1\/clients\/remove\/([^/]+)$/, method: "DELETE",
+    to: m => ({ url: `/v1/clients/${m[1]}`, method: "PATCH",
+      body: { is_active: false }, wrap: p => ({ data: p }) }) },
+
+  // -- view as client -------------------------------------------------------
+  { m: /^\/api\/v1\/auth\/login-as-client\/([^/]+)$/, method: "POST",
+    to: m => ({ url: `/v1/auth/view-as/${m[1]}`, method: "POST", wrap: asUser }) },
+  { m: /^\/api\/v1\/auth\/exit-client-view$/, method: "POST",
+    to: () => ({ url: "/v1/auth/view-as/exit", method: "POST", wrap: asUser }) },
+
+  // -- password / signup completion -----------------------------------------
+  { m: /^\/api\/v1\/auth\/reset-password$/, method: "POST",
+    to: (_m, b) => ({ url: "/v1/auth/password-reset/complete", method: "POST",
+      body: { token: b?.token, password: b?.password ?? b?.new_password } }) },
+  { m: /^\/api\/v1\/auth\/(?:complete-signup|ihc\/set-password)$/, method: "POST",
+    to: (_m, b) => ({ url: "/v1/auth/password-reset/complete", method: "POST",
+      body: { token: b?.token, password: b?.password ?? b?.new_password } }) },
+  { m: /^\/api\/v1\/auth\/ihc\/verify(?:\?(.*))?$/, method: "POST",
+    // The page carries the code in the QUERY; the accepter's email in the body.
+    to: (m, b) => {
+      const code = new URLSearchParams(m[1] ?? "").get("code") ?? b?.code ?? "";
+      return { url: "/v1/auth/invite/verify-share", method: "POST",
+        body: { code, email: b?.email }, wrap: p => ({ data: p }) };
+    } },
+
+  { m: /^\/api\/v1\/notification\/categorized/,
+    to: () => ({ url: "/v1/notifications", method: "GET", wrap: p => ({ data: p }) }) },
+];
+
+export function makeRealAdapter(real: AxiosInstance) {
+  const dispatch = async (method: string, url: string, body?: any) => {
+    const path = url.split("#")[0];
+    for (const r of RULES) {
+      if (r.method && r.method !== method) continue;
+      const match = path.match(r.m);
+      if (!match) continue;
+      const t = r.to(match, body);
+      const res = await real.request({ url: t.url, method: t.method as any, data: t.body });
+      // The old envelope, so 152 call sites reading response.data.data keep
+      // working. Sessions: the new API authenticates with HttpOnly cookies;
+      // the readable pl_user cookie is display state, refreshed on login here.
+      const payload = t.wrap ? t.wrap(res.data) : { data: res.data };
+      if (t.url === "/v1/auth/login" || t.url === "/v1/auth/google" || t.url === "/v1/auth/signup") {
+        const u = (payload as any)?.data?.user ?? (payload as any)?.user;
+        if (u) Cookies.set("pl_user", JSON.stringify({ ...u, client_id: u.clientId ?? u.client_id }),
+                           { sameSite: "lax", path: "/" });
+      }
+      return { status: res.status, data: payload };
+    }
+    console.warn(`[realAdapter] UNMAPPED ${method} ${path} — returning 501`);
+    const err: any = new Error(`Not yet wired to the real API: ${method} ${path}`);
+    err.response = { status: 501, data: { message: err.message } };
+    throw err;
+  };
+
+  return {
+    get: (u: string, _c?: any) => dispatch("GET", u),
+    delete: (u: string, _c?: any) => dispatch("DELETE", u),
+    post: (u: string, b?: any, _c?: any) => dispatch("POST", u, b),
+    put: (u: string, b?: any, _c?: any) => dispatch("PUT", u, b),
+    patch: (u: string, b?: any, _c?: any) => dispatch("PATCH", u, b),
+    interceptors: real.interceptors,
+    defaults: real.defaults,
+  };
+}
