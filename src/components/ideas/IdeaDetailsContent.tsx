@@ -1776,12 +1776,28 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
     );
   };
 
+  // The disclosure under review is the most recently updated draft.
+  //
+  // This used to require EXACTLY one draft. That held for the design's mock
+  // data, where every idea has a single draft, but a real disclosure is often
+  // revised: 30 of the imported ideas carry several, 9 of them sitting in a
+  // review state. For those, a reviewer fell through to the inventor's
+  // draft-card layout and had no approve, request-changes or reject at all —
+  // the idea simply could not be actioned.
+  const reviewDraft = Array.isArray(ideaDraft) && ideaDraft.length
+    ? [...ideaDraft].sort(
+        (a: any, b: any) =>
+          new Date(b?.updatedAt || b?.updated_at || 0).getTime() -
+          new Date(a?.updatedAt || a?.updated_at || 0).getTime(),
+      )[0]
+    : undefined;
+
   const isReviewWorkspace =
-    ideaDraft?.length === 1 &&
-    ideaDraft?.[0]?.idea?.status !== "IN_DRAFT" &&
-    ideaDraft?.[0]?.idea?.clientId === user?.client_id &&
+    !!reviewDraft &&
+    reviewDraft?.idea?.status !== "IN_DRAFT" &&
+    reviewDraft?.idea?.clientId === user?.client_id &&
     ["LEGAL_COUNSEL", "TECH_COMMITTEE"].includes(user?.role ?? "") &&
-    user?.id !== ideaDraft?.[0]?.idea?.created_by_id;
+    user?.id !== reviewDraft?.idea?.created_by_id;
 
   // Two-stage chain: the committee acts at UNDER_REVIEW, counsel at
   // SENT_TO_IHC (and at UNDER_REVIEW when the client runs no committee —
