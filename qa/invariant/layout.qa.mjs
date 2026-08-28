@@ -122,6 +122,12 @@ for (const r of ROLES) {
       }
     }
   }
+  // Write the session back before closing, even when it was reused. The API
+  // rotates the refresh token on every use, so a reused session that is never
+  // re-saved leaves a SPENT token in the cache: the next run — this tier's or
+  // the journey tier's — finds a "fresh" file, fails its refresh with a 401,
+  // and has to burn a login it should not have needed.
+  try { writeFileSync(join(SESSIONS, `${r.role}.json`), JSON.stringify(await ctx.storageState())); } catch { /* closed */ }
   await ctx.close();
 }
 await browser.close();

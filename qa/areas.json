@@ -134,6 +134,18 @@
     ".gitlab-ci.yml": [
       "infra"
     ],
+    "qa/journey/**": [
+      "ideas",
+      "drafts",
+      "review",
+      "clients",
+      "actions",
+      "workspace",
+      "infra"
+    ],
+    "qa/lib/**": [
+      "*"
+    ],
     "qa/**": [
       "infra"
     ],

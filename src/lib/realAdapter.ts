@@ -586,7 +586,27 @@ const RULES: Rule[] = [
       wrap: (i: any) => ({ data: { status: oldIdea(i)?.status, state: i?.state } }) }) },
 
   // -- scoring (agent behind the API; 503 when not configured) --------------
-  { m: /^\/api\/v1\/idea\/check-score\/([^/]+)$/, method: "POST",
+  // NO method lock. All three call sites — DraftWorkspace, DraftCreationContent
+  // and IdeaDetailsContent — issue a GET, and so does the design reference
+  // (`route("GET", "/api/v1/idea/check-score/:draftId")`). GET is simply this
+  // dialect's verb for "start scoring"; translating it to the POST the clean
+  // API wants is precisely this file's job.
+  //
+  // Locked to POST, the GET matched no rule and the adapter returned a
+  // synthetic 501 with no network traffic at all. That broke scoring from every
+  // entry point, and for an inventor it broke submission itself: "Send for
+  // review" renders only once `scored` is true, and an IN_DRAFT idea renders
+  // DraftWorkspace rather than DraftListView, so the other submit button was
+  // unreachable. A 100%-complete disclosure had no way out of DRAFT.
+  // Filing: one call, one transaction on the API side (patent + link +
+  // transition + state). The screen has always posted this path; until
+  // POST /v1/ideas/:ideaId/file existed there was nothing to map it to, so
+  // clicking "Filed" produced a 501 and nothing else.
+  { m: /^\/api\/v1\/idea\/([^/]+)\/file$/, method: "POST",
+    to: (m, b) => ({ url: `/v1/ideas/${m[1]}/file`, method: "POST", body: b,
+      wrap: p => ({ data: p }) }) },
+
+  { m: /^\/api\/v1\/idea\/check-score\/([^/]+)$/,
     to: m => ({ url: `/v1/drafts/${m[1]}/evaluate`, method: "POST", wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/idea\/fetch-score\/([^/]+)$/,
     to: m => ({ url: `/v1/drafts/${m[1]}/evaluation`, method: "GET", wrap: p => ({ data: p }) }) },
