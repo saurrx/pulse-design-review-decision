@@ -346,8 +346,42 @@ const RULES: Rule[] = [
       }, wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/actions\/submit-all$/, method: "POST",
     to: () => ({ url: "/v1/actions/submit-all", method: "POST", wrap: p => ({ data: p }) }) },
+  // The Photon queue was passing the clean shape through untranslated, so the
+  // screen read patent.application_number off an object that is nested under
+  // due_date. It never showed because the queue was empty until real actions
+  // existed — the row map simply never ran.
   { m: /^\/api\/v1\/actions\/oc\/queue/,
-    to: () => ({ url: "/v1/actions/queue", method: "GET", wrap: p => ({ data: p }) }) },
+    to: () => ({ url: "/v1/actions/queue", method: "GET",
+      wrap: (rows: any[]) => ({ data: (rows ?? []).map(r => ({
+        id: r.id,
+        action_status: r.submission_state ?? null,
+        request_status: r.status,
+        selected_countries: r.selected_countries ?? [],
+        notes: r.note ?? "",
+        submitted_at: r.requested_at,
+        days_to_deadline: r.due_date?.due_at
+          ? Math.ceil((new Date(r.due_date.due_at).getTime() - Date.now()) / 86400000)
+          : null,
+        patent: {
+          id: r.due_date?.patent?.id ?? "",
+          application_number: r.due_date?.patent?.application_number ?? "",
+          title: r.due_date?.patent?.title ?? "",
+        },
+        patent_event: {
+          id: r.due_date?.id ?? "",
+          event_name: r.due_date?.title ?? r.due_date?.event_type ?? "",
+          event_date: r.due_date?.due_at ?? null,
+        },
+        action_template: {
+          id: r.template?.id ?? r.template_id ?? r.id,
+          label: r.template?.label ?? r.instruction ?? "",
+          category: r.template?.category ?? "",
+        },
+        submitted_by: null,
+        client_id: r.client_id,
+        // The screen groups the queue by client and reads client.name.
+        client: { id: r.client?.id ?? r.client_id, name: r.client?.name ?? "" },
+      })) }) }) },
   // 94% of real deadline names contain a slash ("3 1/2 Year Maintenance Fee
   // Due"), so the event type travels as a query parameter — in a path segment
   // it splits the route and 404s.
