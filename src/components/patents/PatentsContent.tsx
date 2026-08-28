@@ -1642,7 +1642,9 @@ const PatentsContent = (props: PatentsContentProps) => {
                                   alt={client.name}
                                   crossOrigin="use-credentials"
                                   className="h-5 w-5 object-contain"
-                                  onError={(e) =loading="lazy" decoding="async" > {
+                                  loading="lazy"
+                                  decoding="async"
+                                  onError={(e) => {
                                     (
                                       e.target as HTMLImageElement
                                     ).style.display = "none";
