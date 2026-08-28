@@ -342,3 +342,29 @@ ellipsis` and `line-clamp` are deliberate truncation. Only `hidden` hides.
 Sessions are cached in `qa/.sessions/` (gitignored, never artifacted — they are
 live cookies). The login throttle is 5/5min/IP and there are exactly 5 roles,
 so without caching any re-run inside the window fails every role.
+
+### The journey tier, and what it refuses to do
+`qa/journey/*.qa.mjs` is one file per role — the feature loops, against the
+deployed demo, asserting state transitions rather than page loads. Shared
+machinery is `qa/lib/session.mjs` (cached logins) and `qa/lib/journey.mjs` (the
+step runner and the outcome assertions; there is deliberately no
+`assertNoErrors`). A step returns a short evidence string or throws; the first
+failure aborts the rest as `skip`, because the steps are causally linked and a
+cascade of secondary failures hides which one was real. Teardown always runs.
+
+**Writes are constrained by what the product can undo, not by what would be
+convenient to test.** Three things on demo have no inverse and are therefore
+asserted up to the point of commitment and no further: a submitted idea (the
+backend refuses to delete one — review history must survive, so
+`inventor.qa.mjs --submit` is opt-in and off by default), an instruction
+submitted to Photon (no DELETE on actions, and the dialog says so itself), and a
+committee/counsel decision (append-only). Everything the tier does create is
+prefixed `QA-<timestamp>` and deleted in teardown — including after a failure,
+and including a re-login if the 15-minute access cookie expired mid-run.
+
+Both gates here were proved to bite by planting a violation: pointing the
+inventor journey at a selector that does not exist, and asserting a state the
+idea has not reached. The second one is why the status assertions are scoped to
+named elements — the draft page's status timeline contains the words "Under
+review" and "Filed" as *future* stages, so a whole-page text search cheerfully
+"proved" a state the idea was nowhere near.

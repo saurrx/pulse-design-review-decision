@@ -42,6 +42,10 @@ build:
     # untrustworthy.
     - node qa/cli.mjs contract
     - node qa/cli.mjs exceptions
+    # Verb-aware: the old route-sweep matched paths and ignored methods, so a
+    # rule locked to POST while every call site issued GET passed it — and that
+    # was a P0 (findings.md F-015).
+    - node qa/contract/adapter-coverage.qa.mjs
     - npm run typecheck
     # Encodes the IHC_ADMIN -> LEGAL_COUNSEL rename regression: a role test
     # written with .includes() matched the wrong role for months.
@@ -98,3 +102,35 @@ invariants:
   # No artifacts. qa/.sessions/ holds live authentication cookies for the demo
   # accounts; publishing it would put working sessions in a downloadable
   # artifact. The job's log is the output.
+
+# Role journeys against the DEPLOYED app. Same rules as `invariants` and for the
+# same reason: Vercel finishes its deploy asynchronously and never tells GitLab,
+# so an automatic run on main races the deploy it means to test.
+#
+# The five files log in once each and cache storageState in qa/.sessions/. A
+# cold runner therefore spends exactly five logins, which is exactly the API's
+# throttle (5 / 5 min / IP) — so they run SEQUENTIALLY in one job rather than as
+# five parallel jobs, and a re-run inside the window will report LOGIN FAILED
+# rather than a mysterious empty page. Failures are collected so one broken role
+# does not hide the other four.
+journeys:
+  stage: verify
+  image: mcr.microsoft.com/playwright:v1.62.0-noble
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+      allow_failure: true
+  before_script:
+    - npm ci --cache .npm --prefer-offline
+  script:
+    - |
+      failed=""
+      for f in qa/journey/*.qa.mjs; do
+        echo "=== $f"
+        node "$f" || failed="$failed $f"
+      done
+      if [ -n "$failed" ]; then echo "FAILED JOURNEYS:$failed"; exit 1; fi
+  # No artifacts, for the same reason as `invariants`: qa/.sessions/ holds live
+  # authentication cookies for the demo accounts, and a journey run writes one
+  # per role. The job's log is the output.
