@@ -18,6 +18,7 @@
  * Depends on nothing. Node built-ins only, in all three repos.
  */
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { execSync } from 'node:child_process';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -114,7 +115,9 @@ function checkExceptions() {
 /* ---------- contract drift ------------------------------------------------ */
 function checkContract() {
   const expect = areasMap.contractSha256;
-  const actual = execSync(`shasum -a 256 "${join(QA, 'contract.json')}"`).toString().split(' ')[0];
+  // node:crypto, not `shasum`: node:22-slim has no shasum and this failed in
+  // CI while passing on macOS, which is the whole reason CI exists.
+  const actual = createHash('sha256').update(readFileSync(join(QA, 'contract.json'))).digest('hex');
   if (!expect) { console.log(`qa: contract sha not pinned. Add "contractSha256": "${actual}" to areas.json.`); return 1; }
   if (expect !== actual) {
     console.log('qa: CONTRACT DRIFT.');

@@ -72,11 +72,13 @@ gitleaks:
 dependencies:
   stage: security
   image: { name: "ghcr.io/google/osv-scanner:latest", entrypoint: [""] }
-  allow_failure: true
   script:
-    # allow_failure until the existing backlog is triaged. A permanently-red
-    # gate teaches everyone to ignore the colour.
-    - /osv-scanner scan source --lockfile=package-lock.json
+    # BLOCKING, deliberately. In-range npm update took this repo from 65
+    # vulnerabilities (27 High) to 7, and osv-scanner.toml defers each survivor
+    # explicitly with a reason and a date. An allow_failure job that is
+    # permanently amber teaches everyone to ignore the colour; this way a NEW
+    # vulnerability actually stops the pipeline.
+    - /osv-scanner scan source --lockfile=package-lock.json --config=osv-scanner.toml
 
 # Layout invariants against the DEPLOYED app. Manual (and scheduled) rather
 # than automatic on main: Vercel's deploy finishes asynchronously and GitLab is
