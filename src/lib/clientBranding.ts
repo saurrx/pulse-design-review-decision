@@ -6,18 +6,6 @@ type ClientBrandingInput = {
   } | null;
 };
 
-const SAMPLE_CLIENT_LOGOS_BY_ID: Record<string, string> = {
-  "client-1": "/assets/client-logos/acme-robotics.webp",
-  "client-2": "/assets/client-logos/helix-biotech.png",
-  "client-3": "/assets/client-logos/northwind-energy.png",
-};
-
-const SAMPLE_CLIENT_LOGOS_BY_NAME: Record<string, string> = {
-  "acme robotics": "/assets/client-logos/acme-robotics.webp",
-  "helix biotech": "/assets/client-logos/helix-biotech.png",
-  "northwind energy": "/assets/client-logos/northwind-energy.png",
-};
-
 const absoluteAsset = (path: string, baseUrl = "") => {
   if (/^(?:https?:|data:|blob:)/i.test(path)) return path;
 
@@ -27,8 +15,14 @@ const absoluteAsset = (path: string, baseUrl = "") => {
 };
 
 /**
- * Uploaded client marks always win. The local mappings below make the mock
- * portfolio look realistic without relying on third-party image hotlinks.
+ * Client marks live in object storage (DigitalOcean Spaces) and reach the app as
+ * logo_file.file_path on the client record, put there by the presign upload flow
+ * in the API's files module. Nothing is bundled with the build: shipping sample
+ * customer logos in the repo meant committing third-party trademarks, and it hid
+ * a missing upload behind a plausible-looking mark.
+ *
+ * A client with no uploaded logo returns null, and the caller renders initials
+ * instead — see ClientLogo and Sidebar.
  */
 export const getClientLogoSrc = (
   client?: ClientBrandingInput | null,
@@ -37,13 +31,7 @@ export const getClientLogoSrc = (
   const uploadedPath = client?.logo_file?.file_path;
   if (uploadedPath) return absoluteAsset(uploadedPath, baseUrl);
 
-  const id = String(client?.id || "");
-  if (id && SAMPLE_CLIENT_LOGOS_BY_ID[id]) {
-    return SAMPLE_CLIENT_LOGOS_BY_ID[id];
-  }
-
-  const name = String(client?.name || "").trim().toLowerCase();
-  return SAMPLE_CLIENT_LOGOS_BY_NAME[name] || null;
+  return null;
 };
 
 export const getClientInitials = (name?: string | null) =>
