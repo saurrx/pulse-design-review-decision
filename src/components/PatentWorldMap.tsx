@@ -374,6 +374,7 @@ const PatentWorldMap = (props: any) => {
   const { theme } = useTheme();
 
   const { isPatentDialogOpen, setIsPatentDialogOpen } = props;
+  const mapHeight = Number(props.height) || 480;
 
   const { isFetching: isFetchingPatents, data: patentData } = useQuery({
     queryKey: ["patents", user?.client_id],
@@ -489,6 +490,12 @@ const PatentWorldMap = (props: any) => {
     () => Math.max(1, ...Object.values(countsByIso3).map((c) => c.total)),
     [countsByIso3],
   );
+  const minCountryTotal = useMemo(() => {
+    const totals = Object.values(countsByIso3)
+      .map((country) => country.total)
+      .filter((total) => total > 0);
+    return totals.length ? Math.min(...totals) : 0;
+  }, [countsByIso3]);
 
   const [zoomLevel, setZoomLevel] = useState(2);
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -531,9 +538,10 @@ const PatentWorldMap = (props: any) => {
   if (isFetchingPatents) {
     return (
       <div
-        className={`relative h-[480px] overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-6 pt-6 [box-shadow:var(--pulse-shadow-card)] ${
+        className={`relative overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-6 pt-6 [box-shadow:var(--pulse-shadow-card)] ${
           theme === "dark" ? "card-elevated-dark" : "card-elevated-light"
         }`}
+        style={{ height: mapHeight }}
       >
         <div className="flex items-center justify-center h-full">
           <div
@@ -552,7 +560,7 @@ const PatentWorldMap = (props: any) => {
     <motion.div
       ref={rootContainerRef}
       className={`relative border border-[var(--pulse-line)] [box-shadow:var(--pulse-shadow-card)] ${
-        isPatentDialogOpen ? "h-full rounded-2xl" : "h-[480px] rounded-2xl"
+        isPatentDialogOpen ? "h-full rounded-2xl" : "rounded-2xl"
       } flex flex-col transition-all overflow-hidden group ${
         isPatentDialogOpen
           ? `${
@@ -562,6 +570,7 @@ const PatentWorldMap = (props: any) => {
             }`
           : `${theme === "dark" ? "card-elevated-dark" : "bg-white"}`
       }`}
+      style={isPatentDialogOpen ? undefined : { height: mapHeight }}
     >
       <div className="relative z-10 flex flex-col h-full">
         <div
@@ -591,14 +600,20 @@ const PatentWorldMap = (props: any) => {
               Global patent distribution by country
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div
+            className={`inline-flex overflow-hidden rounded-lg border ${
+              theme === "dark"
+                ? "border-zinc-700 bg-zinc-800/50"
+                : "border-[var(--pulse-line)] bg-white"
+            }`}
+          >
             <button
               disabled={zoomLevel <= 1.5}
               onClick={handleZoomOut}
-              className={`p-2 rounded-md transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+              className={`grid h-9 w-9 place-items-center transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${
                 theme === "dark"
-                  ? "bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 hover:text-zinc-200"
-                  : "bg-zinc-200/50 hover:bg-zinc-300/50 text-zinc-600 hover:text-zinc-700"
+                  ? "text-zinc-300 hover:bg-zinc-700/60 hover:text-zinc-100"
+                  : "text-zinc-600 hover:bg-[var(--pulse-surface-subtle)] hover:text-zinc-900"
               }`}
               aria-label="Zoom out"
             >
@@ -606,10 +621,10 @@ const PatentWorldMap = (props: any) => {
             </button>
             <button
               onClick={handleZoomIn}
-              className={`p-2 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+              className={`grid h-9 w-9 place-items-center border-l transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${
                 theme === "dark"
-                  ? "bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 hover:text-zinc-200"
-                  : "bg-zinc-200/50 hover:bg-zinc-300/50 text-zinc-600 hover:text-zinc-700"
+                  ? "border-zinc-700 text-zinc-300 hover:bg-zinc-700/60 hover:text-zinc-100"
+                  : "border-[var(--pulse-line)] text-zinc-600 hover:bg-[var(--pulse-surface-subtle)] hover:text-zinc-900"
               }`}
               aria-label="Zoom in"
             >
@@ -618,10 +633,10 @@ const PatentWorldMap = (props: any) => {
             <button
               onClick={() => setIsPatentDialogOpen()}
               aria-label="Expand patent map"
-              className={`p-2 rounded-lg transition-all ${
+              className={`grid h-9 w-9 place-items-center border-l transition-colors ${
                 theme === "dark"
-                  ? "bg-zinc-800/50 hover:bg-zinc-700/50 text-zinc-300 hover:text-zinc-200"
-                  : "bg-zinc-200/50 hover:bg-zinc-300/50 text-zinc-600 hover:text-zinc-700"
+                  ? "border-zinc-700 text-zinc-300 hover:bg-zinc-700/60 hover:text-zinc-100"
+                  : "border-[var(--pulse-line)] text-zinc-600 hover:bg-[var(--pulse-surface-subtle)] hover:text-zinc-900"
               }`}
             >
               <svg
@@ -661,7 +676,7 @@ const PatentWorldMap = (props: any) => {
                 theme === "dark" ? "text-zinc-300" : "text-zinc-600"
               }`}
             >
-              Fewer
+              {minCountryTotal} patent{minCountryTotal === 1 ? "" : "s"}
             </span>
             <div
               className="h-2 w-28 rounded-full"
@@ -675,7 +690,7 @@ const PatentWorldMap = (props: any) => {
                 theme === "dark" ? "text-zinc-300" : "text-zinc-600"
               }`}
             >
-              More patents
+              {maxCountryTotal} patent{maxCountryTotal === 1 ? "" : "s"}
             </span>
           </div>
         </div>

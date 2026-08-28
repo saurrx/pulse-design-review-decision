@@ -100,6 +100,8 @@ interface PatentNoveltyReportProps {
     scoringResult: ScoringResult;
   };
   embedded?: boolean;
+  displayScale?: 10 | 100;
+  expandFirstReference?: boolean;
 }
 
 export default function PatentNoveltyReport({
@@ -109,13 +111,15 @@ export default function PatentNoveltyReport({
   report,
   api_evaluation_id,
   embedded = false,
+  displayScale = 100,
+  expandFirstReference = true,
 }: PatentNoveltyReportProps) {
   const { theme } = useTheme();
   const [reEvalOpen, setReEvalOpen] = React.useState(false);
   const [patentInput, setPatentInput] = React.useState("");
   // First prior-art reference expanded by default; the rest collapse to rows.
   const [expandedArts, setExpandedArts] = React.useState<Set<number>>(
-    () => new Set([0])
+    () => new Set(expandFirstReference ? [0] : [])
   );
   const [summaryExpanded, setSummaryExpanded] = React.useState(false);
   const toggleArt = (i: number) =>
@@ -217,6 +221,9 @@ export default function PatentNoveltyReport({
       .replace(/([A-Z])/g, " $1")
       .replace(/^./, (str) => str.toUpperCase());
   };
+
+  const displayScore = (score: number) =>
+    displayScale === 10 ? (score / 10).toFixed(1) : Math.round(score);
 
 const enrichedPriorArt = priorArt.map((art, index) => {
   const matchSummary =
@@ -334,13 +341,13 @@ const topPriorArt = sortedPriorArt.slice(0, 5);
                 }`}
                 style={{ fontVariantNumeric: "tabular-nums" }}
               >
-                {Math.round(scoringResult.noveltyScore)}
+                {displayScore(scoringResult.noveltyScore)}
                 <span
                   className={`ml-1 text-xl font-normal ${
                     theme === "dark" ? "text-gray-400" : "text-[#727272]"
                   }`}
                 >
-                  /100
+                  /{displayScale}
                 </span>
               </div>
               <div>
@@ -604,7 +611,7 @@ const topPriorArt = sortedPriorArt.slice(0, 5);
                                 >
                                   {typeof matchSummary?.noveltyScore ===
                                   "number"
-                                    ? Math.round(matchSummary?.noveltyScore ?? 0)
+                                    ? displayScore(matchSummary?.noveltyScore ?? 0)
                                     : "N/A"}
                                   <span
                                     className={`${
@@ -614,7 +621,7 @@ const topPriorArt = sortedPriorArt.slice(0, 5);
                                     } ml-1 font-normal text-sm`}
                                   >
                                     {" "}
-                                    /100
+                                    /{displayScale}
                                   </span>
                                 </span>
                               </div>

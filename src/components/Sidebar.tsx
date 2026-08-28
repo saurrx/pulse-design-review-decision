@@ -10,9 +10,9 @@ import {
   LayoutDashboard,
   Lightbulb,
   LogOut,
-  Settings,
   UserRound,
   ArrowLeftRight,
+  UsersRound,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ROLE_LABEL } from "@/lib/roles";
@@ -71,9 +71,8 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
   if (role === "INVENTOR") {
     return [
       { label: "Home", path: "/", icon: LayoutDashboard },
-      { label: "My disclosures", path: "/ideas", icon: Lightbulb },
+      { label: "My ideas", path: "/ideas", icon: Lightbulb },
       { label: "Patents", path: "/patents", icon: FileStack },
-      { label: "Profile", path: "/workspace?tab=profile", icon: UserRound },
     ];
   }
 
@@ -90,7 +89,7 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
       },
       { label: "Patents", path: "/patents", icon: FileStack },
       { label: "Actions", path: "/due-dates", icon: CalendarDays },
-      { label: "Profile", path: "/workspace?tab=profile", icon: UserRound },
+      { label: "Profile", path: "/profile", icon: UserRound },
     ];
   }
 
@@ -105,19 +104,28 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
       },
       { label: "Patents", path: "/patents", icon: FileStack },
       { label: "Actions", path: "/due-dates", icon: CalendarDays },
-      { label: "Settings", path: "/workspace", icon: Settings },
+      { label: "Workspace", path: "/workspace", icon: UsersRound },
     ];
   }
 
-  return [
+  const operationalItems: NavItem[] = [
     { label: "Overview", path: "/", icon: LayoutDashboard },
     { label: "Clients", path: "/clients", icon: Building2 },
     { label: "Ideas", path: "/ideas", icon: Lightbulb, badge: reviewCount },
     { label: "Patents", path: "/patents", icon: FileStack },
     { label: "Actions", path: "/due-dates", icon: CalendarDays },
+    // Two nav items both labelled "Actions" is a design slip; /actions is the
+    // photon-side queue, so it keeps our "Operations" label.
     { label: "Operations", path: "/actions", icon: FolderKanban },
-    { label: "Settings", path: "/workspace", icon: Settings },
   ];
+  // Workspace administration is photon-admin only now; every other role gets
+  // the standalone profile page instead (see WorkspacePage's redirect).
+  operationalItems.push(
+    role === "PHOTON_ADMIN"
+      ? { label: "Workspace", path: "/workspace", icon: UsersRound }
+      : { label: "Profile", path: "/profile", icon: UserRound },
+  );
+  return operationalItems;
 };
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
@@ -259,7 +267,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
                     collapsed ? "justify-center px-2" : "gap-3 px-2"
                   } ${
                     active
-                      ? "bg-[var(--pulse-surface-subtle)] text-[var(--pulse-ink)] shadow-[inset_3px_0_0_var(--pulse-brand)]"
+                      ? "bg-[var(--pulse-surface-subtle)] text-[var(--pulse-ink)] shadow-[inset_2px_0_0_#0C0C0C]"
                       : "text-[var(--pulse-ink-secondary)] hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]"
                   }`}
                 >
@@ -336,6 +344,14 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
                 Exit client view
               </DropdownMenuItem>
             )}
+            <DropdownMenuItem
+              onClick={() => navigate("/profile")}
+              className="cursor-pointer rounded-lg px-2 py-2 text-sm"
+            >
+              <UserRound className="mr-2 h-4 w-4" />
+              My profile
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={logout}
               className="cursor-pointer rounded-lg px-2 py-2 text-sm text-[var(--pulse-danger)]"

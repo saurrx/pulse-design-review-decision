@@ -257,6 +257,8 @@
     font-family: "Instrument Sans", sans-serif;
     font-size: 14px;
     line-height: 20px;
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
   }
 
   .pulse-table-page thead {

@@ -38,6 +38,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import DueDatesCalendar from "./DueDatesCalendar";
 import useUserCookie from "@/hooks/use-auth";
 import { isOutsideCounselRole } from "@/lib/roleAccess";
+import {
+  isPatentEventCompleted,
+  usePatentEventCompletion,
+} from "@/hooks/usePatentEventCompletion";
 import API_CONFIG from "@/lib/apiConfig";
 import Loader from "../Loader";
 import moment from "moment";
@@ -57,6 +61,7 @@ import {
   PATENT_LEGAL_STATUS_META,
   type PatentLegalStatus,
 } from "@/utils/patentLegalStatus";
+import ActionDropdown from "@/components/actions/ActionDropdown";
 
 interface DueDate {
   id: string;
@@ -69,7 +74,7 @@ interface DueDate {
   country: string;
 }
 
-type FilterOption = "all" | "upcoming" | "dueToday" | "overdue";
+type FilterOption = "all" | "upcoming" | "dueToday" | "overdue" | "completed";
 type SortOption = "newest" | "oldest" | "eventAZ" | "eventZA";
 export type DueDatesViewType = "list" | "calendar";
 
@@ -146,9 +151,13 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     }
   })();
   const queryClient = useQueryClient();
+  const eventCompletion = usePatentEventCompletion();
   const [remindingId, setRemindingId] = useState<string | null>(null);
+  const [draftActions, setDraftActions] = useState<
+    Record<string, { templateId: string; updatedAt: string }>
+  >({});
 
-  // Column visibility state - order matches the original table display order
+  // Column visibility state - order matches the Actions workflow table.
   const [columns, setColumns] = useState([
     { id: "Sr", label: "S.No", visible: true, sticky: false },
     { id: "event", label: "Event", visible: true, sticky: false },
@@ -156,7 +165,8 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
       id: "applicationNumber",
       label: "Application No.",
       visible: true,
-      sticky: false,
+      // The design fixes the row-identity column so it cannot be hidden.
+      sticky: true,
     },
     // The Client column only means something across tenants — photon-side view.
     ...(isOC ? [{
@@ -418,6 +428,8 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
         return "Due Today";
       case "overdue":
         return "Overdue";
+      case "completed":
+        return "Completed";
       default:
         return "All Due Dates";
     }
@@ -528,31 +540,11 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
         return (
           <td
             key={columnId}
-            className={`p-4 text-sm ${
+            className={`min-w-[150px] p-4 text-sm ${
               theme === "dark" ? "text-neutral-200" : "text-neutral-800"
             }`}
           >
-            <span className="flex items-center gap-2 font-mono text-[13px] tabular-nums text-[var(--pulse-ink-secondary)] dark:text-neutral-300">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="lucide lucide-file-text w-4 h-4 text-neutral-400"
-                aria-hidden="true"
-              >
-                <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path>
-                <path d="M14 2v5a1 1 0 0 0 1 1h5"></path>
-                <path d="M10 9H8"></path>
-                <path d="M16 13H8"></path>
-                <path d="M16 17H8"></path>
-              </svg>
-
+            <span className="whitespace-nowrap text-[13px] tabular-nums text-[var(--pulse-ink-secondary)] dark:text-neutral-300">
               {client?.patent?.application_number || "N/A"}
             </span>
           </td>
@@ -565,9 +557,125 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
               theme === "dark" ? "text-neutral-200" : "text-neutral-800"
             }`}
           >
-            <span className="font-medium text-[var(--pulse-ink)]">{client?.patent?.title || "N/A"}</span>
+            <span
+              className="block max-w-[280px] truncate font-medium text-[var(--pulse-ink)]"
+              title={client?.patent?.title || "N/A"}
+            >
+              {client?.patent?.title || "N/A"}
+            </span>
           </td>
         );
+      case "nextEvent":
+        return (
+          <td key={columnId} className="min-w-[220px] p-4 text-sm">
+            <span
+              className="block max-w-[300px] truncate text-[var(--pulse-ink-secondary)]"
+              title={client.event_name}
+            >
+              {client.event_name || "—"}
+            </span>
+          </td>
+        );
+      case "deadline":
+        return (
+          <td key={columnId} className="min-w-[130px] whitespace-nowrap p-4 text-sm tabular-nums text-[var(--pulse-ink-secondary)]">
+            {client.event_date
+              ? moment(client.event_date).format("MMM D, YYYY")
+              : "—"}
+          </td>
+        );
+      case "days": {
+        const completed = isPatentEventCompleted(client);
+        const today = new Date();
+        const deadline = new Date(client.event_date);
+        today.setHours(0, 0, 0, 0);
+        deadline.setHours(0, 0, 0, 0);
+        const days = Math.ceil(
+          (deadline.getTime() - today.getTime()) / 86400000,
+        );
+        return (
+          <td key={columnId} className="min-w-[90px] whitespace-nowrap p-4 text-xs font-semibold tabular-nums">
+            <span
+              className={
+                completed
+                  ? "text-[var(--pulse-success)]"
+                  : days < 0
+                  ? "text-[var(--pulse-danger)]"
+                  : days <= 30
+                    ? "text-[#7E5A00]"
+                    : "text-[var(--pulse-ink-secondary)]"
+              }
+            >
+              {completed
+                ? "Completed"
+                : days < 0
+                  ? "Overdue"
+                  : days === 0
+                    ? "Today"
+                    : `${days}d`}
+            </span>
+          </td>
+        );
+      }
+      case "action": {
+        const submittedAction =
+          client?.patent_action || client?.PatentAction?.[0];
+        const draftAction = draftActions[client.id];
+        return (
+          <td key={columnId} className="min-w-[220px] p-4">
+            <ActionDropdown
+              eventType={client.event_name || ""}
+              selectedTemplateId={
+                draftAction?.templateId ||
+                submittedAction?.action_template?.id
+              }
+              onSelect={(template) =>
+                setDraftActions((current) => ({
+                  ...current,
+                  [client.id]: {
+                    templateId: template.id,
+                    updatedAt: new Date().toISOString(),
+                  },
+                }))
+              }
+              disabled={Boolean(submittedAction)}
+            />
+          </td>
+        );
+      }
+      case "actionStatus": {
+        const submittedAction =
+          client?.patent_action || client?.PatentAction?.[0];
+        const draftAction = draftActions[client.id];
+        const status = submittedAction?.request_status ||
+          submittedAction?.action_status;
+        const label = draftAction
+          ? "Draft"
+          : status
+            ? String(status)
+                .toLowerCase()
+                .replace(/_/g, " ")
+                .replace(/^./, (letter) => letter.toUpperCase())
+            : "No Action";
+        return (
+          <td key={columnId} className="min-w-[120px] p-4">
+            <ProductChip kind="status" tone="neutral">
+              {label}
+            </ProductChip>
+          </td>
+        );
+      }
+      case "lastUpdated": {
+        const submittedAction =
+          client?.patent_action || client?.PatentAction?.[0];
+        const updatedAt =
+          draftActions[client.id]?.updatedAt || submittedAction?.updatedAt;
+        return (
+          <td key={columnId} className="min-w-[120px] whitespace-nowrap p-4 text-xs text-[var(--pulse-ink-muted)]">
+            {updatedAt ? moment(updatedAt).fromNow() : "—"}
+          </td>
+        );
+      }
       case "outsideCounsel":
         return (
           <td
@@ -996,11 +1104,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                     >
                       <Filter className="w-4 h-4" />
                       <span>
-                        {filterOption === "dueToday"
-                          ? "Due Today"
-                          : filterOption === "upcoming"
-                            ? "Upcoming"
-                            : "All Due Dates"}
+                        {getFilterLabel(filterOption)}
                       </span>
                       <ChevronDown className="w-4 h-4" />
                     </Button>
@@ -1024,6 +1128,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                         { label: "Upcoming", value: "upcoming" },
                         { label: "Due Today", value: "dueToday" },
                         { label: "Overdue", value: "overdue" },
+                        { label: "Completed", value: "completed" },
                       ].map((all) => (
                         <DropdownMenuRadioItem
                           key={all.value}
@@ -1630,6 +1735,15 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
             ) : (
               <div className="flex-1 min-h-0">
                 <DueDatesCalendar
+                  canManageEvents={isOutsideCounselRole(user?.role)}
+                  updatingEventId={
+                    eventCompletion.isPending
+                      ? eventCompletion.variables?.eventId
+                      : undefined
+                  }
+                  onEventCompletion={(eventId, completed) =>
+                    eventCompletion.mutate({ eventId, completed })
+                  }
                   dueDates={dueDatesData?.data?.map((item: any) => {
                     const dueDate = new Date(item.event_date);
                     const today = new Date();
@@ -1653,6 +1767,8 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                       daysOverdue: -daysDiff, // Negative means overdue, positive means upcoming
                       status: item.patent?.legal_current_status || "",
                       country: item.patent?.country || "",
+                      eventStatus: item.event_status || item.status || "OPEN",
+                      completedAt: item.completed_at || item.cleared_at || null,
                     };
                   })}
                 />

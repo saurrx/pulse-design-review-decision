@@ -149,14 +149,13 @@ const PortfolioMotion = ({
   const filingsPeriodTotal = data.length
     ? data.reduce((sum, point) => sum + point.filings, 0)
     : filings90;
-  const yAxisMax = Math.max(1, ideasPeriodTotal);
+  const yAxisStep = Math.max(1, Math.ceil(ideasPeriodTotal / 5));
+  const yAxisMax = Math.max(yAxisStep, Math.ceil(ideasPeriodTotal / yAxisStep) * yAxisStep);
   const yAxisTicks = Array.from(
-    new Set(
-      Array.from({ length: 5 }, (_, index) =>
-        Math.round((yAxisMax * index) / 4),
-      ),
-    ),
+    { length: yAxisMax / yAxisStep + 1 },
+    (_, index) => index * yAxisStep,
   );
+  const xAxisInterval = Math.max(0, Math.ceil(data.length / 8) - 1);
   // Filings are event markers on the cumulative ideas series, not a separate
   // measure. Anchor each week's dots to the line so the relationship reads
   // correctly even when a filing is not linked to an in-window idea record.
@@ -264,7 +263,7 @@ const PortfolioMotion = ({
         aria-label={`${ideasLabel}: ${ideasPeriodTotal} cumulative over the last 3 months. ${filingsPeriodTotal} filings are marked as green dots.`}
       >
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -18 }}>
+          <LineChart data={data} margin={{ top: 8, right: 28, bottom: 0, left: -18 }}>
             <CartesianGrid stroke="#F5F5F5" vertical={false} />
             <XAxis
               dataKey="day"
@@ -272,6 +271,7 @@ const PortfolioMotion = ({
               axisLine={{ stroke: "#E8E8E8" }}
               tickLine={false}
               minTickGap={20}
+              interval={xAxisInterval}
             />
             <YAxis
               tick={{ fontFamily: "Instrument Sans", fontSize: 13, fill: "#73736b" }}
@@ -469,14 +469,14 @@ const IdeaPipeline = ({
 /* -------------------------------- Needs your review ------------------------------ */
 
 const QueueScoreChip = ({ score }: { score: number | null | undefined }) => {
-  const value = score != null ? Math.round(score) : null;
+  const value = score != null ? (score / 10).toFixed(1) : null;
   return (
     <span
       className="inline-flex shrink-0 items-baseline justify-end whitespace-nowrap text-right text-[13px] font-semibold text-[var(--pulse-ink)]"
       style={NUMS}
     >
       {value ?? "—"}
-      <span className="ml-0.5 text-xs font-normal text-[var(--pulse-ink-muted)]">/100</span>
+      <span className="ml-0.5 text-xs font-normal text-[var(--pulse-ink-muted)]">/10</span>
     </span>
   );
 };
@@ -555,7 +555,7 @@ const NeedsReview = ({
         </div>
       </div>
     ) : (
-      <div className="mt-2 flex flex-1 flex-col justify-start">
+      <div className="mt-2 flex flex-1 flex-col">
         <div className={`grid ${rowColumns} gap-3 px-3 pb-1 pt-1 text-xs font-medium text-[var(--pulse-ink-muted)]`}>
           <span>Ideas</span>
           <span>Inventor</span>
@@ -567,7 +567,7 @@ const NeedsReview = ({
             key={r.id}
             type="button"
             onClick={() => onOpen(r.id)}
-            className={`grid ${rowColumns} w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[var(--pulse-surface-subtle)] ${i > 0 ? "border-t border-[var(--pulse-line)]" : ""}`}
+            className={`grid min-h-11 flex-1 ${rowColumns} w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[var(--pulse-surface-subtle)] ${i > 0 ? "border-t border-[var(--pulse-line)]" : ""}`}
           >
             <span
               className="min-w-0 truncate text-[13px] font-medium text-[var(--pulse-ink)]"
@@ -579,7 +579,7 @@ const NeedsReview = ({
               {r.secondary}
             </span>
             {showScore && <QueueScoreChip score={r.score} />}
-            <span className="inline-flex items-center justify-end whitespace-nowrap text-right text-xs text-[var(--pulse-ink-muted)]">
+            <span className="inline-flex items-center justify-end whitespace-nowrap text-right text-xs text-[var(--pulse-ink-muted)]" style={NUMS}>
               {waitingLabel} {r.waitingDays}d
             </span>
           </button>
@@ -779,7 +779,7 @@ const MyIdeas = ({
                   ) : (
                     <>
                       <IdeaStatusChip status={idea.status} />
-                      <span className="w-[92px] shrink-0 text-right text-xs text-[#727272]">
+                      <span className="w-[112px] shrink-0 whitespace-nowrap text-right text-xs tabular-nums text-[#727272]">
                         {d === null ? "" : d === 0 ? "updated today" : `updated ${d}d ago`}
                       </span>
                     </>
@@ -803,31 +803,59 @@ const MyIdeas = ({
 
 /* ----------------------------- Portfolio composition ----------------------------- */
 
+export type PortfolioStatus = {
+  label: string;
+  count: number;
+  color?: string;
+};
+
+const PORTFOLIO_STATUS_COLORS = [
+  "#2F8D70",
+  "var(--pl-amber)",
+  "var(--pl-slate)",
+  "#7057C7",
+  "#25A9B8",
+  "#C96558",
+];
+
 const PortfolioComposition = ({
   total,
   granted,
   pending,
   inactive,
+  statuses,
 }: {
   total: number;
   granted: number;
   pending: number;
   inactive: number;
+  /** Optional client-specific legal statuses. The compact layout supports 3–6 cleanly. */
+  statuses?: PortfolioStatus[];
 }) => {
-  const segments = [
-    { label: "Granted", count: granted, color: "#2F8D70" },
-    { label: "Pending", count: pending, color: "var(--pl-amber)" },
-    { label: "Inactive", count: inactive, color: "var(--pl-slate)" },
-  ].filter(() => true);
+  const statusSource = statuses?.length
+    ? statuses
+    : [
+        { label: "Granted", count: granted },
+        { label: "Pending", count: pending },
+        { label: "Inactive", count: inactive },
+      ];
+  const segments = statusSource.map((status, index) => ({
+    ...status,
+    color: status.color ?? PORTFOLIO_STATUS_COLORS[index % PORTFOLIO_STATUS_COLORS.length],
+  }));
   const hasData = total > 0;
   const pieData = hasData
     ? segments.filter((s) => s.count > 0)
     : [{ label: "Empty", count: 1, color: "#F5F5F5" }];
+  const useCompactLegend = segments.length > 3;
 
   return (
-    <div className={`${CARD_CLASS} flex h-full flex-col`}>
-      <StatLabel>Portfolio</StatLabel>
-      <div className="relative mx-auto mt-2" style={{ width: 200, height: 200 }}>
+    <div className={`${CARD_CLASS} flex h-full min-h-0 flex-col`}>
+      <div>
+        <StatLabel>Patent portfolio</StatLabel>
+        <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">By legal status</p>
+      </div>
+      <div className="relative mx-auto mt-1" style={{ width: 160, height: 160 }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -836,8 +864,8 @@ const PortfolioComposition = ({
               nameKey="label"
               cx="50%"
               cy="50%"
-              innerRadius={72}
-              outerRadius={94}
+              innerRadius={56}
+              outerRadius={75}
               startAngle={90}
               endAngle={-270}
               stroke="#FFFFFF"
@@ -862,23 +890,28 @@ const PortfolioComposition = ({
           </div>
         </div>
       </div>
-      <div className="mt-4">
+      <div className={`mt-2 grid ${useCompactLegend ? "grid-cols-2 gap-x-5" : "grid-cols-1"}`}>
         {segments.map((seg, i) => (
           <div
             key={seg.label}
-            className={`flex items-center justify-between py-2.5 ${
-              i > 0 ? "border-t border-[#E8E8E8]" : ""
+            className={`flex min-w-0 items-center justify-between gap-3 py-2 ${
+              useCompactLegend
+                ? i > 1 ? "border-t border-[#E8E8E8]" : ""
+                : i > 0 ? "border-t border-[#E8E8E8]" : ""
             }`}
           >
-            <span className="flex items-center gap-2.5 text-[13px] font-medium text-[#0C0C0C]">
+            <span className="flex min-w-0 items-center gap-2 text-[13px] font-medium text-[#0C0C0C]">
               <span
-                className="inline-block h-3 w-3 rounded-full"
+                className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
                 style={{ background: seg.color }}
               />
-              {seg.label}
+              <span className="truncate" title={seg.label}>{seg.label}</span>
             </span>
-            <span className="text-[13px] font-semibold text-[#0C0C0C]" style={NUMS}>
+            <span className="shrink-0 text-right text-[13px] font-semibold text-[#0C0C0C]" style={NUMS}>
               {seg.count.toLocaleString()}
+              <span className="ml-1 font-normal text-[#727272]">
+                · {total > 0 ? Math.round((seg.count / total) * 100) : 0}%
+              </span>
             </span>
           </div>
         ))}

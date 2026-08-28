@@ -103,8 +103,11 @@ checks silently broke during the rename once.
   INVENTOR-only affordances; Send requires 100% completion; REJECT_BY_IHC is
   sendable (appeal) and the send mutation collects the required reason via
   prompt (covers the "Skip & submit" co-inventor path too).
-- workspace/: WorkspaceTabs (people/profile; committee+inventor = profile
-  only), PeopleTab (role select incl. IP Committee; suspended→"Disabled"+
+- workspace/: WorkspaceTabs — NO LONGER TABS (saurrx#2): a client identity
+  card whose "Edit workspace" opens OrganizationDetails in a dialog, then
+  PeopleTab; PHOTON_ADMIN still short-circuits to CaseOwnersTab. Profile left
+  the workspace entirely — /profile (pages/ProfilePage.tsx) is its own route
+  and /workspace redirects every non-admin there. PeopleTab (role select incl. IP Committee; suspended→"Disabled"+
   Reactivate), CaseOwnersTab (Manage Access: composed {owners, clients}
   payload; drawer has Access type Permanent/Temporary/Step-in + reason+expiry)
 - clients/: ClientsPage (cards navigate via handleClientClick), OnboardClientModal
@@ -229,6 +232,10 @@ supporting files (presigned Spaces uploads), patent portfolio table + detail +
 CSV export + import, due dates list/calendar + reminders, actions
 selection/queue/resolve, client onboarding + business scope, people/roles/
 suspend, case-owner assignments, view-as-client, desktop gate.
+Landed with the saurrx#2 design port, backend built to match (see
+pulse-backend §5): change password + sign out everywhere on /profile,
+per-client idea reference prefix, and ticking a docket event done/reopen
+(hooks/usePatentEventCompletion.ts → adapter → PATCH /v1/due-dates/:id).
 Not built (do not fake): copilot auto-fill trio, notification bell UI,
 comments/version-history timeline, per-client feature toggles, trademarks,
 mailer-driven email notifications, mobile layout, SSO, access-request flow.

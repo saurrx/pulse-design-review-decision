@@ -21,7 +21,6 @@ import { useTheme } from "@/hooks/useTheme";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { isOutsideCounselRole } from "@/lib/roleAccess";
-import { Plus } from "lucide-react";
 
 const DAY_MS = 86400000;
 
@@ -390,17 +389,7 @@ const Index = () => {
 
   const totalPatents = Number(data?.data?.total_patents) || 0;
   return (
-    <DashboardLayout
-      header={{
-        primaryAction: isInventor
-          ? {
-              label: "New disclosure",
-              icon: <Plus className="h-4 w-4" />,
-              onClick: () => setIsSubmitModalOpen(true),
-            }
-          : undefined,
-      }}
-    >
+    <DashboardLayout>
       <div className="mx-auto w-full max-w-[1680px] px-6 pb-24 pt-6 lg:px-8 md:pb-8">
         <div className="mb-6 grid grid-cols-12 gap-6">
           {isInventor ? (
@@ -524,7 +513,7 @@ const Index = () => {
           )}
 
           {/* Portfolio intelligence */}
-          <div className="col-span-12 xl:col-span-4">
+          <div className="col-span-12 h-[384px] xl:col-span-4">
             <PortfolioComposition
               total={totalPatents}
               granted={Number(data?.data?.granted_patents) || 0}
@@ -536,10 +525,11 @@ const Index = () => {
               }
             />
           </div>
-          <div className="col-span-12 xl:col-span-8">
+          <div className="col-span-12 h-[384px] xl:col-span-8">
             <div className="relative z-10 h-full overflow-hidden rounded-2xl">
               <PatentWorldMap
                 totalPatents={totalPatents}
+                height={384}
                 isPatentDialogOpen={isPatentDialogOpen}
                 setIsPatentDialogOpen={() =>
                   setIsPatentDialogOpen(!isPatentDialogOpen)

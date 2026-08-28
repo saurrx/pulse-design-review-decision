@@ -18,6 +18,7 @@ const IdeaDraftPage = lazy(() => import("./pages/IdeaDraftPage"));
 const PatentsPage = lazy(() => import("./pages/PatentsPage"));
 const DueDatesPage = lazy(() => import("./pages/DueDatesPage"));
 const WorkspacePage = lazy(() => import("./pages/WorkspacePage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ClientsPage = lazy(() => import("./pages/client/ClientsPage"));
 const ClientDetailPage = lazy(() => import("./pages/client/ClientDetailPage"));
@@ -92,6 +93,7 @@ const App = () => {
                   <Route path="/patents/:patentId" element={<PatentsPage />} />
                   <Route path="/due-dates" element={<DueDatesPage />} />
                   <Route path="/workspace" element={<WorkspacePage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/actions" element={<ActionsPage />} />
                 </Route>
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

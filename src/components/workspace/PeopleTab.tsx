@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Trash2, UserPlus, Users } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Check, Copy, Download, Link2, Trash2, UserPlus, Users } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import API_CONFIG from "@/lib/apiConfig";
 import useUserCookie from "@/hooks/use-auth";
@@ -18,8 +19,103 @@ type PeopleTabProps = {
 const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, clientName }) => {
   const { user } = useUserCookie();
   const queryClient = useQueryClient();
+  const qrCodeRef = useRef<SVGSVGElement>(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [localUsers, setLocalUsers] = useState<any[]>(Array.isArray(users) ? users : []);
+  const domain = allowedDomain?.split("@").pop() || "your company domain";
+
+  const { data: inviteLinkData, isLoading: isLoadingInviteLink } = useQuery({
+    queryKey: ["client_invite_link", clientId],
+    queryFn: async () => {
+      const response = await API_CONFIG.get(`/api/v1/clients/${clientId}/invite-link`);
+      return response?.data?.data;
+    },
+    enabled: !!clientId,
+  });
+
+  const generateLinkMutation = useMutation({
+    mutationFn: async () =>
+      API_CONFIG.post(`/api/v1/clients/${clientId}/invite-link`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
+      toast.success("Inventor invite link generated");
+    },
+  });
+
+  const inviteLink = inviteLinkData?.token
+    ? `${window.location.origin}/i/${inviteLinkData.token}`
+    : "";
+  const joinedCount = Number(inviteLinkData?.uses) || 0;
+  const lastJoinedLabel = inviteLinkData?.lastUsedAt
+    ? new Date(inviteLinkData.lastUsedAt).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      })
+    : null;
+
+  const copyInviteLink = async () => {
+    if (!inviteLink) return;
+    await navigator.clipboard.writeText(inviteLink);
+    setLinkCopied(true);
+    toast.success("Inventor invite link copied");
+    window.setTimeout(() => setLinkCopied(false), 2000);
+  };
+
+  const qrCodeBlob = () =>
+    new Promise<Blob>((resolve, reject) => {
+      const svg = qrCodeRef.current;
+      if (!svg) return reject(new Error("QR unavailable"));
+      const source = new XMLSerializer().serializeToString(svg);
+      const image = new Image();
+      const svgUrl = URL.createObjectURL(
+        new Blob([source], { type: "image/svg+xml;charset=utf-8" }),
+      );
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 512;
+        canvas.height = 512;
+        const context = canvas.getContext("2d");
+        if (!context) return reject(new Error("Canvas unavailable"));
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 24, 24, 464, 464);
+        URL.revokeObjectURL(svgUrl);
+        canvas.toBlob(
+          (blob) =>
+            blob ? resolve(blob) : reject(new Error("QR conversion failed")),
+          "image/png",
+        );
+      };
+      image.onerror = reject;
+      image.src = svgUrl;
+    });
+
+  const copyQrImage = async () => {
+    try {
+      const blob = await qrCodeBlob();
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": blob }),
+      ]);
+      toast.success("QR image copied");
+    } catch {
+      toast.error("Your browser could not copy the QR image");
+    }
+  };
+
+  const downloadQrImage = async () => {
+    try {
+      const blob = await qrCodeBlob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${clientName || "workspace"}-inventor-invite.png`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      toast.error("Could not download the QR image");
+    }
+  };
 
   useEffect(() => {
     setLocalUsers((Array.isArray(users) ? users : []).map((person) => ({
@@ -80,10 +176,94 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
           <h2 className="font-sans text-xl font-bold text-neutral-900 dark:text-neutral-100">People</h2>
           <p className="mt-1 text-sm text-neutral-500">Manage who can access the {clientName || "client"} workspace.</p>
         </div>
-        <Button onClick={() => setInviteOpen(true)} className="gap-2 bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]">
-          <UserPlus className="h-4 w-4" /> Invite people
+        <Button onClick={() => setInviteOpen(true)} variant="outline" className="gap-2">
+          <UserPlus className="h-4 w-4" /> Invite administrator
         </Button>
       </div>
+
+      <section className="rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] p-5 shadow-[var(--pulse-shadow-card)] dark:border-[#cccccc20] dark:bg-neutral-900">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          {inviteLinkData?.active ? (
+            <>
+              <div className="min-w-0">
+                <div className="flex items-start gap-3">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--pulse-surface-subtle)] text-[var(--pulse-ink-secondary)]">
+                    <Link2 className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-semibold text-[var(--pulse-ink)]">Invite inventors</h3>
+                    <p className="mt-1 text-xs leading-5 text-[var(--pulse-ink-muted)]">
+                      Anyone at {domain} with this link can join as an inventor. Administrator access is never granted through shared links.
+                    </p>
+                    <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">
+                      {joinedCount > 0
+                        ? `Non-expiring · ${joinedCount} joined${lastJoinedLabel ? ` · Last joined ${lastJoinedLabel}` : ""}`
+                        : "Non-expiring · No one has joined through this link yet"}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 flex max-w-2xl overflow-hidden rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]">
+                  <code className="min-w-0 flex-1 truncate px-3 py-2.5 text-xs text-[var(--pulse-ink-secondary)]" title={inviteLink}>
+                    {inviteLink}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={copyInviteLink}
+                    className="inline-flex shrink-0 items-center gap-1.5 border-l border-[var(--pulse-line)] bg-white px-3 text-xs font-semibold text-[var(--pulse-ink)] transition-colors hover:bg-[var(--pulse-surface-subtle)]"
+                  >
+                    {linkCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                    {linkCopied ? "Copied" : "Copy"}
+                  </button>
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center gap-3 rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] p-3">
+                <div className="rounded-lg border border-[var(--pulse-line)] bg-white p-1.5">
+                  <QRCodeSVG
+                    ref={qrCodeRef}
+                    value={inviteLink}
+                    size={88}
+                    level="M"
+                    marginSize={2}
+                    bgColor="#FFFFFF"
+                    fgColor="#171717"
+                    title={`Shareable QR code for ${clientName || "workspace"} inventor invitation`}
+                  />
+                </div>
+                <div className="flex flex-col items-start gap-2">
+                  <div>
+                    <p className="text-xs font-semibold text-[var(--pulse-ink)]">Share QR</p>
+                  </div>
+                  <Button onClick={downloadQrImage} size="sm" variant="outline" className="h-8 text-xs">
+                    <Download className="mr-1.5 h-3.5 w-3.5" /> Download
+                  </Button>
+                  <button type="button" onClick={copyQrImage} className="text-[11px] font-medium text-[var(--pulse-ink-secondary)] hover:text-[var(--pulse-ink)] hover:underline">
+                    Copy image
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:col-span-2">
+              <div className="flex items-start gap-3">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--pulse-surface-subtle)] text-[var(--pulse-ink-secondary)]">
+                  <Link2 className="h-5 w-5" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-semibold text-[var(--pulse-ink)]">Invite inventors</h3>
+                  <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">Generate a non-expiring, inventor-only link for {domain}.</p>
+                </div>
+              </div>
+              <Button
+                onClick={() => generateLinkMutation.mutate()}
+                disabled={isLoadingInviteLink || generateLinkMutation.isPending}
+                className="shrink-0 bg-[var(--pulse-brand)] text-[var(--pulse-ink)] hover:bg-[var(--pulse-brand-hover)]"
+              >
+                {isLoadingInviteLink ? "Loading…" : "Generate inventor link"}
+              </Button>
+            </div>
+          )}
+        </div>
+      </section>
 
       <section className="overflow-hidden rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] shadow-[0_18px_45px_-38px_rgba(17,16,60,0.45)] dark:border-[#cccccc20] dark:bg-neutral-900">
         <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4 dark:border-[#cccccc20]">
@@ -130,7 +310,7 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
         </div>
       </section>
 
-      <ClientInviteDialog open={inviteOpen} onOpenChange={setInviteOpen} clientId={clientId} clientName={clientName} allowedDomain={allowedDomain} />
+      <ClientInviteDialog open={inviteOpen} onOpenChange={setInviteOpen} clientId={clientId} clientName={clientName} allowedDomain={allowedDomain} adminOnly />
     </div>
   );
 };

@@ -24,6 +24,14 @@ import {
   Phone,
   MapPin,
   Pencil,
+  Bell,
+  Building2,
+  ShieldCheck,
+  Globe2,
+  KeyRound,
+  Laptop,
+  LogOut,
+  Clock3,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -38,6 +46,27 @@ import {
 } from "@/lib/api-service/commonApi.service";
 import { useTheme } from "@/hooks/useTheme";
 import { MAX_FILE_SIZE } from "@/utils/constants";
+import { Switch } from "@/components/ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useNavigate } from "react-router-dom";
+import { clearAuthSession } from "@/lib/auth";
 
 type ProfileTabProps = {
   clientDetails: any;
@@ -460,11 +489,87 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
   cancelProfileRef,
 }) => {
   const { theme } = useTheme();
+  const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [updatedProfileImage, setUpdatedProfileImage] = useState<any>(null);
   const [selectedCountry, setSelectedCountry] = useState(countries[0]); // Default to India
   const [originalFormValues, setOriginalFormValues] =
     useState<ProfileFormValues | null>(null);
+  const [notificationPreferences, setNotificationPreferences] = useState(() => {
+    const defaults = {
+      reviewDecisions: true,
+      informationRequests: true,
+      filingUpdates: true,
+    };
+    try {
+      const saved = localStorage.getItem("pulse-profile-notifications");
+      return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
+    } catch {
+      return defaults;
+    }
+  });
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [signOutAllOpen, setSignOutAllOpen] = useState(false);
+  const [passwordValues, setPasswordValues] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const updateNotificationPreference = (
+    key: keyof typeof notificationPreferences,
+    value: boolean,
+  ) => {
+    const next = { ...notificationPreferences, [key]: value };
+    setNotificationPreferences(next);
+    localStorage.setItem("pulse-profile-notifications", JSON.stringify(next));
+  };
+
+  const resetPasswordForm = () =>
+    setPasswordValues({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+
+  const { mutate: changePassword, isPending: isChangingPassword } =
+    useMutation({
+      mutationKey: ["change_password", currentUser?.id],
+      mutationFn: async () => {
+        if (passwordValues.newPassword.length < 12) {
+          throw new Error("Use at least 12 characters for your new password");
+        }
+        if (passwordValues.newPassword !== passwordValues.confirmPassword) {
+          throw new Error("New passwords do not match");
+        }
+        return API_CONFIG.post("/api/v1/auth/change-password", {
+          current_password: passwordValues.currentPassword,
+          new_password: passwordValues.newPassword,
+        });
+      },
+      onSuccess: () => {
+        toast.success("Password updated");
+        setChangePasswordOpen(false);
+        resetPasswordForm();
+      },
+      onError: (error: any) =>
+        toast.error(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Unable to update password",
+        ),
+    });
+
+  const signOut = async (allSessions = false) => {
+    try {
+      await API_CONFIG.post(
+        allSessions ? "/api/v1/auth/logout-all" : "/api/v1/auth/logout",
+      );
+    } finally {
+      clearAuthSession();
+      navigate("/login", { replace: true });
+    }
+  };
 
   const {
     data: fileUploadData,
@@ -552,12 +657,12 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
         setSelectedCountry(country);
         
         const originalValues = {
-          employeeId: latestUserdata?.employeeId || latestUserdata?.id,
+          employeeId: latestUserdata?.employeeId || "",
           email: latestUserdata?.email,
           name: latestUserdata?.name || "",
           phone: latestUserdata?.phone || "",
           country_code: country.code,
-          country_name: country.name,
+          country_name: latestUserdata?.country_name || "",
           address: latestUserdata?.address || "",
         };
 
@@ -693,93 +798,390 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
             : "Inventor";
 
   if (!isEditMode) {
+    const phone = form.getValues("phone");
+    const organizationName =
+      currentUser?.organization_name || clientDetails?.name || "Workspace";
+    const employeeId = form.getValues("employeeId");
+    const countryName = form.getValues("country_name");
+    const authProvider = String(
+      currentUser?.auth_provider || currentUser?.provider || "password",
+    ).toLowerCase();
+    const isManagedIdentity = [
+      "google",
+      "microsoft",
+      "sso",
+      "saml",
+      "oidc",
+    ].some((provider) => authProvider.includes(provider));
+    const signInMethod = isManagedIdentity
+      ? authProvider.includes("google")
+        ? "Google Workspace"
+        : authProvider.includes("microsoft")
+          ? "Microsoft Entra ID"
+          : "Organization SSO"
+      : "Email and password";
+    const lastSignIn = currentUser?.last_login_at
+      ? new Date(currentUser.last_login_at).toLocaleString([], {
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        })
+      : "Current session";
     const details = [
-      { label: "Employee ID", value: form.getValues("employeeId") || "—", icon: IdCard },
-      { label: "Email", value: form.getValues("email") || "—", icon: Mail },
       {
-        label: "Phone",
-        value: form.getValues("phone")
-          ? `${selectedCountry.code} ${form.getValues("phone")}`
-          : "—",
-        icon: Phone,
+        label: "Legal name",
+        value: form.getValues("name") || currentUser?.name || "Not provided",
+        icon: User,
       },
-      { label: "Role", value: roleLabel, icon: User },
+      {
+        label: "Work email",
+        value: form.getValues("email"),
+        icon: Mail,
+      },
+      {
+        label: "Organization",
+        value: organizationName,
+        icon: Building2,
+      },
+      {
+        label: "Employee ID",
+        value: employeeId || "Not provided",
+        icon: IdCard,
+      },
+      {
+        label: "Country",
+        value: countryName || "Not provided",
+        icon: Globe2,
+      },
+      ...(phone
+        ? [
+            {
+              label: "Phone",
+              value: `${selectedCountry.code} ${phone}`,
+              icon: Phone,
+            },
+          ]
+        : []),
+    ];
+
+    const notificationRows = [
+      {
+        key: "reviewDecisions" as const,
+        title: "Review decisions",
+        description: "When the IP committee approves, declines, or advances an idea.",
+      },
+      {
+        key: "informationRequests" as const,
+        title: "Information requests",
+        description: "When someone needs you to update a submission.",
+      },
+      {
+        key: "filingUpdates" as const,
+        title: "Filing updates",
+        description: "When Photon Legal files or progresses an application.",
+      },
     ];
 
     return (
-      <section
-        className={`mx-auto w-full max-w-4xl overflow-hidden rounded-2xl border shadow-sm ${currentUser?.role === "INVENTOR" || currentUser?.role === "CASE_OWNER" ? "mt-0" : "mt-5"} ${
-          theme === "dark"
-            ? "border-white/10 bg-white/5"
-            : "border-neutral-200 bg-white"
-        }`}
-      >
-        <div
-          className={`flex flex-col gap-5 border-b px-6 py-6 sm:flex-row sm:items-center sm:justify-between ${
-            theme === "dark" ? "border-white/10" : "border-neutral-200"
+      <div className="mx-auto w-full max-w-[960px] space-y-6">
+        <section
+          className={`overflow-hidden rounded-2xl border [box-shadow:var(--pulse-shadow-card)] ${
+            theme === "dark"
+              ? "border-white/10 bg-white/5"
+              : "border-[var(--pulse-line)] bg-white"
           }`}
         >
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#F9B418]/20 text-xl font-bold text-amber-700 ring-4 ring-[#F9B418]/10">
-              {profileImagePath ? (
-                <img
-                  src={assetUrl(profileImagePath)}
-                  alt={currentUser?.name || "Profile"}
-                  crossOrigin="use-credentials"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                initials
-              )}
+          <div className="flex flex-col gap-5 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#F9B418]/20 text-xl font-bold text-amber-700 ring-4 ring-[#F9B418]/10">
+                {profileImagePath ? (
+                  <img
+                    src={assetUrl(profileImagePath)}
+                    alt={currentUser?.name || "Profile"}
+                    crossOrigin="use-credentials"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  initials
+                )}
+              </div>
+              <div>
+                <h2 className={`font-sans text-xl font-semibold tracking-[-0.02em] ${theme === "dark" ? "text-neutral-100" : "text-[var(--pulse-ink)]"}`}>
+                  {currentUser?.name || "Your profile"}
+                </h2>
+                <p className={`mt-1 text-sm ${theme === "dark" ? "text-neutral-400" : "text-[var(--pulse-ink-secondary)]"}`}>
+                  {roleLabel} · {organizationName}
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className={`font-sans text-xl font-bold ${theme === "dark" ? "text-neutral-100" : "text-neutral-900"}`}>
-                {currentUser?.name || "Your profile"}
-              </h2>
-              <p className={`mt-1 text-sm ${theme === "dark" ? "text-neutral-400" : "text-neutral-500"}`}>
-                {roleLabel} · {currentUser?.organization_name || clientDetails?.name || "Workspace"}
-              </p>
-              <p className={`mt-0.5 text-sm ${theme === "dark" ? "text-neutral-500" : "text-neutral-500"}`}>
-                {currentUser?.email}
-              </p>
-            </div>
+            <button
+              type="button"
+              onClick={() => setIsEditMode?.(true)}
+              className={`inline-flex h-10 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium transition-colors ${
+                theme === "dark"
+                  ? "border-white/10 text-neutral-300 hover:border-[#F9B418]/50 hover:text-[#F9B418]"
+                  : "border-[var(--pulse-line)] text-[var(--pulse-ink-secondary)] hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
+              }`}
+            >
+              <Pencil className="h-4 w-4" /> Edit profile
+            </button>
           </div>
-          {currentUser?.role === "PHOTON_ADMIN" && <button
-            onClick={() => setIsEditMode?.(true)}
-            className={`inline-flex h-10 items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition-colors ${
-              theme === "dark"
-                ? "border-white/10 text-neutral-300 hover:border-[#F9B418]/50 hover:text-[#F9B418]"
-                : "border-neutral-200 text-neutral-700 hover:border-[#F9B418] hover:text-amber-700"
-            }`}
-          >
-            <Pencil className="h-4 w-4" /> Edit profile
-          </button>}
+          <div className={`border-t px-6 py-4 text-sm ${theme === "dark" ? "border-white/10 bg-white/[0.02] text-neutral-400" : "border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] text-[var(--pulse-ink-secondary)]"}`}>
+            {currentUser?.role === "INVENTOR"
+              ? "Keep these details accurate—they are used for inventor attribution and workflow notifications."
+              : "Keep these details accurate—they are used for workspace identity and notifications."}
+          </div>
+        </section>
+
+        <div className="grid items-start gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <section className={`rounded-2xl border p-6 [box-shadow:var(--pulse-shadow-card)] ${theme === "dark" ? "border-white/10 bg-white/5" : "border-[var(--pulse-line)] bg-white"}`}>
+            <div className="flex items-center gap-2">
+              <IdCard className="h-4 w-4 text-[var(--pulse-ink-muted)]" />
+              <h3 className={`text-base font-semibold ${theme === "dark" ? "text-neutral-100" : "text-[var(--pulse-ink)]"}`}>
+                {currentUser?.role === "INVENTOR"
+                  ? "Inventor details"
+                  : "Profile details"}
+              </h3>
+            </div>
+            <div className="mt-5 divide-y divide-[var(--pulse-line)]">
+              {details.map(({ label, value, icon: Icon }) => (
+                <div key={label} className="flex items-start justify-between gap-6 py-4 first:pt-0 last:pb-0">
+                  <span className={`inline-flex items-center gap-2 text-sm ${theme === "dark" ? "text-neutral-500" : "text-[var(--pulse-ink-muted)]"}`}>
+                    <Icon className="h-4 w-4" /> {label}
+                  </span>
+                  <span className={`max-w-[60%] text-right text-sm font-medium ${value === "Not provided" ? "text-[var(--pulse-ink-muted)]" : theme === "dark" ? "text-neutral-200" : "text-[var(--pulse-ink)]"}`}>
+                    {value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <div>
+            <section className={`rounded-2xl border p-6 [box-shadow:var(--pulse-shadow-card)] ${theme === "dark" ? "border-white/10 bg-white/5" : "border-[var(--pulse-line)] bg-white"}`}>
+              <div className="flex items-center gap-2">
+                <Bell className="h-4 w-4 text-[var(--pulse-ink-muted)]" />
+                <h3 className={`text-base font-semibold ${theme === "dark" ? "text-neutral-100" : "text-[var(--pulse-ink)]"}`}>
+                  Notifications
+                </h3>
+              </div>
+              <div className="mt-4 divide-y divide-[var(--pulse-line)]">
+                {notificationRows.map((row) => (
+                  <div key={row.key} className="flex items-start justify-between gap-4 py-4 first:pt-0 last:pb-0">
+                    <div>
+                      <p className={`text-sm font-medium ${theme === "dark" ? "text-neutral-200" : "text-[var(--pulse-ink)]"}`}>
+                        {row.title}
+                      </p>
+                      <p className={`mt-1 text-xs leading-5 ${theme === "dark" ? "text-neutral-500" : "text-[var(--pulse-ink-muted)]"}`}>
+                        {row.description}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={notificationPreferences[row.key]}
+                      onCheckedChange={(checked) =>
+                        updateNotificationPreference(row.key, checked)
+                      }
+                      aria-label={row.title}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+
+          </div>
         </div>
 
-        <div className="grid gap-x-10 sm:grid-cols-2">
-          {details.map(({ label, value, icon: Icon }, index) => (
-            <div
-              key={label}
-              className={`px-6 py-5 ${
-                theme === "dark" ? "border-white/10" : "border-neutral-100"
-              } ${index < 2 ? "border-b" : ""}`}
-            >
-              <div className={`mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider ${theme === "dark" ? "text-neutral-500" : "text-neutral-500"}`}>
-                <Icon className="h-4 w-4" /> {label}
-              </div>
-              <p className={`text-sm font-medium ${theme === "dark" ? "text-neutral-200" : "text-neutral-900"}`}>{value}</p>
-            </div>
-          ))}
-          <div className={`border-t px-6 py-5 sm:col-span-2 ${theme === "dark" ? "border-white/10" : "border-neutral-100"}`}>
-            <div className={`mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider ${theme === "dark" ? "text-neutral-500" : "text-neutral-500"}`}>
-              <MapPin className="h-4 w-4" /> Address
-            </div>
-            <p className={`text-sm font-medium ${theme === "dark" ? "text-neutral-200" : "text-neutral-900"}`}>
-              {form.getValues("address") || "—"}
-            </p>
+        <section className={`overflow-hidden rounded-2xl border [box-shadow:var(--pulse-shadow-card)] ${theme === "dark" ? "border-white/10 bg-white/5" : "border-[var(--pulse-line)] bg-white"}`}>
+          <div className="flex items-center gap-2 border-b border-[var(--pulse-line)] px-6 py-5">
+            <ShieldCheck className="h-4 w-4 text-[#1E7B4D]" />
+            <h3 className={`text-base font-semibold ${theme === "dark" ? "text-neutral-100" : "text-[var(--pulse-ink)]"}`}>
+              Security and access
+            </h3>
           </div>
-        </div>
-      </section>
+
+          <div className="grid gap-4 p-6 md:grid-cols-2">
+            <div className={`rounded-xl border p-5 ${theme === "dark" ? "border-white/10 bg-white/[0.02]" : "border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]"}`}>
+              <div className="flex items-start gap-3">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[var(--pulse-surface)] text-[var(--pulse-ink-muted)]">
+                  <KeyRound className="h-4 w-4" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className={`text-sm font-semibold ${theme === "dark" ? "text-neutral-200" : "text-[var(--pulse-ink)]"}`}>
+                      {signInMethod}
+                    </p>
+                    <span className="inline-flex h-6 shrink-0 items-center rounded-md bg-[#E9F1EC] px-2 text-[11px] font-semibold text-[#155C3B]">
+                      Verified
+                    </span>
+                  </div>
+                  <p className={`mt-1 text-xs leading-5 ${theme === "dark" ? "text-neutral-500" : "text-[var(--pulse-ink-muted)]"}`}>
+                    {isManagedIdentity
+                      ? `Sign-in is managed by ${organizationName}.`
+                      : `Signed in as ${currentUser?.email}.`}
+                  </p>
+                  {!isManagedIdentity && (
+                    <button
+                      type="button"
+                      onClick={() => setChangePasswordOpen(true)}
+                      className="mt-3 text-xs font-semibold text-[#4351C0] hover:underline"
+                    >
+                      Change password
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className={`rounded-xl border p-5 ${theme === "dark" ? "border-white/10 bg-white/[0.02]" : "border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]"}`}>
+              <div className="flex items-start gap-3">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[var(--pulse-surface)] text-[var(--pulse-ink-muted)]">
+                  <Laptop className="h-4 w-4" />
+                </span>
+                <div>
+                  <p className={`text-sm font-semibold ${theme === "dark" ? "text-neutral-200" : "text-[var(--pulse-ink)]"}`}>
+                    Current session
+                  </p>
+                  <p className={`mt-1 inline-flex items-center gap-1.5 text-xs leading-5 ${theme === "dark" ? "text-neutral-500" : "text-[var(--pulse-ink-muted)]"}`}>
+                    <Clock3 className="h-3.5 w-3.5" /> Last sign-in: {lastSignIn}
+                  </p>
+                  <p className={`mt-1 text-xs leading-5 ${theme === "dark" ? "text-neutral-500" : "text-[var(--pulse-ink-muted)]"}`}>
+                    This browser is currently active.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-6 py-4">
+            <p className="text-xs text-[var(--pulse-ink-muted)]">
+              Sign out everywhere if you no longer recognize an active session.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => signOut(false)}
+                className="inline-flex h-9 items-center gap-2 rounded-xl border border-[var(--pulse-line)] bg-white px-3.5 text-sm font-medium text-[var(--pulse-ink-secondary)] hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
+              >
+                <LogOut className="h-4 w-4" /> Sign out
+              </button>
+              <button
+                type="button"
+                onClick={() => setSignOutAllOpen(true)}
+                className="inline-flex h-9 items-center gap-2 rounded-xl border border-[var(--pulse-line)] bg-white px-3.5 text-sm font-medium text-[var(--pulse-danger)] hover:border-[var(--pulse-danger)]"
+              >
+                Sign out all devices
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <Dialog
+          open={changePasswordOpen}
+          onOpenChange={(open) => {
+            setChangePasswordOpen(open);
+            if (!open) resetPasswordForm();
+          }}
+        >
+          <DialogContent className="sm:max-w-[480px]">
+            <DialogHeader>
+              <DialogTitle>Change password</DialogTitle>
+              <DialogDescription>
+                Confirm your current password, then choose a new password with at least 12 characters.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <label className="block text-sm font-medium text-[var(--pulse-ink)]">
+                Current password
+                <Input
+                  type="password"
+                  autoComplete="current-password"
+                  value={passwordValues.currentPassword}
+                  onChange={(event) =>
+                    setPasswordValues((values) => ({
+                      ...values,
+                      currentPassword: event.target.value,
+                    }))
+                  }
+                  className="mt-2"
+                />
+              </label>
+              <label className="block text-sm font-medium text-[var(--pulse-ink)]">
+                New password
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  value={passwordValues.newPassword}
+                  onChange={(event) =>
+                    setPasswordValues((values) => ({
+                      ...values,
+                      newPassword: event.target.value,
+                    }))
+                  }
+                  className="mt-2"
+                />
+              </label>
+              <label className="block text-sm font-medium text-[var(--pulse-ink)]">
+                Confirm new password
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  value={passwordValues.confirmPassword}
+                  onChange={(event) =>
+                    setPasswordValues((values) => ({
+                      ...values,
+                      confirmPassword: event.target.value,
+                    }))
+                  }
+                  className="mt-2"
+                />
+              </label>
+            </div>
+            <DialogFooter>
+              <button
+                type="button"
+                onClick={() => setChangePasswordOpen(false)}
+                className="h-10 rounded-xl border border-[var(--pulse-line)] px-4 text-sm font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => changePassword()}
+                disabled={
+                  isChangingPassword ||
+                  !passwordValues.currentPassword ||
+                  !passwordValues.newPassword ||
+                  !passwordValues.confirmPassword
+                }
+                className="h-10 rounded-xl bg-[var(--pulse-brand)] px-4 text-sm font-semibold text-[var(--pulse-ink)] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isChangingPassword ? "Updating…" : "Update password"}
+              </button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <AlertDialog open={signOutAllOpen} onOpenChange={setSignOutAllOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Sign out all devices?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Every active Pulse session for this account will be signed out, including this device.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => signOut(true)}
+                className="bg-[var(--pulse-danger)] text-white hover:bg-[var(--pulse-danger)]/90"
+              >
+                Sign out all devices
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     );
   }
 

@@ -1,114 +1,147 @@
-import React, { useState, useEffect } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import PeopleTab from "@/components/workspace/PeopleTab";
+import React, { useRef, useState } from "react";
+import { Building2, Pen } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import CaseOwnersTab from "@/components/workspace/CaseOwnersTab";
-import ProfileTab from "@/components/workspace/ProfileTab";
+import OrganizationDetails from "@/components/workspace/OrganizationDetails";
+import PeopleTab from "@/components/workspace/PeopleTab";
 import useUserCookie from "@/hooks/use-auth";
-import { useSearchParams } from "react-router-dom";
-import { useTheme } from "@/hooks/useTheme";
+import API_CONFIG from "@/lib/apiConfig";
+import {
+  getClientInitials,
+  getClientLogoSrc,
+} from "@/lib/clientBranding";
 
 type WorkspaceTabsProps = {
   clientDetails: any;
   clientId: string;
-  isEditMode?: boolean;
-  setIsEditMode?: (value: boolean) => void;
-  saveProfileRef?: React.MutableRefObject<(() => void) | null>;
-  cancelProfileRef?: React.MutableRefObject<(() => void) | null>;
+  refetchClientData?: () => void;
 };
 
 const WorkspaceTabs: React.FC<WorkspaceTabsProps> = ({
   clientDetails,
   clientId,
-  isEditMode = false,
-  setIsEditMode,
-  saveProfileRef,
-  cancelProfileRef,
+  refetchClientData,
 }) => {
-  const { theme } = useTheme();
   const { user } = useUserCookie();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const tabFromUrl = searchParams.get('tab');
-  
-  // Set default tab to "profile" if none is specified in URL
-  const [activeTab, setActiveTab] = useState(
-    tabFromUrl && ['profile', 'people'].includes(tabFromUrl)
-      ? tabFromUrl 
-      : user?.role === "PHOTON_ADMIN" ? 'people' : 'profile'
+  const [editOpen, setEditOpen] = useState(false);
+  const saveAboutRef = useRef<(() => void) | null>(null);
+  const cancelAboutRef = useRef<(() => void) | null>(null);
+
+  if (user?.role === "PHOTON_ADMIN") {
+    return <CaseOwnersTab />;
+  }
+
+  const clientName = clientDetails?.name || "Client workspace";
+  const allowedDomain =
+    clientDetails?.allowed_domain?.split("@").pop() || "No domain configured";
+  const clientLogoSrc = getClientLogoSrc(
+    {
+      id: clientDetails?.id || clientId,
+      name: clientName,
+      logo_file: clientDetails?.logo_file,
+    },
+    String(API_CONFIG.defaults.baseURL || ""),
   );
 
-  // Update URL when tab changes
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    setSearchParams({ tab: value });
-  };
-
-  // Sync with URL params if they change externally
-  useEffect(() => {
-    if (tabFromUrl && ['profile', 'people'].includes(tabFromUrl)) {
-      setActiveTab(tabFromUrl);
-    } else if (!tabFromUrl && user?.role === "PHOTON_ADMIN") {
-      setActiveTab("people");
-    } else if (tabFromUrl === "business-scope") {
-      setActiveTab("profile");
-      setSearchParams({ tab: "profile" }, { replace: true });
-    }
-  }, [tabFromUrl, user?.role]);
-
   return (
-    <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-20 md:mb-0">
-      {user?.role !== "INVENTOR" && user?.role !== "TECH_COMMITTEE" && user?.role !== "CASE_OWNER" && <TabsList className={`text-muted-foreground items-center flex justify-start p-1 rounded-xl h-auto mb-3 ${user?.role === "PHOTON_ADMIN" ? "w-full sm:w-fit sm:min-w-[360px]" : "w-full"} ${theme === 'dark' ? 'bg-white/[0.03] border border-white/[0.08]' : 'bg-black/[0.02] border border-black/[0.08]'}`}>
-        {user?.role === "PHOTON_ADMIN" && (
-          <TabsTrigger
-            value="people"
-            className={`font-sans inline-flex flex-1 items-center justify-center gap-1.5 h-9 px-4 py-1 rounded-lg text-sm font-medium whitespace-nowrap transition-all border text-zinc-600 border-transparent dark:text-zinc-400 hover:text-zinc-700 hover:bg-black/[0.05] dark:hover:text-zinc-300 dark:hover:bg-white/[0.05] data-[state=active]:bg-black/[0.08] data-[state=active]:text-zinc-600 data-[state=active]:shadow-sm dark:data-[state=active]:bg-[#F9B418] dark:data-[state=active]:text-black focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4'}`}
-          >
-            Manage Access
-          </TabsTrigger>
-        )}
+    <div className="space-y-5">
+      <section className="flex flex-col gap-4 rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] p-5 shadow-[var(--pulse-shadow-card)] sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-4">
+          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]">
+            {clientLogoSrc ? (
+              <img
+                src={clientLogoSrc}
+                alt={`${clientName} logo`}
+                className="h-full w-full object-contain p-1.5"
+                crossOrigin="use-credentials"
+              />
+            ) : (
+              <span className="text-sm font-semibold text-[var(--pulse-ink)]">
+                {getClientInitials(clientName)}
+              </span>
+            )}
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 shrink-0 text-[var(--pulse-ink-muted)]" />
+              <h2 className="truncate text-base font-semibold text-[var(--pulse-ink)]">
+                {clientName}
+              </h2>
+            </div>
+            <p className="mt-1 text-sm text-[var(--pulse-ink-secondary)]">
+              {allowedDomain}
+            </p>
+            {clientDetails?.about && (
+              <p className="mt-1 max-w-3xl truncate text-xs text-[var(--pulse-ink-muted)]" title={clientDetails.about}>
+                {clientDetails.about}
+              </p>
+            )}
+          </div>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => setEditOpen(true)}
+          className="shrink-0 gap-2"
+        >
+          <Pen className="h-4 w-4" /> Edit workspace
+        </Button>
+      </section>
 
-        <TabsTrigger
-          value="profile"
-          className={`font-sans inline-flex flex-1 items-center justify-center gap-1.5 h-9 px-4 py-1 rounded-lg text-sm font-medium whitespace-nowrap transition-all border text-zinc-600 border-transparent dark:text-zinc-400 hover:text-zinc-700 hover:bg-black/[0.05] dark:hover:text-zinc-300 dark:hover:bg-white/[0.05] data-[state=active]:bg-black/[0.08] data-[state=active]:text-zinc-600 data-[state=active]:shadow-sm dark:data-[state=active]:bg-[#F9B418] dark:data-[state=active]:text-black focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4'}`}          >
-          Your Profile
-        </TabsTrigger>
-        
-        {user?.role !== "INVENTOR" && user?.role !== "TECH_COMMITTEE" && user?.role !== "PHOTON_ADMIN" && (
-          <TabsTrigger
-            value="people"
-            className={`font-sans inline-flex flex-1 items-center justify-center gap-1.5 h-9 px-4 py-1 rounded-lg text-sm font-medium whitespace-nowrap transition-all border text-zinc-600 border-transparent dark:text-zinc-400 hover:text-zinc-700 hover:bg-black/[0.05] dark:hover:text-zinc-300 dark:hover:bg-white/[0.05] data-[state=active]:bg-black/[0.08] data-[state=active]:text-zinc-600 data-[state=active]:shadow-sm dark:data-[state=active]:bg-[#F9B418] dark:data-[state=active]:text-black focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4'}`}
-          >
-            People
-          </TabsTrigger>
-        )}
+      <PeopleTab
+        users={clientDetails?.User}
+        allowedDomain={clientDetails?.allowed_domain}
+        clientId={clientId}
+        clientName={clientName}
+      />
 
-      </TabsList>}
-
-     
-      <TabsContent value="profile" className="flex-1 outline-none mt-0">
-        <ProfileTab
-          clientDetails={clientDetails}
-          isEditMode={isEditMode}
-          setIsEditMode={setIsEditMode}
-          saveProfileRef={saveProfileRef}
-          cancelProfileRef={cancelProfileRef}
-        />
-      </TabsContent>
-      
-      
-      <TabsContent value="people" className="flex-1 outline-none mt-0 space-y-6">
-        {user?.role === "PHOTON_ADMIN" ? (
-          <CaseOwnersTab />
-        ) : (
-          <PeopleTab
-            users={clientDetails?.User}
-            allowedDomain={clientDetails?.allowed_domain}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="max-h-[90vh] max-w-xl overflow-y-auto bg-white dark:bg-neutral-950">
+          <DialogHeader>
+            <DialogTitle>Edit workspace</DialogTitle>
+            <DialogDescription>
+              Update the organization information shown to workspace members.
+            </DialogDescription>
+          </DialogHeader>
+          <OrganizationDetails
+            refetchClientData={refetchClientData}
+            clientDetails={clientDetails}
             clientId={clientId}
-            clientName={clientDetails?.name}
+            isEditMode
+            setIsEditMode={(editing) => {
+              if (!editing) setEditOpen(false);
+            }}
+            saveAboutRef={saveAboutRef}
+            cancelAboutRef={cancelAboutRef}
           />
-        )}
-      </TabsContent>
-
-      </Tabs>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                cancelAboutRef.current?.();
+                setEditOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => saveAboutRef.current?.()}
+              className="bg-[var(--pulse-brand)] text-[var(--pulse-ink)] hover:bg-[var(--pulse-brand-hover)]"
+            >
+              Save workspace
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };
 

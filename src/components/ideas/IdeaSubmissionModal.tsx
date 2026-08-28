@@ -1,5 +1,11 @@
 import React, { useRef, useState } from "react";
-import { FileText, Plus, X } from "lucide-react";
+import {
+  ArrowRight,
+  ClipboardPaste,
+  FileText,
+  Upload,
+  X,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -38,6 +44,9 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
   const [title, setTitle] = useState("");
   const [sourceFiles, setSourceFiles] = useState<File[]>([]);
   const [sourceText, setSourceText] = useState("");
+  const [contextMode, setContextMode] = useState<"files" | "text" | null>(
+    null,
+  );
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -47,6 +56,7 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
     setTitle("");
     setSourceFiles([]);
     setSourceText("");
+    setContextMode(null);
   };
 
   // Creates the idea + a fresh draft. `silent` is the close-with-title path:
@@ -148,7 +158,10 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
         next.push(file);
       }
     });
-    if (next.length) setSourceFiles((prev) => [...prev, ...next]);
+    if (next.length) {
+      setSourceFiles((prev) => [...prev, ...next]);
+      setContextMode("files");
+    }
   };
 
   const dark = theme === "dark";
@@ -157,99 +170,99 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
   const hairline = dark ? "bg-[#cccccc20]" : "bg-[#E8E8E8]";
   const fieldBorder = dark ? "border-white/10" : "border-[#E8E8E8]";
 
-  const sectionHeading = `text-base font-semibold ${ink}`;
-  const fieldLabel = `mb-1 block text-xs font-medium font-sans tracking-wider uppercase ${
-    dark ? "text-neutral-400" : "text-neutral-600"
-  }`;
-
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent
         className={`${
           dark ? "bg-[#080808] border-[#cccccc20]" : "bg-white"
-        } sm:max-w-[560px] max-h-[90vh] overflow-y-auto rounded-2xl p-0 font-sans`}
+        } max-h-[88vh] overflow-hidden rounded-2xl p-0 font-sans sm:max-w-[600px]`}
       >
-        <DialogHeader className="px-6 pt-6">
+        <DialogHeader className="px-7 pb-5 pt-7">
           <DialogTitle
-            className={`text-xl font-bold tracking-wide font-sans ${
+            className={`font-sans text-2xl font-semibold tracking-[-0.025em] ${
               dark ? "text-neutral-100" : "text-zinc-900"
             }`}
           >
-            Submit an Idea
+            Start an idea
           </DialogTitle>
+          <p className={`mt-1 text-sm ${muted}`}>
+            Add a working title. You can build out the details in the draft.
+          </p>
         </DialogHeader>
 
-        <form className="flex flex-col" onSubmit={handleSubmit}>
-          <div className="space-y-7 px-6 pb-6 pt-2">
-            {/* ---- Invention details ---- */}
-            <section>
-              <h3 className={sectionHeading}>Invention Details</h3>
-              <div className="mt-3">
-                <label htmlFor="idea-title" className={fieldLabel}>
-                  Idea title <span className={`${muted} normal-case`}>(required)</span>
-                </label>
-                <Input
-                  name="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className={`h-10 w-full rounded-xl border bg-transparent px-3 text-sm outline-none focus-visible:border-[#F9B418] focus-visible:ring-0 ${fieldBorder} ${
-                    dark
-                      ? "text-neutral-100 placeholder:text-neutral-500"
-                      : "text-neutral-900 placeholder:text-neutral-400"
-                  }`}
-                  type="text"
-                  id="idea-title"
-                  placeholder="A short working title — you can refine it later"
-                />
-              </div>
-            </section>
+        <form className="flex min-h-0 flex-col" onSubmit={handleSubmit}>
+          <div className="min-h-0 space-y-6 overflow-y-auto px-7 pb-7">
+            <div>
+              <label
+                htmlFor="idea-title"
+                className={`mb-2 flex items-center gap-2 text-sm font-medium ${ink}`}
+              >
+                Working title
+                <span className={`text-xs font-normal ${muted}`}>Required</span>
+              </label>
+              <Input
+                autoFocus
+                name="title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className={`h-12 w-full rounded-xl border bg-transparent px-3.5 text-[15px] outline-none focus-visible:border-[#4351C0] focus-visible:ring-2 focus-visible:ring-[#4351C0]/10 ${fieldBorder} ${
+                  dark
+                    ? "text-neutral-100 placeholder:text-neutral-500"
+                    : "text-neutral-900 placeholder:text-neutral-400"
+                }`}
+                type="text"
+                id="idea-title"
+                placeholder="e.g. Self-cooling battery enclosure"
+              />
+            </div>
 
-            {/* ---- Upload documents ---- */}
-            <section
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragOver(true);
-              }}
-              onDragLeave={() => setIsDragOver(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setIsDragOver(false);
-                acceptFiles(e.dataTransfer.files);
-              }}
-            >
-              <h3 className={sectionHeading}>Upload Relevant Documents</h3>
-              <p className={`mt-1 text-xs ${muted}`}>
-                Drop a write-up, deck, or PDF — we'll pre-fill your draft from
-                it. (.pdf, .docx, .pptx)
-              </p>
-
-              {sourceFiles.length > 0 && (
-                <div className="mt-3 space-y-2">
-                  <span className={fieldLabel}>Uploaded files</span>
-                  {sourceFiles.map((f) => (
-                    <div key={f.name} className="flex items-center gap-2">
-                      <div
-                        className={`flex h-10 flex-1 items-center gap-2 rounded-xl border px-3 text-sm ${fieldBorder} ${ink}`}
-                      >
-                        <FileText className="h-4 w-4 shrink-0 text-[#727272]" />
-                        <span className="truncate">{f.name}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setSourceFiles((prev) =>
-                            prev.filter((x) => x.name !== f.name),
-                          )
-                        }
-                        className={`p-1 ${muted} transition-colors hover:text-[#0C0C0C] dark:hover:text-neutral-200`}
-                        aria-label={`Remove ${f.name}`}
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
+            <section className={`border-t pt-5 ${dark ? "border-white/10" : "border-[#E8E8E8]"}`}>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className={`text-sm font-semibold ${ink}`}>
+                    Add context
+                    <span className={`ml-2 font-normal ${muted}`}>Optional</span>
+                  </h3>
+                  <p className={`mt-1 text-xs ${muted}`}>
+                    Skip this for now, or give us a head start on your draft.
+                  </p>
                 </div>
-              )}
+              </div>
+
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  aria-pressed={contextMode === "files"}
+                  onClick={() => setContextMode(contextMode === "files" ? null : "files")}
+                  className={`flex h-10 items-center justify-center gap-2 rounded-xl border text-[13px] font-medium transition-colors ${
+                    contextMode === "files"
+                      ? dark
+                        ? "border-white/30 bg-white/10 text-white"
+                        : "border-[#C8C8C8] bg-[#F5F5F5] text-[#0C0C0C]"
+                      : dark
+                        ? "border-white/10 text-neutral-300 hover:border-white/25"
+                        : "border-[#E8E8E8] text-[#444444] hover:border-[#C8C8C8] hover:bg-[#FAFAFA]"
+                  }`}
+                >
+                  <Upload className="h-4 w-4" /> Upload files
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={contextMode === "text"}
+                  onClick={() => setContextMode(contextMode === "text" ? null : "text")}
+                  className={`flex h-10 items-center justify-center gap-2 rounded-xl border text-[13px] font-medium transition-colors ${
+                    contextMode === "text"
+                      ? dark
+                        ? "border-white/30 bg-white/10 text-white"
+                        : "border-[#C8C8C8] bg-[#F5F5F5] text-[#0C0C0C]"
+                      : dark
+                        ? "border-white/10 text-neutral-300 hover:border-white/25"
+                        : "border-[#E8E8E8] text-[#444444] hover:border-[#C8C8C8] hover:bg-[#FAFAFA]"
+                  }`}
+                >
+                  <ClipboardPaste className="h-4 w-4" /> Paste notes
+                </button>
+              </div>
 
               <input
                 ref={fileInputRef}
@@ -262,61 +275,91 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
                   e.target.value = "";
                 }}
               />
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className={`mt-3 inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-[13px] font-medium transition-colors ${
-                  isDragOver
-                    ? "border-[#F9B418] bg-[#F9B418]/5"
-                    : dark
-                      ? "border-white/15 text-neutral-300 hover:border-white/30"
-                      : "border-[#C8C8C8] text-[#444444] hover:bg-[#F5F5F5]"
-                }`}
-              >
-                <Plus className="h-4 w-4" /> Upload Files
-              </button>
-            </section>
 
-            {/* ---- or ---- */}
-            <div className="flex items-center gap-4">
-              <div className={`h-[1px] flex-1 ${hairline}`} />
-              <span className={`text-xs ${muted}`}>or</span>
-              <div className={`h-[1px] flex-1 ${hairline}`} />
-            </div>
+              {contextMode === "files" && (
+                <div className="mt-3 space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDragOver(true);
+                    }}
+                    onDragLeave={() => setIsDragOver(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsDragOver(false);
+                      acceptFiles(e.dataTransfer.files);
+                    }}
+                    className={`flex w-full items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-5 text-sm transition-colors ${
+                      isDragOver
+                        ? "border-[#4351C0] bg-[#4351C0]/5 text-[#4351C0]"
+                        : dark
+                          ? "border-white/20 text-neutral-300 hover:border-white/35"
+                          : "border-[#C8C8C8] text-[#444444] hover:bg-[#FAFAFA]"
+                    }`}
+                  >
+                    <Upload className="h-4 w-4" />
+                    Drop files here or choose files
+                    <span className={`text-xs ${muted}`}>PDF, DOCX, PPTX</span>
+                  </button>
+                  {sourceFiles.map((file) => (
+                    <div
+                      key={file.name}
+                      className={`flex h-10 items-center gap-2 rounded-xl border px-3 text-sm ${fieldBorder} ${ink}`}
+                    >
+                      <FileText className={`h-4 w-4 shrink-0 ${muted}`} />
+                      <span className="min-w-0 flex-1 truncate">{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setSourceFiles((files) =>
+                            files.filter((item) => item.name !== file.name),
+                          )
+                        }
+                        className={`grid h-7 w-7 place-items-center ${muted} hover:text-[#0C0C0C] dark:hover:text-neutral-200`}
+                        aria-label={`Remove ${file.name}`}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-            {/* ---- Paste content ---- */}
-            <section>
-              <h3 className={sectionHeading}>Paste Related Content</h3>
-              <textarea
-                rows={5}
-                value={sourceText}
-                onChange={(e) => setSourceText(e.target.value)}
-                placeholder="Paste anything — an email, meeting notes, a rough description. We'll structure it for you."
-                className={`mt-3 w-full resize-y rounded-xl border bg-transparent px-3 py-2 text-sm outline-none focus-visible:border-[#F9B418] ${fieldBorder} ${
-                  dark
-                    ? "text-neutral-100 placeholder:text-neutral-500"
-                    : "text-neutral-900 placeholder:text-neutral-400"
-                }`}
-              />
-              <p className={`mt-1 text-xs ${muted}`}>
-                Both are optional — skip them to start with a blank draft.
-              </p>
+              {contextMode === "text" && (
+                <textarea
+                  autoFocus
+                  rows={4}
+                  value={sourceText}
+                  onChange={(e) => setSourceText(e.target.value)}
+                  placeholder="Paste an email, meeting notes, or a rough description…"
+                  className={`mt-3 w-full resize-none rounded-xl border bg-transparent px-3.5 py-3 text-sm outline-none focus-visible:border-[#4351C0] focus-visible:ring-2 focus-visible:ring-[#4351C0]/10 ${fieldBorder} ${
+                    dark
+                      ? "text-neutral-100 placeholder:text-neutral-500"
+                      : "text-neutral-900 placeholder:text-neutral-400"
+                  }`}
+                />
+              )}
             </section>
           </div>
 
-          {/* ---- Primary action ---- */}
           <div className={`h-[1px] w-full ${hairline}`} />
-          <div className="px-6 py-4">
+          <div className="flex items-center justify-between gap-4 px-7 py-4">
+            <p className={`text-xs ${muted}`}>
+              {title.trim() ? "Everything can be edited later." : "Enter a title to continue."}
+            </p>
             <button
               type="submit"
-              className="h-10 w-full rounded-xl bg-[#F9B418] text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-11 min-w-[150px] items-center justify-center gap-2 rounded-xl bg-[#F9B418] px-5 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:cursor-not-allowed disabled:bg-[#FDF3DC] disabled:text-[#9C9C9C]"
               disabled={!title.trim() || isCreatingIdea}
             >
               {isCreatingIdea
-                ? "Creating..."
+                ? "Starting…"
                 : hasSource
-                  ? "Create & pre-fill draft"
-                  : "Create draft"}
+                  ? "Start with context"
+                  : "Start draft"}
+              {!isCreatingIdea && <ArrowRight className="h-4 w-4" />}
             </button>
           </div>
         </form>

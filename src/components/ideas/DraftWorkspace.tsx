@@ -23,6 +23,7 @@ import ideaDraftQuestions from "@/lib/IdeaDraftQuestion";
 import useUserCookie from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/useTheme";
 import CoInventorsField from "@/components/ideas/CoInventorsField";
+import StatusTimeline from "@/components/ideas/StatusTimeline";
 
 /**
  * Sectioned copilot workspace for the inventor draft flow. Converts the
@@ -584,35 +585,57 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
   /* ---------------------------------- render ---------------------------------- */
 
   return (
-    <div className={`pulse-product-page flex h-screen flex-col font-sans ${dark ? "bg-black" : "bg-[var(--pulse-canvas)]"}`}>
+    <div className={`pulse-product-page flex h-[calc(100dvh-4rem)] min-h-0 flex-col font-sans ${dark ? "bg-black" : "bg-[var(--pulse-canvas)]"}`}>
       {/* ---- Header ---- */}
       <div
-        className={`flex items-center justify-between gap-6 border-b px-6 py-4 ${
+        className={`border-b px-6 py-5 ${
           dark ? "border-[#cccccc20] bg-[#0a0a0a]" : "border-[#E8E8E8] bg-white"
         }`}
       >
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="min-w-0">
-            <span className={`block truncate text-lg font-semibold tracking-[-0.015em] ${ink}`}>
-              {idea?.title || "Draft"}
-            </span>
-            <span className={`text-xs ${muted}`}>
-              Draft submission
-              {savedAt && (
-                <span className="ml-2 normal-case">· {savedLabel(savedAt)}</span>
-              )}
-            </span>
+        <div className="mx-auto w-full max-w-[1200px]">
+          <div className={`text-sm ${muted}`}>
+            Ideas <span className="mx-1.5">/</span> {idea?.id?.toUpperCase() || ""}
           </div>
-        </div>
-        <div className="max-w-[360px]">
-          <CoInventorsField ideaId={ideaId} />
+          <h1 className={`mt-4 truncate text-2xl font-semibold tracking-[-0.025em] ${ink}`}>
+            {idea?.title || "Working submission"}
+          </h1>
+          <div className={`mt-2 flex flex-wrap items-center gap-2 text-xs ${muted}`}>
+            <span className="inline-flex h-7 items-center gap-1.5 rounded-md border border-[var(--pulse-line)] bg-white px-2.5 font-medium text-[#484E59]">
+              <span className="h-[7px] w-[7px] bg-[#727272]" /> In draft
+            </span>
+            <span>Working submission</span>
+            {savedAt && <span>· {savedLabel(savedAt)}</span>}
+          </div>
         </div>
       </div>
 
+      {idea && <StatusTimeline idea={idea} showStatusLine={false} />}
+
       {/* ---- Body ---- */}
-      <div className="flex flex-1 gap-6 overflow-hidden px-6 py-6">
+      <div className="min-h-0 flex-1 overflow-y-auto pb-8">
+        <div className="mx-auto w-full max-w-[1160px] px-6 py-8">
+          <section className="overflow-hidden rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] [box-shadow:var(--pulse-shadow-card)]">
+            <div className="flex items-start gap-4 border-l-4 border-l-[#F9B418] px-6 py-5">
+              <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#FDF3DC] text-[#7E5A00]">
+                <FileText className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#7E5A00]">
+                  Keep building
+                </p>
+                <h2 className={`mt-1 text-lg font-semibold tracking-[-0.015em] ${ink}`}>
+                  Complete your working submission
+                </h2>
+                <p className={`mt-1 text-sm ${muted}`}>
+                  Your answers save automatically. Send for review when the required sections are complete.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <div className="mt-6 flex flex-col items-start gap-6 lg:flex-row">
         {/* Left rail: progress + outline */}
-        <aside className="hidden w-52 shrink-0 lg:block">
+        <aside className="hidden">
           <div className="mb-4">
             <div className={`mb-1 flex justify-between text-xs ${muted}`}>
               <span className="font-medium uppercase tracking-[0.05em]">Completion</span>
@@ -669,7 +692,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
         </aside>
 
         {/* Main column */}
-        <main className="min-w-0 flex-1 overflow-y-auto pb-28 pr-1">
+        <main className="w-full min-w-0 lg:w-[64%]">
           {/* Autofill banner */}
           {slimBanner ? (
             <div
@@ -1019,7 +1042,58 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
         </main>
 
         {/* Right rail: preliminary signal */}
-        <aside className="hidden w-60 shrink-0 xl:block">
+        <aside className="w-full shrink-0 space-y-4 lg:sticky lg:top-4 lg:w-[36%]">
+          <div className={`rounded-xl border p-5 ${card}`}>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className={`text-xs font-medium uppercase tracking-[0.05em] ${muted}`}>
+                  Submission readiness
+                </div>
+                <div className={`mt-1 text-sm font-semibold ${ink}`}>
+                  {missingRequired.length === 0
+                    ? "Ready for evaluation"
+                    : `${missingRequired.length} required field${missingRequired.length === 1 ? "" : "s"} remaining`}
+                </div>
+              </div>
+              <span className={`font-mono text-sm font-semibold ${ink}`}>{completion}%</span>
+            </div>
+            <div className={`mt-3 h-1.5 w-full rounded-full ${dark ? "bg-neutral-800" : "bg-neutral-200"}`}>
+              <div
+                className="h-1.5 rounded-full bg-[#F9B418] transition-all"
+                style={{ width: `${completion}%` }}
+              />
+            </div>
+            <nav className="mt-4 space-y-1">
+              {outline.map((item) => {
+                const done = sectionComplete(item.id);
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => scrollToSection(item.id)}
+                    className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] transition-colors hover:bg-[var(--pulse-surface-subtle)] ${muted}`}
+                  >
+                    {item.id === "attachments" && !done ? (
+                      <span className="w-4 shrink-0" />
+                    ) : (
+                      <span
+                        className={`grid h-4 w-4 shrink-0 place-items-center rounded-full border ${
+                          done
+                            ? "border-[#1E7B4D] bg-[#1E7B4D]"
+                            : "border-[var(--pulse-line-strong)]"
+                        }`}
+                      >
+                        {done && <Check className="h-3 w-3 text-white" />}
+                      </span>
+                    )}
+                    <span className="flex-1">{item.title}</span>
+                    {item.id === "attachments" && <span className="text-xs">optional</span>}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
           <div className={`rounded-xl border p-4 ${card}`}>
             <div
               className={`text-xs font-medium uppercase tracking-[0.05em] ${muted}`}
@@ -1032,9 +1106,9 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                   className={`mt-2 text-2xl font-semibold ${ink}`}
                   style={{ fontVariantNumeric: "tabular-nums" }}
                 >
-                  {Math.round(scoreRaw)}
+                  {score10?.toFixed(1)}
                   <span className={`ml-1 text-sm font-normal ${muted}`}>
-                    /100
+                    /10
                   </span>
                 </div>
                 {dirtySinceScore && (
@@ -1048,13 +1122,11 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                     </span>
                   </span>
                 )}
-                <button
-                  type="button"
-                  onClick={() => navigate(`/ideas/${ideaId}`)}
-                  className={`mt-2 block text-xs font-medium underline-offset-2 hover:underline ${ink}`}
-                >
-                  View full report →
-                </button>
+                {scoreMeta?.scoringResult?.summary && (
+                  <p className={`mt-3 text-xs leading-relaxed ${muted}`}>
+                    {scoreMeta.scoringResult.summary}
+                  </p>
+                )}
               </>
             ) : scoringActive ? (
               <p className={`mt-2 text-xs leading-relaxed ${muted}`}>
@@ -1086,17 +1158,28 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                 <p
                   className={`mt-3 border-t pt-2 text-xs ${muted} ${dark ? "border-[#cccccc20]" : "border-[#F5F5F5]"}`}
                 >
-                  The full score out of 100 is calculated when you finish.
+                  The full score out of 10 is calculated when you finish.
                 </p>
               </>
             )}
           </div>
+
+          <div className={`rounded-xl border p-5 ${card}`}>
+            <div className={`text-xs font-medium uppercase tracking-[0.05em] ${muted}`}>
+              Contributors
+            </div>
+            <div className="mt-3">
+              <CoInventorsField ideaId={ideaId} />
+            </div>
+          </div>
         </aside>
+          </div>
+        </div>
       </div>
 
       {/* ---- Footer CTA ---- */}
       <div
-        className={`fixed bottom-0 left-0 z-20 w-full border-t px-6 py-3 md:left-auto md:w-[calc(100vw-16rem)] ${
+        className={`z-20 shrink-0 border-t px-6 py-3 ${
           dark ? "border-[#cccccc20] bg-[#0a0a0a]" : "border-[#E8E8E8] bg-white"
         }`}
       >
@@ -1133,11 +1216,11 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
             ) : scored ? (
               score10! >= 7 ? (
                 <span className={ink}>
-                  Strong signal. Send it to the committee.
+                  Strong signal. Send it for review.
                 </span>
               ) : score10! >= 4 ? (
                 <span className={muted}>
-                  Send to committee{" "}
+                  Send for review{" "}
                   <button
                     type="button"
                     onClick={() => scrollToSection(weakestSectionId)}
@@ -1192,7 +1275,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
               >
                 {isScoring || scoringActive
                   ? "Scoring..."
-                  : "Finish and get score"}
+                  : "Evaluate submission"}
               </button>
             ) : score10! < 4 ? (
               <>
@@ -1206,14 +1289,14 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                       : "border-[#C8C8C8] text-[#444444] hover:bg-[#F5F5F5]"
                   }`}
                 >
-                  {isSending ? "Sending..." : "Send to IP Committee"}
+                  {isSending ? "Sending..." : "Send for review"}
                 </button>
                 <button
                   type="button"
                   onClick={() => scrollToSection(weakestSectionId)}
                   className="rounded-xl bg-[#F9B418] px-5 py-2.5 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700]"
                 >
-                  Improve my draft
+                  Strengthen submission
                 </button>
               </>
             ) : (
@@ -1223,7 +1306,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                 disabled={isSending}
                 className="rounded-xl bg-[#F9B418] px-5 py-2.5 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:opacity-60"
               >
-                {isSending ? "Sending..." : "Send to IP Committee"}
+                {isSending ? "Sending..." : "Send for review"}
               </button>
             )}
           </div>

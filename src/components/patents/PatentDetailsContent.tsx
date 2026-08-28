@@ -49,6 +49,11 @@ import { useTheme } from "@/hooks/useTheme";
 import { Textarea } from "../ui/textarea";
 import { MAX_FILE_SIZE } from "@/utils/constants";
 import { isOutsideCounselRole } from "@/lib/roleAccess";
+import { ProductChip } from "@/components/ui/product-chip";
+import {
+  PATENT_LEGAL_STATUS_META,
+  type PatentLegalStatus,
+} from "@/utils/patentLegalStatus";
 
 // Date validation utilities
 const validateDate = (
@@ -897,14 +902,20 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
     }));
   };
 
+  const currentLegalStatus = patentDetailsData?.data
+    ?.legal_current_status as PatentLegalStatus | undefined;
+  const legalStatusMeta = currentLegalStatus
+    ? PATENT_LEGAL_STATUS_META[currentLegalStatus]
+    : undefined;
+
   return (
-    <div className="w-full space-y-6 dark:bg-[#0a0a0a]">
+    <div className="patent-detail-page w-full dark:bg-[#0a0a0a]">
       {isFetchingPatentDetails && !patentDetailsData ? (
         <Loader />
       ) : (
         <div className={` w-full`}>
           {/* Animated Gradient Background */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+          <div className="hidden">
             {theme === "dark" ? (
               <>
                 {/* Yellow Gradient Blob */}
@@ -980,27 +991,29 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
             )}
           </div>
           <div
-            className={`pt-5 gap-3 px-6 border-b sticky top-0 z-50 w-full ${
+            className={`w-full rounded-2xl border px-6 py-5 [box-shadow:var(--pulse-shadow-card)] ${
               theme === "dark"
                 ? "bg-neutral-950 border-[#cccccc20]"
-                : "bg-white border-photon-gray-300"
+                : "bg-white border-[var(--pulse-line)]"
             }`}
           >
-            <div className="flex items-center gap-3 pt-1">
+            <div className="flex items-center gap-3">
               <span
                 className={`${
                   theme === "dark" ? "text-neutral-500" : "text-gray-600"
-                } text-sm font-sans`}
+                } text-xs font-sans`}
               >
-                Patents <span className="mx-1 text-gray-500">/</span> {patentId}
+                Patents <span className="mx-1 text-gray-500">/</span>{" "}
+                {patentDetailsData?.data?.application_number || patentId}
               </span>
             </div>{" "}
             <div className="flex justify-between w-full">
               <div>
-                <div className="flex items-center gap-6 mt-4 mb-1 ml-2">
+                <div className="mt-3 flex items-center gap-4">
                   <button
                     onClick={handleGoBack}
-                    className="flex items-center justify-center mt-1"
+                    className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--pulse-line)] text-[var(--pulse-ink-secondary)] transition-colors hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]"
+                    aria-label="Back to patents"
                   >
                     <ArrowLeft
                       className={`h-5 w-5 ${
@@ -1009,33 +1022,34 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                     />
                   </button>
                   <span
-                    className={`text-2xl font-bold font-sans ${
+                    className={`text-[22px] font-semibold leading-7 tracking-[-0.02em] font-sans ${
                       theme === "dark" ? "text-zinc-200" : "text-zinc-900"
                     }`}
                   >
                     {patentDetailsData?.data?.title || "-"}
                   </span>
                 </div>
-                <div className="flex items-center gap-5 mb-6">
-                  <div className="flex items-center gap-2 text-xs tracking-wide text-neutral-500 dark:text-neutral-600 ml-[52px] font-sans">
-                    <Clock size={12} />{" "}
-                    {moment(patentDetailsData?.data?.createdAt).format(
-                      "YYYY-MM-DD HH:mm [IST]",
-                    )}
+                <div className="ml-[52px] mt-2 flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2 text-xs text-[var(--pulse-ink-muted)] font-sans tabular-nums">
+                    <Clock size={12} />
+                    Filed{" "}
+                    {patentDetailsData?.data?.application_date
+                      ? moment(patentDetailsData.data.application_date).format(
+                          "MMM D, YYYY",
+                        )
+                      : "—"}
                   </div>
-                  {patentDetailsData?.data?.legal_current_status?.includes(
-                    "ACTIVE",
-                  ) && (
-                    <div className="inline-flex px-3 py-1 uppercase rounded text-xs border bg-green-500/20 text-green-400 border-green-600/30">
-                      Active
-                    </div>
-                  )}
-                  {patentDetailsData?.data?.legal_current_status?.includes(
-                    "Awaiting",
-                  ) && (
-                    <div className="inline-flex px-3 py-1 uppercase whitespace-nowrap rounded text-xs border bg-blue-500/20 text-blue-600 border-blue-500/30">
-                      Under Examination
-                    </div>
+                  {legalStatusMeta && (
+                    <ProductChip
+                      kind="status"
+                      markerColor={legalStatusMeta.marker}
+                      textColor={legalStatusMeta.text}
+                    >
+                      {legalStatusMeta.label.replace(
+                        /^(Active|Inactive) – /,
+                        "",
+                      )}
+                    </ProductChip>
                   )}
                 </div>
               </div>
@@ -1106,9 +1120,9 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
               )}
             </div>
           </div>
-          <div className="w-full max-w-[1328px] mx-auto px-4 pb-10">
-            <div className="grid grid-cols-1 gap-6 mb-6 mt-6 patent-details-grid w-full">
-              <div className="grid grid-cols-1 items-start gap-4 w-full lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+          <div className="w-full pb-10">
+            <div className="mt-5 grid w-full grid-cols-1 gap-5 patent-details-grid">
+              <div className="grid w-full grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,2.2fr)_minmax(320px,0.8fr)]">
                 <Card
                   className={`${
                     theme === "dark"
@@ -1124,9 +1138,9 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                     <CardTitle
                       className={`${
                         theme === "dark" && "text-neutral-100"
-                      } text-base sm:text-lg flex items-center gap-2 font-sans font-bold tracking-[0.015rem]`}
+                      } flex items-center gap-2 font-sans text-[15px] font-semibold`}
                     >
-                      <FileText size={16} className="text-[#F9B418]" /> Patent
+                      <FileText size={16} className="text-[var(--pulse-ink-muted)]" /> Patent
                       Information
                     </CardTitle>
                   </CardHeader>
@@ -1146,7 +1160,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                           <p
                             className={`${
                               theme === "dark" && "text-neutral-300"
-                            } text-sm`}
+                            } text-sm tabular-nums`}
                           >
                             {patentDetailsData?.data?.application_number}
                           </p>
@@ -1185,11 +1199,11 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                           <p
                             className={`${
                               theme === "dark" && "text-neutral-300"
-                            } text-sm`}
+                            } text-sm tabular-nums`}
                           >
                             {moment(
                               patentDetailsData?.data?.application_date,
-                            ).format("DD-MM-YYYY")}
+                            ).format("MMM D, YYYY")}
                           </p>
                         </div>
 
@@ -1208,7 +1222,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                               theme === "dark" && "text-neutral-300"
                             } text-sm`}
                           >
-                            {patent.applicationType}
+                            {patentDetailsData?.data?.application_type || "—"}
                           </p>
                         </div>
 
@@ -1227,7 +1241,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                               theme === "dark" && "text-neutral-300"
                             } text-sm`}
                           >
-                            {patent.priorityCountry}
+                            {patentDetailsData?.data?.priority_country || "—"}
                           </p>
                         </div>
 
@@ -1246,7 +1260,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                               theme === "dark" && "text-neutral-300"
                             } text-sm`}
                           >
-                            {patent.outsideCounsel}
+                            {patentDetailsData?.data?.outside_counsel || "—"}
                           </p>
                         </div>
 
@@ -1265,7 +1279,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                               theme === "dark" && "text-neutral-300"
                             } text-sm`}
                           >
-                            {patent.patentNo}
+                            {patentDetailsData?.data?.patent_number || "Pending"}
                           </p>
                         </div>
 
@@ -1284,7 +1298,11 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                               theme === "dark" && "text-neutral-300"
                             } text-sm`}
                           >
-                            {patent.renewalDate}
+                            {patentDetailsData?.data?.renewal_date
+                              ? moment(
+                                  patentDetailsData.data.renewal_date,
+                                ).format("MMM D, YYYY")
+                              : "—"}
                           </p>
                         </div>
 
@@ -1303,7 +1321,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                               theme === "dark" && "text-neutral-300"
                             } text-sm`}
                           >
-                            {patent.disclosureId}
+                            {patentDetailsData?.data?.disclosure_id || "—"}
                           </p>
                         </div>
                       </div>
@@ -1326,9 +1344,9 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                     <CardTitle
                       className={`${
                         theme === "dark" && "text-neutral-100"
-                      } text-base sm:text-lg flex items-center gap-2 font-sans font-bold`}
+                      } flex items-center gap-2 font-sans text-[15px] font-semibold`}
                     >
-                      <Users size={17} className="text-[#F9B418]" /> Inventors
+                      <Users size={17} className="text-[var(--pulse-ink-muted)]" /> Inventors
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0 pb-4 px-4">
@@ -1413,9 +1431,9 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                   <CardTitle
                     className={`${
                       theme === "dark" && "text-neutral-100"
-                    } text-base sm:text-lg flex items-center gap-2 font-sans font-bold`}
+                    } flex items-center gap-2 font-sans text-[15px] font-semibold`}
                   >
-                    <AlignLeftIcon size={17} className="text-[#F9B418]" />{" "}
+                    <AlignLeftIcon size={17} className="text-[var(--pulse-ink-muted)]" />{" "}
                     Abstract
                   </CardTitle>
                 </CardHeader>
@@ -1468,9 +1486,9 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                   <CardTitle
                     className={`${
                       theme === "dark" && "text-neutral-100"
-                    } text-base sm:text-lg flex items-center gap-2 font-sans font-bold`}
+                    } flex items-center gap-2 font-sans text-[15px] font-semibold`}
                   >
-                    <Globe size={17} className="text-[#F9B418]" /> Family
+                    <Globe size={17} className="text-[var(--pulse-ink-muted)]" /> Family
                     Members
                   </CardTitle>
                 </CardHeader>
@@ -1529,10 +1547,10 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                   <CardTitle
                     className={`${
                       theme === "dark" && "text-neutral-100"
-                    } text-base sm:text-lg flex items-center gap-2 font-sans font-bold justify-between`}
+                    } flex items-center justify-between gap-2 font-sans text-[15px] font-semibold`}
                   >
                     <div className="flex items-center gap-2">
-                      <File size={17} className="text-[#F9B418]" /> Documents
+                      <File size={17} className="text-[var(--pulse-ink-muted)]" /> Documents
                     </div>
                     {isEditMode && (
                       <Button
@@ -1733,9 +1751,9 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                   <CardTitle
                     className={`${
                       theme === "dark" && "text-neutral-100"
-                    } text-base sm:text-lg flex items-center gap-2 font-sans font-bold`}
+                    } flex items-center gap-2 font-sans text-[15px] font-semibold`}
                   >
-                    <Calendar size={17} className="text-[#F9B418]" /> Status and
+                    <Calendar size={17} className="text-[var(--pulse-ink-muted)]" /> Status and
                     Timeline
                   </CardTitle>
                 </CardHeader>
@@ -2251,9 +2269,9 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                 <CardTitle
                   className={`${
                     theme === "dark" && "text-neutral-100"
-                  } text-base sm:text-lg flex items-center gap-2 font-sans font-bold`}
+                  } flex items-center gap-2 font-sans text-[15px] font-semibold`}
                 >
-                  <ClipboardList size={17} className="text-[#F9B418]" /> Next
+                  <ClipboardList size={17} className="text-[var(--pulse-ink-muted)]" /> Next
                   Steps
                 </CardTitle>
               </CardHeader>
@@ -2407,9 +2425,9 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                 <CardTitle
                   className={`${
                     theme === "dark" && "text-neutral-100"
-                  } text-base sm:text-lg flex items-center gap-2 font-sans font-bold`}
+                  } flex items-center gap-2 font-sans text-[15px] font-semibold`}
                 >
-                  <FileEditIcon size={17} className="text-[#F9B418]" />{" "}
+                  <FileEditIcon size={17} className="text-[var(--pulse-ink-muted)]" />{" "}
                   Additional Notes
                 </CardTitle>
               </CardHeader>

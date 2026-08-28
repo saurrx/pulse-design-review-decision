@@ -21,6 +21,7 @@ type ClientInviteDialogProps = {
   clientName?: string;
   allowedDomain?: string;
   onInvited?: () => void;
+  adminOnly?: boolean;
 };
 
 const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
@@ -30,6 +31,7 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
   clientName = "this client",
   allowedDomain = "",
   onInvited,
+  adminOnly = false,
 }) => {
   const queryClient = useQueryClient();
   const [mode, setMode] = useState<"email" | "share">("email");
@@ -39,6 +41,7 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
   const [linkCopied, setLinkCopied] = useState(false);
   const qrCodeRef = useRef<SVGSVGElement>(null);
   const domain = allowedDomain.split("@").pop() || "company.com";
+  const effectiveRole = adminOnly ? "LEGAL_COUNSEL" : role;
 
   const { data: inviteLinkData } = useQuery({
     queryKey: ["client_invite_link", clientId],
@@ -53,10 +56,10 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
     mutationFn: async () =>
       API_CONFIG.post(`/api/v1/clients/${clientId}/invite-user`, {
         email: email.trim(),
-        role,
+        role: effectiveRole,
       }),
     onSuccess: () => {
-      toast.success(`${role === "LEGAL_COUNSEL" ? "Administrator" : "Inventor"} invitation sent`);
+      toast.success(`${effectiveRole === "LEGAL_COUNSEL" ? "Administrator" : "Inventor"} invitation sent`);
       setEmail("");
       setRole("INVENTOR");
       onOpenChange(false);
@@ -69,9 +72,7 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
 
   const regenerateMutation = useMutation({
     mutationFn: async () =>
-      API_CONFIG.post(`/api/v1/clients/${clientId}/invite-link`, {
-        expiresInDays: expiryDays,
-      }),
+      API_CONFIG.post(`/api/v1/clients/${clientId}/invite-link`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
       toast.success("A new secure invite link was generated");
@@ -154,30 +155,34 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl bg-white dark:bg-neutral-950">
         <DialogHeader>
-          <DialogTitle>Invite people</DialogTitle>
-          <DialogDescription>Add people to the {clientName} client workspace.</DialogDescription>
+          <DialogTitle>{adminOnly ? "Invite administrator" : "Invite people"}</DialogTitle>
+          <DialogDescription>
+            {adminOnly
+              ? `Send a verified administrator invitation to the ${clientName} workspace.`
+              : `Add people to the ${clientName} client workspace.`}
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-2 grid grid-cols-2 rounded-lg border border-neutral-200 bg-neutral-50 p-1 dark:border-neutral-700 dark:bg-neutral-900">
+        {!adminOnly && <div className="mt-2 grid grid-cols-2 rounded-lg border border-neutral-200 bg-neutral-50 p-1 dark:border-neutral-700 dark:bg-neutral-900">
           <button onClick={() => setMode("email")} className={`rounded-md px-3 py-2 text-sm font-medium transition-all ${mode === "email" ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-800 dark:text-white" : "text-neutral-500"}`}>Email invitation</button>
           <button onClick={() => setMode("share")} className={`rounded-md px-3 py-2 text-sm font-medium transition-all ${mode === "share" ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-800 dark:text-white" : "text-neutral-500"}`}>Share link</button>
-        </div>
+        </div>}
 
-        {mode === "email" ? (
+        {adminOnly || mode === "email" ? (
           <div className="space-y-5 pt-3">
             <div>
               <label htmlFor="client-invite-email" className="text-sm font-medium">Email address</label>
               <input id="client-invite-email" autoFocus type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder={`name@${domain}`} className="mt-2 h-10 w-full rounded-md border border-neutral-300 bg-transparent px-3 text-sm outline-none transition-colors focus:border-[#F9B418] focus:ring-2 focus:ring-[#F9B418]/20 dark:border-neutral-700" />
             </div>
-            <div>
+            {!adminOnly && <div>
               <p className="text-sm font-medium">Access role</p>
               <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button type="button" onClick={() => setRole("INVENTOR")} className={`rounded-lg border p-3 text-left transition-colors ${role === "INVENTOR" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Inventor</span><span className="mt-1 block text-xs text-neutral-500">Submit and track ideas</span></button>
                 <button type="button" onClick={() => setRole("LEGAL_COUNSEL")} className={`rounded-lg border p-3 text-left transition-colors ${role === "LEGAL_COUNSEL" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Administrator</span><span className="mt-1 block text-xs text-neutral-500">Manage the client workspace</span></button>
               </div>
-            </div>
-            {role === "LEGAL_COUNSEL" && <p className="rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-800">Administrator invitations are email-only so the recipient’s identity can be verified before privileged access is granted.</p>}
-            <Button onClick={() => inviteMutation.mutate()} disabled={!email.trim() || inviteMutation.isPending} className="w-full bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]">{inviteMutation.isPending ? "Sending invitation…" : `Send ${role === "LEGAL_COUNSEL" ? "administrator" : "inventor"} invitation`}</Button>
+            </div>}
+            {(adminOnly || role === "LEGAL_COUNSEL") && <p className="rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-800">Administrator invitations are email-only so the recipient’s identity can be verified before privileged access is granted.</p>}
+            <Button onClick={() => inviteMutation.mutate()} disabled={!email.trim() || inviteMutation.isPending} className="w-full bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]">{inviteMutation.isPending ? "Sending invitation…" : `Send ${effectiveRole === "LEGAL_COUNSEL" ? "administrator" : "inventor"} invitation`}</Button>
           </div>
         ) : (
           <div className="pt-4">
@@ -198,12 +203,11 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
                   </div>
                 </div>
                 <div className="mt-5 grid grid-cols-3 divide-x rounded-lg border border-neutral-200 py-3 text-center dark:border-neutral-700">
-                  <div><p className="text-xs uppercase tracking-wider text-neutral-500">Expires</p><p className="mt-1 text-xs font-semibold">{new Date(inviteLinkData.expiresAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p></div>
+                  <div><p className="text-xs uppercase tracking-wider text-neutral-500">Validity</p><p className="mt-1 text-xs font-semibold">Never expires</p></div>
                   <div><p className="text-xs uppercase tracking-wider text-neutral-500">Joined</p><p className="mt-1 text-xs font-semibold">{inviteLinkData.uses}</p></div>
                   <div><p className="text-xs uppercase tracking-wider text-neutral-500">Created by</p><p className="mt-1 truncate px-2 text-xs font-semibold">{inviteLinkData.createdBy}</p></div>
                 </div>
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-700">
-                  <div className="flex items-center gap-2"><label htmlFor="client-invite-expiry" className="text-xs text-neutral-500">New link expires in</label><select id="client-invite-expiry" value={expiryDays} onChange={(event) => setExpiryDays(Number(event.target.value))} className="h-8 rounded-md border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700"><option value={7}>7 days</option><option value={30}>30 days</option><option value={90}>90 days</option></select></div>
+                <div className="mt-4 flex flex-wrap items-center justify-end gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-700">
                   <div className="flex gap-2"><Button size="sm" variant="outline" onClick={() => window.confirm("Generate a new link? The current QR code and link will stop working immediately.") && regenerateMutation.mutate()} disabled={regenerateMutation.isPending}><RefreshCw className="mr-1.5 h-3.5 w-3.5" />Regenerate</Button><Button size="sm" variant="ghost" onClick={() => window.confirm("Deactivate this invite link? Anyone who has it will no longer be able to join.") && deactivateMutation.mutate()} disabled={deactivateMutation.isPending} className="text-red-600 hover:bg-red-50 hover:text-red-700"><Ban className="mr-1.5 h-3.5 w-3.5" />Deactivate</Button></div>
                 </div>
               </>
@@ -212,7 +216,7 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
                 <Ban className="mx-auto h-7 w-7 text-neutral-400" />
                 <p className="mt-3 text-sm font-semibold">Invite link is inactive</p>
                 <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-neutral-500">Generate a new opaque link before sharing. The previous link can no longer be redeemed.</p>
-                <div className="mx-auto mt-4 flex w-fit items-center gap-2"><select value={expiryDays} onChange={(event) => setExpiryDays(Number(event.target.value))} className="h-9 rounded-md border border-neutral-200 bg-transparent px-3 text-sm dark:border-neutral-700"><option value={7}>7 days</option><option value={30}>30 days</option><option value={90}>90 days</option></select><Button onClick={() => regenerateMutation.mutate()} className="bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]">Generate new link</Button></div>
+                <div className="mx-auto mt-4 flex w-fit items-center gap-2"><Button onClick={() => regenerateMutation.mutate()} className="bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]">Generate new link</Button></div>
               </div>
             )}
           </div>
