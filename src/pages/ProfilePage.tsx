@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { Save, X } from "lucide-react";
 
 import DashboardLayout from "@/components/DashboardLayout";
+import ProductPage from "@/components/layout/ProductPage";
 import ProfileTab from "@/components/workspace/ProfileTab";
 import useUserCookie from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/useTheme";
@@ -41,7 +42,7 @@ const ProfilePage: React.FC = () => {
         ) : null,
       }}
     >
-      <div className="pulse-product-page mx-auto w-full max-w-[960px] px-6 py-6 lg:px-8">
+      <ProductPage maxWidth="max-w-[960px]">
         <ProfileTab
           clientDetails={user?.client || {
             name: user?.organization_name,
@@ -51,7 +52,7 @@ const ProfilePage: React.FC = () => {
           saveProfileRef={saveProfileRef}
           cancelProfileRef={cancelProfileRef}
         />
-      </div>
+      </ProductPage>
     </DashboardLayout>
   );
 };

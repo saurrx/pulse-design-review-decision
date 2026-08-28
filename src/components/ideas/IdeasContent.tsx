@@ -548,7 +548,7 @@ const IdeasContent: React.FC = () => {
   };
 
   return (
-    <div className="pulse-product-page pulse-table-page relative mx-auto h-[calc(100dvh-64px)] min-h-0 w-full max-w-[1680px] overflow-hidden px-6 py-6 lg:px-8">
+    <div className="pulse-product-page pulse-table-page relative mx-auto min-h-0 flex-1 w-full max-w-[1680px] overflow-hidden px-6 py-6 lg:px-8">
       <div className="flex h-full flex-col">
         {/* Animated Gradient Background */}
         <div className="hidden">

@@ -1507,9 +1507,19 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
   };
 
   useEffect(() => {
-    if (ideaDraft?.[0]?.meta_data) {
-      setSections(ideaDraft[0].meta_data);
-    }
+    if (!Array.isArray(ideaDraft) || !ideaDraft.length) return;
+    // The disclosure pane must show the draft that was SENT, not whichever row
+    // the API returned first. An idea can carry several drafts, and reading
+    // [0] rendered an empty 0%-complete one beside a populated summary —
+    // "the disclosure is blank" with the content sitting right there.
+    const preferred =
+      ideaDraft.find((d: any) => d?.status === "SUBMITTED") ??
+      [...ideaDraft].sort(
+        (a: any, b: any) =>
+          new Date(b?.updatedAt || b?.updated_at || 0).getTime() -
+          new Date(a?.updatedAt || a?.updated_at || 0).getTime(),
+      )[0];
+    if (preferred?.meta_data) setSections(preferred.meta_data);
   }, [ideaDraft]);
 
   // Autosave must only run after a real user edit — `sections` also changes
@@ -1784,13 +1794,19 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
   // review state. For those, a reviewer fell through to the inventor's
   // draft-card layout and had no approve, request-changes or reject at all —
   // the idea simply could not be actioned.
-  const reviewDraft = Array.isArray(ideaDraft) && ideaDraft.length
-    ? [...ideaDraft].sort(
-        (a: any, b: any) =>
-          new Date(b?.updatedAt || b?.updated_at || 0).getTime() -
-          new Date(a?.updatedAt || a?.updated_at || 0).getTime(),
-      )[0]
-    : undefined;
+  const reviewDraft = (() => {
+    if (!Array.isArray(ideaDraft) || !ideaDraft.length) return undefined;
+    const byRecency = [...ideaDraft].sort(
+      (a: any, b: any) =>
+        new Date(b?.updatedAt || b?.updated_at || 0).getTime() -
+        new Date(a?.updatedAt || a?.updated_at || 0).getTime(),
+    );
+    // Prefer the draft the inventor actually SENT. An inventor may keep working
+    // on another draft after submitting one, so "most recent" is not the same
+    // thing — it picks the wrong draft in 4 of the 14 imported multi-draft
+    // ideas, showing the reviewer something that was never submitted.
+    return byRecency.find((d: any) => d?.status === "SUBMITTED") ?? byRecency[0];
+  })();
 
   const isReviewWorkspace =
     !!reviewDraft &&
@@ -1928,7 +1944,11 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
   };
 
   return (
-    <div className="pulse-product-page relative flex h-screen flex-col overflow-hidden">
+    /* h-screen is the full viewport, but this sits 64px below the top of it —
+       so the page overhung by exactly that, and overflow-hidden meant the tail
+       of a long disclosure was unreachable rather than merely below the fold.
+       h-full + min-h-0 fills the space the layout actually gives it. */
+    <div className="pulse-product-page relative flex min-h-0 flex-1 flex-col overflow-hidden">
       {/* Animated Gradient Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
         {theme === "dark" ? (
@@ -2211,7 +2231,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
       {isFetchingIdea ? (
         <Loader />
       ) : isInventorOverview ? (
-        <div className="relative z-10 flex-1 overflow-y-auto bg-[var(--pulse-canvas)]">
+        <div className="relative z-10 min-h-0 flex-1 overflow-y-auto bg-[var(--pulse-canvas)] pb-10">
           <div className="mx-auto w-full max-w-[1160px] px-6 py-8">
             <section className="overflow-hidden rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] [box-shadow:var(--pulse-shadow-card)]">
               <div className="flex items-start gap-4 border-l-4 border-l-[#F9B418] px-6 py-5">
@@ -2382,7 +2402,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           </div>
         </div>
       ) : useDisclosureWorkspace ? (
-        <div className="relative z-10 flex-1 overflow-y-auto">
+        <div className="relative z-10 min-h-0 flex-1 overflow-y-auto pb-10">
           <div className="mx-auto flex w-full max-w-[1200px] flex-col items-start gap-8 px-6 py-8 lg:flex-row">
             {/* Disclosure — primary reading pane */}
             <div className="w-full lg:w-[60%]">

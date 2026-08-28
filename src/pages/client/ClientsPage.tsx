@@ -393,7 +393,7 @@ const ClientsPage: React.FC = () => {
             },
       }}
     >
-      <div className="pulse-product-page pulse-table-page relative mx-auto flex h-[calc(100dvh-64px)] min-h-0 w-full max-w-[1680px] flex-col overflow-hidden px-6 py-6 lg:px-8">
+      <div className="pulse-product-page pulse-table-page relative mx-auto flex min-h-0 flex-1 w-full max-w-[1680px] flex-col overflow-hidden px-6 py-6 lg:px-8">
         {/* Animated Gradient Background */}
         <div className="hidden">
           {theme === "dark" ? (
