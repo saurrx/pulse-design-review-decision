@@ -192,6 +192,11 @@
 }
 
 @layer components {
+  /* min-h-full is what lets a short page still paint the full canvas. It also
+     silently beats an explicit height, though: the table pages set
+     h-[calc(100dvh-64px)] and were rendered min-h-full (the full viewport)
+     instead, so each sat 64px lower than it was tall and overhung the bottom of
+     the scroll area. Those pages pair it with min-h-0. */
   .pulse-product-page {
     @apply relative min-h-full font-sans;
     background: var(--pulse-canvas);

@@ -442,6 +442,9 @@ const Index = () => {
                       ? undefined
                       : () => navigate(`/ideas?status=${reviewStatusParam}`)
                   }
+                  // The overflow row always needs somewhere to go, including on
+                  // the photon side where the header has no "review all" CTA.
+                  onViewAll={() => navigate(`/ideas?status=${reviewStatusParam}`)}
                 />
               </div>
               <div className="col-span-12 xl:col-span-4">

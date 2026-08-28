@@ -46,7 +46,12 @@ const asUser = (p: any) => {
   const u = p?.user ?? {};
   const cid = u.client_id ?? u.clientId ?? null;
   const photon = ["PHOTON_ADMIN", "PHOTON_SUPERADMIN", "CASE_OWNER"].includes(u.role);
-  return { data: { user: { ...u, client_id: cid ?? (photon ? PHOTON_SENTINEL : null) } } };
+  return { data: { user: {
+    ...u,
+    client_id: cid ?? (photon ? PHOTON_SENTINEL : null),
+    // The sidebar renders the workspace mark straight off the session user.
+    client: withLogo(u.client),
+  } } };
 };
 const list = (p: any) => ({ data: p?.data ?? p, pagination: p?.pagination });
 
@@ -101,6 +106,19 @@ const PSTATUS_TO_LEGAL: Record<string, string> = {
 };
 const LEGAL_TO_PSTATUS: Record<string, string> = Object.fromEntries(
   Object.entries(PSTATUS_TO_LEGAL).map(([k, v]) => [v, k]));
+
+/**
+ * The workspace mark. The API holds it as a StoredFile; the screens read
+ * `logo_file.file_path` and pass it through assetUrl(), so point that at the
+ * redirect route an <img> can follow. Bytes stay behind the API's own auth
+ * rather than being served from a public bucket URL.
+ */
+const withLogo = (c: any) => c && ({
+  ...c,
+  logo_file: c.logo_file?.id
+    ? { ...c.logo_file, file_path: `v1/files/${c.logo_file.id}/raw` }
+    : c.logo_file ?? null,
+});
 
 const oldPatent = (r: any) => r && ({
   ...r,
@@ -426,8 +444,22 @@ const RULES: Rule[] = [
       body: { name: b?.name, domain: String(b?.allowed_domain ?? "").replace(/^@/, "") || undefined,
         admin_emails: (b?.admin_users ?? []).filter(Boolean) },
       wrap: p => ({ data: p }) }) },
-  { m: /^\/api\/v1\/clients(\?.*)?$/, method: "GET",
-    to: () => ({ url: "/v1/clients", method: "GET", wrap: p => ({ data: p }) }) },
+  // The clients screen filters by name; the rule used to drop the query string,
+  // so every keystroke re-fetched all 82 workspaces and nothing narrowed.
+  { m: /^\/api\/v1\/clients(?:\?(.*))?$/, method: "GET",
+    to: m => {
+      const q = new URLSearchParams(m[1] ?? "");
+      const out = new URLSearchParams();
+      for (const k of ["search", "page", "limit"]) {
+        const v = q.get(k);
+        if (v) out.set(k, v);
+      }
+      const qs = out.toString();
+      return {
+        url: `/v1/clients${qs ? `?${qs}` : ""}`, method: "GET",
+        wrap: (p: any) => ({ data: Array.isArray(p) ? p.map(withLogo) : withLogo(p) }),
+      };
+    } },
   { m: /^\/api\/v1\/patent\/fetch-lastet\/client\/([^/?]+)/,
     to: m => ({ url: `/v1/patents?${isUuid(m[1]) ? `client_id=${m[1]}&` : ""}limit=5`, method: "GET", wrap: patentList }) },
   { m: /^\/api\/v1\/clients\/lookup/, to: () => ({ url: "/v1/clients", method: "GET", wrap: p => ({ data: p }) }) },
@@ -455,7 +487,7 @@ const RULES: Rule[] = [
       wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/clients\/([0-9a-f-]{36})$/,
     to: m => ({ url: `/v1/clients/${m[1]}`, method: "GET", wrap: (c: any) => ({ data: {
-      ...c,
+      ...withLogo(c),
       // The screen speaks the old field names; translate rather than teach it new ones.
       allowed_domain: c?.domain ? `x@${c.domain}` : "",
       about: c?.about ?? "",
