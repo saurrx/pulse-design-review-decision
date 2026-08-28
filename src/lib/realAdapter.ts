@@ -234,6 +234,13 @@ const RULES: Rule[] = [
       body: { current_password: b?.current_password, new_password: b?.new_password } }) },
 
   // -- ideas ----------------------------------------------------------------
+  // State counts for the sidebar badge. Keyed by the OLD status vocabulary the
+  // sidebar speaks, so it needs no knowledge of IdeaState.
+  { m: /^\/api\/v1\/idea\/counts$/,
+    to: () => ({ url: "/v1/ideas/counts", method: "GET",
+      wrap: (p: any) => ({ data: Object.fromEntries(
+        Object.entries(p ?? {}).map(([state, n]) => [STATE_TO_STATUS[state] ?? state, n]),
+      ) }) }) },
   { m: /^\/api\/v1\/idea\/fetch-by-user(?:\?(.*))?$/,
     to: m => ({ url: "/v1/ideas", method: "GET", wrap: ideaListWrap(m[1] ?? "") }) },
   { m: /^\/api\/v1\/idea\/fetch\/([^/]+)$/,
@@ -349,12 +356,21 @@ const RULES: Rule[] = [
       body: { ...b, client_id: m[1] }, wrap: p => ({ data: p }) }) },
 
   // -- actions ----------------------------------------------------------------
-  { m: /^\/api\/v1\/actions\/ihc\/client\/([^/?]+)/,
-    to: m => ({ url: `/v1/actions?client_id=${m[1]}`, method: "GET",
+  // The screen sends page/limit and reads a pagination envelope; this used to
+  // drop the whole query string, so the API returned every pending deadline and
+  // the pager underneath was permanently dead.
+  { m: /^\/api\/v1\/actions\/ihc\/client\/([^/?]+)(?:\?(.*))?$/,
+    to: m => {
+      const q = new URLSearchParams(m[2] ?? "");
+      const out = new URLSearchParams();
+      if (isUuid(m[1])) out.set("client_id", m[1]);
+      if (q.get("page")) out.set("page", q.get("page")!);
+      if (q.get("limit")) out.set("limit", q.get("limit")!);
+      return ({ url: `/v1/actions?${out.toString()}`, method: "GET",
       // The screen was written against the old event-row dialect
       // (event_name / event_date / days_to_deadline / patent_action) — translate
       // rather than teach the screen a second vocabulary.
-      wrap: (rows: any[]) => ({ data: (rows ?? []).map(r => ({
+      wrap: (p: any) => ({ data: (Array.isArray(p) ? p : p?.data ?? []).map((r: any) => ({
         id: r.due_date_id,
         event_name: r.title,
         event_date: r.due_at,
@@ -377,7 +393,8 @@ const RULES: Rule[] = [
           submitted_at: r.requested_at,
         } : null,
         action_request_id: r.id,
-      })) }) }) },
+      })), pagination: p?.pagination }) });
+    } },
   // Photon moving an action along its queue. This previously mapped onto the
   // instruction PATCH, so changing a status rewrote the instruction text.
   { m: /^\/api\/v1\/actions\/request-status$/, method: "PUT",
@@ -396,8 +413,14 @@ const RULES: Rule[] = [
   // screen read patent.application_number off an object that is nested under
   // due_date. It never showed because the queue was empty until real actions
   // existed — the row map simply never ran.
-  { m: /^\/api\/v1\/actions\/oc\/queue/,
-    to: () => ({ url: "/v1/actions/queue", method: "GET",
+  { m: /^\/api\/v1\/actions\/oc\/queue(?:\?(.*))?$/,
+    to: m => {
+      const q = new URLSearchParams(m[1] ?? "");
+      const out = new URLSearchParams();
+      if (q.get("page")) out.set("page", q.get("page")!);
+      if (q.get("limit")) out.set("limit", q.get("limit")!);
+      const qs = out.toString();
+      return ({ url: `/v1/actions/queue${qs ? `?${qs}` : ""}`, method: "GET",
       wrap: (rows: any[]) => ({ data: (rows ?? []).map(r => ({
         id: r.id,
         action_status: r.submission_state ?? null,
@@ -427,7 +450,8 @@ const RULES: Rule[] = [
         client_id: r.client_id,
         // The screen groups the queue by client and reads client.name.
         client: { id: r.client?.id ?? r.client_id, name: r.client?.name ?? "" },
-      })) }) }) },
+      })) }) });
+    } },
   // 94% of real deadline names contain a slash ("3 1/2 Year Maintenance Fee
   // Due"), so the event type travels as a query parameter — in a path segment
   // it splits the route and 404s.

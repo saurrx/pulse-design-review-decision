@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { ROLE_LABEL } from "@/lib/roles";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Copy, Download, Link2, Trash2, UserPlus, Users } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
@@ -282,7 +283,7 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-800">{initials(person)}</span>
                   <div className="min-w-0"><p className="truncate text-sm font-semibold">{displayName(person)}</p><p className="truncate text-xs text-neutral-500">{person.email}</p></div>
                 </div>
-                <Badge variant="outline">{person.role === "LEGAL_COUNSEL" ? "Administrator" : person.role === "TECH_COMMITTEE" ? "IP Committee" : "Inventor"}</Badge>
+                <Badge variant="outline">{ROLE_LABEL[person.role] ?? "Inventor"}</Badge>
               </div>
               <div className="flex items-center justify-between border-t border-neutral-100 pt-3 dark:border-neutral-800">
                 <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${isActive(person) ? "text-emerald-700" : "text-amber-700"}`}><span className={`h-1.5 w-1.5 rounded-full ${isActive(person) ? "bg-emerald-500" : "bg-amber-500"}`} />{isActive(person) ? "Active" : person.suspended ? "Disabled" : "Invited"}</span>

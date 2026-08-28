@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { ROLE_LABEL } from "@/lib/roles";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Ban, Check, Copy, Download, RefreshCw } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
@@ -37,7 +38,6 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
   const [mode, setMode] = useState<"email" | "share">("email");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"INVENTOR" | "LEGAL_COUNSEL">("INVENTOR");
-  const [expiryDays, setExpiryDays] = useState(30);
   const [linkCopied, setLinkCopied] = useState(false);
   const qrCodeRef = useRef<SVGSVGElement>(null);
   const domain = allowedDomain.split("@").pop() || "company.com";
@@ -59,7 +59,7 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
         role: effectiveRole,
       }),
     onSuccess: () => {
-      toast.success(`${effectiveRole === "LEGAL_COUNSEL" ? "Administrator" : "Inventor"} invitation sent`);
+      toast.success(`${ROLE_LABEL[effectiveRole] ?? "Inventor"} invitation sent`);
       setEmail("");
       setRole("INVENTOR");
       onOpenChange(false);
