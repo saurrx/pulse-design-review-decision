@@ -22,6 +22,9 @@ coverage/
 *.log
 .vscode/*
 !.vscode/extensions.json
+# Shared so every editor type-checks with the TypeScript CI uses, not the one
+# VSCode happens to bundle.
+!.vscode/settings.json
 .idea/
 branch_structure.json
 temp_auto_push.bat

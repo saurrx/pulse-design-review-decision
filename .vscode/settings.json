@@ -1,0 +1,12 @@
+{
+  // The editor must type-check with the SAME TypeScript the repo pins and CI
+  // runs (5.5.3). VSCode otherwise falls back to its bundled compiler — 6.0.3
+  // at the time of writing — which reports errors CI never sees: under 6.0.3
+  // this app shows "Cannot find namespace 'NodeJS'" and an .at() lib error
+  // that `npm run typecheck` does not, because module and lib resolution moved.
+  //
+  // The prompt below is what actually activates the tsdk above it; without
+  // accepting "Use Workspace Version" once, the setting has no effect.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}
