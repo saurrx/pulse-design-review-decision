@@ -137,24 +137,25 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
     role === "TECH_COMMITTEE" || role === "LEGAL_COUNSEL" ||
     role === "PHOTON_ADMIN" || role === "CASE_OWNER";
 
-  const { data: queueData } = useQuery({
+  // Counts only. The sidebar is on every page and this badge is one integer;
+  // it used to fetch the whole idea corpus — each row hydrated with author,
+  // client, inventors and patent link — to call .length on a filtered slice.
+  const { data: queueCounts } = useQuery({
     queryKey: ["pulse-review-count", role],
     enabled: isReviewer,
     staleTime: 30_000,
     queryFn: async () =>
-      (await API_CONFIG.get("/api/v1/idea/fetch-by-user?page=1&limit=100"))
-        ?.data,
+      (await API_CONFIG.get("/api/v1/idea/counts"))?.data,
   });
 
   const reviewStatuses =
     role === "TECH_COMMITTEE" ? ["UNDER_REVIEW"]
       : role === "LEGAL_COUNSEL" ? ["UNDER_REVIEW", "SENT_TO_IHC"]
       : ["SEND_TO_OC"];
-  const reviewCount = Array.isArray(queueData?.data)
-    ? queueData.data.filter((idea: any) =>
-        reviewStatuses.includes(idea.status),
-      ).length
-    : 0;
+  const reviewCount = reviewStatuses.reduce(
+    (n, status) => n + Number(queueCounts?.data?.[status] ?? 0),
+    0,
+  );
   const items = navForRole(role, reviewCount);
   const workspaceName =
     user?.organization_name || user?.client?.name || "Photon Legal";

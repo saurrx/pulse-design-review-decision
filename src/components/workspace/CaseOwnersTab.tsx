@@ -267,32 +267,37 @@ const CaseOwnersTab: React.FC = () => {
           <div className="flex-1 overflow-y-auto px-6 py-5">
             <div className="relative mb-4"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" /><Input value={clientSearch} onChange={(e) => setClientSearch(e.target.value)} placeholder="Search clients…" className="pl-9" /></div>
             <div className="mb-3 text-xs"><span className="font-semibold text-neutral-700">{selectedClientIds.length} clients selected</span></div>
+            {/* One setting for the whole assignment, so it lives above the list.
+                It used to be rendered inside each client <button>: eighty-odd
+                copies of the same control, all writing one piece of state and
+                fighting each other, and interactive elements nested in a button
+                so changing the access type also toggled that client. */}
+            <div className="mb-4 space-y-2 rounded-lg border border-neutral-200 p-3">
+              <div className="flex items-center gap-2">
+                <label htmlFor="access-kind" className="text-xs font-medium text-neutral-500">Access type</label>
+                <select id="access-kind" value={accessKind} onChange={(e) => setAccessKind(e.target.value as any)}
+                  className="h-8 rounded-md border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700">
+                  <option value="ASSIGNMENT">Permanent assignment</option>
+                  <option value="TEMPORARY">Temporary</option>
+                  <option value="STEP_IN">Step-in cover</option>
+                </select>
+              </div>
+              {accessKind !== "ASSIGNMENT" && (
+                <div className="flex items-center gap-2">
+                  <input value={accessReason} onChange={(e) => setAccessReason(e.target.value)}
+                    placeholder="Reason (required)"
+                    className="h-8 flex-1 rounded-md border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700" />
+                  <input type="date" value={accessExpiry} onChange={(e) => setAccessExpiry(e.target.value)}
+                    className="h-8 rounded-md border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700" />
+                </div>
+              )}
+            </div>
             <div className="space-y-2">
               {clients.filter((client) => client.name.toLowerCase().includes(clientSearch.toLowerCase())).map((client) => {
                 const selected = selectedClientIds.includes(client.id);
                 const existingOwner = clientOwner.get(client.id);
                 const reassigned = selected && existingOwner && existingOwner.id !== owner?.id;
-                return <button key={client.id} onClick={() => toggleClient(client.id, "manage")} className={`w-full rounded-xl border p-4 text-left transition-colors ${selected ? "border-[#F9B418] bg-amber-50" : "border-neutral-200 hover:border-neutral-300"}`}><div className="flex items-start gap-3"><span className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded border ${selected ? "border-[#F9B418] bg-[#F9B418] text-black" : "border-neutral-300 bg-white"}`}>{selected && <Check className="h-3.5 w-3.5" />}</span><div className="flex-1"><div className="mb-3 space-y-2 border-t pt-3">
-            <div className="flex items-center gap-2">
-              <label className="text-xs font-medium text-neutral-500">Access type</label>
-              <select value={accessKind} onChange={(e) => setAccessKind(e.target.value as any)}
-                className="h-8 rounded-md border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700">
-                <option value="ASSIGNMENT">Permanent assignment</option>
-                <option value="TEMPORARY">Temporary</option>
-                <option value="STEP_IN">Step-in cover</option>
-              </select>
-            </div>
-            {accessKind !== "ASSIGNMENT" && (
-              <div className="flex items-center gap-2">
-                <input value={accessReason} onChange={(e) => setAccessReason(e.target.value)}
-                  placeholder="Reason (required)"
-                  className="h-8 flex-1 rounded-md border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700" />
-                <input type="date" value={accessExpiry} onChange={(e) => setAccessExpiry(e.target.value)}
-                  className="h-8 rounded-md border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700" />
-              </div>
-            )}
-          </div>
-          <div className="flex items-center justify-between"><p className="text-sm font-semibold text-neutral-900">{client.name}</p><span className="text-xs text-neutral-500">{client.patentCount} patents · {client.activeIdeas} active ideas</span></div>{reassigned && <p className="mt-2 text-xs font-medium text-amber-700">Currently owned by {existingOwner.name} — saving will reassign it.</p>}</div></div></button>;
+                return <button key={client.id} onClick={() => toggleClient(client.id, "manage")} className={`w-full rounded-xl border p-4 text-left transition-colors ${selected ? "border-[#F9B418] bg-amber-50" : "border-neutral-200 hover:border-neutral-300"}`}><div className="flex items-start gap-3"><span className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded border ${selected ? "border-[#F9B418] bg-[#F9B418] text-black" : "border-neutral-300 bg-white"}`}>{selected && <Check className="h-3.5 w-3.5" />}</span><div className="flex-1"><div className="flex items-center justify-between"><p className="text-sm font-semibold text-neutral-900">{client.name}</p><span className="text-xs text-neutral-500">{client.patentCount} patents · {client.activeIdeas} active ideas</span></div>{reassigned && <p className="mt-2 text-xs font-medium text-amber-700">Currently owned by {existingOwner.name} — saving will reassign it.</p>}</div></div></button>;
               })}
             </div>
           </div>

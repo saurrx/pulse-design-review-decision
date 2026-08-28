@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { ROLE_LABEL } from "@/lib/roles";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -38,7 +39,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
   const [inviteMode, setInviteMode] = useState<"email" | "share">("email");
   const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState<"INVENTOR" | "LEGAL_COUNSEL">("INVENTOR");
+  const [inviteRole, setInviteRole] = useState<"INVENTOR" | "TECH_COMMITTEE" | "LEGAL_COUNSEL">("INVENTOR");
   const [referencePrefix, setReferencePrefix] = useState(
     clientData?.idea_reference_prefix || "IRN",
   );
@@ -96,7 +97,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
   const inviteMutation = useMutation({
     mutationFn: async () => API_CONFIG.post(`/api/v1/clients/${clientId}/invite-user`, { email: inviteEmail.trim(), role: inviteRole }),
     onSuccess: () => {
-      toast.success(`${inviteRole === "LEGAL_COUNSEL" ? "Administrator" : "Inventor"} invitation sent`);
+      toast.success(`${ROLE_LABEL[inviteRole] ?? "Inventor"} invitation sent`);
       setInviteDialogOpen(false);
       setInviteEmail("");
       setInviteRole("INVENTOR");
@@ -344,7 +345,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
                 return <tr key={member?.id || member?.email || index} className="text-sm">
                   <td className="px-6 py-4"><div className="flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-800">{initials}</span><span className="font-medium">{name}</span></div></td>
                   <td className="px-6 py-4 text-neutral-500">{member?.email || "—"}</td>
-                  <td className="px-6 py-4"><Badge variant="outline">{member?.role === "LEGAL_COUNSEL" ? "Administrator" : member?.role === "TECH_COMMITTEE" ? "IP Committee" : "Inventor"}</Badge></td>
+                  <td className="px-6 py-4"><Badge variant="outline">{ROLE_LABEL[member?.role] ?? "Inventor"}</Badge></td>
                   <td className="px-6 py-4">{member?.active === false ? <span className="inline-flex items-center gap-1.5 text-sm text-amber-700"><span className="h-1.5 w-1.5 rounded-full bg-amber-500" />Invited</span> : <span className="inline-flex items-center gap-1.5 text-sm text-emerald-700"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />Active</span>}</td>
                 </tr>;
               })}
@@ -372,8 +373,13 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
               </div>
               <div>
                 <p className="text-sm font-medium">Access role</p>
-                <div className="mt-2 grid grid-cols-2 gap-2">
+                {/* IP Committee was assignable in the People tab and rendered
+                    as a badge, but could not be invited — the only way into the
+                    role was to invite someone as an inventor and change it
+                    afterwards. */}
+                <div className="mt-2 grid grid-cols-3 gap-2">
                   <button type="button" onClick={() => setInviteRole("INVENTOR")} className={`rounded-lg border p-3 text-left transition-colors ${inviteRole === "INVENTOR" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Inventor</span><span className="mt-1 block text-xs text-neutral-500">Submit and track ideas</span></button>
+                  <button type="button" onClick={() => setInviteRole("TECH_COMMITTEE")} className={`rounded-lg border p-3 text-left transition-colors ${inviteRole === "TECH_COMMITTEE" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">IP Committee</span><span className="mt-1 block text-xs text-neutral-500">Review before legal</span></button>
                   <button type="button" onClick={() => setInviteRole("LEGAL_COUNSEL")} className={`rounded-lg border p-3 text-left transition-colors ${inviteRole === "LEGAL_COUNSEL" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Administrator</span><span className="mt-1 block text-xs text-neutral-500">Manage the client workspace</span></button>
                 </div>
               </div>
