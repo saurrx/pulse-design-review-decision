@@ -177,8 +177,8 @@ build — the design swap is a locked decision, see backend CLAUDE.md §6 for
 the full deviation table.
 
 ## 10. Route → page → component map
-Public: /login (Login.tsx; IHCLogin/OCLogin are dead design leftovers, not
-routed) · /signup (domain-gated; NotOnboarded.tsx when domain unknown) ·
+Public: /login (Login.tsx; OCLogin.tsx is deleted. IHCLogin.tsx is NOT dead —
+ResetPassword.tsx imports its `iIHCLoginForm` type, so it stays) · /signup (domain-gated; NotOnboarded.tsx when domain unknown) ·
 /invite (accept + share-link path) · /forgot-password · /reset-password.
 Protected (all inside DashboardLayout = Sidebar + Header, title logic in
 DashboardLayout.defaultHeaderForRoute):
@@ -208,15 +208,28 @@ DashboardLayout.defaultHeaderForRoute):
   RequestStatusBadge, resolve).
 - **/clients** (photon only) ClientsPage cards → **/clients/:clientId**
   ClientDetailPage (ClientTabs: OverviewTab, PatentsTab + AddPatentModal +
-  DuplicatePatentsModal import, BusinessScopeTab, people via ClientInviteDialog;
+  DuplicatePatentsModal import, people via ClientInviteDialog;
   "View as client" button top-right) · OnboardClientModal from the list page.
+  (BusinessScopeTab existed in two copies and neither was reachable from
+  ClientTabs, which only renders overview + patents. Both deleted.)
 - **/workspace** WorkspacePage → WorkspaceTabs: PeopleTab, CaseOwnersTab
-  (photon admin: Manage Access drawer), OrganizationDetails, ProfileTab,
-  BusinessScopeTab (25-question scope).
+  (photon admin: Manage Access drawer), OrganizationDetails, ProfileTab.
 - **/assistant** AssistantPage — placeholder surface (copilot not built).
-Known-dead design files kept to avoid churn (do NOT wire up): IHCLogin,
-OCLogin, AddOcModal, FilesTab, SelectStatusDraft, ActionFilters,
-ActionStatusBadge, pdfGenerator.ts, PatentReportModal.
+Dead design files are now DELETED, not kept — 48 of them, ~230 KB, including
+the whole never-imported half of components/ui/. If you need one back it is in
+git history; do not re-add it speculatively.
+
+**How that list was produced, because two cheaper methods both got it wrong:**
+grepping for the filename missed relative imports and reported live files as
+dead; grepping for the bare identifier matched ordinary words ("chart",
+"alert", "types") and reported dead files as live. The only reliable answer was
+to parse every import specifier, resolve it against the alias and extension
+rules, and iterate to a fixpoint so cascades are caught — deleting
+BusinessScopeTab orphaned businessScopeQuestion, skeleton and aspect-ratio in
+turn. PatentReportModal, TechBackground, BannerAnimation and IHCLogin all
+survived that pass and are LIVE; the earlier audits had all four listed as
+dead. src/vite-env.d.ts is never imported by design (ambient declaration) and
+must not be swept.
 
 ## 11. Per-role journeys (what the harness asserts, in UI terms)
 - **Inventor:** signup/login → dashboard → My disclosures → New idea →
@@ -261,4 +274,5 @@ and vercel.json owns the SPA fallback + /v1 proxy. Also deleted: bun.lockb
 (npm is the package manager), sketch-preview/, .cursor rules, and all
 unreferenced public assets (scraped "Photon Pulse - OC_files" page, spare
 world geojsons — the map uses world-india-pov.json — placeholder/6sense
-svgs, unused lovable-uploads, unused helvetica variants).
+svgs). lovable-uploads and public/fonts are now deleted — the fonts had a
+single consumer, the dead pdfGenerator.ts.
