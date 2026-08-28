@@ -1,0 +1,147 @@
+{
+  "_doc": "Source glob -> feature areas, for pulse-frontend. A path matching nothing is treated as a FULL run.",
+  "contractSha256": "a9287982779c1928a3e32c4e78ea3207f350b325c7f717e882f33078a3cf5460",
+  "testRoots": [
+    "src",
+    "qa"
+  ],
+  "map": {
+    "src/pages/auth/**": [
+      "auth"
+    ],
+    "src/components/auth/**": [
+      "auth"
+    ],
+    "src/pages/Index.tsx": [
+      "dashboard"
+    ],
+    "src/components/dashboard/**": [
+      "dashboard"
+    ],
+    "src/pages/IdeasPage.tsx": [
+      "ideas"
+    ],
+    "src/pages/IdeaDetailsPage.tsx": [
+      "ideas",
+      "review",
+      "agent-eval"
+    ],
+    "src/pages/IdeaDraftPage.tsx": [
+      "drafts",
+      "agent-eval"
+    ],
+    "src/components/ideas/**": [
+      "ideas",
+      "drafts",
+      "review",
+      "agent-eval"
+    ],
+    "src/components/review/**": [
+      "review",
+      "ideas"
+    ],
+    "src/pages/PatentsPage.tsx": [
+      "patents"
+    ],
+    "src/components/patents/**": [
+      "patents"
+    ],
+    "src/pages/DueDatesPage.tsx": [
+      "duedates"
+    ],
+    "src/components/due-dates/**": [
+      "duedates"
+    ],
+    "src/pages/ActionsPage.tsx": [
+      "actions"
+    ],
+    "src/components/actions/**": [
+      "actions"
+    ],
+    "src/pages/client/**": [
+      "clients"
+    ],
+    "src/components/clients/**": [
+      "clients"
+    ],
+    "src/pages/WorkspacePage.tsx": [
+      "workspace"
+    ],
+    "src/pages/ProfilePage.tsx": [
+      "workspace"
+    ],
+    "src/components/workspace/**": [
+      "workspace",
+      "invites"
+    ],
+    "src/lib/realAdapter.ts": [
+      "*"
+    ],
+    "src/lib/apiConfig.ts": [
+      "*"
+    ],
+    "src/lib/auth.ts": [
+      "*"
+    ],
+    "src/lib/ProtectedRoutes.tsx": [
+      "*"
+    ],
+    "src/lib/PublicRoutes.tsx": [
+      "*"
+    ],
+    "src/App.tsx": [
+      "*"
+    ],
+    "src/main.tsx": [
+      "*"
+    ],
+    "src/components/DashboardLayout.tsx": [
+      "*"
+    ],
+    "src/components/Sidebar.tsx": [
+      "*"
+    ],
+    "src/components/Header.tsx": [
+      "*"
+    ],
+    "src/components/layout/**": [
+      "*"
+    ],
+    "src/components/ui/**": [
+      "*"
+    ],
+    "src/index.css": [
+      "*"
+    ],
+    "src/style.css": [
+      "*"
+    ],
+    "tailwind.config.ts": [
+      "*"
+    ],
+    "package-lock.json": [
+      "*"
+    ],
+    "package.json": [
+      "*"
+    ],
+    "vite.config.ts": [
+      "*"
+    ],
+    "vercel.json": [
+      "infra"
+    ],
+    ".gitlab-ci.yml": [
+      "infra"
+    ],
+    "qa/**": [
+      "infra"
+    ],
+    "CLAUDE.md": [],
+    "README.md": [],
+    ".vscode/**": [],
+    ".github/**": [],
+    ".gitignore": [],
+    "LICENSE": []
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "_doc": [
+    "The exception register: known, deliberate deviations that a tier would",
+    "otherwise fail on.",
+    "",
+    "`qa exceptions` fails the build if an entry is past its expiry or is",
+    "missing a reason, owner or expiry. A suppression that has outlived its",
+    "reason is itself a defect — it hides a real failure and nobody is looking",
+    "at it any more. Renew deliberately or fix the underlying issue.",
+    "",
+    "Keep `match` as narrow as the thing being suppressed: `selContains` is",
+    "there so one exception does not silence a whole page.",
+    "",
+    "Design questions and architectural findings do NOT go here — they go in",
+    "pulse-backend/docs/qa/findings.md, which tracks them to a resolution."
+  ],
+  "exceptions": [
+    {
+      "id": "world-map-pannable-canvas",
+      "match": { "tier": "invariant", "rule": "clipped-horizontal", "page": "/", "selContains": "div.relative.border" },
+      "reason": "PatentWorldMap is a pan/zoom surface with zoom-in, zoom-out and expand controls. Its canvas (1125px) is deliberately wider than the 750px frame and clipped; panning is how you reach the rest. Verified by screenshot 2026-08-29 — the map renders correctly and all continents are reachable.",
+      "owner": "aakash",
+      "expires": "2027-02-28"
+    },
+    {
+      "id": "world-map-pannable-canvas-vertical",
+      "match": { "tier": "invariant", "rule": "clipped-text", "page": "/", "selContains": "div.relative.border" },
+      "reason": "Same element as world-map-pannable-canvas. The clipped-text rule counts the card's own text because the map card has a single child wrapper; the text itself (title, subtitle, legend) is fully visible — it is the map canvas below it that extends past the frame.",
+      "owner": "aakash",
+      "expires": "2027-02-28"
+    }
+  ]
+}
