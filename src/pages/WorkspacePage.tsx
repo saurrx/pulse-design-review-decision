@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
 import DashboardLayout from "@/components/DashboardLayout";
+import ProductPage from "@/components/layout/ProductPage";
 import Loader from "@/components/Loader";
 import WorkspaceTabs from "@/components/workspace/WorkspaceTabs";
 import useUserCookie from "@/hooks/use-auth";
@@ -46,7 +47,7 @@ const WorkspacePage: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="pulse-product-page mx-auto w-full max-w-[1440px] px-6 py-6 lg:px-8">
+      <ProductPage maxWidth="max-w-[1440px]">
         {needsClient && (isLoading || !clientId) ? (
           <Loader />
         ) : (
@@ -56,7 +57,7 @@ const WorkspacePage: React.FC = () => {
             refetchClientData={refetchClientData}
           />
         )}
-      </div>
+      </ProductPage>
     </DashboardLayout>
   );
 };

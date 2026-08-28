@@ -121,7 +121,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   return (
     <div className="flex h-dvh min-h-[640px] bg-[var(--pulse-canvas)] text-[var(--pulse-ink)]">
       <Sidebar collapsed={sidebarCollapsed} toggleSidebar={toggleSidebarCollapse} />
-      <main className={`min-w-0 flex-1 overflow-auto bg-[var(--pulse-canvas)] ${className || ""}`}>
+      {/* A flex column, so a page can say flex-1 and mean "the space left under
+          the header" instead of doing viewport arithmetic. h-full or
+          h-[calc(100dvh-64px)] both ignore the header that sits above them in
+          here, which is where the persistent 64px overhang came from. Still
+          overflow-auto: short pages scroll main, tall ones own their scrolling
+          via min-h-0 flex-1. */}
+      <main className={`flex min-w-0 flex-1 flex-col overflow-auto bg-[var(--pulse-canvas)] ${className || ""}`}>
         {resolvedHeader && <Header {...resolvedHeader} />}
         {children}
       </main>

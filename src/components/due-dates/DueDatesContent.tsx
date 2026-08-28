@@ -175,24 +175,34 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
       visible: true,
       sticky: false,
     }] : []),
+    // The invention title belongs on the default view — a docket row identified
+    // only by application number tells you nothing about what is at stake.
+    { id: "title", label: "Title", visible: true, sticky: false },
     { id: "dueDate", label: "Due Date", visible: true, sticky: false },
+    // Urgency, not just the date. The countdown is the at-a-glance overdue
+    // signal the deadline list exists for.
+    { id: "days", label: "Days", visible: true, sticky: false },
+    // Selecting an action against a deadline. Counsel and the committee have no
+    // /actions nav item, so this column is their ONLY surface for it — dropping
+    // it made choosing an instruction impossible for those two roles.
+    { id: "action", label: "Action", visible: true, sticky: false },
     { id: "status", label: "Status", visible: true, sticky: false },
+    { id: "lastUpdated", label: "Last Updated", visible: true, sticky: false },
     {
       id: "familyMembers",
       label: "Family Members",
-      visible: true,
+      visible: false,
       sticky: false,
     },
     {
       id: "currentEvent",
       label: "Current Event",
-      visible: true,
+      visible: false,
       sticky: false,
     },
     ...(isOC
       ? [{ id: "remind", label: "Remind", visible: true, sticky: false }]
       : []),
-    { id: "title", label: "Title", visible: false, sticky: false },
     { id: "legalStatus", label: "Legal Status", visible: false, sticky: false },
     { id: "assignee", label: "Assignee", visible: false, sticky: false },
     { id: "inventors", label: "Inventors", visible: false, sticky: false },
@@ -970,7 +980,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
   };
 
   return (
-    <div className="pulse-product-page pulse-table-page relative mx-auto flex h-[calc(100dvh-64px)] min-h-0 w-full max-w-[1680px] flex-1 flex-col overflow-hidden px-6 py-6 lg:px-8">
+    <div className="pulse-product-page pulse-table-page relative mx-auto flex min-h-0 flex-1 w-full max-w-[1680px] flex-1 flex-col overflow-hidden px-6 py-6 lg:px-8">
       {/* Animated Gradient Background */}
       <div className="hidden">
         {theme === "dark" ? (

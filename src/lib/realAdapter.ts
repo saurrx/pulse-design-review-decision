@@ -460,8 +460,29 @@ const RULES: Rule[] = [
         wrap: (p: any) => ({ data: Array.isArray(p) ? p.map(withLogo) : withLogo(p) }),
       };
     } },
-  { m: /^\/api\/v1\/patent\/fetch-lastet\/client\/([^/?]+)/,
-    to: m => ({ url: `/v1/patents?${isUuid(m[1]) ? `client_id=${m[1]}&` : ""}limit=5`, method: "GET", wrap: patentList }) },
+  // The Patents table. This hardcoded limit=5 and dropped the query string, so
+  // the screen showed five of 14,260 patents — unsearched, unfiltered and
+  // unsorted — while its own pager reported the real total. The name says
+  // "latest" but this is the only caller, and it is the full table.
+  { m: /^\/api\/v1\/patent\/fetch-lastet\/client\/([^/?]+)(?:\?(.*))?$/,
+    to: m => {
+      const q = new URLSearchParams(m[2] ?? "");
+      const out = new URLSearchParams();
+      // filter_client_id (the photon-side client picker) wins over the path id,
+      // which is the caller's own workspace.
+      const explicit = q.get("filter_client_id");
+      const cid = explicit && isUuid(explicit) ? explicit : (isUuid(m[1]) ? m[1] : null);
+      if (cid) out.set("client_id", cid);
+      if (q.get("page")) out.set("page", q.get("page")!);
+      if (q.get("limit")) out.set("limit", q.get("limit")!);
+      if (q.get("search")) out.set("search", q.get("search")!);
+      // The screen sends a CSV of legal statuses; the API takes one PatentStatus.
+      const status = (q.get("filter_status") ?? "").split(",").filter(Boolean)[0];
+      if (status) out.set("status", LEGAL_TO_PSTATUS[status] ?? status);
+      if (q.get("tag")) out.set("tag", q.get("tag")!);
+      const qs = out.toString();
+      return { url: `/v1/patents${qs ? `?${qs}` : ""}`, method: "GET", wrap: patentList };
+    } },
   { m: /^\/api\/v1\/clients\/lookup/, to: () => ({ url: "/v1/clients", method: "GET", wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/case-owners$/, to: () => ({ url: "/v1/case-owners", method: "GET", wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/case-owners\/([^/]+)\/assignments$/, method: "PUT",

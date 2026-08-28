@@ -37,6 +37,11 @@ const ClientLogo: React.FC<ClientLogoProps> = ({
         alt={`${client?.name || "Client"} logo`}
         className={className}
         crossOrigin="use-credentials"
+        // 82 client cards means 82 authenticated streams through the API, each
+        // a DB lookup plus an S3 GET. Only the handful actually on screen need
+        // to be fetched; the rest arrive as the list is scrolled.
+        loading="lazy"
+        decoding="async"
         onError={() => setFailed(true)}
       />
     );
