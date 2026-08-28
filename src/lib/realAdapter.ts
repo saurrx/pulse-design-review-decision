@@ -284,14 +284,42 @@ const RULES: Rule[] = [
         pending_patents: r.pending ?? 0,
         total: r.count,
       })) }) }) },
-  { m: /^\/api\/v1\/patent\/fetch\/(upcoming-due-dates|all-due-dates)/,
-    to: () => ({ url: "/v1/due-dates", method: "GET", wrap: (p: any) => ({
-      data: (Array.isArray(p) ? p : p?.data ?? []).map((r: any) => ({
-        ...r,
-        event_date: r.due_at,
-        event_name: r.title,
-        patent: r.patent ? { ...oldPatent(r.patent), assignee_original: r.patent?.client?.name ?? null } : r.patent,
-      })) }) }) },
+  // The screen has always sent page/limit and read a pagination envelope; this
+  // rule used to drop the query string, so the API returned every row — 13.7k
+  // of them after the legacy import, ~7s to render. Pass the paging through and
+  // return the envelope the screen already expects.
+  //
+  // The calendar and export ask for everything with limit=0, which the API caps.
+  { m: /^\/api\/v1\/patent\/fetch\/(upcoming-due-dates|all-due-dates)(?:\?(.*))?$/,
+    to: m => {
+      const q = new URLSearchParams(m[2] ?? "");
+      const out = new URLSearchParams();
+      const page = q.get("page"); const limit = q.get("limit");
+      if (page) out.set("page", page);
+      if (limit !== null) out.set("limit", limit);
+      if (q.get("filter_client_id")) out.set("client_id", q.get("filter_client_id")!);
+      const qs = out.toString();
+      return {
+        url: `/v1/due-dates${qs ? `?${qs}` : ""}`, method: "GET",
+        wrap: (p: any) => {
+          const rows = Array.isArray(p) ? p : p?.data ?? [];
+          return {
+            data: rows.map((r: any) => ({
+              ...r,
+              event_date: r.due_at,
+              event_name: r.title,
+              patent: r.patent
+                ? { ...oldPatent(r.patent), assignee_original: r.patent?.client?.name ?? null }
+                : r.patent,
+            })),
+            pagination: p?.pagination ?? {
+              total: rows.length, page: 1, limit: rows.length,
+              totalPages: 1,
+            },
+          };
+        },
+      };
+    } },
   { m: /^\/api\/v1\/patent\/fetch\/([^/]+)$/,
     to: m => ({ url: `/v1/patents/${m[1]}`, method: "GET", wrap: p => ({ data: oldPatent(p) }) }) },
   { m: /^\/api\/v1\/patent\/update(?:-single)?\/([^/]+)$/,
@@ -504,9 +532,15 @@ const RULES: Rule[] = [
   // -- shareable invite links ----------------------------------------------
   { m: /^\/api\/v1\/clients\/([^/]+)\/invite-link\/([^/]+)$/, method: "DELETE",
     to: m => ({ url: `/v1/invites/${m[2]}`, method: "DELETE", wrap: p => ({ data: p }) }) },
+  // Photon roles carry the "photon-legal" sentinel as their client_id; sending
+  // it as a real client reference 400s. isUuid drops it, and the API then falls
+  // back to the caller's own workspace — the same guard every other
+  // client-scoped rule here already applies.
   { m: /^\/api\/v1\/clients\/([^/]+)\/invite-link/,
-    to: m => ({ url: `/v1/invites/share-link?client_id=${m[1]}`, method: "GET",
-      wrap: (p: any) => ({ data: { ...p, link: p?.url, invite_link: p?.url } }) }) },
+    to: m => ({
+      url: `/v1/invites/share-link${isUuid(m[1]) ? `?client_id=${m[1]}` : ""}`, method: "GET",
+      wrap: (p: any) => ({ data: { ...p, link: p?.url, invite_link: p?.url } }),
+    }) },
 
   // -- client detail extras -------------------------------------------------
   { m: /^\/api\/v1\/clients\/personal-info\/([^/]+)$/,
