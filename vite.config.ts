@@ -10,7 +10,9 @@ export default defineConfig(({ mode }) => ({
     // Real-API mode: /v1 is proxied so the API's HttpOnly session cookies stay
     // same-origin — without this the browser rejects them and every request
     // after login is unauthenticated.
-    proxy: { "/v1": { target: "http://localhost:3000", changeOrigin: true } },
+    // Same default as always; overridable so the app can run in a container,
+    // where localhost is the container rather than the API host.
+    proxy: { "/v1": { target: process.env.VITE_PROXY_TARGET || "http://localhost:3000", changeOrigin: true } },
   },
   build: {
     sourcemap: false,
