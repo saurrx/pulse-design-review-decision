@@ -286,12 +286,23 @@ const RULES: Rule[] = [
   { m: /^\/api\/v1\/idea\/send-to-oc\/([^/]+)\/oc$/, method: "POST",
     to: m => ({ url: `/v1/drafts/${m[1]}/review`, method: "POST",
       body: { decision: "APPROVED" } }) },
+  // The comment is forwarded EXACTLY as the reviewer wrote it — no fallback.
+  //
+  // These two rules used to substitute "Rejected" and "Changes requested" when
+  // the body carried nothing. The backend requires a comment on both decisions
+  // (a service guard and a DB CHECK constraint), so the default meant that
+  // guard could never fire through the UI, and the append-only transition
+  // history recorded words the reviewer never wrote, attributed to them, on the
+  // permanent record of someone's rejected disclosure.
+  //
+  // Now an empty comment reaches the backend empty and is refused there, which
+  // is where the rule lives. See pulse-backend/docs/qa/findings.md F-007.
   { m: /^\/api\/v1\/idea\/reject-from-ihc\/([^/]+)$/, method: "POST",
     to: (m, b) => ({ url: `/v1/ideas/${m[1]}/review`, method: "POST",
-      body: { decision: "REJECTED", comment: b?.reject_reason ?? b?.reason ?? b?.comment ?? "Rejected" } }) },
+      body: { decision: "REJECTED", comment: b?.reject_reason ?? b?.reason ?? b?.comment } }) },
   { m: /^\/api\/v1\/idea\/add-update-request\/([^/]+)$/, method: "POST",
     to: (m, b) => ({ url: `/v1/ideas/${m[1]}/review`, method: "POST",
-      body: { decision: "CHANGES_REQUESTED", comment: b?.message ?? b?.comment ?? "Changes requested" } }) },
+      body: { decision: "CHANGES_REQUESTED", comment: b?.note ?? b?.message ?? b?.comment } }) },
 
   // -- patents / due dates --------------------------------------------------
   { m: /^\/api\/v1\/patent\/(?:fetch-all-patents\/)?client\/([^/?]+)(\?.*)?$/,
