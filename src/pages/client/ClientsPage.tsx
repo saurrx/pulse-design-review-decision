@@ -297,6 +297,11 @@ const ClientsPage: React.FC = () => {
       try {
         const params = new URLSearchParams();
         params.append("page", currentPage.toString());
+        // itemsPerPage was in the query key and in the row numbering but never
+        // actually sent, so the API fell back to its 500 cap and returned all
+        // 82 workspaces — 79 logo streams on one page load, and the S.No column
+        // numbered from a page size the server had never heard of.
+        params.append("limit", itemsPerPage.toString());
 
         if (debouncedSearchQuery) {
           params.append("search", debouncedSearchQuery);
