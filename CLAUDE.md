@@ -57,6 +57,17 @@ Dialect map (old ⇄ new):
 - Dashboard wrap: granted_patents/pending_patents/inactive_patents/
   total_patents, weekly_series, ideas_last_30_days, patents_filed_last_90_days,
   top_clients — the design reads these flat names.
+- Actions: `action_status` and `request_status` are TWO real axes now, not one
+  faked field. action_status is the client's submission state (DRAFT/SUBMITTED/
+  UPDATED, from the API's submission_state); request_status is Photon's queue
+  (NEW/ACKNOWLEDGED/IN_PROGRESS/COMPLETED). The adapter used to hardcode
+  action_status:"SUBMITTED", which made UPDATED — a client revising an
+  instruction already in the queue — impossible to render. The OC queue rows
+  are translated too (patent/patent_event/action_template/client are nested
+  differently in the clean shape); passing them through raw crashed the screen
+  the moment real actions existed. Action templates come from a 195-row
+  catalogue: the event type travels as a QUERY parameter because 94% of real
+  deadline names contain a slash.
 - Envelope: every wrap returns {data: ...} because call sites read
   response.data.data.
 
@@ -133,6 +144,9 @@ Playwright scripts must live in repo root (module resolution). Durable set:
 - baseline.mjs/compare.mjs — visual regression (npm run test:visual, 0.02%)
 **LAW (a real bug hid behind its violation): assert OUTCOMES per role — URL
 changed, state changed, element appeared — never just absence of errors.**
+**Corollary: an empty table hides broken code.** The Photon actions queue read
+fields nothing selected and threw on its first real row; with no rows the map
+never ran. Test against imported data, not a bare seed.
 Login throttle is 5/5min/IP: restart the API between multi-login phases.
 Playwright prompt()/confirm() need page.once('dialog') BEFORE the click.
 
