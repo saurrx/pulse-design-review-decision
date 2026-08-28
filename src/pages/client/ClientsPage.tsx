@@ -393,7 +393,7 @@ const ClientsPage: React.FC = () => {
             },
       }}
     >
-      <div className="pulse-product-page pulse-table-page relative mx-auto flex h-[calc(100dvh-64px)] w-full max-w-[1680px] flex-col overflow-hidden px-6 py-6 lg:px-8">
+      <div className="pulse-product-page pulse-table-page relative mx-auto flex h-[calc(100dvh-64px)] min-h-0 w-full max-w-[1680px] flex-col overflow-hidden px-6 py-6 lg:px-8">
         {/* Animated Gradient Background */}
         <div className="hidden">
           {theme === "dark" ? (
@@ -831,7 +831,12 @@ const ClientsPage: React.FC = () => {
         {isLoading && !data ? (
           <Loader />
         ) : viewType === "card" ? (
-          <div className="mt-3 flex flex-none flex-col px-6 pb-3">
+          /* The page is a fixed-height flex column with overflow-hidden, so this
+             region must own its scrolling: flex-none clipped everything past the
+             fold. The demo has a handful of mock clients and never showed it;
+             there are 82 real ones. min-h-0 is what lets a flex child shrink
+             enough to actually scroll. */
+          <div className="mt-3 flex min-h-0 flex-1 flex-col overflow-y-auto px-6 pb-3">
             {clientsData.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-[300px] text-sidebar-foreground">
                 <p className="text-lg mb-2">No clients found</p>

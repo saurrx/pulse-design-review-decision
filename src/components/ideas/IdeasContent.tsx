@@ -548,7 +548,7 @@ const IdeasContent: React.FC = () => {
   };
 
   return (
-    <div className="pulse-product-page pulse-table-page relative mx-auto h-[calc(100dvh-64px)] w-full max-w-[1680px] overflow-hidden px-6 py-6 lg:px-8">
+    <div className="pulse-product-page pulse-table-page relative mx-auto h-[calc(100dvh-64px)] min-h-0 w-full max-w-[1680px] overflow-hidden px-6 py-6 lg:px-8">
       <div className="flex h-full flex-col">
         {/* Animated Gradient Background */}
         <div className="hidden">
@@ -938,7 +938,12 @@ const IdeasContent: React.FC = () => {
                   } flex-1 overflow-hidden flex flex-col md:mb-10`}
               >
                 <div
-                  className={`flex-shrink-0 overflow-x-auto h-[72vh] ${theme === "dark" && "border-[#cccccc20]"
+                  /* Owns both axes of scrolling. It was flex-shrink-0 with a
+                     fixed h-[72vh] and overflow-x only, so anything past 72% of
+                     the viewport was clipped with no way to reach it — the list
+                     simply ended mid-row. flex-1 + min-h-0 lets it size to the
+                     space the page actually has. */
+                  className={`min-h-0 flex-1 overflow-auto ${theme === "dark" ? "border-[#cccccc20]" : ""
                     }`}
                 >
                   <div className="grid grid-cols-1 gap-4 px-6 pb-6">

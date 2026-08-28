@@ -249,7 +249,7 @@ const OCActionsContent: React.FC = () => {
   }
 
   return (
-    <div className="pulse-product-page pulse-table-page mx-auto flex h-[calc(100dvh-64px)] w-full max-w-[1680px] flex-col overflow-hidden px-6 py-6 lg:px-8">
+    <div className="pulse-product-page pulse-table-page mx-auto flex h-[calc(100dvh-64px)] min-h-0 w-full max-w-[1680px] flex-col overflow-hidden px-6 py-6 lg:px-8">
       {/* Search + Filter + Sort + Columns bar */}
       <div className="pulse-toolbar !mx-0 !mb-5 !mt-0">
         <div className="flex-1">
@@ -594,11 +594,15 @@ const OCActionsContent: React.FC = () => {
       </div>
 
       <div
-        className={`pulse-table-frame !mx-0 !mb-3 min-h-0 flex-1 ${
+        /* flex column so the ScrollArea below can be given a height to scroll
+           against. pulse-table-frame is overflow-hidden, and an unconstrained
+           ScrollArea just grows past it — at 1280x720 the last rows of the
+           queue were unreachable. */
+        className={`pulse-table-frame !mx-0 !mb-3 flex min-h-0 flex-1 flex-col ${
           theme === "dark" ? "border-zinc-800" : "border-zinc-200"
         }`}
       >
-        <ScrollArea className="w-full">
+        <ScrollArea className="h-full w-full flex-1">
           <table className="pulse-data-table w-full">
             <thead>
               <tr

@@ -494,6 +494,7 @@ const NeedsReview = ({
   laterCount,
   onOpen,
   onReviewAll,
+  onViewAll,
   title = "Needs your review",
   actionLabel = "Review all",
   showScore = true,
@@ -504,13 +505,23 @@ const NeedsReview = ({
   /** Ideas already past review, for the caught-up empty state. */
   laterCount: number;
   onOpen: (id: string) => void;
+  /** Header CTA. Omitted where the role has no "review all" surface. */
   onReviewAll?: () => void;
+  /** Where the overflow row goes. Falls back to onReviewAll. */
+  onViewAll?: () => void;
   title?: string;
   actionLabel?: string;
   showScore?: boolean;
   waitingLabel?: string;
 }) => {
   const oldestWait = Math.max(0, ...rows.map((row) => row.waitingDays));
+  // The card sits in a fixed-height dashboard row beside the pipeline. Rendering
+  // every queued idea stretched it — 124 rows tall on a real workspace — which
+  // dragged the whole grid row with it and distorted the pipeline next to it.
+  // Show a card's worth and let the overflow row carry the rest.
+  const VISIBLE_ROWS = 5;
+  const visibleRows = rows.slice(0, VISIBLE_ROWS);
+  const hiddenCount = rows.length - visibleRows.length;
   const rowColumns = showScore
     ? "grid-cols-[minmax(0,1fr)_120px_64px_94px]"
     : "grid-cols-[minmax(0,1fr)_120px_94px]";
@@ -562,12 +573,12 @@ const NeedsReview = ({
           {showScore && <span className="text-right">Score</span>}
           <span className="text-right">Age</span>
         </div>
-        {rows.map((r, i) => (
+        {visibleRows.map((r, i) => (
           <button
             key={r.id}
             type="button"
             onClick={() => onOpen(r.id)}
-            className={`grid min-h-11 flex-1 ${rowColumns} w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[var(--pulse-surface-subtle)] ${i > 0 ? "border-t border-[var(--pulse-line)]" : ""}`}
+            className={`grid min-h-11 ${rowColumns} w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[var(--pulse-surface-subtle)] ${i > 0 ? "border-t border-[var(--pulse-line)]" : ""}`}
           >
             <span
               className="min-w-0 truncate text-[13px] font-medium text-[var(--pulse-ink)]"
@@ -584,6 +595,16 @@ const NeedsReview = ({
             </span>
           </button>
         ))}
+        {hiddenCount > 0 && (
+          <button
+            type="button"
+            onClick={onViewAll ?? onReviewAll ?? (() => onOpen(rows[0].id))}
+            className="mt-auto flex w-full items-center justify-between gap-3 rounded-lg border-t border-[var(--pulse-line)] px-3 py-2.5 text-left text-[13px] font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:bg-[var(--pulse-surface-subtle)]"
+          >
+            <span style={NUMS}>{hiddenCount}+ pending {hiddenCount === 1 ? "action" : "actions"}</span>
+            <span className="text-xs text-[var(--pulse-ink-muted)]">{actionLabel} →</span>
+          </button>
+        )}
       </div>
     )}
   </div>
