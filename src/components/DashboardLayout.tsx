@@ -28,7 +28,7 @@ const defaultHeaderForRoute = (
   }
   if (/^\/ideas\/[^/]+\/draft$/.test(pathname)) {
     return {
-      title: "Draft workspace",
+      title: "Working submission",
       back: { label: "Back to idea", to: pathname.replace(/\/draft$/, "") },
     };
   }
@@ -44,7 +44,7 @@ const defaultHeaderForRoute = (
         role === "LEGAL_COUNSEL" || role === "TECH_COMMITTEE"
           ? "Review queue"
           : role === "INVENTOR"
-            ? "My disclosures"
+            ? "My ideas"
             : "Ideas",
     };
   }
@@ -56,15 +56,11 @@ const defaultHeaderForRoute = (
   }
   if (pathname === "/patents") return { title: "Patents" };
   if (pathname === "/due-dates") return { title: "Actions" };
-  if (pathname === "/actions") return { title: "Operations" };
+  if (pathname === "/actions") return { title: "Actions" };
   if (pathname === "/assistant") return { title: "AI assistant" };
+  if (pathname === "/profile") return { title: "My profile" };
   if (pathname === "/workspace") {
-    return {
-      title:
-        role === "INVENTOR" || role === "CASE_OWNER"
-          ? "Profile"
-          : "Workspace settings",
-    };
+    return { title: "Workspace" };
   }
   return { title: "Pulse" };
 };

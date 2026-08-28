@@ -209,6 +209,11 @@ const RULES: Rule[] = [
   { m: /^\/api\/v1\/auth\/ihc\/invite-user$/, method: "POST",
     to: (_m, b) => ({ url: "/v1/invites", method: "POST",
       body: { role: b?.role ?? "INVENTOR", emails: b?.email ?? b?.emails } }) },
+  { m: /^\/api\/v1\/auth\/logout-all$/, method: "POST",
+    to: () => ({ url: "/v1/auth/logout-all", method: "POST" }) },
+  { m: /^\/api\/v1\/auth\/change-password$/, method: "POST",
+    to: (_m, b) => ({ url: "/v1/auth/change-password", method: "POST",
+      body: { current_password: b?.current_password, new_password: b?.new_password } }) },
 
   // -- ideas ----------------------------------------------------------------
   { m: /^\/api\/v1\/idea\/fetch-by-user(?:\?(.*))?$/,
@@ -472,11 +477,24 @@ const RULES: Rule[] = [
   { m: /^\/api\/v1\/remove-file\/([^/]+)$/, method: "DELETE",
     to: m => ({ url: `/v1/files/${m[1]}`, method: "DELETE", wrap: p => ({ data: p }) }) },
 
+  // The design gives the idea-reference prefix its own endpoint; the API keeps
+  // it with the rest of the client configuration. Call sites read
+  // data.data.idea_reference_prefix back, so the wrap must surface it.
+  { m: /^\/api\/v1\/clients\/([^/?]+)\/reference-settings$/, method: "PUT",
+    to: (m, b) => ({ url: `/v1/clients/${m[1]}`, method: "PATCH",
+      body: { idea_reference_prefix: b?.prefix },
+      wrap: (c: any) => ({ data: { idea_reference_prefix: c?.idea_reference_prefix } }) }) },
+
   // -- patents extras -------------------------------------------------------
   { m: /^\/api\/v1\/patent\/export\/client\/([^/?]+)(\?.*)?$/,
     to: m => ({ url: `/v1/patents/export${isUuid(m[1]) ? `?client_id=${m[1]}` : ""}`, method: "GET", wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/patent\/events\/([^/]+)\/remind$/, method: "POST",
     to: m => ({ url: `/v1/due-dates/${m[1]}/remind`, method: "POST", wrap: p => ({ data: p }) }) },
+  // A "patent event" in the design is a docket due date here. The design says
+  // OPEN for the un-ticked state; the API calls it PENDING and translates.
+  { m: /^\/api\/v1\/patent\/events\/([^/]+)$/, method: "PATCH",
+    to: (m, b) => ({ url: `/v1/due-dates/${m[1]}`, method: "PATCH",
+      body: { status: b?.status }, wrap: p => ({ data: p }) }) },
 
   // A "removed" client is deactivated, never deleted — its portfolio and
   // review history must survive (the schema restricts hard deletes anyway).

@@ -212,11 +212,12 @@ type PatentsContentProps = {
 const COLUMN_VISIBILITY_KEY_PREFIX = "patents-portfolio-column-visibility-v5";
 
 const CORE_COLUMN_WIDTHS: Record<string, string> = {
-  title: "33%",
-  legal_current_status: "14%",
-  publicationCountry: "14%",
-  dateOfFiling: "10%",
-  tags: "13%",
+  prn: "160px",
+  title: "320px",
+  legal_current_status: "170px",
+  publicationCountry: "170px",
+  dateOfFiling: "140px",
+  tags: "220px",
 };
 
 const getColumnVisibilityStorageKey = (userId: string | undefined): string =>
@@ -254,6 +255,15 @@ const defaultColumns: Column[] = [
     sortField: "application_number",
   },
   {
+    id: "prn",
+    label: "PRN",
+    width: "w-40",
+    accessor: "prn",
+    visible: true,
+    sticky: true,
+    sortField: "prn",
+  },
+  {
     id: "title",
     label: "Invention Title",
     width: "w-96",
@@ -285,14 +295,6 @@ const defaultColumns: Column[] = [
       moment(patent?.application_date).format("YYYY-MM-DD"),
     visible: true,
     sortField: "application_date",
-  },
-  {
-    id: "prn",
-    label: "PRN",
-    width: "w-40",
-    accessor: "prn",
-    visible: false,
-    sortField: "prn",
   },
   {
     id: "assigneeOriginal",
@@ -1045,9 +1047,9 @@ const PatentsContent = (props: PatentsContentProps) => {
         );
       case "prn":
         return (
-          <td className="px-4 py-2.5" style={{ minWidth: "100px" }}>
+          <td className="px-4 py-2.5" style={{ minWidth: "140px" }}>
             <span
-              className={`whitespace-nowrap font-mono text-[13px] ${
+              className={`whitespace-nowrap text-[13px] tabular-nums ${
                 theme === "dark" ? "text-neutral-300" : "text-[var(--pulse-ink)]"
               }`}
             >
@@ -1059,7 +1061,7 @@ const PatentsContent = (props: PatentsContentProps) => {
         return (
           <td
             className="px-4 py-2.5"
-            style={{ minWidth: "280px", maxWidth: "420px" }}
+            style={{ minWidth: "320px", maxWidth: "480px" }}
           >
             <span
               className={`block truncate whitespace-nowrap font-sans text-sm font-medium ${
@@ -1090,7 +1092,7 @@ const PatentsContent = (props: PatentsContentProps) => {
           <td className="px-4 py-2.5" style={{ minWidth: "120px" }}>
             <div className="flex items-center justify-end gap-2">
               <span
-                className={`whitespace-nowrap font-mono text-[13px] tabular-nums ${
+                className={`whitespace-nowrap text-[13px] tabular-nums ${
                   theme === "dark" ? "text-neutral-400" : "text-[var(--pulse-ink-secondary)]"
                 }`}
               >
@@ -1104,7 +1106,7 @@ const PatentsContent = (props: PatentsContentProps) => {
           <td className="px-4 py-3" style={{ minWidth: "150px" }}>
             <div className="flex items-center gap-2">
               <span
-                className={`font-mono text-[13px] tabular-nums ${
+                className={`text-[13px] tabular-nums ${
                   theme === "dark" ? "text-neutral-400" : "text-[var(--pulse-ink-secondary)]"
                 }`}
               >
@@ -1239,7 +1241,7 @@ const PatentsContent = (props: PatentsContentProps) => {
           <td
             key={columnId}
             className="px-2 py-1.5 align-middle"
-            style={{ minWidth: "180px", maxWidth: "240px" }}
+            style={{ minWidth: "220px", maxWidth: "280px" }}
             onClick={(e) => e.stopPropagation()}
           >
             <PatentTagsCell
@@ -1263,7 +1265,7 @@ const PatentsContent = (props: PatentsContentProps) => {
               <span className="inline-flex items-center gap-2 whitespace-nowrap">
                 {flag && <span className="text-[13px] leading-none">{flag}</span>}
                 <span
-                  className={`font-mono text-[13px] tabular-nums ${
+                  className={`text-[13px] tabular-nums ${
                     theme === "dark" ? "text-neutral-300" : "text-[var(--pulse-ink-secondary)]"
                   }`}
                 >
@@ -1307,8 +1309,8 @@ const PatentsContent = (props: PatentsContentProps) => {
             : "bg-white border-photon-gray-300"
         }`}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <span
               className={`text-sm whitespace-nowrap ${
                 theme === "dark" ? "text-neutral-500" : "text-gray-500"
@@ -1436,7 +1438,7 @@ const PatentsContent = (props: PatentsContentProps) => {
   };
 
   return (
-    <div className="relative flex h-full min-h-0 min-w-0 w-full flex-col overflow-hidden">
+    <div className="relative flex min-w-0 w-full flex-col">
       {/* Animated Gradient Background */}
       <div className="hidden">
         {theme === "dark" ? (
@@ -1513,11 +1515,11 @@ const PatentsContent = (props: PatentsContentProps) => {
           </>
         )}
       </div>
-      <div className="flex min-h-0 w-full flex-1 flex-col bg-transparent">
-        <div className="pulse-toolbar !mx-0 !mb-5 !mt-0 flex-col !items-start md:flex-row">
-          <div className={`flex items-center gap-3 w-full`}>
-            <div className="flex-1 min-w-0">
-              <div className="relative min-w-[300px]">
+      <div className="flex w-full flex-col bg-transparent">
+        <div className="pulse-toolbar !mx-0 !mb-5 !mt-0 !items-start">
+          <div className="flex w-full flex-wrap items-center gap-3">
+            <div className="min-w-[240px] flex-[1_1_320px]">
+              <div className="relative w-full">
                 <Search
                   className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 z-10 pointer-events-none ${
                     theme === "dark" ? "text-neutral-500" : "text-neutral-400"
@@ -1548,7 +1550,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={`gap-1 hover:bg-transparent border py-5 rounded hover:border-[#F9B418] ${
+                    className={`shrink-0 gap-1 hover:bg-transparent border py-5 rounded hover:border-[#F9B418] ${
                       theme === "dark"
                         ? "bg-zinc-900 border-[#cccccc20] hover:bg-zinc-900 hover:border-[#F9B418]/50"
                         : "bg-white text-neutral-700"
@@ -1560,7 +1562,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                       }`}
                     />
                     <span
-                      className={`font-sans hidden sm:inline font-normal ml-1 ${
+                      className={`font-sans font-normal ml-1 ${
                         theme === "dark" ? "text-zinc-200" : "text-neutral-700"
                       }`}
                     >
@@ -1683,7 +1685,7 @@ const PatentsContent = (props: PatentsContentProps) => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`flex items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
+                  className={`flex shrink-0 items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
                     theme === "dark"
                       ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-white/5 hover:text-neutral-300"
                       : "hover:bg-transparent bg-transparent border-neutral-200 text-neutral-700 hover:text-[#494949] hover:border-[#F9B418]"
@@ -1695,7 +1697,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                     }`}
                   />
                   <span
-                    className={`hidden font-sans sm:inline font-normal ${
+                    className={`font-sans font-normal ${
                       theme === "dark" ? "text-zinc-200" : "text-neutral-700"
                     }`}
                   >
@@ -1789,7 +1791,7 @@ const PatentsContent = (props: PatentsContentProps) => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`flex items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
+                  className={`flex shrink-0 items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
                     theme === "dark"
                       ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-white/5 hover:text-neutral-300"
                       : "hover:bg-transparent bg-transparent border-neutral-200 text-neutral-700 hover:text-[#494949] hover:border-[#F9B418]"
@@ -1801,7 +1803,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                     }`}
                   />
                   <span
-                    className={`hidden font-sans sm:inline font-normal ${
+                    className={`font-sans font-normal ${
                       theme === "dark" ? "text-zinc-200" : "text-neutral-700"
                     }`}
                   >
@@ -1924,7 +1926,7 @@ const PatentsContent = (props: PatentsContentProps) => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`flex items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
+                  className={`flex shrink-0 items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
                     theme === "dark"
                       ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-white/5 hover:text-neutral-300"
                       : "hover:bg-transparent bg-transparent border-neutral-200 text-neutral-700 hover:text-[#494949] hover:border-[#F9B418]"
@@ -1936,7 +1938,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                     }`}
                   />
                   <span
-                    className={`hidden font-sans sm:inline font-normal ${
+                    className={`font-sans font-normal ${
                       theme === "dark" ? "text-zinc-200" : "text-neutral-700"
                     }`}
                   >
@@ -2063,7 +2065,7 @@ const PatentsContent = (props: PatentsContentProps) => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`gap-1 hover:bg-transparent border py-5 rounded hover:border-[#F9B418] ${
+                  className={`shrink-0 gap-1 hover:bg-transparent border py-5 rounded hover:border-[#F9B418] ${
                     theme === "dark"
                       ? "bg-zinc-900 border-[#cccccc20] hover:bg-zinc-900 hover:border-[#F9B418]/50"
                       : "hover:text-foreground bg-white text-neutral-700"
@@ -2089,7 +2091,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                     <path d="M15 3v18"></path>
                   </svg>
                   <span
-                    className={`font-sans hidden sm:inline font-normal ${
+                    className={`font-sans font-normal ${
                       theme === "dark" ? "text-zinc-200" : "text-neutral-700"
                     }`}
                   >
@@ -2183,7 +2185,7 @@ const PatentsContent = (props: PatentsContentProps) => {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`gap-1 hover:bg-transparent border py-5 rounded hover:border-[#F9B418] ${
+                  className={`shrink-0 gap-1 hover:bg-transparent border py-5 rounded hover:border-[#F9B418] ${
                     theme === "dark"
                       ? "bg-zinc-900 border-[#cccccc20] hover:bg-zinc-900 hover:border-[#F9B418]/50"
                       : "hover:text-foreground bg-white text-neutral-700"
@@ -2195,7 +2197,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                     }`}
                   />
                   <span
-                    className={`hidden font-sans sm:inline font-normal ${
+                    className={`font-sans font-normal ${
                       theme === "dark" ? "text-zinc-200" : "text-neutral-700"
                     }`}
                   >
@@ -2361,7 +2363,7 @@ const PatentsContent = (props: PatentsContentProps) => {
           <Loader />
         ) : (
           <div
-            className={`pulse-table-frame !mx-0 !mb-3 flex min-h-0 min-w-0 w-auto flex-1 flex-col ${
+            className={`pulse-table-frame !mx-0 !mb-3 flex min-w-0 w-auto flex-col ${
               theme === "dark" ? "border-[#cccccc20]" : ""
             }`}
           >
@@ -2403,15 +2405,15 @@ const PatentsContent = (props: PatentsContentProps) => {
                   theme === "dark"
                     ? "bg-transparent"
                     : "bg-white border-photon-gray-200 border"
-                } flex-1 overflow-hidden flex flex-col`}
+                } flex flex-col`}
               >
                 <div
-                  className={`flex-1 overflow-y-auto overflow-x-auto overflow-auto mb-20 md:mb-0 ${filterOption?.length && "mb-10"}`}
+                  className="overflow-x-auto"
                 >
-                  <table className="pulse-data-table w-full table-fixed">
+                  <table className="pulse-data-table min-w-[1384px] w-full table-fixed">
                     <colgroup>
-                      <col style={{ width: "4%" }} />
-                      <col style={{ width: "12%" }} />
+                      <col style={{ width: "64px" }} />
+                      <col style={{ width: "140px" }} />
                       {visibleColumns.map((column) => (
                         <col
                           key={column.id}
@@ -2537,6 +2539,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                                 ? "bg-[#0a0a0a] group-hover:bg-neutral-900"
                                 : "bg-white group-hover:bg-[#FAFAFA]"
                             }`}
+                            style={{ minWidth: "140px" }}
                           >
                             <div className="flex flex-col gap-0.5">
                               <span
@@ -2544,7 +2547,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                                   theme === "dark"
                                     ? "text-neutral-300"
                                     : "text-[#0C0C0C]"
-                                } text-[13px] tabular-nums whitespace-nowrap flex items-center gap-2 font-mono`}
+                                } text-[13px] tabular-nums whitespace-nowrap flex items-center gap-2`}
                               >
                                                 {client.application_number}
                               </span>

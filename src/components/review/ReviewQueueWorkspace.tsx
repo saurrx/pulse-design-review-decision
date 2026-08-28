@@ -46,6 +46,7 @@ type DecisionDialog = "request" | "decline" | null;
 
 type Idea = {
   id: string;
+  reference_number?: string;
   title: string;
   summary?: string;
   about?: string;
@@ -704,28 +705,27 @@ const ReviewQueueWorkspace = () => {
                     }}
                     className={`group relative w-full border-b border-[var(--pulse-line)] px-4 py-3 text-left transition-colors last:border-b-0 ${
                       selected
-                        ? "bg-[var(--pulse-brand-soft)]"
+                        ? "bg-[var(--pulse-surface-subtle)]"
                         : "hover:bg-[var(--pulse-surface-subtle)]"
                     }`}
                   >
-                    {selected && <span className="absolute inset-y-3 left-0 w-[3px] rounded-r bg-[var(--pulse-brand)]" />}
+                    {selected && <span className="absolute inset-y-0 left-0 w-[2px] bg-[#0C0C0C]" />}
                     <div className="flex items-start justify-between gap-3">
                       <span className="font-mono text-xs font-medium uppercase text-[var(--pulse-ink-muted)]">
-                        {idea.id}
+                        {idea.reference_number || idea.id}
                       </span>
-                      <span className={`text-xs font-semibold tabular-nums ${age >= 30 ? "text-[var(--pulse-danger)]" : age >= 14 ? "text-[#74520a]" : "text-[var(--pulse-ink-muted)]"}`}>
-                        {age}d waiting
+                      <span className="text-right text-xs font-medium tabular-nums text-[var(--pulse-ink-secondary)]">
+                        {age}d
                       </span>
                     </div>
                     <h2 className="mt-1.5 line-clamp-2 text-sm font-semibold leading-5 text-[var(--pulse-ink)]">
                       {idea.title}
                     </h2>
-                    <p className="mt-1.5 truncate text-xs text-[var(--pulse-ink-muted)]">
-                      {submitterName(idea)}
-                      {showClientName && idea.client?.name
-                        ? ` · ${idea.client.name}`
-                        : ""}
-                    </p>
+                    {showClientName && idea.client?.name && (
+                      <p className="mt-1.5 truncate text-xs text-[var(--pulse-ink-muted)]">
+                        {idea.client.name}
+                      </p>
+                    )}
                     {view === "all" && (
                       <div className="mt-2">
                         <StatusTag status={idea.status} />
@@ -760,7 +760,7 @@ const ReviewQueueWorkspace = () => {
                       </span>
                       <StatusTag status={selectedIdea.status} />
                     </div>
-                    <h2 className="mt-3 max-w-4xl text-2xl font-semibold leading-8 tracking-[-0.02em]">
+                    <h2 className="mt-3 max-w-4xl text-[22px] font-semibold leading-7 tracking-[-0.02em]">
                       {selectedIdea.title}
                     </h2>
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--pulse-ink-muted)]">
@@ -914,12 +914,12 @@ const ReviewQueueWorkspace = () => {
                         <div>
                           {reviewDraft.meta_data.map((section) => (
                             <section key={section.id} className="border-b border-[var(--pulse-line)] py-5">
-                              <h4 className="text-[15px] font-semibold text-[var(--pulse-ink)]">{section.title}</h4>
+                              <h4 className="text-[15px] font-semibold leading-[22px] text-[#0C0C0C]">{section.title}</h4>
                               <div className="mt-4 space-y-5">
                                 {section.questions.map((question) => (
                                   <div key={question.id}>
-                                    <p className="text-[13px] leading-5 text-[var(--pulse-ink-muted)]">{question.text}</p>
-                                    <p className={`mt-1 text-sm leading-6 ${question.answer?.trim() ? "text-[var(--pulse-ink-secondary)]" : "italic text-[var(--pulse-ink-muted)]"}`}>
+                                    <p className="text-[13px] font-medium leading-[18px] text-[#727272]">{question.text}</p>
+                                    <p className={`mt-1 text-sm leading-[1.7] ${question.answer?.trim() ? "text-[#0C0C0C]" : "italic text-[var(--pulse-ink-muted)]"}`}>
                                       {question.answer?.trim() || "No answer provided."}
                                     </p>
                                   </div>
@@ -1028,28 +1028,14 @@ const ReviewQueueWorkspace = () => {
                 )}
               </div>
 
-              <div className="sticky bottom-0 z-20 flex min-h-16 shrink-0 items-center justify-between gap-4 border-t border-[var(--pulse-line)] bg-white px-6 py-3 [box-shadow:0_-8px_24px_rgba(17,16,60,0.04)]">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <p className="text-sm font-semibold">
-                      {selectedIdea.status === "UNDER_REVIEW" || selectedIdea.status === "SENT_TO_IHC"
-                        ? "A decision is required"
-                        : STATUS_META[selectedIdea.status]?.label || "No decision required"}
-                    </p>
-                    {selectedQueueIndex >= 0 && (
-                      <span className="text-xs font-medium tabular-nums text-[var(--pulse-ink-muted)]">
-                        {selectedQueueIndex + 1} of {filteredIdeas.length}
-                      </span>
-                    )}
-                  </div>
-                  {(draftsPending || !reviewDraft) && (
-                    <p className="mt-0.5 text-xs text-[var(--pulse-ink-muted)]">
-                      {draftsPending
-                        ? "Checking the submitted record…"
-                        : "Approval is unavailable until a draft is submitted."}
-                    </p>
-                  )}
-                </div>
+              <div className="sticky bottom-0 z-20 flex min-h-16 shrink-0 items-center justify-end gap-4 border-t border-[var(--pulse-line)] bg-white px-6 py-3 [box-shadow:0_-8px_24px_rgba(17,16,60,0.04)]">
+                {(draftsPending || !reviewDraft) && (
+                  <p className="mr-auto text-xs text-[var(--pulse-ink-muted)]">
+                    {draftsPending
+                      ? "Checking the submitted record…"
+                      : "Approval is unavailable until a draft is submitted."}
+                  </p>
+                )}
                 {["UNDER_REVIEW", "SENT_TO_IHC"].includes(selectedIdea.status) && (
                   <div className="flex items-center gap-2">
                     <DropdownMenu>

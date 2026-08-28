@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, FileText, Building2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, CheckCircle2, FileText, Building2, RotateCcw } from 'lucide-react';
 import { format, addMonths, subMonths, setMonth, setYear, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isToday, addYears, subYears, getMonth, getYear } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/hooks/useTheme';
@@ -16,14 +16,22 @@ interface DueDate {
   status: string;
   country: string;
   applicationNumber?: string;
+  eventStatus?: string;
+  completedAt?: string | null;
 }
 
 interface DueDatesCalendarProps {
   dueDates: DueDate[];
+  canManageEvents?: boolean;
+  updatingEventId?: string;
+  onEventCompletion?: (eventId: string, completed: boolean) => void;
 }
 
 const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({ 
-  dueDates
+  dueDates,
+  canManageEvents = false,
+  updatingEventId,
+  onEventCompletion,
 }) => {
   const formatStatusLabel = (status?: string) =>
     (status || "Unknown")
@@ -35,6 +43,11 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<DueDate | null>(null);
+
+  const isCompleted = (event: DueDate) =>
+    ["COMPLETED", "CLEARED"].includes(
+      String(event.eventStatus || "").toUpperCase(),
+    ) || Boolean(event.completedAt);
   
   // Add scrollbar styles on mount
   useEffect(() => {
@@ -199,8 +212,14 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
     setSelectedEvent(event);
   };
   
-  const getEventTone = (daysOverdue: number): ProductChipTone =>
-    daysOverdue > 0 ? 'danger' : daysOverdue === 0 ? 'warning' : 'success';
+  const getEventTone = (event: DueDate): ProductChipTone =>
+    isCompleted(event)
+      ? 'success'
+      : event.daysOverdue > 0
+        ? 'danger'
+        : event.daysOverdue === 0
+          ? 'warning'
+          : 'success';
   
   const formatEventDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { 
@@ -220,6 +239,12 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
   useEffect(() => {
     setSelectedEvent(null);
   }, [selectedDate, currentDate]);
+
+  useEffect(() => {
+    if (!selectedEvent) return;
+    const latest = dueDates.find((event) => event.id === selectedEvent.id);
+    if (latest) setSelectedEvent(latest);
+  }, [dueDates, selectedEvent?.id]);
 
   // Get all days of the month including padding days - always exactly 42 cells (6 rows × 7 days)
   const allDays = useMemo(() => {
@@ -409,7 +434,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
                                 handleEventClick(event);
                               }}
                             >
-                              <ProductChip kind="status" tone={getEventTone(event.daysOverdue)} className="pointer-events-none w-full max-w-full justify-start">
+                              <ProductChip kind="status" tone={getEventTone(event)} className="pointer-events-none w-full max-w-full justify-start">
                                 {event.event}
                               </ProductChip>
                             </div>
@@ -471,6 +496,12 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
                 theme === "dark" ? "text-neutral-500" : "text-neutral-600"
               }`}>Future</span>
             </div>
+            <div className="flex items-center gap-2">
+              <div className="h-3 w-3 rounded border border-emerald-500/50 bg-emerald-500/25"></div>
+              <span className={`text-xs ${
+                theme === "dark" ? "text-neutral-500" : "text-neutral-600"
+              }`}>Completed</span>
+            </div>
           </div>
         </div>
       </div>
@@ -524,7 +555,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
                   <p className='text-neutral-800 dark:text-neutral-300'>{formatEventDate(selectedEvent.dueDate)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500 dark:text-neutral-400 text-xs">Status</p>
+                  <p className="text-gray-500 dark:text-neutral-400 text-xs">Patent Status</p>
                   <div className="flex items-center gap-1.5 mt-1">
                     <ProductChip kind="status" tone="info">
                       {selectedEvent.status}
@@ -533,11 +564,13 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
                 </div>
                 <div>
                   <p className="text-gray-500 dark:text-neutral-400 text-xs">Due Status</p>
-                  <ProductChip kind="status" tone={getEventTone(selectedEvent.daysOverdue)} className="mt-1">
-                    {selectedEvent.daysOverdue > 0 
-                      ? `${selectedEvent.daysOverdue} days overdue` 
-                      : selectedEvent.daysOverdue === 0 
-                        ? 'Due today' 
+                  <ProductChip kind="status" tone={getEventTone(selectedEvent)} className="mt-1">
+                    {isCompleted(selectedEvent)
+                      ? "Completed"
+                      : selectedEvent.daysOverdue > 0
+                      ? `${selectedEvent.daysOverdue} days overdue`
+                      : selectedEvent.daysOverdue === 0
+                        ? 'Due today'
                         : `Due in ${Math.abs(selectedEvent.daysOverdue)} days`}
                   </ProductChip>
                 </div>
@@ -550,6 +583,31 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
                   <p className='text-neutral-800 dark:text-neutral-300'>{selectedEvent.counsel}</p>
                 </div>
               </div>
+
+              {canManageEvents && onEventCompletion && (
+                <Button
+                  size="sm"
+                  disabled={updatingEventId === selectedEvent.id}
+                  className="w-full bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]"
+                  onClick={() =>
+                    onEventCompletion(
+                      selectedEvent.id,
+                      !isCompleted(selectedEvent),
+                    )
+                  }
+                >
+                  {isCompleted(selectedEvent) ? (
+                    <RotateCcw className="mr-1.5 h-4 w-4" />
+                  ) : (
+                    <CheckCircle2 className="mr-1.5 h-4 w-4" />
+                  )}
+                  {updatingEventId === selectedEvent.id
+                    ? "Updating…"
+                    : isCompleted(selectedEvent)
+                      ? "Reopen event"
+                      : "Mark done"}
+                </Button>
+              )}
               
               <Button 
                 variant="outline" 
@@ -599,11 +657,13 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
                         <h4 className={`text-sm ${
                           theme === "dark" ? "text-neutral-200" : "text-neutral-800"
                         }`}>{event.event}</h4>
-                        <ProductChip kind="status" tone={getEventTone(event.daysOverdue)}>
-                          {event.daysOverdue > 0 
-                            ? 'Overdue' 
-                            : event.daysOverdue === 0 
-                              ? 'Due Today' 
+                        <ProductChip kind="status" tone={getEventTone(event)}>
+                          {isCompleted(event)
+                            ? "Completed"
+                            : event.daysOverdue > 0
+                            ? 'Overdue'
+                            : event.daysOverdue === 0
+                              ? 'Due Today'
                               : 'Upcoming'}
                         </ProductChip>
                       </div>
@@ -682,11 +742,13 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
                             <h4 className={`font-sans font-bold text-sm ${
                               theme === "dark" ? "text-neutral-200" : "text-neutral-800"
                             }`}>{event.event}</h4>
-                            <ProductChip kind="status" tone={getEventTone(event.daysOverdue)}>
-                              {event.daysOverdue > 0 
-                                ? 'Overdue' 
-                                : event.daysOverdue === 0 
-                                  ? 'Due Today' 
+                            <ProductChip kind="status" tone={getEventTone(event)}>
+                              {isCompleted(event)
+                                ? "Completed"
+                                : event.daysOverdue > 0
+                                ? 'Overdue'
+                                : event.daysOverdue === 0
+                                  ? 'Due Today'
                                   : 'Upcoming'}
                             </ProductChip>
                           </div>

@@ -66,12 +66,14 @@ const PatentPaperView = ({
   inventors,
   submissionDate,
   sections,
+  panelLabel = "Disclosure",
 }: {
   title?: string;
   irn?: string;
   inventors?: string[];
   submissionDate?: string;
   sections: Section[];
+  panelLabel?: string;
 }) => {
   const byId = Object.fromEntries(sections.map((s) => [s.id, s]));
   const groups = SPEC_ORDER.map(({ heading, sectionIds }) => ({
@@ -88,7 +90,7 @@ const PatentPaperView = ({
           keep the full caption block). */}
       <div className="border-b border-[#E8E8E8] px-6 py-5">
         <div className="text-xs font-semibold uppercase tracking-[1px] text-[#727272]">
-          Disclosure
+          {panelLabel}
         </div>
       </div>
 

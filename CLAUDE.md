@@ -103,8 +103,11 @@ checks silently broke during the rename once.
   INVENTOR-only affordances; Send requires 100% completion; REJECT_BY_IHC is
   sendable (appeal) and the send mutation collects the required reason via
   prompt (covers the "Skip & submit" co-inventor path too).
-- workspace/: WorkspaceTabs (people/profile; committee+inventor = profile
-  only), PeopleTab (role select incl. IP Committee; suspended→"Disabled"+
+- workspace/: WorkspaceTabs — NO LONGER TABS (saurrx#2): a client identity
+  card whose "Edit workspace" opens OrganizationDetails in a dialog, then
+  PeopleTab; PHOTON_ADMIN still short-circuits to CaseOwnersTab. Profile left
+  the workspace entirely — /profile (pages/ProfilePage.tsx) is its own route
+  and /workspace redirects every non-admin there. PeopleTab (role select incl. IP Committee; suspended→"Disabled"+
   Reactivate), CaseOwnersTab (Manage Access: composed {owners, clients}
   payload; drawer has Access type Permanent/Temporary/Step-in + reason+expiry)
 - clients/: ClientsPage (cards navigate via handleClientClick), OnboardClientModal
@@ -112,8 +115,15 @@ checks silently broke during the rename once.
   as "@domain.com" — adapter strips the @), OverviewTab (defensive prop
   defaults — undefined team/history once crashed the page)
 - DesktopOnlyGate.tsx — <1024px overlay (pure CSS visibility, app stays
-  mounted: cannot cause state bugs). Mobile layout is NOT built (known 634px
-  overflow beneath the gate).
+  mounted: cannot cause state bugs). Mobile layout is NOT built, but the gate
+  itself now fits: `body{min-width:1024px}` is scoped to `@media(min-width:
+  1024px)` and html/body scroll-lock below it (index.css). Unscoped, that
+  floor inflated the mobile LAYOUT VIEWPORT to 1024px x full-doc-height —
+  which is what a `fixed inset-0` element sizes against — so the gate became
+  a ~1024x2200 box centring its message off-screen (the old "634px overflow";
+  users had to pan right and down to read it). The gate is its own scroll
+  container (min-h-full inner flex) so the message stays reachable on short
+  landscape viewports. Keep the floor desktop-only.
 
 ## 6. Harnesses & testing law
 Playwright scripts must live in repo root (module resolution). Durable set:
@@ -222,6 +232,10 @@ supporting files (presigned Spaces uploads), patent portfolio table + detail +
 CSV export + import, due dates list/calendar + reminders, actions
 selection/queue/resolve, client onboarding + business scope, people/roles/
 suspend, case-owner assignments, view-as-client, desktop gate.
+Landed with the saurrx#2 design port, backend built to match (see
+pulse-backend §5): change password + sign out everywhere on /profile,
+per-client idea reference prefix, and ticking a docket event done/reopen
+(hooks/usePatentEventCompletion.ts → adapter → PATCH /v1/due-dates/:id).
 Not built (do not fake): copilot auto-fill trio, notification bell UI,
 comments/version-history timeline, per-client feature toggles, trademarks,
 mailer-driven email notifications, mobile layout, SSO, access-request flow.

@@ -11,7 +11,7 @@ import { Check } from "lucide-react";
 const STOPS = [
   { key: "submitted", label: "Submitted" },
   { key: "review", label: "Under review" },
-  { key: "oc", label: "Sent to outside counsel" },
+  { key: "oc", label: "Sent to Photon Legal" },
   { key: "filed", label: "Filed" },
   { key: "granted", label: "Granted" },
 ] as const;
@@ -69,7 +69,13 @@ const derive = (idea: any): Derived & { dates: (string | null)[] } => {
   // submission_date (the last real event) and skip the label deeper in the
   // pipeline where that would overstate the wait.
   const anchor = dates[i] ?? (i <= 1 ? submitted : null);
-  const stageWord = ["in draft", "in review", "with counsel", "filed", "granted"][i];
+  const stageWord = [
+    "in draft",
+    "in review",
+    "with Photon Legal",
+    "filed",
+    "granted",
+  ][i];
   const elapsedLabel =
     variant === "normal" && i < 4 && anchor
       ? `${stageWord} ${Math.max(0, moment().diff(moment(anchor), "days"))}d`
@@ -81,13 +87,13 @@ const derive = (idea: any): Derived & { dates: (string | null)[] } => {
     UNDER_REVIEW: `With the IP committee${since}. You'll get an email when they decide.`,
     SENT_TO_IHC: `With the IP committee${since}. You'll get an email when they decide.`,
     UPDATE_REQUEST: "The IP committee needs more information before it can proceed.",
-    SEND_TO_OC: `With outside counsel${since}. You'll get an email when they respond.`,
-    UPDATE_REQUEST_BY_OC: "Outside counsel needs more information before it can proceed.",
+    SEND_TO_OC: `With Photon Legal${since}. You'll get an email when they respond.`,
+    UPDATE_REQUEST_BY_OC: "Photon Legal needs more information before it can proceed.",
     FILED: "Filed with the patent office. Examination can take a while — we'll keep you posted.",
     GRANTED: "Granted. This idea is now a patent.",
     REJECT_BY_IHC: "The IP committee decided not to proceed with this idea.",
     REJECTED: "The IP committee decided not to proceed with this idea.",
-    REJECT_BY_OC: "Outside counsel decided not to proceed with this idea.",
+    REJECT_BY_OC: "Photon Legal decided not to proceed with this idea.",
   };
 
   return {
@@ -115,12 +121,15 @@ const StatusTimeline = ({
   actionLabel = "View request",
   /** Admin review action attached to the current node (unused in inventor view). */
   currentNodeAction,
+  showStatusLine = true,
 }: {
   idea: any;
   onAction?: () => void;
   actionLabel?: string;
   currentNodeAction?: React.ReactNode;
+  showStatusLine?: boolean;
 }) => {
+  const ideaStatus = (idea?.status || "").toUpperCase();
   const { currentIndex, variant, elapsedLabel, statusLine, dates } =
     derive(idea);
   const granted = currentIndex === 4;
@@ -146,10 +155,12 @@ const StatusTimeline = ({
 
   return (
     <div className="border-b border-[#E8E8E8] bg-white px-6 py-5 font-sans dark:border-[#cccccc20] dark:bg-[#0c0c0c]/80">
-      <div className="mx-auto w-full max-w-[1600px]">
+      <div className="mx-auto w-full max-w-[1200px]">
         <ol className="flex flex-col md:flex-row">
           {STOPS.map((stop, i) => {
           const { done, current, dead, fill, border } = nodeFor(i);
+          const stopLabel =
+            i === 0 && ideaStatus === "IN_DRAFT" ? "Draft" : stop.label;
           const last = i === STOPS.length - 1;
           // Connector segment AFTER node i (to node i+1): solid green when
           // node i+1 is reached, dashed grey ahead of it, gone past a
@@ -203,7 +214,7 @@ const StatusTimeline = ({
                   className="text-xs font-medium leading-tight"
                   style={{ color: done || current ? COLORS.text : COLORS.muted }}
                 >
-                  {stop.label}
+                  {stopLabel}
                 </div>
                 {done && dates[i] && (
                   <div className="mt-0.5 font-mono text-xs text-[#727272]">
@@ -234,7 +245,7 @@ const StatusTimeline = ({
             );
           })}
         </ol>
-        {statusLine && (
+        {showStatusLine && statusLine && (
           <p className="mt-3 text-[13px] text-[#444444] dark:text-neutral-400">
             {statusLine}
           </p>

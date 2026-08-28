@@ -463,15 +463,16 @@ const IdeasContent: React.FC = () => {
   const currentPageFromApi = paginationMeta.page || currentPage;
   const startIndex = (currentPageFromApi - 1) * itemsPerPage;
 
-  // Idea evaluations use the backend's native 0–100 scale everywhere.
+  // The backend stores scores on a 0–100 scale; the product displays them
+  // on the customer-facing 0–10 scale.
   const ScoreChip = ({ score }: { score: number | null | undefined }) => {
-    const value = score != null ? Math.round(score) : null;
+    const value = score != null ? (score / 10).toFixed(1) : null;
     const tone =
-      value == null
+      score == null
         ? { mark: "#5E6470", text: "#484E59" }
-        : value >= 80
+        : score >= 80
           ? { mark: "#1E7B4D", text: "#155C3B" }
-          : value >= 60
+          : score >= 60
             ? { mark: "#F9B418", text: "#7E5A00" }
             : { mark: "#B3362F", text: "#8E2B25" };
     return (
@@ -481,7 +482,7 @@ const IdeasContent: React.FC = () => {
           className="font-mono text-xs font-semibold uppercase leading-none"
           style={{ color: tone.text, letterSpacing: 1 }}
         >
-          Score {value != null ? `${value}/100` : "--"}
+          Score {value != null ? `${value}/10` : "--"}
         </span>
       </span>
     );
@@ -959,7 +960,7 @@ const IdeasContent: React.FC = () => {
                             className="font-mono text-xs text-[#727272]"
                             title="Idea Reference Number"
                           >
-                            IRN{String(startIndex + index + 1).padStart(2, "0")}
+                            {idea.reference_number || idea.id}
                           </span>
                           <div className="flex items-center gap-2">
                             <ScoreChip score={idea?.score} />
@@ -977,11 +978,13 @@ const IdeasContent: React.FC = () => {
                         </div>
                         <div className="flex w-full items-center justify-between gap-3">
                           <div className="flex items-center gap-3.5 text-xs text-[#727272]">
-                            <span>
-                              {typeof idea?.created_by === "string"
-                                ? idea?.created_by
-                                : idea?.created_by?.name || idea?.created_by?.email}
-                            </span>
+                            {!isInventor && (
+                              <span>
+                                {typeof idea?.created_by === "string"
+                                  ? idea?.created_by
+                                  : idea?.created_by?.name || idea?.created_by?.email}
+                              </span>
+                            )}
                             <span className="font-mono">
                               {idea?.submission_date
                                 ? moment(idea?.submission_date).format("MMM D")
@@ -1204,7 +1207,7 @@ const IdeasContent: React.FC = () => {
                     <CardContent className="p-4 pt-2">
                       <div className="text-xs text-muted-foreground mb-3">
                         <span className="font-medium text-photon-primary">
-                          {idea.id}
+                          {idea.reference_number || idea.id}
                         </span>
                       </div>
                       <div className="text-sm mb-3">

@@ -1,11 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useTheme } from "@/hooks/useTheme";
 import API_CONFIG from "@/lib/apiConfig";
 import { MAX_FILE_SIZE } from "@/utils/constants";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Ban, BriefcaseBusiness, CalendarDays, Check, CircleAlert, CircleCheck, CircleX, Copy, Download, FileText, Globe2, History, Plus, RefreshCw, TrendingUp, Upload, UserPlus } from "lucide-react";
+import { Ban, BriefcaseBusiness, CalendarDays, Check, CircleAlert, CircleCheck, CircleX, Copy, Download, FileText, Globe2, Hash, History, Plus, RefreshCw, TrendingUp, Upload, UserPlus } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import React, { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -36,10 +37,16 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [inviteMode, setInviteMode] = useState<"email" | "share">("email");
   const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
-  const [expiryDays, setExpiryDays] = useState(30);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<"INVENTOR" | "LEGAL_COUNSEL">("INVENTOR");
+  const [referencePrefix, setReferencePrefix] = useState(
+    clientData?.idea_reference_prefix || "IRN",
+  );
   const qrCodeRef = useRef<SVGSVGElement>(null);
+
+  React.useEffect(() => {
+    setReferencePrefix(clientData?.idea_reference_prefix || "IRN");
+  }, [clientData?.idea_reference_prefix]);
 
   const { data: metricsData } = useQuery({
     queryKey: ["client_metrics", clientId],
@@ -99,7 +106,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
   });
 
   const regenerateInviteMutation = useMutation({
-    mutationFn: async () => API_CONFIG.post(`/api/v1/clients/${clientId}/invite-link`, { expiresInDays: expiryDays }),
+    mutationFn: async () => API_CONFIG.post(`/api/v1/clients/${clientId}/invite-link`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
       toast.success("A new secure invite link was generated");
@@ -112,6 +119,25 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
       toast.success("Invite link deactivated");
     },
+  });
+
+  const referenceSettingsMutation = useMutation({
+    mutationFn: async (prefix: string) =>
+      API_CONFIG.put(`/api/v1/clients/${clientId}/reference-settings`, {
+        prefix,
+      }),
+    onSuccess: (response: any) => {
+      const savedPrefix = response?.data?.data?.idea_reference_prefix;
+      if (savedPrefix) setReferencePrefix(savedPrefix);
+      queryClient.invalidateQueries({ queryKey: ["client", clientId] });
+      queryClient.invalidateQueries({ queryKey: ["ideas"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard_ideas"] });
+      toast.success("Idea reference format updated");
+    },
+    onError: (error: any) =>
+      toast.error(
+        error?.response?.data?.message || "Could not update the reference format",
+      ),
   });
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,6 +226,61 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
               <p className={`text-3xl font-semibold tracking-[-0.03em] ${color}`}>{value}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className={`rounded-2xl border p-6 ${panelClass}`}>
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2">
+              <Hash className="h-4 w-4 text-[var(--pulse-data-primary)]" />
+              <h3 className="text-sm font-semibold text-[var(--pulse-ink)] dark:text-zinc-300">
+                Idea reference numbering
+              </h3>
+            </div>
+            <p className="mt-1 text-xs leading-5 text-neutral-500">
+              Choose the client-specific prefix used for new idea references.
+              Existing references stay unchanged.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="grid gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              Reference prefix
+              <Input
+                name="idea_reference_prefix"
+                value={referencePrefix}
+                onChange={(event) =>
+                  setReferencePrefix(
+                    event.target.value
+                      .toUpperCase()
+                      .replace(/[^A-Z0-9]/g, "")
+                      .slice(0, 6),
+                  )
+                }
+                className="h-9 w-32 font-mono uppercase"
+                aria-label="Idea reference prefix"
+              />
+            </label>
+            <div className="grid gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400">
+              Next reference preview
+              <div className="flex h-9 min-w-28 items-center rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-3 font-mono text-sm font-semibold text-[var(--pulse-ink)]">
+                {(referencePrefix || "IRN")}
+                {String(clientData?.idea_reference_next_number || 1).padStart(2, "0")}
+              </div>
+            </div>
+            <Button
+              size="sm"
+              disabled={
+                referencePrefix.length < 2 ||
+                referencePrefix === clientData?.idea_reference_prefix ||
+                referenceSettingsMutation.isPending
+              }
+              onClick={() => referenceSettingsMutation.mutate(referencePrefix)}
+              className="h-9 bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]"
+            >
+              {referenceSettingsMutation.isPending ? "Saving…" : "Save format"}
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -319,15 +400,14 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
                   </div>
                 </div>
                 <div className="mt-5 grid grid-cols-3 divide-x rounded-lg border border-neutral-200 py-3 text-center dark:border-neutral-700">
-                  <div><p className="text-xs uppercase tracking-wider text-neutral-500">Expires</p><p className="mt-1 text-xs font-semibold">{new Date(inviteLinkData.expiresAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p></div>
+                  <div><p className="text-xs uppercase tracking-wider text-neutral-500">Validity</p><p className="mt-1 text-xs font-semibold">Never expires</p></div>
                   <div><p className="text-xs uppercase tracking-wider text-neutral-500">Joined</p><p className="mt-1 text-xs font-semibold">{inviteLinkData.uses}</p></div>
                   <div><p className="text-xs uppercase tracking-wider text-neutral-500">Created by</p><p className="mt-1 truncate px-2 text-xs font-semibold">{inviteLinkData.createdBy}</p></div>
                 </div>
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-700">
-                  <div className="flex items-center gap-2"><label htmlFor="invite-expiry" className="text-xs text-neutral-500">New link expires in</label><select id="invite-expiry" value={expiryDays} onChange={(event) => setExpiryDays(Number(event.target.value))} className="h-8 rounded-md border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700"><option value={7}>7 days</option><option value={30}>30 days</option><option value={90}>90 days</option></select></div>
+                <div className="mt-4 flex flex-wrap items-center justify-end gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-700">
                   <div className="flex gap-2"><Button size="sm" variant="outline" onClick={() => window.confirm("Generate a new link? The current QR code and link will stop working immediately.") && regenerateInviteMutation.mutate()} disabled={regenerateInviteMutation.isPending}><RefreshCw className="mr-1.5 h-3.5 w-3.5" />Regenerate</Button><Button size="sm" variant="ghost" onClick={() => window.confirm("Deactivate this invite link? Anyone who has it will no longer be able to join.") && deactivateInviteMutation.mutate()} disabled={deactivateInviteMutation.isPending} className="text-red-600 hover:bg-red-50 hover:text-red-700"><Ban className="mr-1.5 h-3.5 w-3.5" />Deactivate</Button></div>
                 </div>
-              </> : <div className="rounded-xl border border-dashed border-neutral-300 px-6 py-10 text-center dark:border-neutral-700"><Ban className="mx-auto h-7 w-7 text-neutral-400" /><p className="mt-3 text-sm font-semibold">Invite link is inactive</p><p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-neutral-500">Generate a new opaque link before sharing. The previous link can no longer be redeemed.</p><div className="mx-auto mt-4 flex w-fit items-center gap-2"><select value={expiryDays} onChange={(event) => setExpiryDays(Number(event.target.value))} className="h-9 rounded-md border border-neutral-200 bg-transparent px-3 text-sm dark:border-neutral-700"><option value={7}>7 days</option><option value={30}>30 days</option><option value={90}>90 days</option></select><Button onClick={() => regenerateInviteMutation.mutate()} className="bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]">Generate new link</Button></div></div>}
+              </> : <div className="rounded-xl border border-dashed border-neutral-300 px-6 py-10 text-center dark:border-neutral-700"><Ban className="mx-auto h-7 w-7 text-neutral-400" /><p className="mt-3 text-sm font-semibold">Invite link is inactive</p><p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-neutral-500">Generate a new opaque link before sharing. The previous link can no longer be redeemed.</p><div className="mx-auto mt-4 flex w-fit items-center gap-2"><Button onClick={() => regenerateInviteMutation.mutate()} className="bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]">Generate new link</Button></div></div>}
             </div>
           )}
         </DialogContent>

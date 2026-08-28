@@ -431,8 +431,8 @@ const PatentsPage: React.FC = () => {
             }
       }
     >
-      <div className="pulse-product-page pulse-table-page relative mx-auto flex h-[calc(100dvh-64px)] w-full max-w-[1680px] flex-col px-6 py-6 lg:px-8">
-        <div className="flex min-h-0 min-w-0 w-full flex-1 overflow-hidden">
+      <div className="pulse-product-page pulse-table-page relative mx-auto flex min-h-[calc(100dvh-64px)] w-full max-w-[1680px] flex-col px-6 py-6 lg:px-8">
+        <div className="flex min-w-0 w-full flex-col">
           {patentId ? (
             <PatentDetailsContent patentId={patentId} />
           ) : (

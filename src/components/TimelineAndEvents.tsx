@@ -1,6 +1,12 @@
 import React, { useState, useMemo } from "react";
-import { Calendar, ChevronLeft, ChevronRight, List } from "lucide-react";
+import { Calendar, CheckCircle2, ChevronLeft, ChevronRight, List, RotateCcw } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
+import useUserCookie from "@/hooks/use-auth";
+import {
+  isPatentEventCompleted,
+  usePatentEventCompletion,
+} from "@/hooks/usePatentEventCompletion";
+import { isOutsideCounselRole } from "@/lib/roleAccess";
 import moment from "moment";
 import { motion } from "framer-motion";
 import {
@@ -15,9 +21,15 @@ import {
   type ProductChipTone,
 } from "@/components/ui/product-chip";
 
-const getEventTone = (eventDateValue: string): ProductChipTone => {
+const DUE_SOON_DAYS = 30;
+
+const getEventTone = (event: any): ProductChipTone => {
+  if (isPatentEventCompleted(event)) {
+    return "success";
+  }
+
   const today = new Date();
-  const eventDate = new Date(eventDateValue);
+  const eventDate = new Date(event?.event_date);
   today.setHours(0, 0, 0, 0);
   eventDate.setHours(0, 0, 0, 0);
 
@@ -27,7 +39,10 @@ const getEventTone = (eventDateValue: string): ProductChipTone => {
   if (eventDate.getTime() === today.getTime()) {
     return "warning";
   }
-  return "success";
+  const daysUntilEvent = Math.ceil(
+    (eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+  );
+  return daysUntilEvent <= DUE_SOON_DAYS ? "warning" : "neutral";
 };
 
 // Helper to format month and year
@@ -81,24 +96,11 @@ const TimelineAndEvents = ({
   refetch: () => void;
 }) => {
   const { theme } = useTheme();
+  const { user } = useUserCookie();
+  const eventCompletion = usePatentEventCompletion();
+  const canManageEvents = isOutsideCounselRole(user?.role);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  // List is the default; the last-used view persists across sessions.
-  const [viewMode, setViewModeState] = useState<"calendar" | "list">(() => {
-    try {
-      const saved = localStorage.getItem("pl-timeline-view");
-      return saved === "calendar" ? "calendar" : "list";
-    } catch {
-      return "list";
-    }
-  });
-  const setViewMode = (v: "calendar" | "list") => {
-    setViewModeState(v);
-    try {
-      localStorage.setItem("pl-timeline-view", v);
-    } catch {
-      /* private mode */
-    }
-  };
+  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
   const [isShowApplication, setIsShowApplication] = useState<string | null>(
     null,
   );
@@ -333,7 +335,7 @@ const TimelineAndEvents = ({
                           </div>
                           <div className="space-y-1">
                             {dayEvents.slice(0, 2).map((event, eventIndex) => {
-                              const tone = getEventTone(event.event_date);
+                              const tone = getEventTone(event);
                               const eventTitle =
                                 event.event_name ||
                                 event.event ||
@@ -394,6 +396,27 @@ const TimelineAndEvents = ({
                                           {applicationNumber}
                                         </span>
                                       </motion.div>
+                                      {canManageEvents && (
+                                        <button
+                                          type="button"
+                                          disabled={eventCompletion.isPending}
+                                          onClick={(clickEvent) => {
+                                            clickEvent.stopPropagation();
+                                            eventCompletion.mutate({
+                                              eventId: event.id,
+                                              completed: !isPatentEventCompleted(event),
+                                            });
+                                          }}
+                                          className="mt-2 inline-flex items-center gap-1.5 font-semibold text-[var(--pulse-info)] disabled:opacity-50"
+                                        >
+                                          {isPatentEventCompleted(event) ? (
+                                            <RotateCcw className="h-3.5 w-3.5" />
+                                          ) : (
+                                            <CheckCircle2 className="h-3.5 w-3.5" />
+                                          )}
+                                          {isPatentEventCompleted(event) ? "Reopen event" : "Mark done"}
+                                        </button>
+                                      )}
                                     </div>
                                   )}
                                 </div>
@@ -424,6 +447,7 @@ const TimelineAndEvents = ({
             {dueDates?.map((item, index) => {
               const today = new Date();
               const eventDate = new Date(item?.event_date);
+              const isCleared = isPatentEventCompleted(item);
 
               today.setHours(0, 0, 0, 0);
               eventDate.setHours(0, 0, 0, 0);
@@ -466,8 +490,14 @@ const TimelineAndEvents = ({
                         </div>
                       </div>
                     </div>
-                    <ProductChip kind="status" tone={getEventTone(item.event_date)} className="min-w-[64px] justify-center">
-                      {isOverdue ? "Overdue" : isToday ? "Today" : `${daysLeft}d`}
+                    <ProductChip kind="status" tone={getEventTone(item)} className="min-w-[64px] justify-center">
+                      {isCleared
+                        ? "Cleared"
+                        : isOverdue
+                          ? "Overdue"
+                          : isToday
+                            ? "Today"
+                            : `${daysLeft}d`}
                     </ProductChip>
                   </button>
 
@@ -494,6 +524,26 @@ const TimelineAndEvents = ({
                       >
                         {item?.patent?.application_number}
                       </span>
+                      {canManageEvents && (
+                        <button
+                          type="button"
+                          disabled={eventCompletion.isPending}
+                          onClick={() =>
+                            eventCompletion.mutate({
+                              eventId: item.id,
+                              completed: !isCleared,
+                            })
+                          }
+                          className="ml-4 inline-flex items-center gap-1.5 font-semibold text-[var(--pulse-info)] disabled:opacity-50"
+                        >
+                          {isCleared ? (
+                            <RotateCcw className="h-3.5 w-3.5" />
+                          ) : (
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                          )}
+                          {isCleared ? "Reopen event" : "Mark done"}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

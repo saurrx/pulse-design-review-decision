@@ -9,6 +9,10 @@ import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
 import { useTheme } from "@/hooks/useTheme";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import {
+  getClientInitials,
+  getClientLogoSrc,
+} from "@/lib/clientBranding";
 
 type OrganizationDetailsProps = {
   clientDetails: any;
@@ -34,10 +38,7 @@ const OrganizationDetails: React.FC<OrganizationDetailsProps> = ({
   const [formData, setFormData] = useState<any>({
     about: "",
   });
-  const [aboutValue, setAboutValue] = useState(
-    clientDetails?.about ||
-      "Photon Legal is a cutting-edge AI-powered intellectual property law firm specializing in technology patents, innovation management, and strategic IP portfolio development. We leverage advanced AI tools and deep legal expertise to help innovative companies protect and monetize their intellectual property across AI/ML, IoT, software, and emerging technologies."
-  );
+  const [aboutValue, setAboutValue] = useState(clientDetails?.about || "");
   const [originalAboutValue, setOriginalAboutValue] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const aboutValueRef = useRef<string>(aboutValue);
@@ -180,27 +181,38 @@ const OrganizationDetails: React.FC<OrganizationDetailsProps> = ({
   }, [aboutValue, isEditMode]);
 
   const { theme } = useTheme();
+  const clientName = clientDetails?.name || "Client workspace";
+  const clientLogoSrc = getClientLogoSrc(
+    {
+      id: clientDetails?.id || clientId,
+      name: clientName,
+      logo_file: clientDetails?.logo_file,
+    },
+    String(API_CONFIG.defaults.baseURL || ""),
+  );
   
   return (
     <div className={`border rounded-2xl p-6 ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-[var(--pulse-surface)] border-[var(--pulse-line)] shadow-[0_18px_45px_-38px_rgba(17,16,60,0.45)]'}`}>
       <div className="mb-6">
         <div className="flex flex-col gap-4">
-          <div className="relative flex items-center justify-center w-20 h-20 mx-auto">
-            <img
-              src={
-                clientDetails?.logo
-                  ? assetUrl(clientDetails?.logo_file?.file_path)
-                  : "/lovable-uploads/628bf91d-eeb6-4cbe-a91b-53f90cf8ccbc.png"
-              }
-              crossOrigin="use-credentials"
-              alt="Zuora"
-              className="w-full h-full object-contain"
-            />
+          <div className="relative mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]">
+            {clientLogoSrc ? (
+              <img
+                src={clientLogoSrc}
+                crossOrigin="use-credentials"
+                alt={`${clientName} logo`}
+                className="h-full w-full object-contain p-2"
+              />
+            ) : (
+              <span className="text-lg font-semibold text-[var(--pulse-ink)]">
+                {getClientInitials(clientName)}
+              </span>
+            )}
           </div>
 
           <div>
             <p className={`font-sans text-center font-semibold ${theme === 'dark' ? 'text-neutral-100' : 'text-neutral-900'}`}>
-            {clientDetails?.name}
+            {clientName}
             </p>
           </div>
         </div>
@@ -336,6 +348,7 @@ const OrganizationDetails: React.FC<OrganizationDetailsProps> = ({
         </div>
       </div>
 
+      {(isEditMode || aboutValue.trim()) && (
       <div className={`pt-6 border-t font-sans ${theme === 'dark' ? 'border-white/10' : 'border-neutral-200'}`}>
         <label
           data-slot="label"
@@ -391,6 +404,7 @@ const OrganizationDetails: React.FC<OrganizationDetailsProps> = ({
           </p>
         )}
       </div>
+      )}
     </div>
   );
 };

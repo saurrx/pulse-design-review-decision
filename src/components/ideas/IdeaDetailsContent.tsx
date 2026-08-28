@@ -1799,8 +1799,99 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
   const isInventorDraftWorkspace =
     user?.role === "INVENTOR" &&
     mainIdeaData?.status?.toUpperCase() === "IN_DRAFT";
+  const isInventorOverview =
+    user?.role === "INVENTOR" && !isInventorDraftWorkspace;
   const useDisclosureWorkspace =
     isReviewWorkspace || isOCReadOnlyWorkspace;
+
+  const inventorDrafts = Array.isArray(ideaDraft)
+    ? [...ideaDraft].sort(
+        (a: any, b: any) =>
+          new Date(b?.updatedAt || 0).getTime() -
+          new Date(a?.updatedAt || 0).getTime(),
+      )
+    : [];
+  const latestInventorDraft = inventorDrafts[0];
+  const latestScoreReport =
+    latestInventorDraft?.CheckDraftSoreLog?.[0]?.score_meta_data;
+
+  useEffect(() => {
+    if (
+      isInventorDraftWorkspace &&
+      latestInventorDraft?.id &&
+      ideaId
+    ) {
+      navigate(
+        `/ideas/${ideaId}/draft?draftId=${latestInventorDraft.id}`,
+        { replace: true },
+      );
+    }
+  }, [ideaId, isInventorDraftWorkspace, latestInventorDraft?.id, navigate]);
+
+  const inventorStatus = (() => {
+    switch (mainIdeaData?.status?.toUpperCase()) {
+      case "UNDER_REVIEW":
+      case "SENT_TO_IHC":
+        return {
+          eyebrow: "No action needed",
+          title: "Your idea is with the IP committee",
+          description:
+            "They are reviewing the submission. We’ll email you when a decision is made.",
+          needsAction: false,
+        };
+      case "SEND_TO_OC":
+        return {
+          eyebrow: "No action needed",
+          title: "Your idea is with Photon Legal",
+          description:
+            "Photon Legal is assessing the next filing steps. We’ll email you when the review progresses.",
+          needsAction: false,
+        };
+      case "UPDATE_REQUEST":
+      case "UPDATE_REQUEST_BY_OC":
+        return {
+          eyebrow: "Your input is needed",
+          title: "More information has been requested",
+          description:
+            "Review the request and update your draft so the evaluation can continue.",
+          needsAction: true,
+        };
+      case "FILED":
+        return {
+          eyebrow: "No action needed",
+          title: "Your patent application has been filed",
+          description:
+            "Examination can take time. We’ll keep you informed as the application progresses.",
+          needsAction: false,
+        };
+      case "GRANTED":
+        return {
+          eyebrow: "Complete",
+          title: "Your idea is now a granted patent",
+          description:
+            "The application has completed prosecution and the patent has been granted.",
+          needsAction: false,
+        };
+      case "REJECT_BY_IHC":
+      case "REJECT_BY_OC":
+      case "REJECTED":
+        return {
+          eyebrow: "Review complete",
+          title: "This idea will not proceed at this time",
+          description:
+            "You can review the record and evaluation for the decision context.",
+          needsAction: false,
+        };
+      default:
+        return {
+          eyebrow: "Status update",
+          title: "Your idea is being processed",
+          description: "We’ll notify you when the status changes.",
+          needsAction: false,
+        };
+    }
+  })();
+
   const ocWorkflowStatus: OCWorkflowStatus =
     mainIdeaData?.status?.toUpperCase() === "FILED"
       ? "FILED"
@@ -1928,7 +2019,8 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                 status={mainIdeaData?.status?.toUpperCase()}
                 label={mapStatusCodeToLabel(mainIdeaData?.status?.toUpperCase())}
               />
-              {mainIdeaData?.IdeaInventor?.[0]?.inventor?.name && (
+              {user?.role !== "INVENTOR" &&
+                mainIdeaData?.IdeaInventor?.[0]?.inventor?.name && (
                 <>
                   <span className="text-[#C8C8C8]">·</span>
                   <span>
@@ -1946,16 +2038,20 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                   </span>
                 </>
               )}
-              <span className="text-[#C8C8C8]">·</span>
-              <button
-                onClick={handleDownloadFiles}
-                disabled={!selectedDraftId && !ideaDraft?.[0]?.id}
-                className="inline-flex items-center gap-1 text-[#444444] transition-colors hover:text-[#0C0C0C] disabled:cursor-not-allowed disabled:opacity-50 dark:text-neutral-400"
-              >
-                {mainIdeaData?.IdeaFiles?.length || 0} file
-                {(mainIdeaData?.IdeaFiles?.length || 0) === 1 ? "" : "s"}
-                <Download className="h-3.5 w-3.5" />
-              </button>
+              {(mainIdeaData?.IdeaFiles?.length || 0) > 0 && (
+                <>
+                  <span className="text-[#C8C8C8]">·</span>
+                  <button
+                    onClick={handleDownloadFiles}
+                    disabled={!selectedDraftId && !ideaDraft?.[0]?.id}
+                    className="inline-flex items-center gap-1 text-[#444444] transition-colors hover:text-[#0C0C0C] disabled:cursor-not-allowed disabled:opacity-50 dark:text-neutral-400"
+                  >
+                    {mainIdeaData.IdeaFiles.length} file
+                    {mainIdeaData.IdeaFiles.length === 1 ? "" : "s"}
+                    <Download className="h-3.5 w-3.5" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -2092,11 +2188,183 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         <StatusTimeline
           idea={mainIdeaData}
           onAction={() => setShowViewContentsModal(true)}
+          showStatusLine={false}
         />
       )}
 
       {isFetchingIdea ? (
         <Loader />
+      ) : isInventorOverview ? (
+        <div className="relative z-10 flex-1 overflow-y-auto bg-[var(--pulse-canvas)]">
+          <div className="mx-auto w-full max-w-[1160px] px-6 py-8">
+            <section className="overflow-hidden rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] [box-shadow:var(--pulse-shadow-card)]">
+              <div className="flex items-start gap-4 border-l-4 border-l-[#F9B418] px-6 py-5">
+                <span
+                  className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full ${
+                    inventorStatus.needsAction
+                      ? "bg-[#FAF1DA] text-[#7E5A00]"
+                      : "bg-[#E9F1EC] text-[#1E7B4D]"
+                  }`}
+                >
+                  {inventorStatus.needsAction ? (
+                    <Info className="h-4 w-4" />
+                  ) : (
+                    <CircleCheck className="h-4 w-4" />
+                  )}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p
+                    className={`text-xs font-semibold uppercase tracking-[0.08em] ${
+                      inventorStatus.needsAction
+                        ? "text-[#7E5A00]"
+                        : "text-[#1E7B4D]"
+                    }`}
+                  >
+                    {inventorStatus.eyebrow}
+                  </p>
+                  <h2 className="mt-1 text-lg font-semibold tracking-[-0.015em] text-[var(--pulse-ink)]">
+                    {inventorStatus.title}
+                  </h2>
+                  <p className="mt-1 max-w-[720px] text-sm text-[var(--pulse-ink-secondary)]">
+                    {inventorStatus.description}
+                  </p>
+                </div>
+                {inventorStatus.needsAction && (
+                  <button
+                    type="button"
+                    onClick={() => setShowViewContentsModal(true)}
+                    className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl bg-[#F9B418] px-4 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700]"
+                  >
+                    View request <ArrowRight className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </section>
+
+            {isFechingIdeaDraft ? (
+              <div className="py-20">
+                <Loader />
+              </div>
+            ) : latestInventorDraft ? (
+              <>
+                <div className="mt-6 flex w-full flex-col items-start gap-6 lg:flex-row">
+                  <main className="w-full lg:w-[60%]">
+                    <PatentPaperView
+                      title={mainIdeaData?.title}
+                      irn={mainIdeaData?.id?.toUpperCase()}
+                      submissionDate={
+                        mainIdeaData?.submission_date
+                          ? moment(mainIdeaData.submission_date).format(
+                              "MMM D, YYYY",
+                            )
+                          : undefined
+                      }
+                      sections={sections}
+                      panelLabel="Your submission"
+                    />
+                    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 px-1 text-xs text-[var(--pulse-ink-muted)]">
+                      <span className="inline-flex items-center gap-1.5">
+                        <CircleCheck className="h-3.5 w-3.5 text-[#1E7B4D]" />
+                        Submitted version
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Calendar className="h-3.5 w-3.5" />
+                        Updated {moment(latestInventorDraft.updatedAt).format("MMM D, YYYY")}
+                      </span>
+                    </div>
+                  </main>
+
+                  <aside className="w-full lg:sticky lg:top-4 lg:w-[40%]">
+                    {latestScoreReport ? (
+                      <div className="overflow-hidden rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)]">
+                        <div className="border-b border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-5 py-4 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-muted)]">
+                          AI evaluation
+                        </div>
+                        <div className="px-5 py-5">
+                          <PatentNoveltyReport
+                            embedded
+                            displayScale={10}
+                            expandFirstReference={false}
+                            title={mainIdeaData?.title}
+                            api_evaluation_id={latestScoreReport?.id}
+                            scoringResult={latestScoreReport?.scoringResult}
+                            priorArt={latestScoreReport?.priorArt || []}
+                            report={latestScoreReport}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <section className="pulse-content-card p-6">
+                        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-muted)]">
+                          AI evaluation
+                        </p>
+                        <p className="mt-3 text-sm text-[var(--pulse-ink-secondary)]">
+                          No evaluation is available for this submission yet.
+                        </p>
+                      </section>
+                    )}
+                  </aside>
+                </div>
+
+                {(mainIdeaData?.IdeaFiles?.length || 0) > 0 && (
+                  <section className="pulse-content-card mt-6 flex items-center justify-between gap-5 px-6 py-5">
+                    <div>
+                      <h2 className="text-sm font-semibold text-[var(--pulse-ink)]">
+                        Attachments
+                      </h2>
+                      <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">
+                        {mainIdeaData.IdeaFiles.length} supporting file
+                        {mainIdeaData.IdeaFiles.length === 1 ? "" : "s"}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleDownloadFiles}
+                      className="inline-flex h-9 items-center gap-2 rounded-xl border border-[var(--pulse-line)] px-3.5 text-sm font-medium text-[var(--pulse-ink-secondary)] hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
+                    >
+                      <Download className="h-4 w-4" /> Download files
+                    </button>
+                  </section>
+                )}
+
+                {inventorDrafts.length > 1 && (
+                  <details className="pulse-content-card mt-6 overflow-hidden">
+                    <summary className="cursor-pointer list-none px-6 py-5 text-sm font-semibold text-[var(--pulse-ink)]">
+                      Version history · {inventorDrafts.length} versions
+                    </summary>
+                    <div className="border-t border-[var(--pulse-line)] px-6 py-2">
+                      {inventorDrafts.slice(1).map((draft: any, index: number) => (
+                        <button
+                          key={draft.id}
+                          type="button"
+                          onClick={() => handleEditDraft(draft.id)}
+                          className="flex w-full items-center justify-between border-b border-[var(--pulse-line)] py-3 text-left text-sm last:border-0"
+                        >
+                          <span className="font-medium text-[var(--pulse-ink)]">
+                            Version {inventorDrafts.length - index - 1}
+                          </span>
+                          <span className="text-xs text-[var(--pulse-ink-muted)]">
+                            {moment(draft.updatedAt).format("MMM D, YYYY")}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </details>
+                )}
+              </>
+            ) : (
+              <section className="pulse-content-card mt-6 px-6 py-12 text-center">
+                <FileText className="mx-auto h-6 w-6 text-[var(--pulse-ink-muted)]" />
+                <h2 className="mt-3 text-base font-semibold text-[var(--pulse-ink)]">
+                  No submission is available
+                </h2>
+                <p className="mt-1 text-sm text-[var(--pulse-ink-secondary)]">
+                  The submitted record will appear here when it is ready.
+                </p>
+              </section>
+            )}
+          </div>
+        </div>
       ) : useDisclosureWorkspace ? (
         <div className="relative z-10 flex-1 overflow-y-auto">
           <div className="mx-auto flex w-full max-w-[1200px] flex-col items-start gap-8 px-6 py-8 lg:flex-row">
