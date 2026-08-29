@@ -1,0 +1,499 @@
+{
+ "_measured": "2026-08-29",
+ "_against": "https://demo.photonpulse.ai",
+ "roles": {
+  "PHOTON_SUPERADMIN": {
+   "/": {
+    "landed": "/",
+    "reachable": true,
+    "calls": [
+     "GET /v1/dashboard",
+     "GET /v1/due-dates",
+     "GET /v1/ideas",
+     "GET /v1/ideas/counts",
+     "GET /v1/patents/stats"
+    ]
+   },
+   "/ideas": {
+    "landed": "/ideas",
+    "reachable": true,
+    "calls": [
+     "GET /v1/clients",
+     "GET /v1/ideas",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/patents": {
+    "landed": "/patents",
+    "reachable": true,
+    "calls": [
+     "GET /v1/clients",
+     "GET /v1/ideas/counts",
+     "GET /v1/patents",
+     "GET /v1/patents/tags"
+    ]
+   },
+   "/due-dates": {
+    "landed": "/due-dates",
+    "reachable": true,
+    "calls": [
+     "GET /v1/actions/templates",
+     "GET /v1/clients",
+     "GET /v1/due-dates",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/actions": {
+    "landed": "/actions",
+    "reachable": true,
+    "calls": [
+     "GET /v1/actions/queue",
+     "GET /v1/clients",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/clients": {
+    "landed": "/clients",
+    "reachable": true,
+    "calls": [
+     "GET /v1/clients",
+     "GET /v1/files/{id}/raw",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/workspace": {
+    "landed": "/workspace",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts",
+     "GET /v1/invites/share-link"
+    ]
+   },
+   "/profile": {
+    "landed": "/profile",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/assistant": {
+    "landed": "/assistant",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts"
+    ]
+   }
+  },
+  "PHOTON_ADMIN": {
+   "/": {
+    "landed": "/",
+    "reachable": true,
+    "calls": [
+     "GET /v1/dashboard",
+     "GET /v1/due-dates",
+     "GET /v1/ideas",
+     "GET /v1/ideas/counts",
+     "GET /v1/patents/stats"
+    ]
+   },
+   "/ideas": {
+    "landed": "/ideas",
+    "reachable": true,
+    "calls": [
+     "GET /v1/clients",
+     "GET /v1/ideas",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/patents": {
+    "landed": "/patents",
+    "reachable": true,
+    "calls": [
+     "GET /v1/clients",
+     "GET /v1/ideas/counts",
+     "GET /v1/patents",
+     "GET /v1/patents/tags"
+    ]
+   },
+   "/due-dates": {
+    "landed": "/due-dates",
+    "reachable": true,
+    "calls": [
+     "GET /v1/actions/templates",
+     "GET /v1/clients",
+     "GET /v1/due-dates",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/actions": {
+    "landed": "/actions",
+    "reachable": true,
+    "calls": [
+     "GET /v1/actions/queue",
+     "GET /v1/clients",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/clients": {
+    "landed": "/clients",
+    "reachable": true,
+    "calls": [
+     "GET /v1/clients",
+     "GET /v1/files/{id}/raw",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/workspace": {
+    "landed": "/workspace",
+    "reachable": true,
+    "calls": [
+     "GET /v1/case-owners",
+     "GET /v1/ideas/counts",
+     "GET /v1/invites/share-link"
+    ]
+   },
+   "/profile": {
+    "landed": "/profile",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/assistant": {
+    "landed": "/assistant",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts"
+    ]
+   }
+  },
+  "CASE_OWNER": {
+   "/": {
+    "landed": "/",
+    "reachable": true,
+    "calls": [
+     "GET /v1/dashboard",
+     "GET /v1/due-dates",
+     "GET /v1/ideas",
+     "GET /v1/ideas/counts",
+     "GET /v1/patents/stats"
+    ]
+   },
+   "/ideas": {
+    "landed": "/ideas",
+    "reachable": true,
+    "calls": [
+     "GET /v1/clients",
+     "GET /v1/ideas",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/patents": {
+    "landed": "/patents",
+    "reachable": true,
+    "calls": [
+     "GET /v1/clients",
+     "GET /v1/ideas/counts",
+     "GET /v1/patents",
+     "GET /v1/patents/tags"
+    ]
+   },
+   "/due-dates": {
+    "landed": "/due-dates",
+    "reachable": true,
+    "calls": [
+     "GET /v1/actions/templates",
+     "GET /v1/clients",
+     "GET /v1/due-dates",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/actions": {
+    "landed": "/actions",
+    "reachable": true,
+    "calls": [
+     "GET /v1/actions/queue",
+     "GET /v1/clients",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/clients": {
+    "landed": "/clients",
+    "reachable": true,
+    "calls": [
+     "GET /v1/clients",
+     "GET /v1/files/{id}/raw",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/workspace": {
+    "landed": "/profile",
+    "reachable": false,
+    "calls": [
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/profile": {
+    "landed": "/profile",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/assistant": {
+    "landed": "/assistant",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts"
+    ]
+   }
+  },
+  "LEGAL_COUNSEL": {
+   "/": {
+    "landed": "/",
+    "reachable": true,
+    "calls": [
+     "GET /v1/dashboard",
+     "GET /v1/due-dates",
+     "GET /v1/ideas",
+     "GET /v1/ideas/colleagues",
+     "GET /v1/ideas/counts",
+     "GET /v1/patents",
+     "GET /v1/patents/stats"
+    ]
+   },
+   "/ideas": {
+    "landed": "/ideas",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas",
+     "GET /v1/ideas/counts",
+     "GET /v1/ideas/{id}/drafts"
+    ]
+   },
+   "/patents": {
+    "landed": "/patents",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts",
+     "GET /v1/patents",
+     "GET /v1/patents/tags"
+    ]
+   },
+   "/due-dates": {
+    "landed": "/due-dates",
+    "reachable": true,
+    "calls": [
+     "GET /v1/actions/templates",
+     "GET /v1/due-dates",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/actions": {
+    "landed": "/actions",
+    "reachable": true,
+    "calls": [
+     "GET /v1/actions",
+     "GET /v1/actions/templates",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/clients": {
+    "landed": "/",
+    "reachable": false,
+    "calls": [
+     "GET /v1/clients",
+     "GET /v1/dashboard",
+     "GET /v1/due-dates",
+     "GET /v1/ideas",
+     "GET /v1/ideas/colleagues",
+     "GET /v1/ideas/counts",
+     "GET /v1/patents",
+     "GET /v1/patents/stats"
+    ]
+   },
+   "/workspace": {
+    "landed": "/workspace",
+    "reachable": true,
+    "calls": [
+     "GET /v1/clients/{id}",
+     "GET /v1/ideas/counts",
+     "GET /v1/invites/share-link"
+    ]
+   },
+   "/profile": {
+    "landed": "/profile",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/assistant": {
+    "landed": "/assistant",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts"
+    ]
+   }
+  },
+  "TECH_COMMITTEE": {
+   "/": {
+    "landed": "/",
+    "reachable": true,
+    "calls": [
+     "GET /v1/dashboard",
+     "GET /v1/due-dates",
+     "GET /v1/ideas",
+     "GET /v1/ideas/colleagues",
+     "GET /v1/ideas/counts",
+     "GET /v1/patents",
+     "GET /v1/patents/stats"
+    ]
+   },
+   "/ideas": {
+    "landed": "/ideas",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas",
+     "GET /v1/ideas/counts",
+     "GET /v1/ideas/{id}/drafts"
+    ]
+   },
+   "/patents": {
+    "landed": "/patents",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts",
+     "GET /v1/patents",
+     "GET /v1/patents/tags"
+    ]
+   },
+   "/due-dates": {
+    "landed": "/due-dates",
+    "reachable": true,
+    "calls": [
+     "GET /v1/actions/templates",
+     "GET /v1/due-dates",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/actions": {
+    "landed": "/actions",
+    "reachable": true,
+    "calls": [
+     "GET /v1/actions",
+     "GET /v1/actions/templates",
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/clients": {
+    "landed": "/",
+    "reachable": false,
+    "calls": [
+     "GET /v1/clients",
+     "GET /v1/dashboard",
+     "GET /v1/due-dates",
+     "GET /v1/ideas",
+     "GET /v1/ideas/colleagues",
+     "GET /v1/ideas/counts",
+     "GET /v1/patents",
+     "GET /v1/patents/stats"
+    ]
+   },
+   "/workspace": {
+    "landed": "/profile",
+    "reachable": false,
+    "calls": [
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/profile": {
+    "landed": "/profile",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts"
+    ]
+   },
+   "/assistant": {
+    "landed": "/assistant",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas/counts"
+    ]
+   }
+  },
+  "INVENTOR": {
+   "/": {
+    "landed": "/",
+    "reachable": true,
+    "calls": [
+     "GET /v1/dashboard",
+     "GET /v1/due-dates",
+     "GET /v1/ideas",
+     "GET /v1/ideas/colleagues",
+     "GET /v1/patents/stats"
+    ]
+   },
+   "/ideas": {
+    "landed": "/ideas",
+    "reachable": true,
+    "calls": [
+     "GET /v1/ideas"
+    ]
+   },
+   "/patents": {
+    "landed": "/patents",
+    "reachable": true,
+    "calls": [
+     "GET /v1/patents",
+     "GET /v1/patents/tags"
+    ]
+   },
+   "/due-dates": {
+    "landed": "/due-dates",
+    "reachable": true,
+    "calls": [
+     "GET /v1/due-dates"
+    ]
+   },
+   "/actions": {
+    "landed": "/",
+    "reachable": false,
+    "calls": [
+     "GET /v1/dashboard",
+     "GET /v1/due-dates",
+     "GET /v1/ideas",
+     "GET /v1/ideas/colleagues",
+     "GET /v1/patents/stats"
+    ]
+   },
+   "/clients": {
+    "landed": "/",
+    "reachable": false,
+    "calls": [
+     "GET /v1/clients",
+     "GET /v1/dashboard",
+     "GET /v1/due-dates",
+     "GET /v1/ideas",
+     "GET /v1/ideas/colleagues",
+     "GET /v1/patents/stats"
+    ]
+   },
+   "/workspace": {
+    "landed": "/profile",
+    "reachable": false,
+    "calls": []
+   },
+   "/profile": {
+    "landed": "/profile",
+    "reachable": true,
+    "calls": []
+   },
+   "/assistant": {
+    "landed": "/assistant",
+    "reachable": true,
+    "calls": []
+   }
+  }
+ }
+}
