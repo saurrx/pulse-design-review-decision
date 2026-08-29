@@ -497,3 +497,17 @@ record the nested v2 entry that `npm ci` then demands.
 Copies, not the working tree: `npm ci` inside a Linux container against the
 mounted tree installs Linux rollup binaries over the macOS ones and breaks your
 local build. That has also happened.
+
+### The Atlas (cross-repo map)
+
+`~/workspace/photonlegal/atlas` joins the three repos into one map: role
+journeys traced through frontend route → components → API call → adapter rule
+→ backend route → service → capabilities → Prisma models, plus the
+triggers/schedulers register (code no user journey drives) and the stale-code
+register (evidence-backed, delete only on approval). This repo's layer is
+generated into `qa/map/` and **drift-gated in CI** — change a route without
+regenerating and the pipeline fails, exactly like the OpenAPI spec. Regenerate
+locally, commit the JSON, and re-run `node join.mjs` in atlas when the joined
+view matters.
+
+Regenerate this repo's layer: `node qa/map/generate.mjs   (and qa/map/measure.mjs for the measured layer)`
