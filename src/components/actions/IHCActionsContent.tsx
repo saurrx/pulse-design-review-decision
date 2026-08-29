@@ -794,11 +794,17 @@ const IHCActionsContent: React.FC = () => {
             Page {pagination.page} of {pagination.totalPages} ({pagination.total}{" "}
             total)
           </p>
+          {/* Icon-only pagers with no accessible name at all: the other four
+              paginated tables in this app title theirs, this one did not, so
+              screen readers and the conformance tier both saw four unnamed
+              buttons. */}
           <div className="flex items-center gap-1">
             <Button
               variant="outline"
               size="icon"
               className="h-8 w-8"
+              title="First page"
+              aria-label="First page"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(1)}
             >
@@ -808,6 +814,8 @@ const IHCActionsContent: React.FC = () => {
               variant="outline"
               size="icon"
               className="h-8 w-8"
+              title="Previous page"
+              aria-label="Previous page"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => p - 1)}
             >
@@ -817,6 +825,8 @@ const IHCActionsContent: React.FC = () => {
               variant="outline"
               size="icon"
               className="h-8 w-8"
+              title="Next page"
+              aria-label="Next page"
               disabled={currentPage === pagination.totalPages}
               onClick={() => setCurrentPage((p) => p + 1)}
             >
@@ -826,6 +836,8 @@ const IHCActionsContent: React.FC = () => {
               variant="outline"
               size="icon"
               className="h-8 w-8"
+              title="Last page"
+              aria-label="Last page"
               disabled={currentPage === pagination.totalPages}
               onClick={() => setCurrentPage(pagination.totalPages)}
             >
