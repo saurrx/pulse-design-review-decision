@@ -18,6 +18,7 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import EvaluationProgress from "@/components/ideas/EvaluationProgress";
 import API_CONFIG from "@/lib/apiConfig";
 import ideaDraftQuestions from "@/lib/IdeaDraftQuestion";
 import useUserCookie from "@/hooks/use-auth";
@@ -445,6 +446,17 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
   });
   const scoreRaw = scoreData?.data?.score;
   const scoreMeta = scoreData?.data?.score_meta_data;
+  const serverEvaluationStatus = scoreData?.data?.status as string | undefined;
+  const runningEvaluationId =
+    scoreData?.data?.report?.evaluationId ?? scoreData?.data?.report?.id ?? null;
+
+  // The server, not component state, knows whether an evaluation is running —
+  // scoringActive used to be set only by the button click, so closing the tab
+  // mid-scan and reopening showed nothing while the agent kept working
+  // (F-029's UX half). One poll answers RUNNING and this resumes the loop.
+  useEffect(() => {
+    if (serverEvaluationStatus === "RUNNING" && !scoringActive) setScoringActive(true);
+  }, [serverEvaluationStatus, scoringActive]);
   const scored = typeof scoreRaw === "number";
   const score10 = scored ? scoreRaw / 10 : null;
   const weakestSectionId: string =
@@ -1129,9 +1141,9 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                 )}
               </>
             ) : scoringActive ? (
-              <p className={`mt-2 text-xs leading-relaxed ${muted}`}>
-                Scoring your draft — this takes a few seconds…
-              </p>
+              <div className="mt-2">
+                <EvaluationProgress compact evaluationId={runningEvaluationId} />
+              </div>
             ) : (
               <>
                 {signal ? (

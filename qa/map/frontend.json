@@ -542,7 +542,7 @@
    "route": "/ideas",
    "page": "IdeasPage",
    "entry": "src/pages/IdeasPage.tsx",
-   "components": 40,
+   "components": 41,
    "calls": [
     {
      "method": "POST",
@@ -658,6 +658,15 @@
      "rule": "^\\/api\\/v1\\/idea\\/fetch-drafts\\/([^/]+)$",
      "v1": [
       "/v1/ideas/{id}/drafts"
+     ],
+     "from": "src/components/review/ReviewQueueWorkspace.tsx"
+    },
+    {
+     "method": "GET",
+     "call": "/api/v1/idea/fetch-score/${reviewDraft!.id}",
+     "rule": "^\\/api\\/v1\\/idea\\/fetch-score\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/evaluation"
      ],
      "from": "src/components/review/ReviewQueueWorkspace.tsx"
     },
@@ -1089,7 +1098,7 @@
    "route": "/ideas/:id/draft",
    "page": "IdeaDraftPage",
    "entry": "src/pages/IdeaDraftPage.tsx",
-   "components": 21,
+   "components": 22,
    "calls": [
     {
      "method": "POST",
