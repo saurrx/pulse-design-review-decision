@@ -32,6 +32,10 @@ secret_detection:
 build:
   stage: test
   image: node:22-slim
+  # Not on schedules: a scheduled run exists to exercise the DEPLOYED app, and
+  # the source has not changed since the last push that already built it.
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule"
   cache:
     key: { files: [package-lock.json] }
     paths: [.npm/]
@@ -61,6 +65,9 @@ build:
 gitleaks:
   stage: security
   image: { name: "zricethezav/gitleaks:latest", entrypoint: [""] }
+  # Same reasoning as build: unchanged history, unchanged answer.
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule"
   script:
     # The gitleaks CLI is MIT. Only the GitHub Action carries a commercial
     # licence, and we are not on GitHub.
@@ -76,6 +83,9 @@ gitleaks:
 dependencies:
   stage: security
   image: { name: "ghcr.io/google/osv-scanner:latest", entrypoint: [""] }
+  # Deliberately DOES run on schedules: new advisories are published against a
+  # lockfile nobody has touched, so this is the one scan worth repeating on a
+  # timer.
   script:
     # BLOCKING, deliberately. In-range npm update took this repo from 65
     # vulnerabilities (27 High) to 7, and osv-scanner.toml defers each survivor
