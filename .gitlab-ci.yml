@@ -133,6 +133,10 @@ browser-tiers:
         echo "=== $f"
         node "$f" || failed="$failed $f"
       done
+      # After the tiers: now the hit files exist, so a suppression that
+      # matched nothing can be told from one that is merely dormant.
+      echo "=== exception register (strict)"
+      node qa/cli.mjs exceptions --strict || failed="$failed exceptions--strict"
       if [ -n "$failed" ]; then echo "FAILED:$failed"; exit 1; fi
   # No artifacts: qa/.sessions/ holds live authentication cookies. The log is
   # the output.

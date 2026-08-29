@@ -17,6 +17,7 @@
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { recordHits } from '../lib/exception-hits.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const SRC = join(ROOT, 'src');
@@ -116,6 +117,13 @@ const allowed = !existsSync(exFile) ? [] :
     .flatMap(e => e.match.paths ?? []);
 const byDesign = c => allowed.some(a => c.path.startsWith(a));
 
+// Which exception ids actually covered something on this run.
+const firedIds = new Set(
+  (JSON.parse(readFileSync(exFile, 'utf8')).exceptions ?? [])
+    .filter(e => e.match?.tier === 'contract' && e.match?.rule === 'adapter-coverage')
+    .filter(e => calls.some(c => !resolves(c) && (e.match.paths ?? []).some(a => c.path.startsWith(a))))
+    .map(e => e.id));
+
 const seen = new Set();
 const suppressed = calls.filter(c => !resolves(c) && byDesign(c)).length;
 const unmapped = calls.filter(c => !resolves(c) && !byDesign(c)).filter(c => {
@@ -126,6 +134,7 @@ const unmapped = calls.filter(c => !resolves(c) && !byDesign(c)).filter(c => {
 
 console.log(`${calls.length} call sites · ${rules.length} adapter rules · ${suppressed} unmapped by design`);
 if (unmapped.length) {
+  recordHits('contract', [...firedIds]);
   console.log(`\n${unmapped.length} call(s) resolve to NO rule for their verb — each returns a synthetic 501:`);
   for (const c of unmapped) {
     console.log(`  ${c.method} ${c.path}\n      ${c.file}`);
@@ -135,4 +144,5 @@ if (unmapped.length) {
   }
   process.exit(1);
 }
+recordHits('contract', [...firedIds]);
 console.log('\nevery call resolves, verb included (except the ones unmapped on purpose)');

@@ -91,9 +91,41 @@ function loadExceptions() {
   return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')).exceptions ?? [] : [];
 }
 
-function checkExceptions() {
+/**
+ * Which exceptions actually fired, per tier, from the last complete run of each.
+ * Written by the tiers via qa/lib/exception-hits.mjs.
+ */
+function loadHits() {
+  const dir = join(QA, '.exception-hits');
+  if (!existsSync(dir)) return {};
+  const out = {};
+  for (const f of readdirSync(dir)) {
+    if (!f.endsWith('.json')) continue;
+    try {
+      const d = JSON.parse(readFileSync(join(dir, f), 'utf8'));
+      if (d?.tier) out[d.tier] = d;
+    } catch { /* a half-written file is not evidence */ }
+  }
+  return out;
+}
+
+/**
+ * Tiers whose findings come from RULES, where an exception matching nothing
+ * really is dead.
+ *
+ * `conformance` is deliberately absent. Its findings are diffs against a
+ * committed baseline, so the moment the baseline is re-recorded there is
+ * nothing left to suppress — its exceptions go dormant by construction and
+ * wake again the next time reality drifts. Judging them the same way would
+ * report eleven perfectly good suppressions as dead every time someone runs
+ * `--update`, which is how a strict check teaches people to pass `--no-strict`.
+ */
+const RULE_BASED_TIERS = new Set(['invariant', 'contract', 'security', 'behaviour', 'unit', 'journey']);
+
+function checkExceptions({ strict = false } = {}) {
   const ex = loadExceptions();
   const today = new Date().toISOString().slice(0, 10);
+  const hits = strict ? loadHits() : {};
   let bad = 0;
   if (!ex.length) { console.log('qa: no exceptions registered.'); return 0; }
   for (const e of ex) {
@@ -103,8 +135,22 @@ function checkExceptions() {
     if (!e.owner) problems.push('no owner');
     if (!e.expires) problems.push('no expiry');
     else if (e.expires < today) problems.push(`EXPIRED ${e.expires}`);
+    // A suppression that no longer matches anything is dead: it hides nothing,
+    // and it will go on hiding nothing after the thing it was written for comes
+    // back. Only judged when a COMPLETE run of the entry's own tier is on
+    // record — a security exception must not look dead because only the
+    // invariant tier ran.
+    let note = '';
+    if (strict && !problems.length) {
+      const tier = e.match?.tier;
+      const run = tier ? hits[tier] : null;
+      if (!RULE_BASED_TIERS.has(tier)) note = `  (dormancy expected — ${tier ?? 'untiered'} compares against a baseline)`;
+      else if (!run) note = `  (not judged — no complete ${tier} run on record)`;
+      else if (!run.complete) note = `  (not judged — last ${tier} run was incomplete)`;
+      else if (!run.ids.includes(e.id)) problems.push(`DEAD — matched nothing in the last complete ${tier} run`);
+    }
     if (problems.length) { bad++; console.log(`  FAIL ${e.id ?? '(unnamed)'} — ${problems.join(', ')}`); }
-    else console.log(`  ok   ${e.id}  (expires ${e.expires}, ${e.owner})`);
+    else console.log(`  ok   ${e.id}  (expires ${e.expires}, ${e.owner})${note}`);
   }
   // A suppression that has outlived its reason is itself a defect: it hides a
   // real failure and nobody is looking at it any more.
@@ -222,7 +268,7 @@ if (cmd === 'checkpoint') {
   process.exit(0);
 }
 
-if (cmd === 'exceptions') process.exit(checkExceptions());
+if (cmd === 'exceptions') process.exit(checkExceptions({ strict: rest.includes('--strict') }));
 if (cmd === 'contract') process.exit(checkContract());
 
 if (cmd === 'list') {
@@ -241,7 +287,7 @@ console.log(`qa — test selection across the three Pulse repos
   qa affected [--base origin/main] [--print-areas]
   qa run --tier <t> [--area a,b] [--sec s] [--cp c]
   qa checkpoint <smoke|pre-deploy|post-deploy|nightly>
-  qa exceptions
+  qa exceptions [--strict]   # --strict also fails a suppression that matched nothing
   qa contract
   qa list
 
