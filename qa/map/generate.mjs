@@ -117,14 +117,30 @@ if (rules.length !== declared) {
 }
 
 /* ---- per-route component tree + API calls --------------------------------- */
-// `${…}` placeholders become a UUID-shaped value so id-pattern rules match.
+// The SAME extraction adapter-coverage.qa.mjs proved out, because a weaker one
+// already burned us: a naive [^\`'"]+ capture truncates at any quote inside a
+// nested interpolation, and the fetch-lastet call in PatentsContent — a
+// multiline template with a ternary containing string literals — came out as
+// "zero call sites" for a rule that is in fact the only loader of the patents
+// table. That false evidence reached the stale register (F3) and survived to
+// the deletion MR, where the forward coverage gate caught it. The delimiter is
+// captured and back-referenced so the match ends at the MATCHING quote, and
+// interpolations collapse repeatedly (they nest) before whitespace is
+// stripped.
+const CALL_RE = /API_CONFIG\s*\.\s*(get|post|put|patch|delete)\s*\(\s*(['"\`])((?:(?!\2)[\s\S])*?)\2/g;
 const PLACEHOLDER = '0f0e0d0c-0b0a-4908-8706-050403020100';
+const collapseCall = (raw) => {
+  let t = raw, prev;
+  do { prev = t; t = t.replace(/\$\{[^{}]*\}/g, PLACEHOLDER); } while (t !== prev);
+  return t.replace(/\s+/g, '');
+};
 const callsOf = (f) =>
-  [...body[f].matchAll(/API_CONFIG\.(get|post|put|patch|delete)\s*\(\s*[`'"]([^`'"]+)/g)]
+  [...body[f].matchAll(CALL_RE)]
+    .filter((m) => m[3].includes('/api/v1/'))
     .map((m) => ({
       method: m[1].toUpperCase(),
-      path: m[2].replace(/\$\{[^}]*\}/g, PLACEHOLDER),
-      raw: m[2],
+      path: collapseCall(m[3]),
+      raw: m[3].replace(/\s+/g, ' '),
     }));
 
 const ruleFor = (c) => rules.findIndex((r) => r.re.test(c.path) && (!r.method || r.method === c.method));

@@ -13,7 +13,7 @@
     "",
     "`match.source: \"design-reconciliation\"` marks an entry that belongs to the",
     "ONE-TIME comparison against the designer's reference implementation",
-    "(qa/conformance/design-diff.mjs): a deviation from the design that we",
+    "(design-diff.mjs, retired and removed after the one-time run): a deviation from the design that we",
     "decided to keep. Those entries are read ONLY by that tool.",
     "qa/conformance/structure.qa.mjs skips every entry carrying a `source`,",
     "because a rule like `table-columns` scoped to /due-dates would otherwise",
