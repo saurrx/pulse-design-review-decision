@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch();
+const ctx = await b.newContext({ viewport: { width: 1440, height: 900 } });
+await ctx.addCookies([{ name: 'pl_user', value: encodeURIComponent(JSON.stringify({ id:'user-ihc-1', name:'Priya Sharma', email:'priya@acmerobotics.com', role:'IHC_ADMIN', client_id:'client-1', verified:true, active:true })), domain: 'localhost', path: '/' }]);
+const p = await ctx.newPage();
+await p.goto('http://localhost:3700/due-dates', { waitUntil: 'networkidle' });
+await p.waitForTimeout(2500);
+const snap = await p.locator('body').ariaSnapshot({ boxes: true });
+console.log(snap.slice(0, 6000));
+console.log('\n\n=== LENGTH', snap.length);
+await b.close();
