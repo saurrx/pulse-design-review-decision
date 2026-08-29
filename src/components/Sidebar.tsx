@@ -73,6 +73,11 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
       { label: "Home", path: "/", icon: LayoutDashboard },
       { label: "My ideas", path: "/ideas", icon: Lightbulb },
       { label: "Patents", path: "/patents", icon: FileStack },
+      // Every other role has a Profile (or Workspace) nav item and the design
+      // gave the inventor one too; the IA split that moved profile out of the
+      // workspace dropped it from this branch only. The user menu still
+      // reaches /profile, so this was invisible rather than fatal.
+      { label: "Profile", path: "/profile", icon: UserRound },
     ];
   }
 

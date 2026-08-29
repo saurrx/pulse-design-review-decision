@@ -100,7 +100,27 @@ const TimelineAndEvents = ({
   const eventCompletion = usePatentEventCompletion();
   const canManageEvents = isOutsideCounselRole(user?.role);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
+  // List is the default; the last-used view persists across sessions. Both
+  // halves came from the design and were lost in the port, which left the
+  // dashboard opening on the calendar every single time and forgetting the
+  // choice you had just made.
+  const [viewMode, setViewModeState] = useState<"calendar" | "list">(() => {
+    try {
+      return localStorage.getItem("pl-timeline-view") === "calendar"
+        ? "calendar"
+        : "list";
+    } catch {
+      return "list";
+    }
+  });
+  const setViewMode = (v: "calendar" | "list") => {
+    setViewModeState(v);
+    try {
+      localStorage.setItem("pl-timeline-view", v);
+    } catch {
+      /* private mode: the choice just does not persist */
+    }
+  };
   const [isShowApplication, setIsShowApplication] = useState<string | null>(
     null,
   );
