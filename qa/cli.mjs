@@ -3,7 +3,7 @@
  * qa — the test selector.
  *
  *   qa affected            areas touched by the current diff, and the tests for them
- *   qa run --tier security --area ideas
+ *   qa run --tier security --area ideas       select and RUN (--list to only list)
  *   qa checkpoint smoke
  *   qa exceptions          check the exception register is honest
  *   qa contract            check the shared contract has not drifted
@@ -19,7 +19,7 @@
  */
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { execSync } from 'node:child_process';
+import { execSync, spawnSync } from 'node:child_process';
 import { join, dirname, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -227,6 +227,70 @@ function select({ areas, tier, sec, cp }) {
   });
 }
 
+
+/* ---------- execution -----------------------------------------------------
+ * Selection is only half the job. `run` and `checkpoint` used to print a list
+ * and exit 0, which is the worst possible outcome: the command a human is told
+ * to trust reports success without executing a single assertion. CI was green
+ * because .gitlab-ci.yml invokes the runners directly and never went through
+ * here — so the gap was invisible from the pipeline.
+ *
+ * HOW a test file is executed is repo-specific (vitest here, jest there, plain
+ * `node` for the .qa.mjs scripts), so it is declared per repo in
+ * qa/areas.json `runners` and this file stays byte-identical across all three.
+ *
+ * `each: true` runs one process per file. The browser tiers need it — they are
+ * standalone scripts, and running them sequentially in one process each is
+ * what keeps five logins from racing the login throttle.
+ */
+function runnerFor(file) {
+  for (const r of areasMap.runners ?? []) if (new RegExp(r.match).test(file)) return r;
+  return null;
+}
+
+function execute(tests) {
+  // Nothing selected is a failure, not a pass. A checkpoint that matches no
+  // test is a broken filter, and reporting "ok" for it is how a suite rots.
+  if (!tests.length) {
+    console.error('qa: no tests selected — refusing to report success.');
+    return 1;
+  }
+  const files = tests.map(t => t.file);
+  const unrunnable = files.filter(f => !runnerFor(f));
+  if (unrunnable.length) {
+    // Same rule as an unmapped glob: a file nobody knows how to run must be
+    // loud. Silently skipping it would mean the count says 12 and 3 ran.
+    console.error(`qa: ${unrunnable.length} selected file(s) match no runner in areas.json:`);
+    unrunnable.forEach(f => console.error('    ' + f));
+    return 1;
+  }
+
+  // Group in selection order so a repo's grouping stays predictable.
+  const groups = [];
+  for (const f of files) {
+    const r = runnerFor(f);
+    const last = groups[groups.length - 1];
+    if (!r.each && last && last.runner === r) last.files.push(f);
+    else groups.push({ runner: r, files: [f] });
+  }
+
+  const failed = [];
+  for (const g of groups) {
+    const batches = g.runner.each ? g.files.map(f => [f]) : [g.files];
+    for (const batch of batches) {
+      const argv = [...g.runner.command, ...batch];
+      console.log(`\nqa> ${argv.join(' ')}`);
+      const res = spawnSync(argv[0], argv.slice(1), { cwd: ROOT, stdio: 'inherit', shell: false });
+      // A signal-killed child has status null; that is a failure, not a pass.
+      if (res.status !== 0) failed.push(...batch);
+    }
+  }
+
+  console.log(`\nqa: ${files.length} file(s), ${failed.length} failed`);
+  failed.forEach(f => console.log('  FAIL ' + f));
+  return failed.length ? 1 : 0;
+}
+
 /* ---------- commands ------------------------------------------------------ */
 const [, , cmd, ...rest] = process.argv;
 const flag = (n, d) => { const i = rest.indexOf('--' + n); return i === -1 ? d : rest[i + 1]; };
@@ -258,14 +322,14 @@ if (cmd === 'run') {
   const tests = select({ areas, tier: flag('tier'), sec: flag('sec'), cp: flag('cp') });
   console.log(`qa: ${tests.length} test file(s)`);
   tests.forEach(t => console.log('  ' + t.file));
-  process.exit(0);
+  process.exit(rest.includes('--list') ? 0 : execute(tests));
 }
 
 if (cmd === 'checkpoint') {
   const tests = select({ cp: rest[0] });
   console.log(`qa: checkpoint "${rest[0]}" -> ${tests.length} test file(s)`);
   tests.forEach(t => console.log('  ' + t.file));
-  process.exit(0);
+  process.exit(rest.includes('--list') ? 0 : execute(tests));
 }
 
 if (cmd === 'exceptions') process.exit(checkExceptions({ strict: rest.includes('--strict') }));
@@ -285,8 +349,9 @@ if (cmd === 'list') {
 console.log(`qa — test selection across the three Pulse repos
 
   qa affected [--base origin/main] [--print-areas]
-  qa run --tier <t> [--area a,b] [--sec s] [--cp c]
-  qa checkpoint <smoke|pre-deploy|post-deploy|nightly>
+  qa run --tier <t> [--area a,b] [--sec s] [--cp c] [--list]
+  qa checkpoint <smoke|pre-deploy|post-deploy|nightly> [--list]
+                             # both EXECUTE the selection; --list only prints it
   qa exceptions [--strict]   # --strict also fails a suppression that matched nothing
   qa contract
   qa list

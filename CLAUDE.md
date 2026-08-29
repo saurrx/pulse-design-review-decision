@@ -299,6 +299,14 @@ suite" or "journey suite" to keep in step — they are views over the same tests
     node qa/cli.mjs exceptions        # the exception register is still honest
     node qa/cli.mjs list              # every test and its tags
 
+`run` and `checkpoint` **select and then execute**; add `--list` to only print
+the selection. They exit non-zero if any selected file fails, if a selected file
+matches no runner, or if the filter selected **nothing** — an empty checkpoint is
+a broken filter, and reporting "ok" for it is how a suite rots. HOW each kind of
+file runs (vitest / jest / plain `node`) is declared per repo in `qa/areas.json`
+under `runners`, which is what lets `cli.mjs` stay byte-identical across the
+three repos alongside `contract.json`.
+
 **Tags** live in a test's doc comment: `@tier:` `@area:` `@role:` `@sec:`
 `@soc2:` `@gdpr:` `@cp:`. An **untagged test always runs** — absence of a tag
 must never mean "skip", or a test silently stops being selected the day someone
