@@ -27,7 +27,8 @@ Dialect map (old ⇄ new):
 - Paths: `/api/v1/...` → `/v1/...` via RULES regex table; rules match method
   when specified, ANY method otherwise (a POST once fell through to a GET rule
   — method-lock rules that share a path). Unmapped → named 501 + console.warn.
-  `node route-sweep.mjs` lists every unmapped call — run it after adding UI.
+  `node qa/contract/adapter-coverage.qa.mjs` lists every unmapped call,
+  verb included — run it after adding UI.
 - Idea: state DRAFT/TECH_REVIEW/LEGAL_REVIEW/CHANGES_REQUESTED/REJECTED/
   SENT_TO_PHOTON/FILED ⇄ status IN_DRAFT/UNDER_REVIEW/SENT_TO_IHC/
   UPDATE_REQUEST/REJECT_BY_IHC/SEND_TO_OC/FILED (STATE_TO_STATUS +
@@ -137,18 +138,27 @@ checks silently broke during the rename once.
   landscape viewports. Keep the floor desktop-only.
 
 ## 6. Harnesses & testing law
-Playwright scripts must live in repo root (module resolution). Durable set:
-- journeys.mjs <outdir> — 5-persona walk: crashes, console errors, HTTP≥400,
-  blank pages, screenshots
-- route-sweep.mjs — adapter coverage vs every /api/v1 literal in src
-- baseline.mjs/compare.mjs — visual regression (npm run test:visual, 0.02%)
+The four root-level `.mjs` harnesses are **gone**, replaced by `qa/`:
+
+| was | now | why the replacement is better |
+|---|---|---|
+| `journeys.mjs` | `qa/journey/*.qa.mjs` | asserts outcomes per role, not absence-of-errors |
+| `route-sweep.mjs` | `qa/contract/adapter-coverage.qa.mjs` | matches the VERB too — the old one passed a rule locked to POST while every call site sent GET, which was a P0 |
+| `baseline.mjs` + `compare.mjs` | `qa/invariant/` + `qa/conformance/` | a pixel baseline records whatever it first sees, so a page that was wrong on day one is defended forever; these assert rules and structure instead |
+
 **LAW (a real bug hid behind its violation): assert OUTCOMES per role — URL
 changed, state changed, element appeared — never just absence of errors.**
 **Corollary: an empty table hides broken code.** The Photon actions queue read
 fields nothing selected and threw on its first real row; with no rows the map
-never ran. Test against imported data, not a bare seed.
-Login throttle is 5/5min/IP: restart the API between multi-login phases.
-Playwright prompt()/confirm() need page.once('dialog') BEFORE the click.
+never ran. Test against imported data, not a bare seed — and see
+pulse-backend `prisma/seed-demo-inventor.ts`, which exists because the inventor
+account had no ideas and three tiers were passing without checking anything.
+
+Playwright scripts must live where module resolution finds `playwright` —
+repo root or `qa/`. Login throttle is 5/5min/IP: reuse `qa/.sessions/`, never
+run two browser tiers concurrently, and see `THROTTLE_DISABLED` in
+pulse-backend if you need it off for a testing window.
+Playwright `prompt()`/`confirm()` need `page.once('dialog')` BEFORE the click.
 
 ## 7. Workflows
 dev `npm run dev` (:3600; API must run on :3000) · typecheck (strict, keep 0)
