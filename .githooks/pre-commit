@@ -1,0 +1,34 @@
+#!/bin/sh
+# Refuse a commit that is much larger than its author probably thinks.
+#
+# findings.md F-017: a commit whose message described de-flaking ONE test step
+# actually carried 37 files — another process's half-finished work, four
+# unreviewed src changes and a stray scratch file — because `git add -A` was run
+# in a checkout someone else was working in. It merged and deployed.
+#
+# Large commits are legitimate (a 48-file deletion landed the same week). This
+# does not forbid them; it makes them deliberate. Set ALLOW_BIG_COMMIT=1 when
+# the size is the point.
+#
+# Enable once per clone:   git config core.hooksPath .githooks
+LIMIT=${BIG_COMMIT_LIMIT:-15}
+COUNT=$(git diff --cached --name-only | wc -l | tr -d ' ')
+
+if [ "$COUNT" -gt "$LIMIT" ] && [ -z "$ALLOW_BIG_COMMIT" ]; then
+  echo "pre-commit: $COUNT files staged (limit $LIMIT)."
+  echo
+  git diff --cached --name-only | sed 's/^/    /'
+  echo
+  echo "  Read that list. If every one of those belongs in this commit, re-run with:"
+  echo "      ALLOW_BIG_COMMIT=1 git commit ..."
+  echo "  If it does not, you have probably staged someone else's work — see"
+  echo "  findings.md F-017. Stage explicit paths, or take a git worktree."
+  exit 1
+fi
+
+# A second, cheaper signal: staging inside another worktree's checkout.
+if git worktree list 2>/dev/null | tail -n +2 | grep -q .; then
+  echo "pre-commit: note — this repo has other worktrees:"
+  git worktree list | tail -n +2 | sed 's/^/    /'
+fi
+exit 0

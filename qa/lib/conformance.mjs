@@ -310,11 +310,39 @@ export function project(root) {
   };
 }
 
+/**
+ * A name that BEGINS with a placeholder is a record, not a label.
+ *
+ * Repeat-detection anonymises sibling blocks that occur more than once, and
+ * DATA_CONTAINERS covers anything inside a row or list item. Neither catches a
+ * list of ONE: seeding a single inventor turned the dashboard's ranked list
+ * into `button "2 Demo Inventor 7"` — one child, nothing to detect a repeat
+ * against — so a person's name became page structure and the tier churned on a
+ * data change it exists to ignore. findings.md F-019.
+ *
+ * The rule is LEADING-only, and that is the whole point. An earlier attempt
+ * anonymised any name containing a placeholder, which also flattened
+ * `button:filed #` — the dashboard pipeline tiles are a label plus a count, and
+ * discarding the label with the number means removing the "Filed" tile
+ * entirely would stop being detectable. Trading churn for a coverage hole is
+ * the wrong way round.
+ *
+ * Checked against the committed baselines before adopting: 48 signatures move
+ * to <data> — pagination numbers, the awaiting-action cards, the ranked rows —
+ * while `filed #`, `granted #`, `status #` and `ideas #` all survive, because a
+ * label does not start with its own data.
+ */
+const LEADS_WITH_DATA = /^(?:#|<id>|<date>|<email>|<money>|<ago>|<data>)(?:\s|$)/;
+
 function signature(node, inData) {
   const level = node.attrs.level ? `[${node.attrs.level}]` : '';
   const state = ['disabled', 'checked', 'expanded', 'pressed', 'selected']
     .filter((k) => k in node.attrs).sort().map((k) => `+${k}`).join('');
-  const name = inData ? '<data>' : normText(node.name ?? '');
+  const raw = normText(node.name ?? '');
+  // columnheader is never anonymised: it is the promise the table makes, and a
+  // dropped Action column is why this tier exists.
+  const record = node.role !== 'columnheader' && LEADS_WITH_DATA.test(raw);
+  const name = inData || record ? '<data>' : raw;
   return `${node.role}${level}:${name}${state}`;
 }
 

@@ -30,7 +30,6 @@
     "table:"
   ],
   "signatures": [
-    "button:#",
     "button:<data>",
     "button:all due dates",
     "button:calendar view",
@@ -73,8 +72,8 @@
     "listitem:<data>",
     "main:",
     "navigation:primary navigation",
-    "option:#",
-    "option:#+selected",
+    "option:<data>",
+    "option:<data>+selected",
     "paragraph:<data>",
     "region:notifications (f#)",
     "region:notifications alt+t",
@@ -86,7 +85,7 @@
     "textbox:search by event, application number, client..."
   ],
   "styles": {
-    "button:#": {
+    "button:<data>": {
       "alignItems": "normal",
       "backgroundColor": "rgb(249, 180, 24)",
       "borderBottomWidth": "0px",
