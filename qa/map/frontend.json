@@ -11,18 +11,27 @@
      "method": "POST",
      "call": "/api/v1/auth/email-signup",
      "rule": "^\\/api\\/v1\\/auth\\/email-signup$",
+     "v1": [
+      "/v1/auth/signup"
+     ],
      "from": "src/pages/auth/Signup.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/login",
      "rule": "^\\/api\\/v1\\/auth\\/(?:ihc\\/)?login$",
+     "v1": [
+      "/v1/auth/login"
+     ],
      "from": "src/pages/auth/Login.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/social-login",
      "rule": "^\\/api\\/v1\\/auth\\/social-login$",
+     "v1": [
+      "/v1/auth/google"
+     ],
      "from": "src/pages/auth/Login.tsx"
     }
    ]
@@ -37,12 +46,18 @@
      "method": "POST",
      "call": "/api/v1/auth/email-signup",
      "rule": "^\\/api\\/v1\\/auth\\/email-signup$",
+     "v1": [
+      "/v1/auth/signup"
+     ],
      "from": "src/pages/auth/Signup.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/social-login",
      "rule": "^\\/api\\/v1\\/auth\\/social-login$",
+     "v1": [
+      "/v1/auth/google"
+     ],
      "from": "src/pages/auth/Signup.tsx"
     }
    ]
@@ -57,6 +72,9 @@
      "method": "POST",
      "call": "/api/v1/auth/ihc/verify?code=${code}&domain=${domain}",
      "rule": "^\\/api\\/v1\\/auth\\/ihc\\/verify(?:\\?(.*))?$",
+     "v1": [
+      "/v1/auth/invite/verify-share"
+     ],
      "from": "src/pages/auth/Invite.tsx"
     }
    ]
@@ -71,6 +89,9 @@
      "method": "POST",
      "call": "/api/v1/auth/ihc/verify?code=${code}&domain=${domain}",
      "rule": "^\\/api\\/v1\\/auth\\/ihc\\/verify(?:\\?(.*))?$",
+     "v1": [
+      "/v1/auth/invite/verify-share"
+     ],
      "from": "src/pages/auth/Invite.tsx"
     }
    ]
@@ -85,30 +106,45 @@
      "method": "POST",
      "call": "/api/v1/auth/complete-signup",
      "rule": "^\\/api\\/v1\\/auth\\/(?:complete-signup|ihc\\/set-password)$",
+     "v1": [
+      "/v1/auth/password-reset/complete"
+     ],
      "from": "src/pages/auth/ResetPassword.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/ihc/login",
      "rule": "^\\/api\\/v1\\/auth\\/(?:ihc\\/)?login$",
+     "v1": [
+      "/v1/auth/login"
+     ],
      "from": "src/pages/auth/ResetPassword.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/ihc/set-password",
      "rule": "^\\/api\\/v1\\/auth\\/(?:complete-signup|ihc\\/set-password)$",
+     "v1": [
+      "/v1/auth/password-reset/complete"
+     ],
      "from": "src/pages/auth/ResetPassword.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/login",
      "rule": "^\\/api\\/v1\\/auth\\/(?:ihc\\/)?login$",
+     "v1": [
+      "/v1/auth/login"
+     ],
      "from": "src/pages/auth/IHCLogin.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/reset-password",
      "rule": "^\\/api\\/v1\\/auth\\/reset-password$",
+     "v1": [
+      "/v1/auth/password-reset/complete"
+     ],
      "from": "src/pages/auth/ResetPassword.tsx"
     }
    ]
@@ -123,6 +159,9 @@
      "method": "POST",
      "call": "/api/v1/auth/forgot-password",
      "rule": "^\\/api\\/v1\\/auth\\/forgot-password$",
+     "v1": [
+      "/v1/auth/password-reset/request"
+     ],
      "from": "src/pages/auth/ForgotPassword.tsx"
     }
    ]
@@ -137,78 +176,117 @@
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients/fetch-all-inventors/${user?.client_id}",
      "rule": "^\\/api\\/v1\\/clients\\/fetch-all-inventors\\/([^/?]+)",
+     "v1": [
+      "/v1/ideas/colleagues"
+     ],
      "from": "src/pages/Index.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/dashboard",
      "rule": "^\\/api\\/v1\\/dashboard",
+     "v1": [
+      "/v1/dashboard"
+     ],
      "from": "src/pages/Index.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/create-new/draft",
      "rule": "^\\/api\\/v1\\/idea\\/create-new\\/draft$",
+     "v1": [
+      "/v1/ideas/{id}/drafts"
+     ],
      "from": "src/components/ideas/IdeaSubmissionModal.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/create",
      "rule": "^\\/api\\/v1\\/idea\\/create$",
+     "v1": [
+      "/v1/ideas"
+     ],
      "from": "src/components/ideas/IdeaSubmissionModal.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch-by-user?page=1&limit=100",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-by-user(?:\\?(.*))?$",
+     "v1": [
+      "/v1/ideas"
+     ],
      "from": "src/pages/Index.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/send-latest-draft-to-ihc/${id}",
      "rule": "^\\/api\\/v1\\/idea\\/send-latest-draft-to-ihc\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/submit"
+     ],
      "from": "src/pages/Index.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/all-stats/client",
      "rule": "^\\/api\\/v1\\/patent\\/all-stats\\/client",
+     "v1": [
+      "/v1/patents/stats"
+     ],
      "from": "src/components/PatentWorldMap.tsx"
     },
     {
      "method": "PATCH",
      "call": "/api/v1/patent/events/${eventId}",
      "rule": "^\\/api\\/v1\\/patent\\/events\\/([^/]+)$",
+     "v1": [
+      "/v1/due-dates/{id}"
+     ],
      "from": "src/hooks/usePatentEventCompletion.ts"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/fetch-all-patents/client/${user?.client_id}?limit=500",
      "rule": "^\\/api\\/v1\\/patent\\/(?:fetch-all-patents\\/)?client\\/([^/?]+)(\\?.*)?$",
+     "v1": [
+      "/v1/patents"
+     ],
      "from": "src/pages/Index.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/fetch/upcoming-due-dates?month=${month}&year=${year}",
      "rule": "^\\/api\\/v1\\/patent\\/fetch\\/(upcoming-due-dates|all-due-dates)(?:\\?(.*))?$",
+     "v1": [
+      "/v1/due-dates"
+     ],
      "from": "src/pages/Index.tsx"
     }
    ]
@@ -223,42 +301,63 @@
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients?${params.toString()}",
      "rule": "^\\/api\\/v1\\/clients(?:\\?(.*))?$",
+     "v1": [
+      "/v1/clients"
+     ],
      "from": "src/pages/client/ClientsPage.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/clients/remove/${clientId}",
      "rule": "^\\/api\\/v1\\/clients\\/remove\\/([^/]+)$",
+     "v1": [
+      "/v1/clients/{id}"
+     ],
      "from": "src/pages/client/ClientsPage.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/clients",
      "rule": "^\\/api\\/v1\\/clients$",
+     "v1": [
+      "/v1/clients"
+     ],
      "from": "src/pages/client/ClientsPage.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/remove-file/${id}",
      "rule": "^\\/api\\/v1\\/remove-file\\/([^/]+)$",
+     "v1": [
+      "/v1/files/{id}"
+     ],
      "from": "src/components/clients/OnboardClientModal.tsx"
     }
    ]
@@ -273,108 +372,162 @@
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/login-as-client/${clientId}",
      "rule": "^\\/api\\/v1\\/auth\\/login-as-client\\/([^/]+)$",
+     "v1": [
+      "/v1/auth/view-as/{id}"
+     ],
      "from": "src/pages/client/ClientDetailPage.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/auth/user/${present_user?.id}",
      "rule": "^\\/api\\/v1\\/auth\\/user\\/([^/]+)$",
+     "v1": [
+      "/v1/auth/me"
+     ],
      "from": "src/lib/api-service/commonApi.service.ts"
     },
     {
      "method": "PUT",
      "call": "/api/v1/case-owners/${owner.id}/assignments",
      "rule": "^\\/api\\/v1\\/case-owners\\/([^/]+)\\/assignments$",
+     "v1": [
+      "/v1/case-owners/{id}/assignments"
+     ],
      "from": "src/pages/client/ClientDetailPage.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/case-owners",
      "rule": "^\\/api\\/v1\\/case-owners$",
+     "v1": [
+      "/v1/case-owners"
+     ],
      "from": "src/pages/client/ClientDetailPage.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.token}",
      "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/invite-link\\/([^/]+)$",
+     "v1": [
+      "/v1/invites/{id}"
+     ],
      "from": "src/components/clients/OverviewTab.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients/${clientId}/invite-link",
      "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/invite-link",
+     "v1": [
+      "/v1/invites/share-link"
+     ],
      "from": "src/components/clients/OverviewTab.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/clients/${clientId}/invite-link",
      "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/invite-link",
+     "v1": [
+      "/v1/invites/share-link"
+     ],
      "from": "src/components/clients/OverviewTab.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/clients/${clientId}/invite-user",
      "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/invite-user$",
+     "v1": [
+      "/v1/invites"
+     ],
      "from": "src/components/clients/OverviewTab.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/clients/${clientId}/reference-settings",
      "rule": "^\\/api\\/v1\\/clients\\/([^/?]+)\\/reference-settings$",
+     "v1": [
+      "/v1/clients/{id}"
+     ],
      "from": "src/components/clients/OverviewTab.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients/${clientId}",
      "rule": "^\\/api\\/v1\\/clients\\/([0-9a-f-]{36})$",
+     "v1": [
+      "/v1/clients/{id}"
+     ],
      "from": "src/pages/client/ClientDetailPage.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients/patent-metrics/${clientId}",
      "rule": "^\\/api\\/v1\\/clients\\/patent-metrics\\/([^/]+)",
+     "v1": [
+      "/v1/patents/stats"
+     ],
      "from": "src/components/clients/OverviewTab.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/clients/personal-info/${clientId}",
      "rule": "^\\/api\\/v1\\/clients\\/personal-info\\/([^/]+)$",
+     "v1": [
+      "/v1/clients/{id}"
+     ],
      "from": "src/components/clients/ClientDetails.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/patent/client/${clientId}",
      "rule": "^\\/api\\/v1\\/patent\\/(?:fetch-all-patents\\/)?client\\/([^/?]+)(\\?.*)?$",
+     "v1": [
+      "/v1/patents"
+     ],
      "from": "src/components/clients/AddPatentModal.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/fetch-all-patents/client/${clientId}?page=${currentPage}&limit=${itemsPerPage}",
      "rule": "^\\/api\\/v1\\/patent\\/(?:fetch-all-patents\\/)?client\\/([^/?]+)(\\?.*)?$",
+     "v1": [
+      "/v1/patents"
+     ],
      "from": "src/components/clients/PatentsTab.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/patent/import",
      "rule": "^\\/api\\/v1\\/patent\\/import$",
+     "v1": [
+      "/v1/patents/import"
+     ],
      "from": "src/components/clients/OverviewTab.tsx"
     }
    ]
@@ -389,102 +542,153 @@
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients/lookup",
      "rule": "^\\/api\\/v1\\/clients\\/lookup",
+     "v1": [
+      "/v1/clients"
+     ],
      "from": "src/components/ideas/IdeasContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/add-update-request/${selectedIdea.id}",
      "rule": "^\\/api\\/v1\\/idea\\/add-update-request\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/review"
+     ],
      "from": "src/components/review/ReviewQueueWorkspace.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/clone/${ideaId}",
      "rule": "^\\/api\\/v1\\/idea\\/clone\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/clone"
+     ],
      "from": "src/components/ideas/IdeasContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/create-new/draft",
      "rule": "^\\/api\\/v1\\/idea\\/create-new\\/draft$",
+     "v1": [
+      "/v1/ideas/{id}/drafts"
+     ],
      "from": "src/components/ideas/IdeaSubmissionModal.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/create",
      "rule": "^\\/api\\/v1\\/idea\\/create$",
+     "v1": [
+      "/v1/ideas"
+     ],
      "from": "src/components/ideas/IdeaSubmissionModal.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch-by-user?${params?.toString()}&limit=10&order=${order}&sort=${sort}&search=${debouncedSearchQuery}${statusFilters?.length ? ",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-by-user(?:\\?(.*))?$",
+     "v1": [
+      "/v1/ideas"
+     ],
      "from": "src/components/ideas/IdeasContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch-by-user?page=1&limit=100&sort=submission_date&order=asc",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-by-user(?:\\?(.*))?$",
+     "v1": [
+      "/v1/ideas"
+     ],
      "from": "src/components/review/ReviewQueueWorkspace.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch-drafts/${idea.id}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-drafts\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/drafts"
+     ],
      "from": "src/components/ideas/IdeasContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch-drafts/${nextIdea.id}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-drafts\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/drafts"
+     ],
      "from": "src/components/review/ReviewQueueWorkspace.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch-drafts/${selectedId}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-drafts\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/drafts"
+     ],
      "from": "src/components/review/ReviewQueueWorkspace.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/re-evaluate/${api_evaluation_id}",
      "rule": "^\\/api\\/v1\\/idea\\/re-evaluate\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/re-evaluate"
+     ],
      "from": "src/components/ideas/ShowScoreReport.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/reject-from-ihc/${selectedIdea.id}",
      "rule": "^\\/api\\/v1\\/idea\\/reject-from-ihc\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/review"
+     ],
      "from": "src/components/review/ReviewQueueWorkspace.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/idea/remove/${idea_inventor_id}",
      "rule": "^\\/api\\/v1\\/idea\\/remove\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}"
+     ],
      "from": "src/components/ideas/IdeasContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/send-to-oc/${reviewDraft.id}/oc",
      "rule": "^\\/api\\/v1\\/idea\\/send-to-oc\\/([^/]+)\\/oc$",
+     "v1": [
+      "/v1/drafts/{id}/review"
+     ],
      "from": "src/components/review/ReviewQueueWorkspace.tsx"
     }
    ]
@@ -499,18 +703,27 @@
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     }
    ]
@@ -525,234 +738,341 @@
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/ihc/invite-user",
      "rule": "^\\/api\\/v1\\/auth\\/ihc\\/invite-user$",
+     "v1": [
+      "/v1/invites"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/auth/user/${present_user?.id}",
      "rule": "^\\/api\\/v1\\/auth\\/user\\/([^/]+)$",
+     "v1": [
+      "/v1/auth/me"
+     ],
      "from": "src/lib/api-service/commonApi.service.ts"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients/fetch-all-inventors/${user?.client_id}",
      "rule": "^\\/api\\/v1\\/clients\\/fetch-all-inventors\\/([^/?]+)",
+     "v1": [
+      "/v1/ideas/colleagues"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/${ideaId}/file",
      "rule": "^\\/api\\/v1\\/idea\\/([^/]+)\\/file$",
+     "v1": [
+      "/v1/ideas/{id}/file"
+     ],
      "from": "src/components/ideas/FileIdeaModal.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/idea/${ideaId}/oc-workflow-status",
      "rule": "^\\/api\\/v1\\/idea\\/([^/]+)\\/oc-workflow-status$",
+     "v1": [
+      "/v1/ideas/{id}"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/add-update-request/${ideaId}",
      "rule": "^\\/api\\/v1\\/idea\\/add-update-request\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/review"
+     ],
      "from": "src/components/ideas/RequestUpdate.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/add/inventor/${ideaId}/${id}",
      "rule": "^\\/api\\/v1\\/idea\\/add\\/inventor\\/([^/]+)\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/inventors/{id}"
+     ],
      "from": "src/components/ideas/CoInventorsField.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/add/inventor/${ideaId}/${inventorId}",
      "rule": "^\\/api\\/v1\\/idea\\/add\\/inventor\\/([^/]+)\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/inventors/{id}"
+     ],
      "from": "src/components/ideas/CoInventorsField.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/analyze-document",
      "rule": null,
+     "v1": [],
      "from": "src/components/ideas/DraftCreationContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/check-score/${draftId}",
      "rule": "^\\/api\\/v1\\/idea\\/check-score\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/evaluate"
+     ],
      "from": "src/components/ideas/DraftCreationContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/check-score/${ideaDraft?.[0]?.id}",
      "rule": "^\\/api\\/v1\\/idea\\/check-score\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/evaluate"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/clone-draft/${draftId}",
      "rule": "^\\/api\\/v1\\/idea\\/clone-draft\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/clone"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/create-new/draft",
      "rule": "^\\/api\\/v1\\/idea\\/create-new\\/draft$",
+     "v1": [
+      "/v1/ideas/{id}/drafts"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/idea/draft/${draftId}",
      "rule": "^\\/api\\/v1\\/idea\\/draft\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}"
+     ],
      "from": "src/components/ideas/DraftListView.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch-drafts/${ideaId}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-drafts\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/drafts"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch-recent-update-request/${ideaId}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-recent-update-request\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/transitions"
+     ],
      "from": "src/components/ideas/ViewRequestUpdate.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch-score/${draftId}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-score\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/evaluation"
+     ],
      "from": "src/components/ideas/DraftCreationContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch-score/${localStorage.getItem(",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-score\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/evaluation"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch-update-requests/${ideaId}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-update-requests\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/transitions"
+     ],
      "from": "src/components/ideas/RequestUpdate.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch/${ideaId}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/generate-summary/${draftId}",
      "rule": null,
+     "v1": [],
      "from": "src/components/ideas/DraftCreationContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/re-evaluate/${api_evaluation_id}",
      "rule": "^\\/api\\/v1\\/idea\\/re-evaluate\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/re-evaluate"
+     ],
      "from": "src/components/ideas/ShowScoreReport.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/re-evaluate/${draftApiEvaluationId}",
      "rule": "^\\/api\\/v1\\/idea\\/re-evaluate\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/re-evaluate"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/reject-from-ihc/${ideaId}",
      "rule": "^\\/api\\/v1\\/idea\\/reject-from-ihc\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/review"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/idea/remove-idea-file/${ideaFileId}",
      "rule": "^\\/api\\/v1\\/idea\\/remove-idea-file\\/([^/]+)$",
+     "v1": [
+      "/v1/files/{id}"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/idea/remove/inventor/${idea_inventor_id}",
      "rule": "^\\/api\\/v1\\/idea\\/remove\\/inventor\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/inventor-credits/{id}"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/idea/remove/inventor/${ideaInventorId}",
      "rule": "^\\/api\\/v1\\/idea\\/remove\\/inventor\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/inventor-credits/{id}"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/send-to-ihc/${payload.draft_id}/${payload.ihc_id}",
      "rule": "^\\/api\\/v1\\/idea\\/send-to-ihc\\/([^/]+)\\/",
+     "v1": [
+      "/v1/drafts/{id}/submit"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/send-to-oc/${selectedDraftId || inventorIdeas?.[0]?.id\n          }/oc",
      "rule": "^\\/api\\/v1\\/idea\\/send-to-oc\\/([^/]+)\\/oc$",
+     "v1": [
+      "/v1/drafts/{id}/review"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/single-draft/${draftId}",
      "rule": "^\\/api\\/v1\\/idea\\/single-draft\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}"
+     ],
      "from": "src/components/ideas/DraftCreationContent.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/idea/update-idea/${ideaId}",
      "rule": "^\\/api\\/v1\\/idea\\/update-idea\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/update-requested-change/${editingRequestId}",
      "rule": null,
+     "v1": [],
      "from": "src/components/ideas/RequestUpdate.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/update/draft/${draftId}",
      "rule": "^\\/api\\/v1\\/idea\\/update\\/draft\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}"
+     ],
      "from": "src/components/ideas/DraftCreationContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/update/draft/${ideaDraft?.[0]?.id}",
      "rule": "^\\/api\\/v1\\/idea\\/update\\/draft\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}"
+     ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/upload-idea-file/${ideaId}",
      "rule": null,
+     "v1": [],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
      "method": "POST",
      "call": "api/v1/idea/add/inventor/${ideaId}/${inventorId}",
      "rule": null,
+     "v1": [],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     }
    ]
@@ -767,108 +1087,154 @@
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/ihc/invite-user",
      "rule": "^\\/api\\/v1\\/auth\\/ihc\\/invite-user$",
+     "v1": [
+      "/v1/invites"
+     ],
      "from": "src/components/ideas/CoInventorsField.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients/fetch-all-inventors/${user?.client_id}",
      "rule": "^\\/api\\/v1\\/clients\\/fetch-all-inventors\\/([^/?]+)",
+     "v1": [
+      "/v1/ideas/colleagues"
+     ],
      "from": "src/components/ideas/CoInventorsField.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/add/inventor/${ideaId}/${id}",
      "rule": "^\\/api\\/v1\\/idea\\/add\\/inventor\\/([^/]+)\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/inventors/{id}"
+     ],
      "from": "src/components/ideas/CoInventorsField.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/add/inventor/${ideaId}/${inventorId}",
      "rule": "^\\/api\\/v1\\/idea\\/add\\/inventor\\/([^/]+)\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}/inventors/{id}"
+     ],
      "from": "src/components/ideas/CoInventorsField.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/analyze-document",
      "rule": null,
+     "v1": [],
      "from": "src/components/ideas/DraftWorkspace.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/check-score/${draftId}",
      "rule": "^\\/api\\/v1\\/idea\\/check-score\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/evaluate"
+     ],
      "from": "src/components/ideas/DraftWorkspace.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/draft-field/${draftId}",
      "rule": null,
+     "v1": [],
      "from": "src/components/ideas/DraftWorkspace.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch-score/${draftId}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-score\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/evaluation"
+     ],
      "from": "src/components/ideas/DraftWorkspace.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/fetch/${ideaId}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/{id}"
+     ],
      "from": "src/components/ideas/DraftWorkspace.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/preliminary-signal/${draftId}?sections=${sectionsWithContent}",
      "rule": "^\\/api\\/v1\\/idea\\/preliminary-signal\\/([^/?]+)(?:\\?(.*))?$",
+     "v1": [],
      "from": "src/components/ideas/DraftWorkspace.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/idea/remove/inventor/${ideaInventorId}",
      "rule": "^\\/api\\/v1\\/idea\\/remove\\/inventor\\/([^/]+)$",
+     "v1": [
+      "/v1/ideas/inventor-credits/{id}"
+     ],
      "from": "src/components/ideas/CoInventorsField.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/send-to-ihc/${draftId}/${user?.client_id}",
      "rule": "^\\/api\\/v1\\/idea\\/send-to-ihc\\/([^/]+)\\/",
+     "v1": [
+      "/v1/drafts/{id}/submit"
+     ],
      "from": "src/components/ideas/DraftWorkspace.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/single-draft/${draftId}",
      "rule": "^\\/api\\/v1\\/idea\\/single-draft\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}"
+     ],
      "from": "src/components/ideas/DraftWorkspace.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/update/draft/${draftId}",
      "rule": "^\\/api\\/v1\\/idea\\/update\\/draft\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}"
+     ],
      "from": "src/components/ideas/DraftWorkspace.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/idea/upload-idea-file/${ideaId}",
      "rule": null,
+     "v1": [],
      "from": "src/components/ideas/DraftWorkspace.tsx"
     }
    ]
@@ -883,72 +1249,106 @@
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/auth/user/${present_user?.id}",
      "rule": "^\\/api\\/v1\\/auth\\/user\\/([^/]+)$",
+     "v1": [
+      "/v1/auth/me"
+     ],
      "from": "src/lib/api-service/commonApi.service.ts"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients?limit=500&sort=name&order=asc",
      "rule": "^\\/api\\/v1\\/clients(?:\\?(.*))?$",
+     "v1": [
+      "/v1/clients"
+     ],
      "from": "src/components/patents/PatentsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/patent/delete-doc/${id}",
      "rule": "^\\/api\\/v1\\/patent\\/delete-doc\\/([^/]+)$",
+     "v1": [
+      "/v1/files/{id}"
+     ],
      "from": "src/components/patents/PatentDetailsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/distinct-tags/client/${user?.client_id}",
      "rule": "^\\/api\\/v1\\/patent\\/distinct-tags\\/client\\/([^/?]+)",
+     "v1": [
+      "/v1/patents/tags"
+     ],
      "from": "src/components/patents/PatentsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/export/client/${user?.client_id}?${params.toString()}",
      "rule": "^\\/api\\/v1\\/patent\\/export\\/client\\/([^/?]+)(\\?.*)?$",
+     "v1": [
+      "/v1/patents/export"
+     ],
      "from": "src/components/patents/PatentsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/fetch-lastet/client/${\n          user?.client_id\n        }?source=dashboard&page=${currentPage}&limit=${itemsPerPage}&search=${searchQuery}&filter_status=${\n          filterOption.length > 0 ? filterOption.join(",
      "rule": null,
+     "v1": [],
      "from": "src/components/patents/PatentsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/fetch/${patentId}",
      "rule": "^\\/api\\/v1\\/patent\\/fetch\\/([^/]+)$",
+     "v1": [
+      "/v1/patents/{id}"
+     ],
      "from": "src/components/patents/PatentDetailsContent.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/patent/update-single/${id}",
      "rule": "^\\/api\\/v1\\/patent\\/update(?:-single)?\\/([^/]+)$",
+     "v1": [
+      "/v1/patents/{id}"
+     ],
      "from": "src/components/patents/PatentsContent.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/patent/update-single/${patentId}",
      "rule": "^\\/api\\/v1\\/patent\\/update(?:-single)?\\/([^/]+)$",
+     "v1": [
+      "/v1/patents/{id}"
+     ],
      "from": "src/components/patents/PatentDetailsContent.tsx"
     }
    ]
@@ -963,72 +1363,106 @@
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/auth/user/${present_user?.id}",
      "rule": "^\\/api\\/v1\\/auth\\/user\\/([^/]+)$",
+     "v1": [
+      "/v1/auth/me"
+     ],
      "from": "src/lib/api-service/commonApi.service.ts"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients?limit=500&sort=name&order=asc",
      "rule": "^\\/api\\/v1\\/clients(?:\\?(.*))?$",
+     "v1": [
+      "/v1/clients"
+     ],
      "from": "src/components/patents/PatentsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/patent/delete-doc/${id}",
      "rule": "^\\/api\\/v1\\/patent\\/delete-doc\\/([^/]+)$",
+     "v1": [
+      "/v1/files/{id}"
+     ],
      "from": "src/components/patents/PatentDetailsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/distinct-tags/client/${user?.client_id}",
      "rule": "^\\/api\\/v1\\/patent\\/distinct-tags\\/client\\/([^/?]+)",
+     "v1": [
+      "/v1/patents/tags"
+     ],
      "from": "src/components/patents/PatentsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/export/client/${user?.client_id}?${params.toString()}",
      "rule": "^\\/api\\/v1\\/patent\\/export\\/client\\/([^/?]+)(\\?.*)?$",
+     "v1": [
+      "/v1/patents/export"
+     ],
      "from": "src/components/patents/PatentsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/fetch-lastet/client/${\n          user?.client_id\n        }?source=dashboard&page=${currentPage}&limit=${itemsPerPage}&search=${searchQuery}&filter_status=${\n          filterOption.length > 0 ? filterOption.join(",
      "rule": null,
+     "v1": [],
      "from": "src/components/patents/PatentsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/fetch/${patentId}",
      "rule": "^\\/api\\/v1\\/patent\\/fetch\\/([^/]+)$",
+     "v1": [
+      "/v1/patents/{id}"
+     ],
      "from": "src/components/patents/PatentDetailsContent.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/patent/update-single/${id}",
      "rule": "^\\/api\\/v1\\/patent\\/update(?:-single)?\\/([^/]+)$",
+     "v1": [
+      "/v1/patents/{id}"
+     ],
      "from": "src/components/patents/PatentsContent.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/patent/update-single/${patentId}",
      "rule": "^\\/api\\/v1\\/patent\\/update(?:-single)?\\/([^/]+)$",
+     "v1": [
+      "/v1/patents/{id}"
+     ],
      "from": "src/components/patents/PatentDetailsContent.tsx"
     }
    ]
@@ -1043,48 +1477,72 @@
      "method": "GET",
      "call": "/api/v1/actions/templates/event/${encodeURIComponent(eventType)}",
      "rule": "^\\/api\\/v1\\/actions\\/templates\\/event\\/(.+)$",
+     "v1": [
+      "/v1/actions/templates"
+     ],
      "from": "src/components/actions/ActionDropdown.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients/lookup?${params.toString()}",
      "rule": "^\\/api\\/v1\\/clients\\/lookup",
+     "v1": [
+      "/v1/clients"
+     ],
      "from": "src/components/due-dates/DueDatesContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "PATCH",
      "call": "/api/v1/patent/events/${eventId}",
      "rule": "^\\/api\\/v1\\/patent\\/events\\/([^/]+)$",
+     "v1": [
+      "/v1/due-dates/{id}"
+     ],
      "from": "src/hooks/usePatentEventCompletion.ts"
     },
     {
      "method": "POST",
      "call": "/api/v1/patent/events/${patentEventId}/remind",
      "rule": "^\\/api\\/v1\\/patent\\/events\\/([^/]+)\\/remind$",
+     "v1": [
+      "/v1/due-dates/{id}/remind"
+     ],
      "from": "src/components/due-dates/DueDatesContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/patent/fetch/all-due-dates?${params?.toString()}&limit=${itemsPerPage}&order=${order}&sort=${\n          sort\n        }&search=${searchQuery}&filter=${filterOption}&filter_client_id=${selectedClientIds.join(\n          ",
      "rule": "^\\/api\\/v1\\/patent\\/fetch\\/([^/]+)$",
+     "v1": [
+      "/v1/patents/{id}"
+     ],
      "from": "src/components/due-dates/DueDatesContent.tsx"
     }
    ]
@@ -1099,84 +1557,126 @@
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/auth/update-profile/${userId}",
      "rule": "^\\/api\\/v1\\/auth\\/update-profile\\/([^/]+)$",
+     "v1": [
+      "/v1/users/{id}"
+     ],
      "from": "src/components/workspace/PeopleTab.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/case-owners/${owner?.id}/assignments",
      "rule": "^\\/api\\/v1\\/case-owners\\/([^/]+)\\/assignments$",
+     "v1": [
+      "/v1/case-owners/{id}/assignments"
+     ],
      "from": "src/components/workspace/CaseOwnersTab.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/case-owners/invite",
      "rule": "^\\/api\\/v1\\/case-owners\\/invite$",
+     "v1": [
+      "/v1/invites"
+     ],
      "from": "src/components/workspace/CaseOwnersTab.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/case-owners",
      "rule": "^\\/api\\/v1\\/case-owners$",
+     "v1": [
+      "/v1/case-owners"
+     ],
      "from": "src/components/workspace/CaseOwnersTab.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.token}",
      "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/invite-link\\/([^/]+)$",
+     "v1": [
+      "/v1/invites/{id}"
+     ],
      "from": "src/components/clients/ClientInviteDialog.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients/${clientId}/invite-link",
      "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/invite-link",
+     "v1": [
+      "/v1/invites/share-link"
+     ],
      "from": "src/components/workspace/PeopleTab.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/clients/${clientId}/invite-link",
      "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/invite-link",
+     "v1": [
+      "/v1/invites/share-link"
+     ],
      "from": "src/components/workspace/PeopleTab.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/clients/${clientId}/invite-user",
      "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/invite-user$",
+     "v1": [
+      "/v1/invites"
+     ],
      "from": "src/components/clients/ClientInviteDialog.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients/${clientId}",
      "rule": "^\\/api\\/v1\\/clients\\/([0-9a-f-]{36})$",
+     "v1": [
+      "/v1/clients/{id}"
+     ],
      "from": "src/pages/WorkspacePage.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/clients/personal-info/${clientId}",
      "rule": "^\\/api\\/v1\\/clients\\/personal-info\\/([^/]+)$",
+     "v1": [
+      "/v1/clients/{id}"
+     ],
      "from": "src/components/workspace/OrganizationDetails.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "DELETE",
      "call": "/api/v1/users/${userId}",
      "rule": "^\\/api\\/v1\\/users\\/([^/]+)$",
+     "v1": [
+      "/v1/users/{id}"
+     ],
      "from": "src/components/workspace/PeopleTab.tsx"
     }
    ]
@@ -1191,36 +1691,54 @@
      "method": "POST",
      "call": "/api/v1/auth/change-password",
      "rule": "^\\/api\\/v1\\/auth\\/change-password$",
+     "v1": [
+      "/v1/auth/change-password"
+     ],
      "from": "src/components/workspace/ProfileTab.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/auth/update-profile/${currentUser?.id}",
      "rule": "^\\/api\\/v1\\/auth\\/update-profile\\/([^/]+)$",
+     "v1": [
+      "/v1/users/{id}"
+     ],
      "from": "src/components/workspace/ProfileTab.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/auth/user/${present_user?.id}",
      "rule": "^\\/api\\/v1\\/auth\\/user\\/([^/]+)$",
+     "v1": [
+      "/v1/auth/me"
+     ],
      "from": "src/lib/api-service/commonApi.service.ts"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     }
    ]
@@ -1235,54 +1753,81 @@
      "method": "GET",
      "call": "/api/v1/actions/ihc/client/${clientId}?${params.toString()}",
      "rule": "^\\/api\\/v1\\/actions\\/ihc\\/client\\/([^/?]+)(?:\\?(.*))?$",
+     "v1": [
+      "/v1/actions"
+     ],
      "from": "src/components/actions/IHCActionsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/actions/oc/queue?${params.toString()}",
      "rule": "^\\/api\\/v1\\/actions\\/oc\\/queue(?:\\?(.*))?$",
+     "v1": [
+      "/v1/actions/queue"
+     ],
      "from": "src/components/actions/OCActionsContent.tsx"
     },
     {
      "method": "PUT",
      "call": "/api/v1/actions/request-status",
      "rule": "^\\/api\\/v1\\/actions\\/request-status$",
+     "v1": [
+      "/v1/actions/{id}/request-status"
+     ],
      "from": "src/components/actions/OCActionsContent.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/actions/submit-all",
      "rule": "^\\/api\\/v1\\/actions\\/submit-all$",
+     "v1": [
+      "/v1/actions/submit-all"
+     ],
      "from": "src/components/actions/IHCActionsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/actions/templates/event/${encodeURIComponent(eventType)}",
      "rule": "^\\/api\\/v1\\/actions\\/templates\\/event\\/(.+)$",
+     "v1": [
+      "/v1/actions/templates"
+     ],
      "from": "src/components/actions/ActionDropdown.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/exit-client-view",
      "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
+     "v1": [
+      "/v1/auth/view-as/exit"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
+     "v1": [
+      "/v1/auth/logout"
+     ],
      "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/clients/lookup?${params.toString()}",
      "rule": "^\\/api\\/v1\\/clients\\/lookup",
+     "v1": [
+      "/v1/clients"
+     ],
      "from": "src/components/actions/OCActionsContent.tsx"
     },
     {
      "method": "GET",
      "call": "/api/v1/idea/counts",
      "rule": "^\\/api\\/v1\\/idea\\/counts$",
+     "v1": [
+      "/v1/ideas/counts"
+     ],
      "from": "src/components/Sidebar.tsx"
     }
    ]
