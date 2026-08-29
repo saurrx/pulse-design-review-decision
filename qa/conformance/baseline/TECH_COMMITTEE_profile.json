@@ -39,7 +39,9 @@
     "paragraph:<data>",
     "region:notifications (f#)",
     "region:notifications alt+t",
-    "switch:<data>+checked",
+    "switch:filing updates+checked",
+    "switch:information requests+checked",
+    "switch:review decisions+checked",
     "text:<data>"
   ],
   "styles": {

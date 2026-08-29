@@ -36,9 +36,42 @@ const STYLED_ROLES = new Set(['heading', 'columnheader', 'button', 'link', 'tab'
 /** Probing every control on a 300-node page costs more than it teaches. */
 const MAX_STYLE_PROBES = 70;
 
-export async function captureStructure(page, { path, role, settleMs = 2500 } = {}) {
+/**
+ * Snapshot until the page stops changing, rather than after a fixed wait.
+ *
+ * A fixed wait is a bet on how long the slowest query takes, and it loses
+ * quietly: a dashboard whose awaiting-action list had not arrived yet recorded
+ * a baseline missing two controls, and the very next run reported them as new.
+ * A snapshot that equals the previous one is direct evidence the page has
+ * settled, which is the thing the wait was trying to approximate.
+ */
+async function stableSnapshot(page, { settleMs, pollMs = 1000, attempts = 8, stableReads = 2 }) {
+  // networkidle again, not just the one at goto(). These pages fire their
+  // react-query requests AFTER mount, so the load-time idle happens before the
+  // dashboard has asked for anything - which is how a capture came back
+  // without the Nudge button that is reliably there a second later.
+  await page.waitForLoadState('networkidle').catch(() => {});
   await page.waitForTimeout(settleMs);
-  const snapshot = await page.locator('body').ariaSnapshot({ boxes: true });
+  let previous = await page.locator('body').ariaSnapshot({ boxes: true });
+  let stable = 0;
+  for (let i = 0; i < attempts; i++) {
+    await page.waitForTimeout(pollMs);
+    const next = await page.locator('body').ariaSnapshot({ boxes: true });
+    // TWO consecutive matches, not one. A dashboard chip that arrives a second
+    // late holds still just long enough to look settled, and the run that
+    // catches it reports a control as missing that is merely slow.
+    if (next === previous) { if (++stable >= stableReads) return next; }
+    else stable = 0;
+    previous = next;
+  }
+  // Still moving after every attempt. Return the last read rather than
+  // throwing: a page with a live clock or a spinner is not a test failure, and
+  // whatever is oscillating will show up as a diff for a human to judge.
+  return previous;
+}
+
+export async function captureStructure(page, { path, role, settleMs = 2000 } = {}) {
+  const snapshot = await stableSnapshot(page, { settleMs });
   const structure = project(parseAria(snapshot));
 
   const styles = {};

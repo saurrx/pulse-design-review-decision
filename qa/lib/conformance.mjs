@@ -157,10 +157,52 @@ const REPEATABLE_ALONE = new Set(['heading', 'listitem', 'article', 'row', 'link
  * article) inside is the thing a toolbar button never has. */
 const STRUCTURED_CHILD = new Set(['heading', 'paragraph', 'article', 'table', 'grid', 'list']);
 
+/* ...and only for roles a record card is actually built from. A landmark is
+ * never a record: this app renders two toast regions side by side, each
+ * wrapping a list, and without this they were "a repeated block of two" and
+ * lost their names. */
+const CARD_ROLES = new Set(['button', 'link', 'listitem', 'article', 'row', 'group', 'figure']);
+
 const hasStructuredChild = (node, depth = 2) =>
   depth > 0 && node.children.some((c) => STRUCTURED_CHILD.has(c.role) || hasStructuredChild(c, depth - 1));
 
+const isCard = (node) => CARD_ROLES.has(node.role) && hasStructuredChild(node);
+
+/* A record always carries something to read - a heading, a line of text, an
+ * avatar. A run of nothing but controls is a control cluster.
+ *
+ * Without this, the photon dashboard's [Calendar, List][Previous month, Next
+ * month] toggle pair matched as a period-2 block repeated three times and lost
+ * every one of its labels - the tier quietly stopped asserting four controls
+ * while looking perfectly green. Found by the design diff reporting them as
+ * "only in the design" when they were plainly on both. */
+const PURE_CONTROL_ROLES = new Set([
+  'button', 'link', 'tab', 'checkbox', 'radio', 'switch', 'combobox',
+  'textbox', 'searchbox', 'option', 'menuitem', 'slider', 'spinbutton',
+]);
+
+const carriesContent = (children, start, p) => {
+  // A record block never starts OR ends on a control. A card begins and ends
+  // with content - an avatar, a title, a status line. A toolbar button sitting
+  // immediately before the first card, or a "Review all" link after the last,
+  // is how a period-N alignment slides sideways and swallows chrome; pinning
+  // both ends fixes the alignment to the cards themselves. Without this the
+  // same page recorded a different set of controls depending on how many
+  // records happened to be in the list that day.
+  if (PURE_CONTROL_ROLES.has(children[start].role)) return false;
+  if (PURE_CONTROL_ROLES.has(children[start + p - 1].role)) return false;
+  for (let i = start; i < start + p; i++) if (!PURE_CONTROL_ROLES.has(children[i].role)) return true;
+  return false;
+};
+
+/* Three is the threshold for "this is a list, not a layout" - except for a
+ * node that wraps a heading, where two is already conclusive. Chrome does not
+ * nest headings inside buttons; record cards do. Keeping three here meant a
+ * dashboard whose awaiting-action list happened to hold exactly TWO items
+ * recorded both idea titles into the baseline, and the next idea anyone
+ * created broke the tier. */
 const MIN_REPEATS = 3;
+const MIN_REPEATS_CARD = 2;
 
 /**
  * Find the children that belong to a repeated block, e.g. the three client
@@ -181,14 +223,16 @@ function repeatedIndices(children) {
     for (let k = 0; k < len; k++) if (roles[a + k] !== roles[b + k]) return false;
     return true;
   };
-  for (let p = 1; p <= Math.floor(n / MIN_REPEATS); p++) {
+  for (let p = 1; p <= Math.floor(n / MIN_REPEATS_CARD); p++) {
     let start = 0;
-    while (start + MIN_REPEATS * p <= n) {
+    while (start + MIN_REPEATS_CARD * p <= n) {
       if (marked.has(start)) { start++; continue; }
       let reps = 1;
       while (start + (reps + 1) * p <= n && seqEq(start, start + reps * p, p)) reps++;
-      const singleOk = REPEATABLE_ALONE.has(roles[start]) || hasStructuredChild(children[start]);
-      if (reps >= MIN_REPEATS && (p >= 2 || singleOk)) {
+      const card = p === 1 && isCard(children[start]);
+      const need = card ? MIN_REPEATS_CARD : MIN_REPEATS;
+      const block = p >= 2 ? carriesContent(children, start, p) : (card || REPEATABLE_ALONE.has(roles[start]));
+      if (reps >= need && block) {
         for (let i = start; i < start + reps * p; i++) marked.add(i);
         start += reps * p;
       } else start++;

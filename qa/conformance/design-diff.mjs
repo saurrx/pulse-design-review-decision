@@ -43,6 +43,21 @@ const DESIGN = arg('design', 'http://localhost:3700');
 // committed here.
 const OUT = arg('out', join(HERE, '..', '.conformance-design'));
 
+/* Deviations already triaged and accepted. They stay visible - printed under
+ * "settled" rather than deleted - so a re-run of this reconciliation does not
+ * re-raise questions that have an owner, a reason and an expiry against them
+ * in qa/exceptions.json. */
+const QA = join(HERE, '..');
+const EXCEPTIONS = (existsSync(join(QA, 'exceptions.json'))
+  ? JSON.parse(readFileSync(join(QA, 'exceptions.json'), 'utf8')).exceptions ?? []
+  : []).filter((e) => e.match?.tier === 'conformance' && e.match?.source === 'design-reconciliation');
+
+const settledBy = (role, path, f) => EXCEPTIONS.find((e) =>
+  (!e.match.rule || e.match.rule === f.rule) &&
+  (!e.match.page || e.match.page === path) &&
+  (!e.match.role || e.match.role === role) &&
+  (!e.match.selContains || f.detail.includes(e.match.selContains)));
+
 const probe = await fetch(DESIGN).then((r) => r.ok).catch(() => false);
 if (!probe) {
   console.log(`qa: the design app is not answering at ${DESIGN}.`);
@@ -84,15 +99,18 @@ for (const role of COMPARABLE_ROLES) {
       missingBaseline++; continue;
     }
     const ours = JSON.parse(readFileSync(ourFile, 'utf8'));
-    const findings = diff(designStructure, ours);
+    const all = diff(designStructure, ours);
     compared++;
+
+    const settled = [], findings = [];
+    for (const f of all) (settledBy(role, s.path, f) ? settled : findings).push(f);
 
     const missing = findings.filter((f) => f.rule === 'missing-signature');
     const extra = findings.filter((f) => f.rule === 'extra-signature');
     const hard = findings.filter((f) => !['missing-signature', 'extra-signature', 'style-drift'].includes(f.rule));
     const style = findings.filter((f) => f.rule === 'style-drift');
 
-    console.log(`  ---  ${s.path}${designStructure.landedOn ? ` (design landed on ${designStructure.landedOn})` : ''}${ours.landedOn ? ` (ours landed on ${ours.landedOn})` : ''}`);
+    console.log(`  ---  ${s.path}${designStructure.landedOn ? ` (design landed on ${designStructure.landedOn})` : ''}${ours.landedOn ? ` (ours landed on ${ours.landedOn})` : ''}${settled.length ? `  [${settled.length} settled]` : ''}`);
     for (const f of hard) console.log(`       [${f.rule}] ${f.detail}`);
     if (missing.length) {
       console.log(`       ONLY IN DESIGN (${missing.length}):`);
@@ -104,7 +122,7 @@ for (const role of COMPARABLE_ROLES) {
     }
     if (extra.length) console.log(`       only in ours (${extra.length}): ${extra.map((f) => f.detail).join(' | ')}`);
 
-    report.push({ role, path: s.path, hard, missing, style, extra });
+    report.push({ role, path: s.path, hard, missing, style, extra, settled });
   }
   await ctx.close();
 }
@@ -115,7 +133,7 @@ writeFileSync(join(OUT, '_findings.json'), `${JSON.stringify(report, null, 2)}\n
 const n = (k) => report.reduce((a, r) => a + r[k].length, 0);
 console.log(`\n${compared} surface(s) compared across ${COMPARABLE_ROLES.length} of 6 roles.`);
 console.log('TECH_COMMITTEE and PHOTON_SUPERADMIN have no design counterpart and were not compared.');
-console.log(`structural-in-design-only ${n('missing')} · only-in-ours ${n('extra')} · table/order ${n('hard')} · style ${n('style')}`);
+console.log(`structural-in-design-only ${n('missing')} · only-in-ours ${n('extra')} · table/order ${n('hard')} · style ${n('style')} · already settled ${n('settled')}`);
 if (missingBaseline) console.log(`${missingBaseline} surface(s) skipped for want of a recorded baseline.`);
 console.log(`raw captures + _findings.json in ${OUT}`);
 // Reporting tool, not a gate: a deviation is an input to triage, not a build
