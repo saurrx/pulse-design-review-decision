@@ -10,8 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "lint:roles": "node tools/no-substring-roles.mjs",
-    "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "test:visual": "node baseline.mjs /tmp/pulse-visual && node compare.mjs /tmp/pulse-visual-base /tmp/pulse-visual"
+    "typecheck": "tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -103,12 +102,10 @@
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
-    "pngjs": "^7.0.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.11",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.21",
-    "why-is-node-running": "^3.2.2"
+    "vite": "^5.4.21"
   }
 }
