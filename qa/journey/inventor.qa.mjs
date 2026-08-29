@@ -66,6 +66,7 @@ const j = new Journey(`INVENTOR disclosure loop  [${RUN}]`);
 console.log(`  (session ${session.reused ? 'reused' : 'fresh login'})`);
 
 let ideaId = null;
+let draftId = null;
 let recovery = null;          // a re-login, only ever opened to finish teardown
 
 /** The draft heading. The page carries three h1s — the hidden desktop-only
@@ -85,6 +86,7 @@ try {
     const url = await assertUrl(page, /\/ideas\/[0-9a-f-]{36}\/draft\?draftId=[0-9a-f-]{36}/,
       'creating an idea must open its draft workspace');
     ideaId = /\/ideas\/([0-9a-f-]{36})\//.exec(url)[1];
+    draftId = /draftId=([0-9a-f-]{36})/.exec(url)[1];
     return `idea ${ideaId}`;
   });
 
@@ -122,6 +124,30 @@ try {
   });
 
   await j.step('autosave persisted the answers on the SERVER', async () => {
+    // Poll the SERVER until it actually holds the last answer, rather than
+    // guessing at the autosave debounce. Reloading on a timer raced the final
+    // field and failed once at 82%; a flaky test is a defect in the test, and
+    // "it passed on the re-run" is not a diagnosis. This also happens to be a
+    // more honest form of the assertion the step is making.
+    // The DOM id is `f-${q.id}` (DraftWorkspace.tsx), so the key the API
+    // stores is the id WITHOUT that prefix. Checking for "f-bg1" server-side
+    // finds nothing and looks exactly like autosave never firing.
+    const field = 'f-bg1';
+    const last = field.replace(/^f-/, '');
+    const deadline = Date.now() + 20000;
+    let stored = null;
+    while (Date.now() < deadline) {
+      const r = await page.request.get(`${BASE}/v1/drafts/${draftId}`,
+        { headers: { 'x-requested-with': 'XMLHttpRequest' } });
+      if (r.ok()) {
+        stored = ((await r.json()) ?? {}).answers ?? {};
+        if (stored[last] === ANSWERS[field]) break;
+      }
+      await page.waitForTimeout(1000);
+    }
+    assert(stored && stored[last] === ANSWERS[field],
+      `the server never received the last answer within 20s — autosave did not flush`);
+
     // Reloading is the point: it proves the answers came back from the API and
     // not from a component that never lost them.
     await page.reload({ waitUntil: 'networkidle' });
