@@ -462,3 +462,25 @@ live authentication cookies for the demo accounts and a CI artifact is
 downloadable.
 
 Locally the same applies: run them one after another, not concurrently.
+
+### The lockfile trap (has bitten twice)
+`npm install` can leave package.json and package-lock.json out of sync here, and
+only `npm ci` notices — so it passes locally and fails in CI with
+`Missing: yaml@2.9.0 from lock file`.
+
+It is not random. `tailwindcss -> postcss-load-config` wants `yaml@^2` while
+`cosmiconfig` (via react-select -> emotion -> babel-plugin-macros) wants
+`yaml@^1`. npm hoists a single `yaml@1.10.3`, marks the tailwind branch invalid
+— `npm ls yaml` exits ELSPROBLEMS — and a plain `npm install` does not always
+record the nested v2 entry that `npm ci` then demands.
+
+**After ANY dependency change:**
+
+    rm -rf node_modules package-lock.json && npm install
+    # then verify the way CI will, against COPIES of the manifests:
+    mkdir /tmp/v && cp package.json package-lock.json /tmp/v && cd /tmp/v
+    docker run --rm -v "$PWD:/w" -w /w node:22-slim npm ci
+
+Copies, not the working tree: `npm ci` inside a Linux container against the
+mounted tree installs Linux rollup binaries over the macOS ones and breaks your
+local build. That has also happened.
