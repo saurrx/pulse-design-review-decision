@@ -22,6 +22,7 @@ import {
   LayoutGridIcon,
 } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
+import { isOutsideCounselRole } from "@/lib/roleAccess";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import OnboardClientModal from "@/components/clients/OnboardClientModal";
@@ -378,9 +379,9 @@ const ClientsPage: React.FC = () => {
     </div>
   );
 
-   // Client portfolio access is available to OC admins and scoped case owners.
-   const allowedRoles = ["PHOTON_ADMIN", "CASE_OWNER"];
-   if (user && !allowedRoles.includes(user.role)) {
+   // Client portfolio access is available to OC admins (which includes
+   // superadmins — see isOCAdminRole) and scoped case owners.
+   if (user && !isOutsideCounselRole(user.role)) {
      return <Navigate to="/" replace />;
    }
 

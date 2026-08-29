@@ -1,4 +1,17 @@
-export const isOCAdminRole = (role?: string | null) => role === "PHOTON_ADMIN";
+/**
+ * Photon-side administration.
+ *
+ * PHOTON_SUPERADMIN belongs here and was missing everywhere except
+ * realAdapter: the API grants a founder every capability and serves them all
+ * 82 clients, while the UI gated on allow-lists that named PHOTON_ADMIN
+ * literally — so the one role with unbounded reach was redirected off
+ * /clients and /workspace and saw LESS product than a Head of Patents
+ * (F-028). The schema comment predicted exactly this: the tier exists "so
+ * access checks account for it rather than treating a founder as a Head of
+ * Patents".
+ */
+export const isOCAdminRole = (role?: string | null) =>
+  role === "PHOTON_ADMIN" || role === "PHOTON_SUPERADMIN";
 
 export const isCaseOwnerRole = (role?: string | null) => role === "CASE_OWNER";
 
