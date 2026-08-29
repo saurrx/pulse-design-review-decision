@@ -56,6 +56,8 @@ interface ActionEvent {
   };
   patent_action: {
     id: string;
+    /** Denormalised at decide-time; the display source of truth. */
+    instruction?: string;
     action_template: {
       id: string;
       label: string;
@@ -702,6 +704,7 @@ const IHCActionsContent: React.FC = () => {
                                   selectedTemplateId={
                                     event.patent_action?.action_template?.id
                                   }
+                                  selectedLabel={event.patent_action?.instruction}
                                   onSelect={(template) =>
                                     handleActionSelect(
                                       event.id,
