@@ -106,10 +106,20 @@ const oldIdea = (i: any) => i && ({
 });
 
 // -- patent dialect translation ---------------------------------------------
+// Every PatentStatus the API can emit must appear here, and every value here
+// must be one the screens know (src/utils/patentLegalStatus.ts). NONPAYMENT was
+// missing: `PSTATUS_TO_LEGAL[r.status] ?? r.status` passed it through raw, so
+// 487 production patents arrived carrying "NONPAYMENT" — a value absent from
+// PATENT_LEGAL_STATUS_VALUES, so it had no label, no chip colour, and could not
+// be selected in the status filter. The screens already had
+// INACTIVE_NONPAYMENT defined and waiting.
+// qa/contract/status-parity.qa.mjs now fails if either side gains a value the
+// other lacks.
 const PSTATUS_TO_LEGAL: Record<string, string> = {
   GRANTED: "ACTIVE_GRANTED", APPLIED: "ACTIVE_APPLIED", EXAMINATION: "ACTIVE_EXAMINATION",
   EXPIRED: "INACTIVE_EXPIRED", WITHDRAWN: "INACTIVE_WITHDRAWN",
   REJECTED: "INACTIVE_REJECTED", ABANDONED: "INACTIVE_ABANDONED",
+  NONPAYMENT: "INACTIVE_NONPAYMENT",
 };
 const LEGAL_TO_PSTATUS: Record<string, string> = Object.fromEntries(
   Object.entries(PSTATUS_TO_LEGAL).map(([k, v]) => [v, k]));
