@@ -73,7 +73,10 @@
      "call": "/api/v1/auth/ihc/verify?code=${code}&domain=${domain}",
      "rule": "^\\/api\\/v1\\/auth\\/ihc\\/verify(?:\\?(.*))?$",
      "v1": [
-      "/v1/auth/invite/verify-share"
+      "/v1/auth/invite/verify-share",
+      "/v1/auth/login",
+      "/v1/auth/google",
+      "/v1/auth/signup"
      ],
      "from": "src/pages/auth/Invite.tsx"
     }
@@ -90,7 +93,10 @@
      "call": "/api/v1/auth/ihc/verify?code=${code}&domain=${domain}",
      "rule": "^\\/api\\/v1\\/auth\\/ihc\\/verify(?:\\?(.*))?$",
      "v1": [
-      "/v1/auth/invite/verify-share"
+      "/v1/auth/invite/verify-share",
+      "/v1/auth/login",
+      "/v1/auth/google",
+      "/v1/auth/signup"
      ],
      "from": "src/pages/auth/Invite.tsx"
     }
@@ -914,7 +920,16 @@
     },
     {
      "method": "GET",
-     "call": "/api/v1/idea/fetch-score/${localStorage.getItem(",
+     "call": "/api/v1/idea/fetch-score/${localStorage.getItem(\"analysisDraftID\")}",
+     "rule": "^\\/api\\/v1\\/idea\\/fetch-score\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/evaluation"
+     ],
+     "from": "src/contexts/BackgroundAnalysisContext.tsx"
+    },
+    {
+     "method": "GET",
+     "call": "/api/v1/idea/fetch-score/${localStorage.getItem(\"selectedDraftID\") ? localStorage.getItem(\"selectedDraftID\") : ideaDraft?.[0]?.id}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-score\\/([^/]+)$",
      "v1": [
       "/v1/drafts/{id}/evaluation"
@@ -1011,7 +1026,7 @@
     },
     {
      "method": "POST",
-     "call": "/api/v1/idea/send-to-oc/${selectedDraftId || inventorIdeas?.[0]?.id\n          }/oc",
+     "call": "/api/v1/idea/send-to-oc/${selectedDraftId || inventorIdeas?.[0]?.id }/oc",
      "rule": "^\\/api\\/v1\\/idea\\/send-to-oc\\/([^/]+)\\/oc$",
      "v1": [
       "/v1/drafts/{id}/review"
@@ -1064,13 +1079,6 @@
     {
      "method": "POST",
      "call": "/api/v1/idea/upload-idea-file/${ideaId}",
-     "rule": null,
-     "v1": [],
-     "from": "src/components/ideas/IdeaDetailsContent.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "api/v1/idea/add/inventor/${ideaId}/${inventorId}",
      "rule": null,
      "v1": [],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
@@ -1319,9 +1327,11 @@
     },
     {
      "method": "GET",
-     "call": "/api/v1/patent/fetch-lastet/client/${\n          user?.client_id\n        }?source=dashboard&page=${currentPage}&limit=${itemsPerPage}&search=${searchQuery}&filter_status=${\n          filterOption.length > 0 ? filterOption.join(",
-     "rule": null,
-     "v1": [],
+     "call": "/api/v1/patent/fetch-lastet/client/${ user?.client_id }?source=dashboard&page=${currentPage}&limit=${itemsPerPage}&search=${searchQuery}&filter_status=${ filterOption.length > 0 ? filterOption.join(\",\") : \"\" }&sortBy=${sortConfig.sortBy}&sortOrder=${sortConfig.sortOrder}${ selectedClientId.length > 0 ? ",
+     "rule": "^\\/api\\/v1\\/patent\\/fetch-lastet\\/client\\/([^/?]+)(?:\\?(.*))?$",
+     "v1": [
+      "/v1/patents"
+     ],
      "from": "src/components/patents/PatentsContent.tsx"
     },
     {
@@ -1433,9 +1443,11 @@
     },
     {
      "method": "GET",
-     "call": "/api/v1/patent/fetch-lastet/client/${\n          user?.client_id\n        }?source=dashboard&page=${currentPage}&limit=${itemsPerPage}&search=${searchQuery}&filter_status=${\n          filterOption.length > 0 ? filterOption.join(",
-     "rule": null,
-     "v1": [],
+     "call": "/api/v1/patent/fetch-lastet/client/${ user?.client_id }?source=dashboard&page=${currentPage}&limit=${itemsPerPage}&search=${searchQuery}&filter_status=${ filterOption.length > 0 ? filterOption.join(\",\") : \"\" }&sortBy=${sortConfig.sortBy}&sortOrder=${sortConfig.sortOrder}${ selectedClientId.length > 0 ? ",
+     "rule": "^\\/api\\/v1\\/patent\\/fetch-lastet\\/client\\/([^/?]+)(?:\\?(.*))?$",
+     "v1": [
+      "/v1/patents"
+     ],
      "from": "src/components/patents/PatentsContent.tsx"
     },
     {
@@ -1538,10 +1550,10 @@
     },
     {
      "method": "GET",
-     "call": "/api/v1/patent/fetch/all-due-dates?${params?.toString()}&limit=${itemsPerPage}&order=${order}&sort=${\n          sort\n        }&search=${searchQuery}&filter=${filterOption}&filter_client_id=${selectedClientIds.join(\n          ",
-     "rule": "^\\/api\\/v1\\/patent\\/fetch\\/([^/]+)$",
+     "call": "/api/v1/patent/fetch/all-due-dates?${params?.toString()}&limit=${itemsPerPage}&order=${order}&sort=${ sort }&search=${searchQuery}&filter=${filterOption}&filter_client_id=${selectedClientIds.join( \",\", )}",
+     "rule": "^\\/api\\/v1\\/patent\\/fetch\\/(upcoming-due-dates|all-due-dates)(?:\\?(.*))?$",
      "v1": [
-      "/v1/patents/{id}"
+      "/v1/due-dates"
      ],
      "from": "src/components/due-dates/DueDatesContent.tsx"
     }
@@ -1833,31 +1845,6 @@
    ]
   }
  ],
- "adapterRules": 84,
- "unusedAdapterRules": [
-  {
-   "src": "^\\/api\\/v1\\/auth\\/logout-all$",
-   "method": "POST"
-  },
-  {
-   "src": "^\\/api\\/v1\\/actions\\/save$",
-   "method": "PUT"
-  },
-  {
-   "src": "^\\/api\\/v1\\/patent\\/fetch-lastet\\/client\\/([^/?]+)(?:\\?(.*))?$",
-   "method": null
-  },
-  {
-   "src": "^\\/api\\/v1\\/clients\\/update-business-scope\\/([^/]+)$",
-   "method": null
-  },
-  {
-   "src": "^\\/api\\/v1\\/clients\\/remove-business-scope-file\\/([^/]+)\\/([^/]+)$",
-   "method": "DELETE"
-  },
-  {
-   "src": "^\\/api\\/v1\\/notification\\/categorized",
-   "method": null
-  }
- ]
+ "adapterRules": 79,
+ "unusedAdapterRules": []
 }

@@ -430,11 +430,11 @@ environments are structurally identical.
 
 **Where the baseline came from.** A one-time reconciliation against the
 designer's reference implementation (saurrx/pulse-design-auto @3f9b2fdb), which
-was given for that exercise only and is now retired. `qa/conformance/design-diff.mjs`
-is the tool that did it; it is deliberately **not** a `.qa.mjs` file so
-`qa/cli.mjs` cannot select it and no checkpoint can come to depend on a repo we
-do not own. It needs the design app running (`npx vite --port 3700` in a
-checkout) and reads our side from the committed baseline. Nothing in CI runs it.
+was given for that exercise only and is now retired. The tool that did it
+(`design-diff.mjs`) and its raw captures were removed once the reconciliation
+was complete and its accepted deviations recorded in `qa/exceptions.json`
+(atlas stale.md F7) — the committed conformance baseline is the ongoing truth,
+and nothing in CI ever depended on the design repo.
 Four of our six roles had a counterpart there (OC_ADMIN→PHOTON_ADMIN,
 IHC_ADMIN→LEGAL_COUNSEL, CASE_OWNER, INVENTOR); TECH_COMMITTEE and
 PHOTON_SUPERADMIN have none and were never compared.

@@ -17,7 +17,8 @@
  * column, a vanished button or a heading demoted from h1 to h3 must.
  *
  * The baseline was seeded from a one-time reconciliation against the
- * designer's reference implementation (qa/conformance/design-diff.mjs). That
+ * designer's reference implementation (design-diff.mjs, since removed —
+ * stale.md F7). That
  * repo is retired; this baseline is what survives it.
  *
  * `--update` is the whole risk here: it will happily record a bug as the new

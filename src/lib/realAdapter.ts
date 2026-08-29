@@ -244,8 +244,6 @@ const RULES: Rule[] = [
   { m: /^\/api\/v1\/auth\/ihc\/invite-user$/, method: "POST",
     to: (_m, b) => ({ url: "/v1/invites", method: "POST",
       body: { role: b?.role ?? "INVENTOR", emails: b?.email ?? b?.emails } }) },
-  { m: /^\/api\/v1\/auth\/logout-all$/, method: "POST",
-    to: () => ({ url: "/v1/auth/logout-all", method: "POST" }) },
   { m: /^\/api\/v1\/auth\/change-password$/, method: "POST",
     to: (_m, b) => ({ url: "/v1/auth/change-password", method: "POST",
       body: { current_password: b?.current_password, new_password: b?.new_password } }) },
@@ -437,13 +435,6 @@ const RULES: Rule[] = [
   { m: /^\/api\/v1\/actions\/request-status$/, method: "PUT",
     to: (_m, b) => ({ url: `/v1/actions/${b?.id ?? b?.action_id}/request-status`, method: "PATCH",
       body: { status: b?.request_status ?? b?.status }, wrap: p => ({ data: p }) }) },
-  // The client choosing an instruction: template id and countries travel too.
-  { m: /^\/api\/v1\/actions\/save$/, method: "PUT",
-    to: (_m, b) => ({ url: `/v1/actions/${b?.id ?? b?.action_request_id}`, method: "PATCH",
-      body: {
-        template_id: b?.action_template_id, instruction: b?.instruction ?? b?.action,
-        selected_countries: b?.selected_countries, note: b?.notes ?? b?.note,
-      }, wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/actions\/submit-all$/, method: "POST",
     to: () => ({ url: "/v1/actions/submit-all", method: "POST", wrap: p => ({ data: p }) }) },
   // The Photon queue was passing the clean shape through untranslated, so the
@@ -701,11 +692,6 @@ const RULES: Rule[] = [
   // -- client detail extras -------------------------------------------------
   { m: /^\/api\/v1\/clients\/personal-info\/([^/]+)$/,
     to: (m, b) => ({ url: `/v1/clients/${m[1]}`, method: "PATCH", body: b, wrap: p => ({ data: p }) }) },
-  { m: /^\/api\/v1\/clients\/update-business-scope\/([^/]+)$/,
-    to: (m, b) => ({ url: `/v1/clients/${m[1]}`, method: "PATCH",
-      body: { business_scope: b?.business_scope ?? b }, wrap: p => ({ data: p }) }) },
-  { m: /^\/api\/v1\/clients\/remove-business-scope-file\/([^/]+)\/([^/]+)$/, method: "DELETE",
-    to: m => ({ url: `/v1/files/${m[2]}`, method: "DELETE", wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/clients\/patent-metrics\/([^/]+)/,
     to: m => ({ url: `/v1/patents/stats${isUuid(m[1]) ? `?client_id=${m[1]}` : ""}`, method: "GET",
       wrap: (p: any) => ({ data: {
@@ -770,8 +756,6 @@ const RULES: Rule[] = [
         body: { code, email: b?.email }, wrap: p => ({ data: p }) };
     } },
 
-  { m: /^\/api\/v1\/notification\/categorized/,
-    to: () => ({ url: "/v1/notifications", method: "GET", wrap: p => ({ data: p }) }) },
 ];
 
 export function makeRealAdapter(real: AxiosInstance) {
