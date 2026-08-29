@@ -52,6 +52,10 @@ build:
     # render or filter, and nothing failed because the lookup has a `?? s`
     # fallback that always produces a string.
     - node qa/contract/status-parity.qa.mjs
+    # The Atlas layer: route -> page -> component tree -> API calls -> adapter
+    # rule, plus the reverse index of rules nothing calls. Stale fails, same
+    # as the backend's spec and map.
+    - node qa/map/generate.mjs --check
     - npm run typecheck
     # Encodes the IHC_ADMIN -> LEGAL_COUNSEL rename regression: a role test
     # written with .includes() matched the wrong role for months.
