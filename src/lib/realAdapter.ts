@@ -417,6 +417,10 @@ const RULES: Rule[] = [
         // revising an instruction already in the queue — impossible to render.
         patent_action: r.instruction ? {
           id: r.id,
+          // The saved text, verbatim. The template id also rides along, but
+          // display must come from THIS field: rendering the template's
+          // CURRENT label rewrites history whenever a template is relabeled.
+          instruction: r.instruction,
           action_template: r.template_id
             ? { id: r.template_id, label: r.instruction }
             : { id: r.id, label: r.instruction },

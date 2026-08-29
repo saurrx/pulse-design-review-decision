@@ -22,6 +22,8 @@ interface ActionTemplate {
 
 interface ActionDropdownProps {
   eventType: string;
+  /** The denormalised instruction text already saved on the row. */
+  selectedLabel?: string | null;
   selectedTemplateId?: string;
   onSelect: (template: ActionTemplate) => void;
   disabled?: boolean;
@@ -32,6 +34,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
   selectedTemplateId,
   onSelect,
   disabled = false,
+  selectedLabel,
 }) => {
   const { data: templatesData } = useQuery({
     queryKey: ["action_templates_event", eventType],
@@ -55,12 +58,21 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
 
   return (
     <Select
-      value={selectedTemplateId || ""}
+      // When an instruction is already saved, the closed control shows THAT
+      // text via the placeholder — not the id-matched item, whose CURRENT
+      // label changes when templates are relabeled and would rewrite history.
+      value={selectedLabel ? "" : selectedTemplateId || ""}
       onValueChange={handleValueChange}
       disabled={disabled}
     >
       <SelectTrigger className="w-[200px] h-8 text-xs font-sans">
-        <SelectValue placeholder="Select action..." />
+        {/* The instruction is DENORMALISED onto the row at decide-time, on
+            purpose — history must not change when a template is relabeled.
+            Radix only renders a value whose item exists in the CURRENT
+            template list, so a row whose saved template no longer surfaces
+            for this event (or was renamed) showed an empty cell. The saved
+            text is the truth; show it. */}
+        <SelectValue placeholder={selectedLabel || "Select action..."} />
       </SelectTrigger>
       <SelectContent className="font-sans">
         {templates.map((template) => (
