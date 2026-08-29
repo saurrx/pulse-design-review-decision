@@ -1,5 +1,6 @@
 import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import EvaluationProgress from "@/components/ideas/EvaluationProgress";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -432,6 +433,27 @@ const ReviewQueueWorkspace = () => {
   )[0];
   const evaluationReport =
     reviewDraft?.CheckDraftSoreLog?.at(-1)?.score_meta_data;
+
+  // A reviewer often opens a submission WHILE the agent is still scanning —
+  // there is no report yet, but there is an evaluation id. Poll its status;
+  // when it completes (the agent's webhook has already persisted the score by
+  // then, F-029), refetch the drafts so the report appears in place.
+  const awaitingEvaluation = Boolean(reviewDraft?.api_evaluation_id) && !evaluationReport?.scoringResult;
+  const { data: liveEvaluation } = useQuery({
+    queryKey: ["pulse-review-evaluation", reviewDraft?.id],
+    enabled: awaitingEvaluation && Boolean(reviewDraft?.id),
+    refetchInterval: awaitingEvaluation ? 5000 : false,
+    queryFn: async () =>
+      (await API_CONFIG.get(`/api/v1/idea/fetch-score/${reviewDraft!.id}`))?.data,
+  });
+  const evaluationRunning = liveEvaluation?.data?.status === "RUNNING";
+  const liveEvaluationId =
+    liveEvaluation?.data?.report?.evaluationId ?? reviewDraft?.api_evaluation_id ?? null;
+  React.useEffect(() => {
+    if (awaitingEvaluation && liveEvaluation?.data?.status === "COMPLETE") {
+      void queryClient.invalidateQueries({ queryKey: ["pulse-review-drafts", selectedId] });
+    }
+  }, [awaitingEvaluation, liveEvaluation?.data?.status, queryClient, selectedId]);
   const priorArtReferences = React.useMemo(() => {
     const scoreMeta = evaluationReport;
     const references = scoreMeta?.priorArt || [];
@@ -988,6 +1010,14 @@ const ReviewQueueWorkspace = () => {
                           />
                         </div>
                       </section>
+                    ) : evaluationRunning ? (
+                      <div className="rounded-xl border border-[var(--pulse-line)] bg-white p-6">
+                        <h3 className="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-secondary)]">Patent Analysis in progress</h3>
+                        <div className="mt-4">
+                          <EvaluationProgress evaluationId={liveEvaluationId} />
+                        </div>
+                        <p className="mt-3 text-xs text-[var(--pulse-ink-muted)]">The report appears here the moment the scan completes — no refresh needed.</p>
+                      </div>
                     ) : (
                       <div className="rounded-xl border border-dashed border-[var(--pulse-line-strong)] bg-white p-8 text-center">
                         <Sparkles className="mx-auto h-5 w-5 text-[var(--pulse-ink-muted)]" />

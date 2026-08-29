@@ -637,7 +637,12 @@ const RULES: Rule[] = [
   { m: /^\/api\/v1\/idea\/check-score\/([^/]+)$/,
     to: m => ({ url: `/v1/drafts/${m[1]}/evaluate`, method: "POST", wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/idea\/fetch-score\/([^/]+)$/,
-    to: m => ({ url: `/v1/drafts/${m[1]}/evaluation`, method: "GET", wrap: p => ({ data: p }) }) },
+    // score_meta_data mirrors the list wrap (report under the old name) so the
+    // workspace and the reviewer read the same field; status/state pass
+    // through so a REOPENED tab can tell "still running" from "never ran" —
+    // the pre-F-029 UI kept that in component state and lost it on unmount.
+    to: m => ({ url: `/v1/drafts/${m[1]}/evaluation`, method: "GET",
+      wrap: p => ({ data: { ...p, score_meta_data: p?.report ?? null } }) }) },
   /**
    * The early patentability read, answered locally.
    *
