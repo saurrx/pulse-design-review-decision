@@ -31,6 +31,7 @@ import { fileURLToPath } from 'node:url';
 import { openSession, APP } from '../lib/session.mjs';
 import { diff } from '../lib/conformance.mjs';
 import { captureStructure, serialise } from './capture.mjs';
+import { recordHits } from '../lib/exception-hits.mjs';
 import { SURFACES, VIEWPORT, key } from './surfaces.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -84,12 +85,16 @@ mkdirSync(BASELINE, { recursive: true });
 
 const browser = await chromium.launch();
 let failures = 0, hushedTotal = 0, checked = 0, written = 0, infra = 0;
+// Which exceptions actually fired — see qa/lib/exception-hits.mjs.
+const hits = [];
+let loginFailures = 0;
 const seen = new Set();
 
 for (const [role, paths] of byRole) {
   const session = await openSession(browser, role, { base: BASE, viewport: VIEWPORT });
   if (!session) {
     console.log(`### ${role}: LOGIN FAILED (throttle is 5/5min/IP - wait, or reuse qa/.sessions)`);
+    loginFailures++;
     infra++; continue;
   }
   const { page } = session;
@@ -127,7 +132,10 @@ for (const [role, paths] of byRole) {
     const expected = JSON.parse(readFileSync(file, 'utf8'));
     const findings = diff(expected, structure);
     const real = [], hushed = [];
-    for (const f of findings) (suppressed(role, path, f) ? hushed : real).push(f);
+    for (const f of findings) {
+      const ex = suppressed(role, path, f);
+      if (ex) { hushed.push(f); hits.push(ex.id); } else real.push(f);
+    }
     hushedTotal += hushed.length;
     if (real.length) {
       failures += real.length;
@@ -141,11 +149,23 @@ for (const [role, paths] of byRole) {
   await session.close();
 }
 await browser.close();
+if (!ONLY_ROLE && !ONLY_PATH && loginFailures > 0) {
+  console.log(`\nqa: orphan-baseline check skipped — ${loginFailures} role(s) never logged in, so their baselines were never visited.`);
+}
+// Not recorded on a --update run: re-recording the baseline suppresses nothing,
+// so treating that as evidence would mark every exception dead.
+if (!UPDATE) recordHits('conformance', hits, { complete: loginFailures === 0 });
 
 /* A baseline file for a surface nobody captures any more is a test that
  * stopped running without anyone deciding it should. Only meaningful on a full
- * run - a filtered run legitimately touches a subset. */
-if (!ONLY_ROLE && !ONLY_PATH) {
+ * run - a filtered run legitimately touches a subset.
+ *
+ * And only when every role got in. A throttled login skips that role's whole
+ * surface set, and calling those baselines orphans told the reader to delete 23
+ * perfectly good files because the API said 429. An orphan is a CONFIG
+ * question; a skipped role is an INFRASTRUCTURE one, and conflating them turns
+ * a rate limit into data loss. */
+if (!ONLY_ROLE && !ONLY_PATH && loginFailures === 0) {
   const orphans = readdirSync(BASELINE).filter((f) => f.endsWith('.json') && !seen.has(f));
   if (orphans.length) {
     console.log(`\nqa: ${orphans.length} baseline file(s) match no surface in surfaces.mjs:`);

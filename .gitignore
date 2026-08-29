@@ -31,3 +31,4 @@ temp_auto_push.bat
 temp_interactive_push.bat
 qa/.sessions/
 qa/.conformance-design/
+qa/.exception-hits/

@@ -307,10 +307,22 @@ glob escalates to a full run — "I don't know what this affects" must never mea
 **`qa/exceptions.json`** suppresses a known test failure, and requires a reason,
 an owner and an expiry. An expired or incomplete entry **fails the build**.
 
-It does NOT yet detect an entry that no longer matches anything — the CLI has
-no visibility into what the tiers actually suppressed. A dead suppression is
-therefore still possible, and that is the gap this register was meant to close;
-see findings.md F-018 for what closing it takes.
+`qa exceptions --strict` additionally fails a suppression that matched nothing
+— the thing the register exists to prevent. It works because the tiers now
+record which exception ids actually fired, per tier, into `qa/.exception-hits/`
+(gitignored). Run it AFTER the tiers, which is why it lives at the end of the
+`browser-tiers` job rather than in `build`: with no hit files there is nothing
+to judge.
+
+Two deliberate refusals to guess:
+- An exception is judged only when a **complete** run of its own tier is on
+  record. A throttled login skips a role, and a partial run is not evidence.
+- **Conformance exceptions are never judged dead.** Their findings are diffs
+  against a committed baseline, so re-recording the baseline leaves nothing to
+  suppress and they go dormant by construction, waking when reality drifts
+  again. Calling those dead would report eleven good suppressions as failures
+  after every `--update` — which is how a strict check teaches people to turn
+  it off.
 
 **`docs/qa/findings.md`** is different — it tracks *design* questions where
 intent and code disagree, each to a resolution (fix code / fix doc / accept).

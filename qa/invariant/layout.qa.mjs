@@ -15,6 +15,7 @@ import { readFileSync, existsSync, mkdirSync, writeFileSync, statSync } from 'no
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { COLLECT, evaluate } from '../lib/invariants.mjs';
+import { recordHits } from '../lib/exception-hits.mjs';
 
 const QA = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i === -1 ? d : process.argv[i + 1]; };
@@ -92,12 +93,15 @@ async function contextFor(browser, r) {
 
 const browser = await chromium.launch();
 let failures = 0, suppressedCount = 0, checked = 0;
+// Which exceptions actually fired — see qa/lib/exception-hits.mjs.
+const hits = [];
+let loginFailures = 0;
 
 for (const r of ROLES) {
   const session = await contextFor(browser, r);
   if (!session) {
     console.log(`### ${r.role}: LOGIN FAILED (throttle is 5/5min/IP — wait, or reuse qa/.sessions)`);
-    failures++; continue;
+    failures++; loginFailures++; continue;
   }
   const { ctx, page, reused } = session;
   console.log(`\n### ${r.role}${reused ? ' (cached session)' : ''}`);
@@ -110,7 +114,10 @@ for (const r of ROLES) {
       const violations = evaluate(raw);
       checked++;
       const real = [], hushed = [];
-      for (const v of violations) (suppressed(r.role, p, v) ? hushed : real).push(v);
+      for (const v of violations) {
+        const ex = suppressed(r.role, p, v);
+        if (ex) { hushed.push(v); hits.push(ex.id); } else real.push(v);
+      }
       suppressedCount += hushed.length;
       if (real.length) {
         failures += real.length;
@@ -131,5 +138,8 @@ for (const r of ROLES) {
   await ctx.close();
 }
 await browser.close();
+// `complete` is false when a role never logged in: a tier that skipped a role
+// has not proved anything about the exceptions scoped to it.
+recordHits('invariant', hits, { complete: loginFailures === 0 });
 console.log(`\n${checked} page-viewport combinations · ${failures} violation(s) · ${suppressedCount} suppressed`);
 process.exit(failures ? 1 : 0);
