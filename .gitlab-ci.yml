@@ -10,24 +10,21 @@
 
 stages: [test, security, verify]
 
-include:
-  - template: Security/SAST.gitlab-ci.yml
-  - template: Security/Secret-Detection.gitlab-ci.yml
+# No GitLab security templates. Their JS/TS analyser IS semgrep and their
+# secret detection overlaps gitleaks, so including them ran both twice — and on
+# Free their output is a JSON artifact nobody reads, because the MR widget and
+# Vulnerability Report are Ultimate-only. The `semgrep` job below is the same
+# engine with PINNED rule packs, which makes a green run reproducible, and it
+# gates on exit code. It also happens to be about four times faster than the
+# template it replaces.
 
 variables:
-  SECRET_DETECTION_ENABLED: 'true'
   # Full history: change-based test selection needs a merge base, and the
   # default shallow clone degrades it silently rather than failing.
   GIT_DEPTH: 0
 
 default:
   interruptible: true
-
-sast:
-  stage: test
-
-secret_detection:
-  stage: test
 
 build:
   stage: test
@@ -61,6 +58,18 @@ build:
     when: on_success
     expire_in: 1 week
     paths: [dist/]
+
+semgrep:
+  stage: security
+  image: semgrep/semgrep:latest
+  script:
+    # Pinned packs, not --config auto: auto phones home and its rule set moves
+    # under you, so a green run proves nothing repeatable. The explicit `src/
+    # qa/` target is load-bearing — with no target the image insists the code
+    # is mounted at /src, which it is not under GitLab CI.
+    - semgrep scan --config=p/typescript --config=p/react --config=p/owasp-top-ten
+        --error --severity=ERROR --sarif -o semgrep.sarif src/ qa/
+  artifacts: { when: always, expire_in: 90 days, paths: [semgrep.sarif] }
 
 gitleaks:
   stage: security
