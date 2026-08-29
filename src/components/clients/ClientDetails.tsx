@@ -258,12 +258,15 @@ const ClientDetails = forwardRef<ClientDetailsRef, ClientDetailsProps>(
     };
 
     const validateAllowedDomain = (domain: string) => {
-      const domainRegex = /^@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
+      // Accept what people actually paste: "@6sense.com", "6sense.com", or a
+    // full address like "x@6sense.com" — the save path extracts the domain
+    // either way, so refusing an email here only blocked a valid intent.
+    const domainRegex = /^(?:[^@\s]*@)?[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/;
       if (!domain.trim()) {
         return "Allowed domain is required";
       }
       if (!domainRegex.test(domain)) {
-        return "Domain must be in format @domain.com (e.g., @example.com)";
+        return "Enter a domain like @example.com (a full email works too — we keep the domain).";
       }
       return null;
     };

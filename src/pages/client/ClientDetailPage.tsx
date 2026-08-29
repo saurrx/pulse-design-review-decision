@@ -28,6 +28,19 @@ const ClientDetailPage: React.FC = () => {
   const { theme } = useTheme();
   const { clientId } = useParams();
   const { user } = useUserCookie();
+  // A case owner's reach comes from assignment rows, and the session carries
+  // them. Off-assignment: the page is read-only and the one action is asking
+  // for access — which notifies every Photon admin through the audited flow,
+  // instead of a button that 403s.
+  const isUnassignedCaseOwner =
+    user?.role === "CASE_OWNER" &&
+    !((user as any)?.assigned_client_ids ?? []).includes(clientId);
+  const requestAccessMutation = useMutation({
+    mutationFn: async () =>
+      (await API_CONFIG.post(`/api/v1/clients/${clientId}/request-access`))?.data,
+    onSuccess: () => toast.success("Access requested — the Photon admins have been notified."),
+    onError: () => toast.error("Couldn't send the request. Try again."),
+  });
   const isCaseOwner = user?.role === "CASE_OWNER";
   const assignedClientIds: string[] = Array.isArray(user?.assigned_client_ids)
     ? user.assigned_client_ids
@@ -188,6 +201,20 @@ const ClientDetailPage: React.FC = () => {
               </>
             ) : (
               <>
+                {isUnassignedCaseOwner ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 rounded-lg"
+                    disabled={requestAccessMutation.isPending}
+                    onClick={() => requestAccessMutation.mutate()}
+                  >
+                    <User className="h-4 w-4" />
+                    <span className="hidden lg:inline">
+                      {requestAccessMutation.isPending ? "Requesting…" : "Request access"}
+                    </span>
+                  </Button>
+                ) : (
                 <Button
                   variant="outline"
                   size="sm"
@@ -197,6 +224,7 @@ const ClientDetailPage: React.FC = () => {
                   <User className="h-4 w-4" />
                   <span className="hidden lg:inline">View as client</span>
                 </Button>
+                )}
                 {user?.role === "PHOTON_ADMIN" && (
                 <Button
                   variant="outline"

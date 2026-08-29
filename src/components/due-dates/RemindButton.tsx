@@ -55,7 +55,7 @@ const RemindButton: React.FC<RemindButtonProps> = ({
           <TooltipContent>
             <p>
               {actionAlreadySubmitted
-                ? "IP Committee has already submitted an action for this deadline"
+                ? "The client has already submitted an action for this deadline"
                 : `Cooldown: ${hoursRemaining}h remaining`}
             </p>
           </TooltipContent>

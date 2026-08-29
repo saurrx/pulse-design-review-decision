@@ -1,3 +1,4 @@
+import useUserCookie from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
 import { ROLE_LABEL } from "@/lib/roles";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,23 @@ type OverviewTabProps = {
 };
 
 const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHistory = [], clientId, clientData, caseOwnerName, onChangeCaseOwner, canManageTeam }) => {
+  const { user: sessionUser } = useUserCookie();
+  // Off-assignment case owners see this page read-only: the server would 403
+  // their writes anyway (client:configure is assignment-scoped through RLS),
+  // and an editable field that cannot save is a lie.
+  const readOnlyForCaseOwner =
+    sessionUser?.role === "CASE_OWNER" &&
+    !((sessionUser as any)?.assigned_client_ids ?? []).includes(clientId);
+  // Import history now comes from the backend audit trail — the old
+  // PatentFileHistory prop read a key the clean API has never returned, so
+  // the button was permanently hidden even right after an import.
+  const { data: importHistoryData } = useQuery({
+    queryKey: ["client_import_history", clientId],
+    queryFn: async () =>
+      (await API_CONFIG.get(`/api/v1/clients/${clientId}/import-history`))?.data?.data,
+  });
+  const importHistory: any[] = Array.isArray(importHistoryData) ? importHistoryData : [];
+
   const { theme } = useTheme();
   const queryClient = useQueryClient();
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
@@ -115,7 +133,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
   });
 
   const deactivateInviteMutation = useMutation({
-    mutationFn: async () => API_CONFIG.delete(`/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.token}`),
+    mutationFn: async () => // Revoke is by invite ID; `token` is the short CODE the URL/QR carry
+      // — sending it here was the 'Invite not found' on every Deactivate.
+      API_CONFIG.delete(`/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
       toast.success("Invite link deactivated");
@@ -249,6 +269,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
               Reference prefix
               <Input
                 name="idea_reference_prefix"
+              disabled={readOnlyForCaseOwner}
                 value={referencePrefix}
                 onChange={(event) =>
                   setReferencePrefix(
@@ -272,10 +293,12 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
             <Button
               size="sm"
               disabled={
+                readOnlyForCaseOwner ||
                 referencePrefix.length < 2 ||
                 referencePrefix === clientData?.idea_reference_prefix ||
                 referenceSettingsMutation.isPending
               }
+              title={readOnlyForCaseOwner ? "You are not assigned to this client — request access to edit." : undefined}
               onClick={() => referenceSettingsMutation.mutate(referencePrefix)}
               className="h-9 bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]"
             >
@@ -293,23 +316,22 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
               <p className="mt-1 text-xs text-neutral-500">Import a portfolio file or add an individual patent</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {patentFileHistory.length > 0 && <Button variant="outline" size="sm" onClick={() => setHistoryDialogOpen(true)}><History className="mr-1.5 h-4 w-4" />Import history</Button>}
+              {importHistory.length > 0 && <Button variant="outline" size="sm" onClick={() => setHistoryDialogOpen(true)}><History className="mr-1.5 h-4 w-4" />Import history</Button>}
               <input id="data-upload" type="file" className="hidden" accept=".xls,.xlsx,.csv" onChange={handleFileUpload} disabled={isUploadingPatentFile} />
               <Button asChild variant="outline" size="sm"><label htmlFor="data-upload" className="cursor-pointer"><Upload className="mr-1.5 h-4 w-4" />{isUploadingPatentFile ? "Uploading…" : "Upload portfolio"}</label></Button>
               <Button size="sm" onClick={() => setShowAddPatentModal(true)} className="bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]"><Plus className="mr-1.5 h-4 w-4" />Add patent</Button>
             </div>
           </div>
 
-          {patentFileHistory.length > 0 ? (
+          {importHistory.length > 0 ? (
             <div className="flex items-center justify-between gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-[#cccccc20] dark:bg-neutral-800">
               <div className="flex min-w-0 items-center gap-3">
                 <div className="rounded-lg bg-white p-2 shadow-sm dark:bg-neutral-900"><FileText className="h-5 w-5 text-neutral-500" /></div>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">{patentFileHistory[0]?.file_name}</p>
-                  <p className="mt-1 truncate text-xs text-neutral-500">Latest import · {formatDate(patentFileHistory[0]?.createdAt)}{patentFileHistory[0]?.User?.name || patentFileHistory[0]?.user?.email ? ` · ${patentFileHistory[0]?.User?.name || patentFileHistory[0]?.user?.email}` : ""}</p>
+                  <p className="truncate text-sm font-medium">{importHistory[0]?.created ?? 0} patents imported</p>
+                  <p className="mt-1 truncate text-xs text-neutral-500">Latest import · {formatDate(importHistory[0]?.at)} · {importHistory[0]?.by}{importHistory[0]?.failed ? ` · ${importHistory[0].failed} row(s) failed` : ""}</p>
                 </div>
               </div>
-              <a href={`${API_CONFIG.defaults?.baseURL || ""}/patent/${patentFileHistory[0]?.file_name}`} className="rounded-md p-2 text-neutral-500 transition-colors hover:bg-white hover:text-neutral-900 dark:hover:bg-neutral-700 dark:hover:text-white" aria-label="Download latest portfolio"><Download className="h-4 w-4" /></a>
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-neutral-300 px-5 py-8 text-center dark:border-neutral-700"><FileText className="mx-auto mb-2 h-6 w-6 text-neutral-400" /><p className="text-sm font-medium">No portfolio file imported</p><p className="mt-1 text-xs text-neutral-500">Upload Excel or CSV to add this client’s patent records.</p></div>
@@ -379,7 +401,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
                     afterwards. */}
                 <div className="mt-2 grid grid-cols-3 gap-2">
                   <button type="button" onClick={() => setInviteRole("INVENTOR")} className={`rounded-lg border p-3 text-left transition-colors ${inviteRole === "INVENTOR" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Inventor</span><span className="mt-1 block text-xs text-neutral-500">Submit and track ideas</span></button>
-                  <button type="button" onClick={() => setInviteRole("TECH_COMMITTEE")} className={`rounded-lg border p-3 text-left transition-colors ${inviteRole === "TECH_COMMITTEE" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">IP Committee</span><span className="mt-1 block text-xs text-neutral-500">Review before legal</span></button>
+                  <button type="button" onClick={() => setInviteRole("TECH_COMMITTEE")} className={`rounded-lg border p-3 text-left transition-colors ${inviteRole === "TECH_COMMITTEE" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Tech Committee</span><span className="mt-1 block text-xs text-neutral-500">Review before legal</span></button>
                   <button type="button" onClick={() => setInviteRole("LEGAL_COUNSEL")} className={`rounded-lg border p-3 text-left transition-colors ${inviteRole === "LEGAL_COUNSEL" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Administrator</span><span className="mt-1 block text-xs text-neutral-500">Manage the client workspace</span></button>
                 </div>
               </div>
@@ -423,7 +445,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
         <DialogContent className="max-w-2xl bg-white/95 backdrop-blur-xl dark:bg-neutral-950">
           <DialogHeader><DialogTitle>Portfolio import history</DialogTitle><DialogDescription>Previous patent portfolio uploads for this client.</DialogDescription></DialogHeader>
           <div className="mt-3 max-h-[380px] space-y-3 overflow-auto">
-            {patentFileHistory.map((file) => <div key={file?.id} className="flex items-center gap-3 rounded-lg border p-4"><FileText className="h-5 w-5 text-neutral-400" /><div className="min-w-0"><p className="truncate text-sm font-medium">{file?.file_name}</p><p className="mt-1 text-xs text-neutral-500">{formatDate(file?.createdAt)} · {file?.User?.name || file?.user?.email || "Unknown"}</p></div></div>)}
+            {importHistory.map((row) => <div key={row?.id} className="flex items-center gap-3 rounded-lg border p-4"><FileText className="h-5 w-5 text-neutral-400" /><div className="min-w-0"><p className="truncate text-sm font-medium">{row?.created ?? 0} imported{row?.failed ? ` · ${row.failed} failed` : ""}{row?.rows ? ` · of ${row.rows} row(s)` : ""}</p><p className="mt-1 text-xs text-neutral-500">{formatDate(row?.at)} · {row?.by || "Unknown"}</p></div></div>)}
           </div>
         </DialogContent>
       </Dialog>

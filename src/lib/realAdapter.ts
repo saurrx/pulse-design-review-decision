@@ -433,7 +433,10 @@ const RULES: Rule[] = [
   // Photon moving an action along its queue. This previously mapped onto the
   // instruction PATCH, so changing a status rewrote the instruction text.
   { m: /^\/api\/v1\/actions\/request-status$/, method: "PUT",
-    to: (_m, b) => ({ url: `/v1/actions/${b?.id ?? b?.action_id}/request-status`, method: "PATCH",
+    // OCActionsContent has always sent `patent_action_id`; reading only
+    // id/action_id produced PATCH /v1/actions/undefined/... -> 404 'Action
+    // not found' on every status change.
+    to: (_m, b) => ({ url: `/v1/actions/${b?.patent_action_id ?? b?.id ?? b?.action_id}/request-status`, method: "PATCH",
       body: { status: b?.request_status ?? b?.status }, wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/actions\/submit-all$/, method: "POST",
     to: () => ({ url: "/v1/actions/submit-all", method: "POST", wrap: p => ({ data: p }) }) },
@@ -501,15 +504,29 @@ const RULES: Rule[] = [
   { m: /^\/api\/v1\/clients(?:\?(.*))?$/, method: "GET",
     to: m => {
       const q = new URLSearchParams(m[1] ?? "");
-      const out = new URLSearchParams();
-      for (const k of ["search", "page", "limit"]) {
-        const v = q.get(k);
-        if (v) out.set(k, v);
-      }
-      const qs = out.toString();
+      const page = Math.max(1, Number(q.get("page")) || 1);
+      const limit = Math.max(1, Number(q.get("limit")) || 0);
+      const search = (q.get("search") ?? "").trim().toLowerCase();
       return {
-        url: `/v1/clients${qs ? `?${qs}` : ""}`, method: "GET",
-        wrap: (p: any) => ({ data: Array.isArray(p) ? p.map(withLogo) : withLogo(p) }),
+        // The API returns the caller's whole client list as an ARRAY, with no
+        // pagination envelope — which is why the clients page's fully-built
+        // pagination bar never rendered (its guard reads pagination.total).
+        // Slice here: 82 rows is nothing over the wire, and every other
+        // consumer of this rule still gets the plain array when it asks for
+        // no page.
+        url: "/v1/clients", method: "GET",
+        wrap: (p: any) => {
+          if (!Array.isArray(p)) return { data: withLogo(p) };
+          let rows = p.map(withLogo);
+          if (search) rows = rows.filter((c: any) =>
+            String(c?.name ?? "").toLowerCase().includes(search) ||
+            String(c?.domain ?? "").toLowerCase().includes(search));
+          if (!limit) return { data: rows };
+          const total = rows.length;
+          const start = (page - 1) * limit;
+          return { data: rows.slice(start, start + limit),
+            pagination: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) } };
+        },
       };
     } },
   // The Patents table. This hardcoded limit=5 and dropped the query string, so
@@ -682,21 +699,54 @@ const RULES: Rule[] = [
       body: { role: "CASE_OWNER", emails: b?.email ?? b?.emails }, wrap: p => ({ data: p }) }) },
 
   // -- shareable invite links ----------------------------------------------
+  // The wrap exposes BOTH identities on purpose: `token` is the short CODE
+  // (what the /i/:code URL and the QR encode), `id` is what DELETE revokes.
+  // The old shape conflated them, so Deactivate sent the code where the API
+  // wanted the id and died with 'Invite not found'.
   { m: /^\/api\/v1\/clients\/([^/]+)\/invite-link\/([^/]+)$/, method: "DELETE",
     to: m => ({ url: `/v1/invites/${m[2]}`, method: "DELETE", wrap: p => ({ data: p }) }) },
+  // Regenerate. This rule was method-unlocked and forced GET, so every
+  // "Generate link" click was silently downgraded to a read of the existing
+  // link: the toast said generated, nothing was, and the old URL kept working.
+  { m: /^\/api\/v1\/clients\/([^/]+)\/invite-link/, method: "POST",
+    to: m => ({
+      url: `/v1/invites/share-link/regenerate${isUuid(m[1]) ? `?client_id=${m[1]}` : ""}`, method: "POST",
+      wrap: (p: any) => ({ data: { ...p, token: p?.code, link: p?.url, invite_link: p?.url } }),
+    }) },
   // Photon roles carry the "photon-legal" sentinel as their client_id; sending
   // it as a real client reference 400s. isUuid drops it, and the API then falls
   // back to the caller's own workspace — the same guard every other
   // client-scoped rule here already applies.
-  { m: /^\/api\/v1\/clients\/([^/]+)\/invite-link/,
+  { m: /^\/api\/v1\/clients\/([^/]+)\/invite-link/, method: "GET",
     to: m => ({
       url: `/v1/invites/share-link${isUuid(m[1]) ? `?client_id=${m[1]}` : ""}`, method: "GET",
-      wrap: (p: any) => ({ data: { ...p, link: p?.url, invite_link: p?.url } }),
+      wrap: (p: any) => ({ data: { ...p, token: p?.code, link: p?.url, invite_link: p?.url } }),
     }) },
 
+  { m: /^\/api\/v1\/clients\/([^/]+)\/request-access$/, method: "POST",
+    to: m => ({ url: `/v1/clients/${m[1]}/request-access`, method: "POST", wrap: p => ({ data: p }) }) },
+
+  { m: /^\/api\/v1\/clients\/([^/]+)\/import-history$/,
+    to: m => ({ url: `/v1/patents/import-history?client_id=${m[1]}`, method: "GET", wrap: p => ({ data: p }) }) },
+
   // -- client detail extras -------------------------------------------------
+  // Old dialect: allowed_domain (with a leading @, sometimes a full email —
+  // the edit screen's field has taught both), admin_users (no backend concept;
+  // members are managed through invites), logo (a file id). Translate; the
+  // create path at /clients already strips the @ the same way.
   { m: /^\/api\/v1\/clients\/personal-info\/([^/]+)$/,
-    to: (m, b) => ({ url: `/v1/clients/${m[1]}`, method: "PATCH", body: b, wrap: p => ({ data: p }) }) },
+    to: (m, b) => {
+      const body: any = {};
+      if (b?.name !== undefined) body.name = b.name;
+      if (b?.about !== undefined) body.about = b.about;
+      if (b?.logo !== undefined) body.logo_file_id = b.logo;
+      if (b?.allowed_domain !== undefined) {
+        const raw = String(b.allowed_domain).trim();
+        // "x@6sense.com" and "@6sense.com" both mean the 6sense.com domain.
+        body.domain = raw.includes("@") ? raw.slice(raw.lastIndexOf("@") + 1) : raw;
+      }
+      return { url: `/v1/clients/${m[1]}`, method: "PATCH", body, wrap: p => ({ data: p }) };
+    } },
   { m: /^\/api\/v1\/clients\/patent-metrics\/([^/]+)/,
     to: m => ({ url: `/v1/patents/stats${isUuid(m[1]) ? `?client_id=${m[1]}` : ""}`, method: "GET",
       wrap: (p: any) => ({ data: {

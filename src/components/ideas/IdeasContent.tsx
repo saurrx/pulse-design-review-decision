@@ -193,10 +193,10 @@ const IdeasContent: React.FC = () => {
   const statusCodeList: { value: FilterOption; label: string }[] = [
     { value: "IN_DRAFT", label: "In Draft" },
     { value: "UNDER_REVIEW", label: `${user?.role==="INVENTOR" ? "Under Review" : "Review Pending"}` },
-    { value: "REJECT_BY_IHC", label: "Rejected by IP Committee" },
-    { value: "UPDATE_REQUEST", label: `${user?.role==="INVENTOR" ? "Update Requested by IP Committee" :  "Sent back to Inventor"}` },
+    { value: "REJECT_BY_IHC", label: "Rejected in Client Review" },
+    { value: "UPDATE_REQUEST", label: `${user?.role==="INVENTOR" ? "Update Requested by Reviewers" :  "Sent back to Inventor"}` },
     { value: "UPDATE_REQUEST_BY_OC", label: `${isOC ? "Update Requested" : "Update Requested by OC" }` },
-    { value: "SEND_TO_OC", label: `${user?.role==="INVENTOR" ||  user?.role === "LEGAL_COUNSEL" ? "Sent to Photon Legal" :  "Sent by IP Committee"}` },
+    { value: "SEND_TO_OC", label: `${user?.role==="INVENTOR" ||  user?.role === "LEGAL_COUNSEL" ? "Sent to Photon Legal" :  "Sent by Legal Counsel"}` },
     { value: "REJECT_BY_OC", label: "Rejected by OC" },
     { value: "FILED", label: "Filed" },
   ];
@@ -214,10 +214,10 @@ const IdeasContent: React.FC = () => {
         else
           return "Review Pending";
       case "REJECT_BY_IHC":
-        return "Rejected by IP Committee";
+        return "Rejected in Client Review";
       case "UPDATE_REQUEST":
         if (user?.role === "INVENTOR")
-          return "Update Requested by IP Committee"
+          return "Update Requested by Reviewers"
         else
           return "Sent back to Inventor";
       case "UPDATE_REQUEST_BY_OC":
@@ -229,7 +229,7 @@ const IdeasContent: React.FC = () => {
         if (user?.role === "INVENTOR" || user?.role === "LEGAL_COUNSEL")
           return "Sent to Photon Legal";
         else
-          return "Sent by IP Committee"
+          return "Sent by Legal Counsel"
       case "REJECT_BY_OC":
         return "Rejected by OC";
       case "FILED":
@@ -492,7 +492,7 @@ const IdeasContent: React.FC = () => {
     switch (status) {
       case "In Draft":
         return "bg-blue-50 text-blue-600";
-      case "Sent to IP Committee for review":
+      case "Sent for review":
         return "bg-green-50 text-green-600";
       case "Idea Rejected":
         return "bg-red-50 text-red-600";
@@ -949,7 +949,7 @@ const IdeasContent: React.FC = () => {
                   <div className="grid grid-cols-1 gap-4 px-6 pb-6">
                     {sortedIdeas?.map((idea: any, index: number) => {
                       const status = idea.status?.toUpperCase();
-                      // Only the internal IP committee reviews ideas here.
+                      // Only the client-side reviewers (tech committee and/or counsel) review here.
                       // OC Admin receives committee-approved ideas but does not
                       // perform a review from the repository card.
                       const reviewable =
@@ -1236,8 +1236,8 @@ const IdeasContent: React.FC = () => {
                             idea.status,
                           )}`}
                         >
-                          {isMobile && idea.status === "Sent to IP Committee for review"
-                            ? "Sent to IP Committee"
+                          {isMobile && idea.status === "Review Pending"
+                          ? "In review"
                             : idea.status}
                         </span>
                       </div>

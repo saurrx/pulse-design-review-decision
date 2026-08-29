@@ -37,6 +37,6 @@ export const ROLE_LABEL: Record<string, string> = {
   [ROLE.PHOTON_ADMIN]: 'Photon Legal admin',
   [ROLE.CASE_OWNER]: 'Case Owner',
   [ROLE.LEGAL_COUNSEL]: 'In-house counsel',
-  [ROLE.TECH_COMMITTEE]: 'IP Committee',
+  [ROLE.TECH_COMMITTEE]: 'Tech Committee',
   [ROLE.INVENTOR]: 'Inventor',
 };

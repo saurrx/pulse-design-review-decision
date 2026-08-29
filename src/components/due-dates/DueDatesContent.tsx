@@ -284,7 +284,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["all_due_dates"] });
       setRemindingId(null);
-      toast.success("Reminder sent to IP Committee members");
+      toast.success("Reminder sent to the client's legal team");
     },
     onError: (error: any) => {
       setRemindingId(null);

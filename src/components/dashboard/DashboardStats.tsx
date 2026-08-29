@@ -697,7 +697,7 @@ const MyIdeas = ({
   onOpenIdea: (id: string) => void;
   onViewAll: () => void;
   onOpenPatent: (patentId: string) => void;
-  /** Sends a scored-but-unsent idea's draft to the IP Committee. */
+  /** Sends a scored-but-unsent idea's draft into review. */
   onSendIdea?: (id: string) => void;
 }) => {
   const recent = ideas.slice(0, 5);

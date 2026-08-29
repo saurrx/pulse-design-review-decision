@@ -302,14 +302,24 @@ const TimelineAndEvents = ({
         </div>
 
         {/* Calendar Grid — always rendered; empty months get a note above it */}
-        {viewMode === "calendar" && Object.keys(eventsByDay).length === 0 && (
+        {/* isLoading was passed in and used by NOTHING, so a month change
+            showed "No deadlines or meetings" for the seconds the new month
+            was in flight — a false empty. Loading now says loading, and the
+            empty banner waits for the data to have actually arrived. */}
+        {viewMode === "calendar" && isLoading && (
+          <div className="mb-3 flex items-center justify-center gap-2 rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-4 py-2 text-center text-[13px] text-[var(--pulse-ink-muted)]">
+            <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-neutral-300 border-t-[#F9B418] motion-reduce:animate-none" aria-hidden />
+            Loading {currentDate.toLocaleString("en-US", { month: "long" })}…
+          </div>
+        )}
+        {viewMode === "calendar" && !isLoading && Object.keys(eventsByDay).length === 0 && (
           <div className="mb-3 rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-4 py-2 text-center text-[13px] text-[var(--pulse-ink-muted)]">
             No deadlines or meetings in{" "}
             {currentDate.toLocaleString("en-US", { month: "long" })}
           </div>
         )}
         {viewMode === "calendar" && (
-          <div className="overflow-hidden rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface)] font-sans">
+          <div className={`overflow-hidden rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface)] font-sans transition-opacity ${isLoading ? "opacity-50" : ""}`}>
             {/* Week Day Headers */}
             <div className="grid grid-cols-7 border-b border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]">
               {weekDays.map((day) => (

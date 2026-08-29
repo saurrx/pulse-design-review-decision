@@ -133,7 +133,7 @@ const TopInventors = ({
         )}
       </div>
 
-      <div className="mt-2 flex flex-col justify-start">
+      <div className="mt-2 flex min-h-0 flex-col justify-start overflow-y-auto">
         {hasToggle ? (
           <>
             {ranked.map((e, index) => (

@@ -249,6 +249,31 @@ const Index = () => {
     [ideas, isOC],
   );
 
+  // The dropdown's data source. The old code read data.data.client_metrics,
+  // a key the dashboard endpoint has never returned, so clientOptions was
+  // forever [] and the whole (already-built) dropdown never rendered. The
+  // ideas list this page already fetches carries client_id + client.name on
+  // every row — derive the options and the per-client stage counts from it.
+  const derivedClientMetrics = React.useMemo(() => {
+    const byId = new Map<string, { id: string; name: string; pipeline: Record<string, number> }>();
+    for (const idea of ideas as any[]) {
+      const cid = idea.client_id ?? idea.client?.id;
+      if (!cid) continue;
+      const entry = byId.get(cid) ?? {
+        id: cid,
+        name: idea.client?.name ?? "Unknown client",
+        pipeline: { submitted: 0, review_pending: 0, sent_to_oc: 0, filed: 0, granted: 0 },
+      };
+      if (idea.status !== "IN_DRAFT") entry.pipeline.submitted++;
+      if (pendingStatuses.includes(idea.status)) entry.pipeline.review_pending++;
+      if (idea.status === "SEND_TO_OC") entry.pipeline.sent_to_oc++;
+      if (idea.status === "FILED") entry.pipeline.filed++;
+      if ((idea.IdeaPatentLink ?? []).some((l: any) => l?.patent?.status === "GRANTED")) entry.pipeline.granted++;
+      byId.set(cid, entry);
+    }
+    return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }, [ideas]);
+
   const filteredPipeline = React.useMemo(() => {
     if (selectedPipelineClientIds == null) {
       return {
@@ -260,7 +285,7 @@ const Index = () => {
       };
     }
 
-    const selected = motionClientMetrics.filter((client) =>
+    const selected = derivedClientMetrics.filter((client) =>
       selectedPipelineClientIds.includes(client.id),
     );
     const total = (key: string) =>
@@ -279,7 +304,7 @@ const Index = () => {
   }, [
     data,
     ideas,
-    motionClientMetrics,
+    derivedClientMetrics,
     reviewQueue.length,
     selectedPipelineClientIds,
   ]);
@@ -407,7 +432,7 @@ const Index = () => {
                         `/api/v1/idea/send-latest-draft-to-ihc/${id}`,
                         {},
                       );
-                      toast.success("Sent to the IP Committee");
+                      toast.success("Sent for review");
                       refetchIdeas();
                     } catch {
                       toast.error("Failed to send");
@@ -456,7 +481,7 @@ const Index = () => {
                   granted={filteredPipeline.granted}
                   clientOptions={
                     isOC
-                      ? motionClientMetrics.map((client) => ({
+                      ? derivedClientMetrics.map((client) => ({
                           id: client.id,
                           name: client.name,
                         }))
@@ -479,7 +504,7 @@ const Index = () => {
                   series={filteredMotion.series}
                   clientOptions={
                     isOC
-                      ? motionClientMetrics.map((client) => ({
+                      ? derivedClientMetrics.map((client) => ({
                           id: client.id,
                           name: client.name,
                         }))

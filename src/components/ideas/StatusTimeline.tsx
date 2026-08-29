@@ -83,16 +83,16 @@ const derive = (idea: any): Derived & { dates: (string | null)[] } => {
 
   const since = anchor ? ` since ${fmt(anchor)}` : "";
   const lines: Record<string, string> = {
-    IN_DRAFT: "Still a draft. Send it to the IP committee when it's ready.",
-    UNDER_REVIEW: `With the IP committee${since}. You'll get an email when they decide.`,
-    SENT_TO_IHC: `With the IP committee${since}. You'll get an email when they decide.`,
-    UPDATE_REQUEST: "The IP committee needs more information before it can proceed.",
+    IN_DRAFT: "Still a draft. Send it for review when it's ready.",
+    UNDER_REVIEW: `In review with your workspace${since}. You'll get an email when they decide.`,
+    SENT_TO_IHC: `In review with your workspace${since}. You'll get an email when they decide.`,
+    UPDATE_REQUEST: "Your reviewers need more information before it can proceed.",
     SEND_TO_OC: `With Photon Legal${since}. You'll get an email when they respond.`,
     UPDATE_REQUEST_BY_OC: "Photon Legal needs more information before it can proceed.",
     FILED: "Filed with the patent office. Examination can take a while — we'll keep you posted.",
     GRANTED: "Granted. This idea is now a patent.",
-    REJECT_BY_IHC: "The IP committee decided not to proceed with this idea.",
-    REJECTED: "The IP committee decided not to proceed with this idea.",
+    REJECT_BY_IHC: "Your reviewers decided not to proceed with this idea.",
+    REJECTED: "Your reviewers decided not to proceed with this idea.",
     REJECT_BY_OC: "Photon Legal decided not to proceed with this idea.",
   };
 

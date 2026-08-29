@@ -495,19 +495,6 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
   const [selectedCountry, setSelectedCountry] = useState(countries[0]); // Default to India
   const [originalFormValues, setOriginalFormValues] =
     useState<ProfileFormValues | null>(null);
-  const [notificationPreferences, setNotificationPreferences] = useState(() => {
-    const defaults = {
-      reviewDecisions: true,
-      informationRequests: true,
-      filingUpdates: true,
-    };
-    try {
-      const saved = localStorage.getItem("pulse-profile-notifications");
-      return saved ? { ...defaults, ...JSON.parse(saved) } : defaults;
-    } catch {
-      return defaults;
-    }
-  });
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [signOutAllOpen, setSignOutAllOpen] = useState(false);
   const [passwordValues, setPasswordValues] = useState({
@@ -516,14 +503,6 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
     confirmPassword: "",
   });
 
-  const updateNotificationPreference = (
-    key: keyof typeof notificationPreferences,
-    value: boolean,
-  ) => {
-    const next = { ...notificationPreferences, [key]: value };
-    setNotificationPreferences(next);
-    localStorage.setItem("pulse-profile-notifications", JSON.stringify(next));
-  };
 
   const resetPasswordForm = () =>
     setPasswordValues({
@@ -794,7 +773,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
         : currentUser?.role === "LEGAL_COUNSEL"
           ? "In-house counsel"
           : currentUser?.role === "TECH_COMMITTEE"
-            ? "IP Committee"
+            ? "Tech Committee"
             : "Inventor";
 
   if (!isEditMode) {
@@ -865,23 +844,6 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
         : []),
     ];
 
-    const notificationRows = [
-      {
-        key: "reviewDecisions" as const,
-        title: "Review decisions",
-        description: "When the IP committee approves, declines, or advances an idea.",
-      },
-      {
-        key: "informationRequests" as const,
-        title: "Information requests",
-        description: "When someone needs you to update a submission.",
-      },
-      {
-        key: "filingUpdates" as const,
-        title: "Filing updates",
-        description: "When Photon Legal files or progresses an application.",
-      },
-    ];
 
     return (
       <div className="mx-auto w-full max-w-[960px] space-y-6">
@@ -966,27 +928,17 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                   Notifications
                 </h3>
               </div>
-              <div className="mt-4 divide-y divide-[var(--pulse-line)]">
-                {notificationRows.map((row) => (
-                  <div key={row.key} className="flex items-start justify-between gap-4 py-4 first:pt-0 last:pb-0">
-                    <div>
-                      <p className={`text-sm font-medium ${theme === "dark" ? "text-neutral-200" : "text-[var(--pulse-ink)]"}`}>
-                        {row.title}
-                      </p>
-                      <p className={`mt-1 text-xs leading-5 ${theme === "dark" ? "text-neutral-500" : "text-[var(--pulse-ink-muted)]"}`}>
-                        {row.description}
-                      </p>
-                    </div>
-                    <Switch
-                      checked={notificationPreferences[row.key]}
-                      onCheckedChange={(checked) =>
-                        updateNotificationPreference(row.key, checked)
-                      }
-                      aria-label={row.title}
-                    />
-                  </div>
-                ))}
-              </div>
+              {/* The three toggles that lived here wrote to localStorage and
+                  were read by NOTHING — no notification feed exists yet (it
+                  is in the platform's known-not-built list), so they promised
+                  control over behaviour that cannot happen. A dead switch is
+                  worse than no switch. */}
+              <p className={`mt-4 text-sm ${theme === "dark" ? "text-neutral-400" : "text-[var(--pulse-ink-muted)]"}`}>
+                You’ll be notified in-app when reviewers decide on your ideas,
+                when someone needs an update from you, and when Photon Legal
+                progresses a filing. Preference controls arrive with the
+                notification centre.
+              </p>
             </section>
 
           </div>

@@ -1516,7 +1516,7 @@ const PatentsContent = (props: PatentsContentProps) => {
         )}
       </div>
       <div className="flex w-full flex-col bg-transparent">
-        <div className="pulse-toolbar !mx-0 !mb-5 !mt-0 !items-start">
+        <div className="pulse-toolbar !mx-0 !mb-5 !mt-0 items-center">
           <div className="flex w-full flex-wrap items-center gap-3">
             <div className="min-w-[240px] flex-[1_1_320px]">
               <div className="relative w-full">
@@ -1550,7 +1550,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={`shrink-0 gap-1 hover:bg-transparent border py-5 rounded hover:border-[#F9B418] ${
+                    className={`shrink-0 gap-1 hover:bg-transparent border h-[42px] rounded hover:border-[#F9B418] ${
                       theme === "dark"
                         ? "bg-zinc-900 border-[#cccccc20] hover:bg-zinc-900 hover:border-[#F9B418]/50"
                         : "bg-white text-neutral-700"
@@ -2067,7 +2067,7 @@ const PatentsContent = (props: PatentsContentProps) => {
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`shrink-0 gap-1 hover:bg-transparent border py-5 rounded hover:border-[#F9B418] ${
+                  className={`shrink-0 gap-1 hover:bg-transparent border h-[42px] rounded hover:border-[#F9B418] ${
                     theme === "dark"
                       ? "bg-zinc-900 border-[#cccccc20] hover:bg-zinc-900 hover:border-[#F9B418]/50"
                       : "hover:text-foreground bg-white text-neutral-700"
@@ -2187,7 +2187,7 @@ const PatentsContent = (props: PatentsContentProps) => {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className={`shrink-0 gap-1 hover:bg-transparent border py-5 rounded hover:border-[#F9B418] ${
+                  className={`shrink-0 gap-1 hover:bg-transparent border h-[42px] rounded hover:border-[#F9B418] ${
                     theme === "dark"
                       ? "bg-zinc-900 border-[#cccccc20] hover:bg-zinc-900 hover:border-[#F9B418]/50"
                       : "hover:text-foreground bg-white text-neutral-700"

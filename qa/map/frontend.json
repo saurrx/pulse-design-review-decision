@@ -429,8 +429,17 @@
      "from": "src/pages/client/ClientDetailPage.tsx"
     },
     {
+     "method": "GET",
+     "call": "/api/v1/clients/${clientId}/import-history",
+     "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/import-history$",
+     "v1": [
+      "/v1/patents/import-history"
+     ],
+     "from": "src/components/clients/OverviewTab.tsx"
+    },
+    {
      "method": "DELETE",
-     "call": "/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.token}",
+     "call": "/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.id}",
      "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/invite-link\\/([^/]+)$",
      "v1": [
       "/v1/invites/{id}"
@@ -451,7 +460,7 @@
      "call": "/api/v1/clients/${clientId}/invite-link",
      "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/invite-link",
      "v1": [
-      "/v1/invites/share-link"
+      "/v1/invites/share-link/regenerate"
      ],
      "from": "src/components/clients/OverviewTab.tsx"
     },
@@ -472,6 +481,15 @@
       "/v1/clients/{id}"
      ],
      "from": "src/components/clients/OverviewTab.tsx"
+    },
+    {
+     "method": "POST",
+     "call": "/api/v1/clients/${clientId}/request-access",
+     "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/request-access$",
+     "v1": [
+      "/v1/clients/{id}/request-access"
+     ],
+     "from": "src/pages/client/ClientDetailPage.tsx"
     },
     {
      "method": "GET",
@@ -1630,7 +1648,7 @@
     },
     {
      "method": "DELETE",
-     "call": "/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.token}",
+     "call": "/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.id}",
      "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/invite-link\\/([^/]+)$",
      "v1": [
       "/v1/invites/{id}"
@@ -1651,7 +1669,7 @@
      "call": "/api/v1/clients/${clientId}/invite-link",
      "rule": "^\\/api\\/v1\\/clients\\/([^/]+)\\/invite-link",
      "v1": [
-      "/v1/invites/share-link"
+      "/v1/invites/share-link/regenerate"
      ],
      "from": "src/components/workspace/PeopleTab.tsx"
     },
@@ -1854,6 +1872,6 @@
    ]
   }
  ],
- "adapterRules": 79,
+ "adapterRules": 82,
  "unusedAdapterRules": []
 }

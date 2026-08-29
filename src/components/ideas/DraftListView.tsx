@@ -501,7 +501,7 @@ const DraftListView: React.FC<DraftListViewProps> = ({
                                     Sending...
                                   </>
                                 ) : (
-                                  "Send to IP Committee"
+                                  "Send for review"
                                 )}
                               </Button>
                             );
@@ -557,7 +557,7 @@ const DraftListView: React.FC<DraftListViewProps> = ({
                             const disabled =
                               isDeletingDraft || wasSent || isOnlyDraft;
                             const tooltip = wasSent
-                              ? "Cannot delete a draft sent to IP Committee"
+                              ? "Cannot delete a draft that is in review"
                               : isOnlyDraft
                                 ? "An idea must have at least one draft"
                                 : "Delete draft";

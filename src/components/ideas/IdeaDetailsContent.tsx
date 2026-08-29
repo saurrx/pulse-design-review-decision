@@ -490,7 +490,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         } catch (error) {
           console.error("Error rejecting idea by IHC:", error);
           toast.error(
-            error?.response?.data?.message || "Error rejecting idea by IP Committee", { position: "top-center" }
+            error?.response?.data?.message || "Error rejecting idea", { position: "top-center" }
           );
         }
       },
@@ -578,11 +578,11 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         );
 
         if (response?.status === 200) {
-          toast.success("Draft sent to IP Committee successfully", { position: "top-center" });
+          toast.success("Draft sent for review", { position: "top-center" });
         }
       } catch (error) {
         console.error("Error sending to IHC:", error);
-        toast.error(error?.response?.data?.message || "Error sending to IP Committee", { position: "top-center" });
+        toast.error(error?.response?.data?.message || "Error sending for review", { position: "top-center" });
       }
     },
     onSuccess: () => {
@@ -916,17 +916,17 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         else
           return "Review Pending";
       case "REJECT_BY_IHC":
-        return "Rejected by IP Committee";
+        return "Rejected in Client Review";
       case "UPDATE_REQUEST":
         if (user?.role === "INVENTOR")
-          return "Update Requested by IP Committee"
+          return "Update Requested by Reviewers"
         else
           return "Sent back to Inventor";
       case "SEND_TO_OC":
         if (user?.role === "INVENTOR" || user?.role === "LEGAL_COUNSEL")
           return "Sent to Photon Legal";
         else
-          return "Sent by IP Committee"
+          return "Sent by Legal Counsel"
       case "REJECT_BY_OC":
         return "Rejected by OC";
       case "REJECTED":
@@ -1866,7 +1866,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
       case "SENT_TO_IHC":
         return {
           eyebrow: "No action needed",
-          title: "Your idea is with the IP committee",
+          title: "Your idea is in review",
           description:
             "They are reviewing the submission. We’ll email you when a decision is made.",
           needsAction: false,
@@ -1940,7 +1940,12 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
       setShowFileIdeaModal(true);
       return;
     }
-    updateOCWorkflowStatus(status);
+    // There IS no free status write on the photon side — the API's one OC
+    // transition is SENT_TO_PHOTON -> FILED, through the filing flow above.
+    // The old branch PUT to a rule the adapter answers with a read, so the
+    // toast said "Status updated" while nothing changed and the next refetch
+    // put the real state back. Say so instead of pretending.
+    toast.info("Status moves on its own as the idea progresses — the one action here is filing it.");
   };
 
   return (
