@@ -9,7 +9,7 @@
     "heading[1]:ideas"
   ],
   "signatures": [
-    "button:#",
+    "button:<data>",
     "button:collapse navigation",
     "button:dc demo case owner case owner",
     "button:first page+disabled",
@@ -40,7 +40,7 @@
     "textbox:search by title, inventor, client, status..."
   ],
   "styles": {
-    "button:#": {
+    "button:<data>": {
       "alignItems": "center",
       "backgroundColor": "rgb(249, 180, 24)",
       "borderBottomWidth": "0px",

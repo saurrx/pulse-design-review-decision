@@ -27,7 +27,6 @@
     "table:"
   ],
   "signatures": [
-    "button:#",
     "button:<data>",
     "button:collapse navigation",
     "button:columns",
@@ -61,8 +60,8 @@
     "listitem:<data>",
     "main:",
     "navigation:primary navigation",
-    "option:#",
-    "option:#+selected",
+    "option:<data>",
+    "option:<data>+selected",
     "paragraph:<data>",
     "region:notifications (f#)",
     "region:notifications alt+t",
@@ -73,7 +72,7 @@
     "textbox:search by application no., title, inventor..."
   ],
   "styles": {
-    "button:#": {
+    "button:<data>": {
       "alignItems": "center",
       "backgroundColor": "rgb(249, 180, 24)",
       "borderBottomWidth": "0px",
