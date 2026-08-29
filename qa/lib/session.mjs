@@ -49,7 +49,13 @@ export async function openSession(browser, role, {
   viewport = { width: 1440, height: 900 },
 } = {}) {
   mkdirSync(SESSIONS, { recursive: true });
-  const file = join(SESSIONS, `${role}.json`);
+  // Cookies are host-scoped, so a session cached against one base is useless
+  // against another - and worse than useless if it is silently reused, because
+  // the run then burns a login it thought it had. The default base keeps the
+  // plain `<ROLE>.json` name so every existing cache file stays valid.
+  const file = join(SESSIONS, base === APP
+    ? `${role}.json`
+    : `${role}--${new URL(base).host.replace(/[:.]/g, '_')}.json`);
   const email = ACCOUNTS[role];
   if (!email) throw new Error(`no demo account for role ${role}`);
 

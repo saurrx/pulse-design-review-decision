@@ -368,3 +368,57 @@ idea has not reached. The second one is why the status assertions are scoped to
 named elements — the draft page's status timeline contains the words "Under
 review" and "Filed" as *future* stages, so a whole-page text search cheerfully
 "proved" a state the idea was nowhere near.
+
+### The conformance tier, and the design repo it outlived
+`qa/conformance/structure.qa.mjs` walks every role over every page and asserts
+the page's **shape** against a committed snapshot in `qa/conformance/baseline/`:
+ARIA roles, accessible names, heading levels, table column headers, section
+order, and a curated computed-style projection (type scale, weight, colour,
+radius, spacing, display/flex/grid) over the nodes that matched.
+
+    node qa/conformance/structure.qa.mjs                    # check (exit 1 on drift)
+    node qa/conformance/structure.qa.mjs --role INVENTOR --path /ideas
+    node qa/conformance/structure.qa.mjs --update           # re-record, AFTER reading the diff
+    node qa/conformance/structure.qa.mjs --base http://localhost:3800
+
+It defaults to the deployed demo, like the other browser tiers. To check a
+branch before it ships, run the app locally against the demo API and point the
+tier at it — `VITE_PROXY_TARGET=https://demo-api.photonpulse.ai npx vite --port
+3800`, then `--base http://localhost:3800`. Sessions are cached per base host,
+so this does not poison the demo cache with cookies that cannot work there.
+That is also how the committed baseline was recorded, and a local run against a
+demo-recorded baseline differed by exactly the one intended change — the two
+environments are structurally identical.
+
+**Where the baseline came from.** A one-time reconciliation against the
+designer's reference implementation (saurrx/pulse-design-auto @3f9b2fdb), which
+was given for that exercise only and is now retired. `qa/conformance/design-diff.mjs`
+is the tool that did it; it is deliberately **not** a `.qa.mjs` file so
+`qa/cli.mjs` cannot select it and no checkpoint can come to depend on a repo we
+do not own. It needs the design app running (`npx vite --port 3700` in a
+checkout) and reads our side from the committed baseline. Nothing in CI runs it.
+Four of our six roles had a counterpart there (OC_ADMIN→PHOTON_ADMIN,
+IHC_ADMIN→LEGAL_COUNSEL, CASE_OWNER, INVENTOR); TECH_COMMITTEE and
+PHOTON_SUPERADMIN have none and were never compared.
+
+**Why structure and not a screenshot.** The two apps shared no data, so a pixel
+diff between them was 100% noise; and a pixel baseline of our own would capture
+whatever is on screen and then defend it. Data is normalised away (dates,
+numbers, ids, emails) and repeated record blocks are detected and anonymised, so
+a new idea on demo does not move the file but a dropped column does. The rules
+that keep that honest are commented in `qa/lib/conformance.mjs`: a
+`columnheader` is never treated as row data, nothing inside a nav landmark is
+anonymised, and a repeated block must start and end on content rather than on a
+control — that last one because a "Review all" button next to a card list was
+being swallowed, and the tier silently stopped asserting it.
+
+**`--update` is the risk.** It will record a bug as the new truth. Read the diff
+first, exactly as you would a snapshot test's. Legitimate reasons to re-record:
+a deliberate UI change, or demo data changing shape. If a *name* moved and you
+did not intend it, that is the finding.
+
+**Proved to bite:** deleting the Due Dates `Action` column (the real bug this
+tier exists for) and the Patents `Export CSV` button produced 17 failures across
+9 surfaces — `table-columns … dropped=[action]`, `missing-signature:
+columnheader:action`, `missing-signature: button:export csv` — exit 1; restoring
+both returned it to 0.

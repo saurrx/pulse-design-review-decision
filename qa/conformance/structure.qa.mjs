@@ -50,9 +50,14 @@ const EXCEPTIONS = existsSync(exceptionsFile)
   ? JSON.parse(readFileSync(exceptionsFile, 'utf8')).exceptions ?? [] : [];
 
 /** As narrow as the thing it suppresses - `selContains` matches inside the
- * finding's detail so one accepted deviation cannot silence a whole page. */
+ * finding's detail so one accepted deviation cannot silence a whole page.
+ *
+ * Entries carrying a `source` are skipped outright. They belong to the
+ * one-time design reconciliation, and one of them pins `table-columns` on
+ * /due-dates: honouring it here would silence a genuine future column drop on
+ * the exact page whose dropped Action column is why this tier exists. */
 const suppressed = (role, path, f) => EXCEPTIONS.find((e) =>
-  e.match?.tier === 'conformance' &&
+  e.match?.tier === 'conformance' && !e.match?.source &&
   (!e.match.rule || e.match.rule === f.rule) &&
   (!e.match.page || e.match.page === path) &&
   (!e.match.role || e.match.role === role) &&

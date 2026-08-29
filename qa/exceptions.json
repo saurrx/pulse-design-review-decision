@@ -5,13 +5,22 @@
     "",
     "`qa exceptions` fails the build if an entry is past its expiry or is",
     "missing a reason, owner or expiry. A suppression that has outlived its",
-    "reason is itself a defect \u2014 it hides a real failure and nobody is looking",
+    "reason is itself a defect — it hides a real failure and nobody is looking",
     "at it any more. Renew deliberately or fix the underlying issue.",
     "",
     "Keep `match` as narrow as the thing being suppressed: `selContains` is",
     "there so one exception does not silence a whole page.",
     "",
-    "Design questions and architectural findings do NOT go here \u2014 they go in",
+    "`match.source: \"design-reconciliation\"` marks an entry that belongs to the",
+    "ONE-TIME comparison against the designer's reference implementation",
+    "(qa/conformance/design-diff.mjs): a deviation from the design that we",
+    "decided to keep. Those entries are read ONLY by that tool.",
+    "qa/conformance/structure.qa.mjs skips every entry carrying a `source`,",
+    "because a rule like `table-columns` scoped to /due-dates would otherwise",
+    "silence a genuine future column drop on exactly the page whose dropped",
+    "Action column is the reason that tier exists.",
+    "",
+    "Design questions and architectural findings do NOT go here — they go in",
     "pulse-backend/docs/qa/findings.md, which tracks them to a resolution."
   ],
   "exceptions": [
@@ -23,7 +32,7 @@
         "page": "/",
         "selContains": "div.relative.border"
       },
-      "reason": "PatentWorldMap is a pan/zoom surface with zoom-in, zoom-out and expand controls. Its canvas (1125px) is deliberately wider than the 750px frame and clipped; panning is how you reach the rest. Verified by screenshot 2026-08-29 \u2014 the map renders correctly and all continents are reachable.",
+      "reason": "PatentWorldMap is a pan/zoom surface with zoom-in, zoom-out and expand controls. Its canvas (1125px) is deliberately wider than the 750px frame and clipped; panning is how you reach the rest. Verified by screenshot 2026-08-29 — the map renders correctly and all continents are reachable.",
       "owner": "aakash",
       "expires": "2027-02-28"
     },
@@ -35,7 +44,7 @@
         "page": "/",
         "selContains": "div.relative.border"
       },
-      "reason": "Same element as world-map-pannable-canvas. The clipped-text rule counts the card's own text because the map card has a single child wrapper; the text itself (title, subtitle, legend) is fully visible \u2014 it is the map canvas below it that extends past the frame.",
+      "reason": "Same element as world-map-pannable-canvas. The clipped-text rule counts the card's own text because the map card has a single child wrapper; the text itself (title, subtitle, legend) is fully visible — it is the map canvas below it that extends past the frame.",
       "owner": "aakash",
       "expires": "2027-02-28"
     },
@@ -52,9 +61,137 @@
           "/api/v1/idea/update-requested-change/"
         ]
       },
-      "reason": "The copilot trio (analyze-document, draft-field, generate-summary) plus the multipart upload-idea-file path and update-requested-change are 501 BY DESIGN until agent support exists \u2014 CLAUDE.md 'Known-not-built'. They are deliberately unmapped so the failure is named rather than silent. Listed explicitly so a SIXTH unmapped call fails the check instead of hiding among them.",
+      "reason": "The copilot trio (analyze-document, draft-field, generate-summary) plus the multipart upload-idea-file path and update-requested-change are 501 BY DESIGN until agent support exists — CLAUDE.md 'Known-not-built'. They are deliberately unmapped so the failure is named rather than silent. Listed explicitly so a SIXTH unmapped call fails the check instead of hiding among them.",
       "owner": "aakash",
       "expires": "2027-06-30"
+    },
+    {
+      "id": "dashboard-awaiting-action-cards-are-data",
+      "match": {
+        "tier": "conformance",
+        "page": "/",
+        "selContains": "waiting #d"
+      },
+      "reason": "The dashboard's awaiting-action list renders each idea as a leaf <button> whose accessible name IS the idea title plus its age ('Temporal Score-Delta Monitoring Harness awaiting 6d'). Four leaf buttons in a row are indistinguishable by shape from a toolbar, so the repeated-block detector cannot anonymise them without also anonymising Sort/Columns/Export. Every idea created on demo would otherwise move the baseline. The list's PRESENCE is still asserted — only the per-idea names are suppressed. Covers both directions of the signature-set diff, which is why no rule is pinned; the substring is specific to these cards.",
+      "owner": "aakash",
+      "expires": "2027-02-28"
+    },
+    {
+      "id": "review-queue-names-the-open-disclosure",
+      "match": {
+        "tier": "conformance",
+        "page": "/ideas",
+        "selContains": "heading[2]:"
+      },
+      "reason": "ReviewQueueWorkspace (LEGAL_COUNSEL and TECH_COMMITTEE only) titles the disclosure it currently has open in an h2, and which disclosure is first in the queue is data. No other role renders an h2 on /ideas, so this cannot silence anything else. The queue's own cards are already anonymised by the repeated-card detector; this is the single selected record.",
+      "owner": "aakash",
+      "expires": "2027-02-28"
+    },
+    {
+      "id": "review-queue-full-record-link",
+      "match": {
+        "tier": "conformance",
+        "page": "/ideas",
+        "selContains": "open full record for"
+      },
+      "reason": "Same element as review-queue-names-the-open-disclosure: the 'Open full record for <title>' link names the selected disclosure. The link's presence is asserted by the journey tier, which clicks it; only the data-derived name is suppressed here.",
+      "owner": "aakash",
+      "expires": "2027-02-28"
+    },
+    {
+      "id": "design-profile-left-the-workspace",
+      "match": {
+        "tier": "conformance",
+        "source": "design-reconciliation",
+        "selContains": "link:settings"
+      },
+      "reason": "ACCEPTED design deviation. The reference (pulse-design-auto @3f9b2fdb) has one 'Settings' nav item pointing at /workspace, which held both administration and a 'Your profile' tab. The saurrx#2 IA split (our commit 135e275) made /workspace administration-only and gave every other role a standalone /profile, so 'Settings' became 'Workspace' (photon admin, counsel) or 'Profile' (everyone else). This is the newer design, not drift.",
+      "owner": "aakash",
+      "expires": "2027-08-31"
+    },
+    {
+      "id": "design-workspace-is-no-longer-tabs",
+      "match": {
+        "tier": "conformance",
+        "source": "design-reconciliation",
+        "page": "/workspace",
+        "selContains": "tab:"
+      },
+      "reason": "ACCEPTED design deviation. Same IA split as design-profile-left-the-workspace: the reference's tablist (People / Manage access / Your profile) is gone. /workspace is now a client identity card whose 'Edit workspace' opens OrganizationDetails in a dialog, with People beneath; the 'Your profile' tab's content lives at /profile, where 'Edit profile' is still offered. Recorded in CLAUDE.md §5.",
+      "owner": "aakash",
+      "expires": "2027-08-31"
+    },
+    {
+      "id": "design-due-dates-column-set",
+      "match": {
+        "tier": "conformance",
+        "source": "design-reconciliation",
+        "page": "/due-dates",
+        "selContains": "table#0"
+      },
+      "reason": "ACCEPTED design deviation, and a deliberate one: commit 135e275 records that the saurrx#2 merge appended the design's mock-data columns while dropping ours, leaving renderer cases with no matching column. We keep Title / Days / Action / Last updated and drop the reference's 'Family members' (every mock row reads N/A; the API exposes no such field) and 'Current event' (in the reference it duplicates the Event column verbatim). The Action column is the one this whole tier exists to protect — it is present, and the baseline now pins it.",
+      "owner": "aakash",
+      "expires": "2027-08-31"
+    },
+    {
+      "id": "design-patents-prn-column",
+      "match": {
+        "tier": "conformance",
+        "source": "design-reconciliation",
+        "page": "/patents",
+        "selContains": "prn"
+      },
+      "reason": "ACCEPTED design deviation: /patents carries a PRN column the reference does not, from the per-client idea reference prefix that landed with the saurrx#2 port (CLAUDE.md §12). An added column, not a dropped one.",
+      "owner": "aakash",
+      "expires": "2027-08-31"
+    },
+    {
+      "id": "design-inventor-says-ideas-not-disclosures",
+      "match": {
+        "tier": "conformance",
+        "source": "design-reconciliation",
+        "role": "INVENTOR",
+        "selContains": "disclosure"
+      },
+      "reason": "ACCEPTED design deviation, vocabulary only. The reference says 'My disclosures' / 'New disclosure' to the inventor; this product says 'My ideas' / 'Submit an idea', consistently across nav, page heading and empty state. Both are internally consistent; ours matches the rest of the product (the /ideas route, the Ideas nav item photon roles see, the idea/ API).",
+      "owner": "aakash",
+      "expires": "2027-08-31"
+    },
+    {
+      "id": "design-world-map-controls-are-a-segmented-group",
+      "match": {
+        "tier": "conformance",
+        "source": "design-reconciliation",
+        "rule": "style-drift",
+        "selContains": "patent map"
+      },
+      "reason": "ACCEPTED design deviation. The reference styles zoom-in / zoom-out / expand as three separate translucent pills (p-2, rounded-lg, bg-zinc-200/50); ours renders one bordered segmented group of 36px cells. Landed deliberately with the saurrx#2 port (commit 135e275) and is consistent with the segmented controls elsewhere in this app. Same three controls, same order, same labels — only the chrome differs.",
+      "owner": "aakash",
+      "expires": "2027-08-31"
+    },
+    {
+      "id": "design-toast-region-label-is-the-library",
+      "match": {
+        "tier": "conformance",
+        "source": "design-reconciliation",
+        "selContains": "region:notifications"
+      },
+      "reason": "ACCEPTED, and not a product decision at all: sonner names its live region 'Notifications (F8)' in the reference's version and 'Notifications alt+T' in ours. A dependency's hotkey hint, not a design difference.",
+      "owner": "aakash",
+      "expires": "2027-08-31"
+    },
+    {
+      "id": "design-counsel-workspace-is-built-out",
+      "match": {
+        "tier": "conformance",
+        "source": "design-reconciliation",
+        "role": "LEGAL_COUNSEL",
+        "page": "/workspace",
+        "selContains": "columnheader:"
+      },
+      "reason": "ACCEPTED design deviation, in our favour. The reference's counsel workspace is a profile card; ours is a real members table (Team member / Email / Role / Status / Action) with Invite administrator and Generate inventor link. Built beyond the design against real endpoints — CLAUDE.md §12 'people/roles/suspend'.",
+      "owner": "aakash",
+      "expires": "2027-08-31"
     }
   ]
 }
