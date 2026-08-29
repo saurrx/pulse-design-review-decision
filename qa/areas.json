@@ -1,6 +1,6 @@
 {
   "_doc": "Source glob -> feature areas, for pulse-frontend. A path matching nothing is treated as a FULL run.",
-  "contractSha256": "a9287982779c1928a3e32c4e78ea3207f350b325c7f717e882f33078a3cf5460",
+  "contractSha256": "e01c8ec9ce22bf0777fa722dae1f4344d2a8e48b571c64640016aad483ce965c",
   "testRoots": [
     "src",
     "qa"
@@ -15,6 +15,13 @@
       "each": true
     }
   ],
+  "checkpoints": {
+    "_doc": "Which shared-contract checkpoints this repo participates in. \"tagged\" = select by @cp: tag and fail if that selects nothing; \"all\" = every tagged test file; \"n/a: <reason>\" = no such surface here, exits 0. A contract checkpoint missing from this map is an error, so adding one forces every repo to decide what it does about it.",
+    "smoke": "tagged",
+    "pre-deploy": "tagged",
+    "post-deploy": "tagged",
+    "nightly": "all"
+  },
   "map": {
     "src/pages/auth/**": [
       "auth"

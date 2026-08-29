@@ -300,7 +300,12 @@ suite" or "journey suite" to keep in step — they are views over the same tests
     node qa/cli.mjs list              # every test and its tags
 
 `run` and `checkpoint` **select and then execute**; add `--list` to only print
-the selection. They exit non-zero if any selected file fails, if a selected file
+the selection. Each repo declares its stance on every shared checkpoint in
+`qa/areas.json` under `checkpoints` — `"tagged"` (select by `@cp:` tag),
+`"all"` (every test here, which is what `nightly` means), or `"n/a: <reason>"`
+for a checkpoint with no surface in this repo (a repo with no UI has no journey
+to smoke-test). A contract checkpoint left undeclared is an **error**, so adding
+one forces all three repos to say what they do about it. They exit non-zero if any selected file fails, if a selected file
 matches no runner, or if the filter selected **nothing** — an empty checkpoint is
 a broken filter, and reporting "ok" for it is how a suite rots. HOW each kind of
 file runs (vitest / jest / plain `node`) is declared per repo in `qa/areas.json`
