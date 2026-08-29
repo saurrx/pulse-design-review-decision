@@ -77,7 +77,37 @@ for (const m of adapter.matchAll(/\{\s*m:\s*\//g)) {
   const src = adapter.slice(start, end);
   const after = adapter.slice(end + 1, end + 80);
   const meth = after.match(/^\s*,\s*method:\s*"([A-Z]+)"/);
-  try { rules.push({ src, re: new RegExp(src), method: meth ? meth[1] : null }); }
+  // The rule's `to:` body runs until the next rule literal; the /v1 string
+  // literals inside it are the real backend route(s) this rule translates to.
+  // A rule whose body builds its URL dynamically contributes what it can.
+  const nextRule = adapter.indexOf('{ m: /', end);
+  const toBody = adapter.slice(end, nextRule === -1 ? end + 2000 : nextRule);
+  // Templates nest (`${qs ? `?${qs}` : ""}`), so a regex substitution is
+  // unreliable. Walk the string tracking `${…}` nesting depth: each top-level
+  // placeholder collapses to one token — `{id}` in path position, dropped in
+  // query position — and the static suffix after it survives, so
+  // `/v1/actions/${b.id}/request-status` maps to `/v1/actions/{id}/request-status`.
+  const collapse = (t) => {
+    let out = '', depth = 0;
+    for (let i = 0; i < t.length; i++) {
+      if (t[i] === '$' && t[i + 1] === '{') {
+        if (depth === 0) out += '\u0000';
+        depth++; i++; continue;
+      }
+      if (depth > 0) { if (t[i] === '{') depth++; else if (t[i] === '}') depth--; continue; }
+      out += t[i];
+    }
+    out = out.split('?')[0];
+    return out
+      .replace(/\/\u0000/g, '/{id}')
+      .replace(/\u0000/g, '')
+      .replace(/\/$/, '');
+  };
+  const v1 = [...new Set(
+    [...toBody.matchAll(/[\`](\/v1\/[^\`]*)\`|["'](\/v1\/[^"']*)["']/g)]
+      .map((x) => collapse(x[1] ?? x[2])),
+  )];
+  try { rules.push({ src, re: new RegExp(src), method: meth ? meth[1] : null, v1 }); }
   catch { /* not a rule literal */ }
 }
 const declared = (adapter.match(/\{\s*m:\s*\//g) ?? []).length;
@@ -125,6 +155,7 @@ const routeRows = routes.map((r) => {
         method: c.method,
         call: c.raw,
         rule: i >= 0 ? rules[i].src : null,
+        v1: i >= 0 ? rules[i].v1 : [],
         from: relative(ROOT, f),
       });
     }
@@ -156,7 +187,7 @@ const unusedRules = rules
     }
     return true;
   })
-  .map(({ src, method }) => ({ src, method }));
+  .map(({ src, method, v1 }) => ({ src, method, v1 }));
 
 const doc = {
   _generated: 'qa/map/generate.mjs — do not edit by hand; CI fails if stale',
