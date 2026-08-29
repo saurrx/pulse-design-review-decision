@@ -305,9 +305,12 @@ glob escalates to a full run — "I don't know what this affects" must never mea
 "run less". Add new top-level paths to the map.
 
 **`qa/exceptions.json`** suppresses a known test failure, and requires a reason,
-an owner and an expiry. An expired or unmatched entry **fails the build**: a
-suppression that has outlived its reason hides a real failure that nobody is
-looking at any more.
+an owner and an expiry. An expired or incomplete entry **fails the build**.
+
+It does NOT yet detect an entry that no longer matches anything — the CLI has
+no visibility into what the tiers actually suppressed. A dead suppression is
+therefore still possible, and that is the gap this register was meant to close;
+see findings.md F-018 for what closing it takes.
 
 **`docs/qa/findings.md`** is different — it tracks *design* questions where
 intent and code disagree, each to a resolution (fix code / fix doc / accept).
