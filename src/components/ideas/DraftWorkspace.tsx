@@ -1149,12 +1149,21 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                 {signal ? (
                   <>
                     <div className={`mt-2 text-xl font-semibold ${ink}`}>
-                      {signal.band}
+                      {signal.band ?? signal.headline ?? "Keep going"}
                     </div>
-                    <p className={`mt-1 text-xs ${muted}`}>
-                      based on {signal.sections_with_content} of{" "}
-                      {signal.total_sections} sections
-                    </p>
+                    {/* The model's honest-persuasion line — facts only, spam
+                        gets the no-push copy with band null. Falls back to
+                        the plain section count when the heuristic answered. */}
+                    {signal.message ? (
+                      <p className={`mt-1 text-xs leading-relaxed ${muted}`}>
+                        {signal.message}
+                      </p>
+                    ) : (
+                      <p className={`mt-1 text-xs ${muted}`}>
+                        based on {signal.sections_with_content} of{" "}
+                        {signal.total_sections} sections
+                      </p>
+                    )}
                   </>
                 ) : (
                   <p className={`mt-2 text-xs leading-relaxed ${muted}`}>

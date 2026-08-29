@@ -495,6 +495,36 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
   const [selectedCountry, setSelectedCountry] = useState(countries[0]); // Default to India
   const [originalFormValues, setOriginalFormValues] =
     useState<ProfileFormValues | null>(null);
+  // Notification preferences — server-persisted on app_user.notification_prefs
+  // (a future cron mailer reads them; the localStorage version they replace
+  // was read by nothing). Seeded from the session user, saved through the
+  // same profile PATCH the rest of this screen uses, optimistic with revert.
+  const [notificationPreferences, setNotificationPreferences] = useState<Record<string, boolean>>({
+    reviewDecisions: true,
+    informationRequests: true,
+    filingUpdates: true,
+  });
+  useEffect(() => {
+    const p = (currentUser as any)?.notification_prefs;
+    if (p && typeof p === "object") {
+      setNotificationPreferences((prev) => ({ ...prev, ...p }));
+    }
+  }, [currentUser]);
+  const updateNotificationPreference = async (key: string, value: boolean) => {
+    const prev = notificationPreferences;
+    const next = { ...prev, [key]: value };
+    setNotificationPreferences(next);
+    try {
+      await API_CONFIG.put(`/api/v1/auth/update-profile/${currentUser?.id}`, {
+        notification_prefs: { [key]: value },
+      });
+      userCookieUpdate();
+    } catch {
+      setNotificationPreferences(prev);
+      toast.error("Couldn't save that preference — try again.");
+    }
+  };
+
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [signOutAllOpen, setSignOutAllOpen] = useState(false);
   const [passwordValues, setPasswordValues] = useState({
@@ -928,17 +958,32 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                   Notifications
                 </h3>
               </div>
-              {/* The three toggles that lived here wrote to localStorage and
-                  were read by NOTHING — no notification feed exists yet (it
-                  is in the platform's known-not-built list), so they promised
-                  control over behaviour that cannot happen. A dead switch is
-                  worse than no switch. */}
-              <p className={`mt-4 text-sm ${theme === "dark" ? "text-neutral-400" : "text-[var(--pulse-ink-muted)]"}`}>
-                You’ll be notified in-app when reviewers decide on your ideas,
-                when someone needs an update from you, and when Photon Legal
-                progresses a filing. Preference controls arrive with the
-                notification centre.
-              </p>
+              {/* Server-persisted (app_user.notification_prefs) — the
+                  contract a future cron mailer honours. Their localStorage
+                  ancestors were removed as dead; these are live data. */}
+              <div className="mt-4 divide-y divide-[var(--pulse-line)]">
+                {[
+                  { key: "reviewDecisions", title: "Review decisions", description: "When your reviewers approve, decline, or advance an idea." },
+                  { key: "informationRequests", title: "Information requests", description: "When someone needs you to update a submission." },
+                  { key: "filingUpdates", title: "Filing updates", description: "When Photon Legal files or progresses an application." },
+                ].map((row) => (
+                  <div key={row.key} className="flex items-start justify-between gap-4 py-4 first:pt-0 last:pb-0">
+                    <div>
+                      <p className={`text-sm font-medium ${theme === "dark" ? "text-neutral-200" : "text-[var(--pulse-ink)]"}`}>
+                        {row.title}
+                      </p>
+                      <p className={`mt-1 text-xs leading-5 ${theme === "dark" ? "text-neutral-500" : "text-[var(--pulse-ink-muted)]"}`}>
+                        {row.description}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={notificationPreferences[row.key] !== false}
+                      onCheckedChange={(checked) => updateNotificationPreference(row.key, checked)}
+                      aria-label={row.title}
+                    />
+                  </div>
+                ))}
+              </div>
             </section>
 
           </div>

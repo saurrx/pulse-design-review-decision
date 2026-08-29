@@ -682,12 +682,13 @@ const RULES: Rule[] = [
    *
    * Thresholds are the original contract's, not invented.
    */
+  // Was answered locally from the section COUNT alone; now the backend reads
+  // the actual content (OpenRouter behind it, heuristic when unconfigured) —
+  // so the rail can tell a genuine disclosure from spam and say something
+  // worth reading. The old ?sections= is ignored: the server counts for
+  // itself from the autosaved answers.
   { m: /^\/api\/v1\/idea\/preliminary-signal\/([^/?]+)(?:\?(.*))?$/,
-    to: (_m, _b) => ({ url: "", method: "GET", synth: () => {
-      const n = Number(new URLSearchParams(_m[2] ?? "").get("sections")) || 0;
-      const band = n >= 6 ? "Strong" : n >= 4 ? "Promising" : "Emerging";
-      return { data: { band, sections_with_content: n, total_sections: 6 } };
-    } }) },
+    to: m => ({ url: `/v1/drafts/${m[1]}/signal`, method: "GET", wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/idea\/re-evaluate\/([^/]+)$/, method: "POST",
     to: m => ({ url: `/v1/drafts/${m[1]}/re-evaluate`, method: "POST", wrap: p => ({ data: p }) }) },
 
