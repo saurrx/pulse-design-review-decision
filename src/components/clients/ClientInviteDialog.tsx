@@ -81,7 +81,7 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
 
   const deactivateMutation = useMutation({
     mutationFn: async () =>
-      API_CONFIG.delete(`/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.token}`),
+      API_CONFIG.delete(`/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
       toast.success("Invite link deactivated");

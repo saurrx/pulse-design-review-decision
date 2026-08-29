@@ -335,10 +335,15 @@ const ReviewQueueWorkspace = () => {
   const ideas: Idea[] = Array.isArray(response?.data) ? response.data : [];
   const { user: sessionUser } = useUserCookie();
   const isCommittee = sessionUser?.role === "TECH_COMMITTEE";
-  // The committee decides at the technical stage; counsel at both internal
-  // stages. An idea already with counsel is not the committee's queue.
+  // One stage, one queue. The committee acts at TECH_REVIEW (UNDER_REVIEW in
+  // the old dialect); counsel acts at LEGAL_REVIEW (SENT_TO_IHC). Counsel's
+  // queue used to ALSO list committee-stage ideas, and every decision on one
+  // died with a 403 ('You cannot review at this stage.') because the server
+  // derives the needed capability from the idea's state — the queue was
+  // showing counsel work that was never theirs. For a client without a tech
+  // committee, ideas go straight to LEGAL_REVIEW, so nothing is lost.
   const reviewStatuses = React.useMemo(
-    () => (isCommittee ? ["UNDER_REVIEW"] : ["UNDER_REVIEW", "SENT_TO_IHC"]),
+    () => (isCommittee ? ["UNDER_REVIEW"] : ["SENT_TO_IHC"]),
     [isCommittee],
   );
 
@@ -599,7 +604,7 @@ const ReviewQueueWorkspace = () => {
       if (["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
       if (
         !selectedIdea ||
-        !["UNDER_REVIEW", "SENT_TO_IHC"].includes(selectedIdea.status)
+        !(isCommittee ? selectedIdea.status === "UNDER_REVIEW" : selectedIdea.status === "SENT_TO_IHC")
       ) {
         return;
       }
@@ -1066,7 +1071,12 @@ const ReviewQueueWorkspace = () => {
                       : "Approval is unavailable until a draft is submitted."}
                   </p>
                 )}
-                {["UNDER_REVIEW", "SENT_TO_IHC"].includes(selectedIdea.status) && (
+                {!isCommittee && selectedIdea.status === "UNDER_REVIEW" && (
+                  <p className="rounded-lg border border-dashed border-[var(--pulse-line-strong)] bg-[var(--pulse-surface-subtle)] px-4 py-2.5 text-sm text-[var(--pulse-ink-muted)]">
+                    Under Tech Committee review — it reaches your queue once the committee sends it on.
+                  </p>
+                )}
+                {(isCommittee ? selectedIdea.status === "UNDER_REVIEW" : selectedIdea.status === "SENT_TO_IHC") && (
                   <div className="flex items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

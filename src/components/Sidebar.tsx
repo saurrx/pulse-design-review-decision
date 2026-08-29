@@ -73,11 +73,9 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
       { label: "Home", path: "/", icon: LayoutDashboard },
       { label: "My ideas", path: "/ideas", icon: Lightbulb },
       { label: "Patents", path: "/patents", icon: FileStack },
-      // Every other role has a Profile (or Workspace) nav item and the design
-      // gave the inventor one too; the IA split that moved profile out of the
-      // workspace dropped it from this branch only. The user menu still
-      // reaches /profile, so this was invisible rather than fatal.
-      { label: "Profile", path: "/profile", icon: UserRound },
+      // Profile is reachable from the user menu at the bottom of the sidebar;
+      // a nav item for it duplicated that door on every role and is gone
+      // everywhere in the same change.
     ];
   }
 
@@ -94,7 +92,6 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
       },
       { label: "Patents", path: "/patents", icon: FileStack },
       { label: "Actions", path: "/due-dates", icon: CalendarDays },
-      { label: "Profile", path: "/profile", icon: UserRound },
     ];
   }
 
@@ -118,18 +115,19 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
     { label: "Clients", path: "/clients", icon: Building2 },
     { label: "Ideas", path: "/ideas", icon: Lightbulb, badge: reviewCount },
     { label: "Patents", path: "/patents", icon: FileStack },
-    { label: "Actions", path: "/due-dates", icon: CalendarDays },
-    // Two nav items both labelled "Actions" is a design slip; /actions is the
-    // photon-side queue, so it keeps our "Operations" label.
-    { label: "Operations", path: "/actions", icon: FolderKanban },
+    // ONE "Actions" now, and it is /actions — the Photon operations queue,
+    // which IS this side's action items. The old pair ("Actions" -> the
+    // read-only due-dates calendar, "Operations" -> the real queue) made the
+    // label point at the wrong screen; /due-dates stays reachable from rows
+    // and links, it just is not a second nav item pretending to be Actions.
+    { label: "Actions", path: "/actions", icon: FolderKanban },
   ];
-  // Workspace administration is photon-admin only now; every other role gets
-  // the standalone profile page instead (see WorkspacePage's redirect).
-  operationalItems.push(
-    role === "PHOTON_ADMIN" || role === "PHOTON_SUPERADMIN"
-      ? { label: "Workspace", path: "/workspace", icon: UsersRound }
-      : { label: "Profile", path: "/profile", icon: UserRound },
-  );
+  // Workspace administration is photon-admin only. Profile is deliberately
+  // NOT a nav item for anyone — it already lives in the user menu at the
+  // bottom of this sidebar, and two doors to the same page read as clutter.
+  if (role === "PHOTON_ADMIN" || role === "PHOTON_SUPERADMIN") {
+    operationalItems.push({ label: "Workspace", path: "/workspace", icon: UsersRound });
+  }
   return operationalItems;
 };
 

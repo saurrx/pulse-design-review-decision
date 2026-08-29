@@ -1,3 +1,4 @@
+import React from "react";
 import { lazy, Suspense, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -30,9 +31,61 @@ const ActionsPage = lazy(() => import("./pages/ActionsPage"));
 const Invite = lazy(() => import("./pages/auth/Invite"));
 const Signup = lazy(() => import("./pages/auth/Signup"));
 
-const PageFallback = () => (
-  <div className="flex h-screen w-full items-center justify-center" />
+/**
+ * Route-transition chrome. Every page is React.lazy, so EVERY navigation used
+ * to paint a full-viewport EMPTY div while the chunk loaded — the app felt
+ * hung on slow links, and after a redeploy (stale chunk hash) it stayed blank
+ * forever because nothing caught the failed import. Three pieces fix that:
+ *
+ *  - TopLoader: the thin animated bar at the very top, the pattern YouTube/
+ *    GitHub use — motion without layout shift, visible on every transition.
+ *  - PageFallback now shows the bar plus a quiet spinner instead of nothing.
+ *  - RouteErrorBoundary catches a rejected lazy import and reloads ONCE per
+ *    navigation (the standard recovery for a stale-deploy chunk miss; see
+ *    also the vite:preloadError listener in main.tsx).
+ */
+const TopLoader = () => (
+  <div className="fixed inset-x-0 top-0 z-[100] h-0.5 overflow-hidden bg-transparent" aria-hidden>
+    <div
+      className="h-full w-2/5 rounded-full bg-[#F9B418] motion-safe:animate-[pulse-slide_1.1s_ease-in-out_infinite]"
+      style={{ boxShadow: "0 0 8px rgba(249,180,24,.7)" }}
+    />
+    <style>{`@keyframes pulse-slide{0%{transform:translateX(-100%)}60%{transform:translateX(160%)}100%{transform:translateX(260%)}}`}</style>
+  </div>
 );
+
+const PageFallback = () => (
+  <div className="flex h-screen w-full items-center justify-center">
+    <TopLoader />
+    <div className="h-6 w-6 animate-spin rounded-full border-2 border-neutral-300 border-t-[#F9B418] motion-reduce:animate-none" aria-label="Loading" />
+  </div>
+);
+
+class RouteErrorBoundary extends React.Component<{ children: React.ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch(err: unknown) {
+    const msg = String(err);
+    // A dynamically imported chunk that no longer exists = a deploy happened
+    // under this tab. Reload once to pick up the new manifest.
+    if (/Failed to fetch dynamically imported|Importing a module script failed|ChunkLoadError/.test(msg)
+        && !sessionStorage.getItem("pl_chunk_reloaded")) {
+      sessionStorage.setItem("pl_chunk_reloaded", "1");
+      window.location.reload();
+    }
+  }
+  render() {
+    if (this.state.failed) return (
+      <div className="flex h-screen w-full flex-col items-center justify-center gap-3 text-sm text-neutral-600">
+        <p>This page failed to load — usually a new version was just deployed.</p>
+        <button className="rounded border px-3 py-1.5" onClick={() => { sessionStorage.removeItem("pl_chunk_reloaded"); window.location.reload(); }}>
+          Reload
+        </button>
+      </div>
+    );
+    return this.props.children;
+  }
+}
 
 const App = () => {
   const [queryClient] = useState(() => new QueryClient({
@@ -67,6 +120,7 @@ const App = () => {
               <Toaster />
               <Sonner />
               <BrowserRouter>
+              <RouteErrorBoundary>
               <Suspense fallback={<PageFallback />}>
               <Routes>
                 <Route element={<PublicRoutes />}>
@@ -100,6 +154,7 @@ const App = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               </Suspense>
+              </RouteErrorBoundary>
             </BrowserRouter>
           </TooltipProvider>
           </BackgroundAnalysisProvider>

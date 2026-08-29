@@ -572,7 +572,9 @@ const Login = () => {
                   handleChange({
                     target: {
                       name: "email",
-                      value: e.target.value?.trim()?.toLowerCase(),
+                      // trim() only strips the ends; a space TYPED mid-way
+                      // stayed. No email contains whitespace — drop it all.
+                      value: e.target.value?.replace(/\s+/g, "").toLowerCase(),
                     },
                   })
                 }

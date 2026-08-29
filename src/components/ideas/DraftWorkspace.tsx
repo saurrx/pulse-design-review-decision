@@ -531,7 +531,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
         score: scoreRaw,
         stale: dirtySinceScore,
       });
-      toast.success("Sent to the IP Committee");
+      toast.success("Sent for review");
       navigate(`/ideas/${ideaId}`);
     },
     onError: () => toast.error("Failed to send"),

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/command";
 import API_CONFIG from "@/lib/apiConfig";
 import useUserCookie from "@/hooks/use-auth";
+import { isOutsideCounselRole } from "@/lib/roleAccess";
 import { useTheme } from "@/hooks/useTheme";
 import { ProductChip } from "@/components/ui/product-chip";
 
@@ -136,6 +137,27 @@ const PatentTagsCell = ({
 
   const visibleChips = currentTags.slice(0, VISIBLE_CHIPS);
   const overflow = currentTags.length - visibleChips.length;
+
+  // Tag writes need asset:write, which an inventor and the tech committee do
+  // not hold — their clicks used to open the editor and then fail on save.
+  // Read-only roles get the chips with no popover at all.
+  const canEditTags = isOutsideCounselRole(user?.role) || user?.role === "LEGAL_COUNSEL";
+  if (!canEditTags) {
+    return (
+      <div className="flex w-full flex-wrap items-center gap-1 p-1">
+        {currentTags.length === 0 ? (
+          <span className={theme === "dark" ? "text-xs text-neutral-600" : "text-xs text-neutral-400"}>—</span>
+        ) : (
+          currentTags.slice(0, VISIBLE_CHIPS).map((t) => (
+            <ProductChip key={t} kind="tag">{t}</ProductChip>
+          ))
+        )}
+        {currentTags.length > VISIBLE_CHIPS && (
+          <span className="text-xs text-neutral-500">+{currentTags.length - VISIBLE_CHIPS}</span>
+        )}
+      </div>
+    );
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

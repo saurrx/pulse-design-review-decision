@@ -694,8 +694,14 @@ const topPriorArt = sortedPriorArt.slice(0, 5);
           </div>
         </div>
 
-        {/* ---------- RECOMMENDATIONS SECTION ---------- */}
-        {!embedded && scoringResult?.recommendations &&
+        {/* ---------- RECOMMENDATIONS SECTION ----------
+            Rendered in the embedded (review) view too — the reviewer is the
+            person these exist for, and the !embedded guard here is why the
+            review tab showed prior art but no recommendations. Each item is
+            the agent's {text, rationale, basis[]} — the old string render
+            stringified the object, which is the raw JSON the review view
+            reported. */}
+        {scoringResult?.recommendations &&
           scoringResult?.recommendations.length > 0 && (
             <Card className="mb-10 p-6 border-l-4 border-l-blue-700 bg-gradient-to-r from-blue-50 to-white">
               <div className="flex items-center gap-2 mb-4">
@@ -705,15 +711,33 @@ const topPriorArt = sortedPriorArt.slice(0, 5);
                 </h2>
               </div>
 
-              <ul className="space-y-3">
-                {scoringResult?.recommendations.map((recommendation, idx) => (
-                  <li key={idx} className="flex gap-3">
-                    <div className="flex-shrink-0 mt-1">
-                      <ChevronRight className="h-4 w-4 text-blue-700" />
-                    </div>
-                    <p className="text-gray-700">{recommendation}</p>
-                  </li>
-                ))}
+              <ul className="space-y-4">
+                {scoringResult?.recommendations.map((recommendation: any, idx) => {
+                  const rec = typeof recommendation === "string"
+                    ? { text: recommendation, rationale: "", basis: [] }
+                    : recommendation ?? { text: "", rationale: "", basis: [] };
+                  if (!rec.text) return null;
+                  return (
+                    <li key={idx} className="flex gap-3">
+                      <div className="flex-shrink-0 mt-1">
+                        <ChevronRight className="h-4 w-4 text-blue-700" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-gray-800 font-medium">{rec.text}</p>
+                        {rec.rationale ? (
+                          <p className="mt-0.5 text-sm text-gray-600">{rec.rationale}</p>
+                        ) : null}
+                        {Array.isArray(rec.basis) && rec.basis.length > 0 ? (
+                          <p className="mt-1 flex flex-wrap gap-1.5">
+                            {rec.basis.map((b: string) => (
+                              <span key={b} className="rounded bg-blue-100 px-1.5 py-0.5 font-mono text-[11px] text-blue-800">{b}</span>
+                            ))}
+                          </p>
+                        ) : null}
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </Card>
           )}
