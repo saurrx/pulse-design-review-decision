@@ -34,6 +34,13 @@ type Rule = {
     url: string; method: string; body?: any;
     /** Reshape the new API's payload into what the screen expects. */
     wrap?: (payload: any) => any;
+    /**
+     * Answer locally, without a request. For old-dialect endpoints whose whole
+     * response is derivable from what the caller already sent — the clean API
+     * has no equivalent to call, and inventing a round trip to a route that
+     * returns the wrong shape is worse than answering honestly here.
+     */
+    synth?: () => any;
   };
 };
 
@@ -377,6 +384,15 @@ const RULES: Rule[] = [
       if (isUuid(m[1])) out.set("client_id", m[1]);
       if (q.get("page")) out.set("page", q.get("page")!);
       if (q.get("limit")) out.set("limit", q.get("limit")!);
+      // The docket search box sends ?search= and this dropped it, so typing
+      // filtered nothing and the row count never moved. The backend ignored it
+      // too — the box was dead at BOTH layers, which is why it looked like a
+      // debounce problem rather than a missing feature.
+      //
+      // `filter`, `status` and `sort` are still dropped: the API has no
+      // equivalent yet, and forwarding a parameter nothing honours would only
+      // move the silence one layer down.
+      if (q.get("search")) out.set("search", q.get("search")!);
       return ({ url: `/v1/actions?${out.toString()}`, method: "GET",
       // The screen was written against the old event-row dialect
       // (event_name / event_date / days_to_deadline / patent_action) — translate
@@ -621,8 +637,30 @@ const RULES: Rule[] = [
     to: m => ({ url: `/v1/drafts/${m[1]}/evaluate`, method: "POST", wrap: p => ({ data: p }) }) },
   { m: /^\/api\/v1\/idea\/fetch-score\/([^/]+)$/,
     to: m => ({ url: `/v1/drafts/${m[1]}/evaluation`, method: "GET", wrap: p => ({ data: p }) }) },
-  { m: /^\/api\/v1\/idea\/preliminary-signal\/([^/]+)$/,
-    to: m => ({ url: `/v1/drafts/${m[1]}/evaluation`, method: "GET", wrap: p => ({ data: p }) }) },
+  /**
+   * The early patentability read, answered locally.
+   *
+   * This pointed at /v1/drafts/:id/evaluation, which returns the AGENT's
+   * evaluation — state, score, report — and carries no `band`,
+   * `sections_with_content` or `total_sections`. All three read undefined, so
+   * the card rendered the literal text "based on of sections" under a blank
+   * heading, on every draft, at every completion level.
+   *
+   * The old contract took the count from the CALLER (`?sections=N`) and
+   * returned a band over six sections — DraftWorkspace's five questionnaire
+   * sections plus attachments, which is exactly what it still sends. So the
+   * whole response is derivable here and needs no request at all; the previous
+   * mapping was a network round trip that could only ever return the wrong
+   * shape.
+   *
+   * Thresholds are the original contract's, not invented.
+   */
+  { m: /^\/api\/v1\/idea\/preliminary-signal\/([^/?]+)(?:\?(.*))?$/,
+    to: (_m, _b) => ({ url: "", method: "GET", synth: () => {
+      const n = Number(new URLSearchParams(_m[2] ?? "").get("sections")) || 0;
+      const band = n >= 6 ? "Strong" : n >= 4 ? "Promising" : "Emerging";
+      return { data: { band, sections_with_content: n, total_sections: 6 } };
+    } }) },
   { m: /^\/api\/v1\/idea\/re-evaluate\/([^/]+)$/, method: "POST",
     to: m => ({ url: `/v1/drafts/${m[1]}/re-evaluate`, method: "POST", wrap: p => ({ data: p }) }) },
 
@@ -734,6 +772,7 @@ export function makeRealAdapter(real: AxiosInstance) {
       const match = path.match(r.m);
       if (!match) continue;
       const t = r.to(match, body);
+      if (t.synth) return { status: 200, data: t.synth() };
       const res = await real.request({ url: t.url, method: t.method as any, data: t.body });
       // The old envelope, so 152 call sites reading response.data.data keep
       // working. Sessions: the new API authenticates with HttpOnly cookies;
