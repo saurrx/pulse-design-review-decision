@@ -5,6 +5,16 @@
     "src",
     "qa"
   ],
+  "runners": [
+    {
+      "_doc": "Browser + node tiers are standalone scripts. each:true keeps them sequential, which is what stops five role logins racing the login throttle.",
+      "match": "\\.qa\\.mjs$",
+      "command": [
+        "node"
+      ],
+      "each": true
+    }
+  ],
   "map": {
     "src/pages/auth/**": [
       "auth"
