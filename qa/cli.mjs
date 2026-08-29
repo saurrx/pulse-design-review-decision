@@ -325,9 +325,40 @@ if (cmd === 'run') {
   process.exit(rest.includes('--list') ? 0 : execute(tests));
 }
 
+/**
+ * A checkpoint means the same thing in all three repos, but the WORK it implies
+ * does not exist everywhere: a repo with no UI has no journey to smoke-test.
+ * That is a legitimate empty, and it must not read the same as a filter that
+ * matched nothing by mistake — so each repo DECLARES its stance in
+ * qa/areas.json `checkpoints`:
+ *
+ *   "tagged"  select by @cp: tag; selecting zero is a broken filter and fails
+ *   "all"     every tagged test file in the repo (this is what `nightly` means)
+ *   "n/a: …"  this repo has no such surface; exits 0 and prints the reason
+ *
+ * A checkpoint in the shared contract but absent from areas.json is an ERROR,
+ * not a default. Adding one to contract.json then forces all three repos to say
+ * what they do about it, which is the same reflex the contract hash enforces.
+ */
 if (cmd === 'checkpoint') {
-  const tests = select({ cp: rest[0] });
-  console.log(`qa: checkpoint "${rest[0]}" -> ${tests.length} test file(s)`);
+  const name = rest[0];
+  const known = Object.keys(contract.checkpoints.values);
+  if (!known.includes(name)) {
+    console.error(`qa: unknown checkpoint "${name}". Known: ${known.join(', ')}`);
+    process.exit(1);
+  }
+  const stance = (areasMap.checkpoints ?? {})[name];
+  if (!stance) {
+    console.error(`qa: checkpoint "${name}" is in contract.json but undeclared in this repo's areas.json.`);
+    console.error('    Declare it as "tagged", "all", or "n/a: <reason>".');
+    process.exit(1);
+  }
+  if (stance.startsWith('n/a')) {
+    console.log(`qa: checkpoint "${name}" — ${stance} (nothing to run here)`);
+    process.exit(0);
+  }
+  const tests = stance === 'all' ? discover() : select({ cp: name });
+  console.log(`qa: checkpoint "${name}" [${stance}] -> ${tests.length} test file(s)`);
   tests.forEach(t => console.log('  ' + t.file));
   process.exit(rest.includes('--list') ? 0 : execute(tests));
 }

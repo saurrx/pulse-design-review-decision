@@ -3,7 +3,7 @@
     "THE SHARED QA CONTRACT. This file is byte-identical in patent-agent,",
     "pulse-backend and pulse-frontend, and a test in each repo fails if they",
     "diverge. Edit it in one repo and you must copy it to the other two in the",
-    "same change — that is the whole point: the three repos are separate git",
+    "same change \u2014 that is the whole point: the three repos are separate git",
     "repos, so nothing else keeps their vocabulary aligned.",
     "",
     "JSON rather than YAML on purpose: patent-agent has no YAML parser and this",
@@ -14,49 +14,71 @@
     "One corpus, sliced four ways. 'Run the security suite', 'run the inventor",
     "journeys' and 'run everything touching ideas' are all the same filter."
   ],
-
   "version": 1,
-
   "areas": {
     "_doc": "Feature areas: the unit of 'is this relevant to my change'. Shared across all three repos so a backend diff can name a frontend test.",
     "values": [
-      "auth", "ideas", "drafts", "review", "patents", "duedates", "actions",
-      "clients", "workspace", "files", "invites", "dashboard", "notifications",
-      "agent-eval", "retrieval", "scoring", "infra"
+      "auth",
+      "ideas",
+      "drafts",
+      "review",
+      "patents",
+      "duedates",
+      "actions",
+      "clients",
+      "workspace",
+      "files",
+      "invites",
+      "dashboard",
+      "notifications",
+      "agent-eval",
+      "retrieval",
+      "scoring",
+      "infra"
     ]
   },
-
   "roles": {
     "_doc": "Journey actors. Mirrors UserRole in pulse-backend/prisma/schema.prisma; the drift test in pulse-backend asserts they match, so a new role cannot be added to the product without appearing here.",
     "values": [
-      "INVENTOR", "TECH_COMMITTEE", "LEGAL_COUNSEL", "CASE_OWNER",
-      "PHOTON_ADMIN", "PHOTON_SUPERADMIN"
+      "INVENTOR",
+      "TECH_COMMITTEE",
+      "LEGAL_COUNSEL",
+      "CASE_OWNER",
+      "PHOTON_ADMIN",
+      "PHOTON_SUPERADMIN"
     ]
   },
-
   "tiers": {
     "_doc": "What kind of claim a test makes. Where each runs is in the CI table in each repo's CLAUDE.md.",
     "values": {
-      "unit":        "Pure logic, no IO. policy.ts, review-chain.ts, scoring math.",
-      "contract":    "The API spec is current, has no breaking diff, and every adapter rule resolves to a real route.",
-      "behaviour":   "Declared state machines are complete AND enforced: legal transitions work, illegal ones are refused, no enum value is unreachable.",
-      "security":    "Authz matrix, IDOR, tenant isolation, payloads, headers, the privacy invariant.",
-      "journey":     "Role-driven feature loops end to end, across repo boundaries.",
-      "invariant":   "DOM geometry rules: overflow, clipping, overlap, unbounded lists, a11y.",
+      "unit": "Pure logic, no IO. policy.ts, review-chain.ts, scoring math.",
+      "contract": "The API spec is current, has no breaking diff, and every adapter rule resolves to a real route.",
+      "behaviour": "Declared state machines are complete AND enforced: legal transitions work, illegal ones are refused, no enum value is unreachable.",
+      "security": "Authz matrix, IDOR, tenant isolation, payloads, headers, the privacy invariant.",
+      "journey": "Role-driven feature loops end to end, across repo boundaries.",
+      "invariant": "DOM geometry rules: overflow, clipping, overlap, unbounded lists, a11y.",
       "conformance": "ARIA + computed-style structure against the committed snapshot."
     }
   },
-
   "security": {
     "_doc": "Security concern tags. A test may carry more than one.",
     "values": [
-      "authz", "idor", "tenant-isolation", "injection", "xss", "upload",
-      "rate-limit", "secrets", "headers", "privacy", "csrf", "authn"
+      "authz",
+      "idor",
+      "tenant-isolation",
+      "injection",
+      "xss",
+      "upload",
+      "rate-limit",
+      "secrets",
+      "headers",
+      "privacy",
+      "csrf",
+      "authn"
     ]
   },
-
   "compliance": {
-    "_doc": "Control references, so a CI artifact can be cited as evidence. Only tags that a test actually evidences from code — not aspirational.",
+    "_doc": "Control references, so a CI artifact can be cited as evidence. Only tags that a test actually evidences from code \u2014 not aspirational.",
     "soc2": {
       "CC6.1": "Logical access controls restrict who may reach what.",
       "CC6.2": "Access is granted through a registration/authorisation process.",
@@ -67,26 +89,24 @@
       "CC8.1": "Changes are authorised, tested and approved before deployment."
     },
     "gdpr": {
-      "art5-1c": "Data minimisation — only what is necessary is collected.",
-      "art5-1e": "Storage limitation — data is kept no longer than necessary.",
-      "art15":   "Right of access.",
-      "art17":   "Right to erasure.",
-      "art32":   "Security of processing."
+      "art5-1c": "Data minimisation \u2014 only what is necessary is collected.",
+      "art5-1e": "Storage limitation \u2014 data is kept no longer than necessary.",
+      "art15": "Right of access.",
+      "art17": "Right to erasure.",
+      "art32": "Security of processing."
     }
   },
-
   "checkpoints": {
     "_doc": "Named subsets, for whole-application runs.",
     "values": {
-      "smoke":       "One journey per role plus health. Target under 3 minutes.",
-      "pre-deploy":  "Everything that can run without a deployed build: unit, contract, behaviour, security-static.",
+      "smoke": "One journey per role plus health. Target under 3 minutes.",
+      "pre-deploy": "Everything that can run without a deployed build: unit, contract, behaviour, security-static.",
       "post-deploy": "journey + invariant + conformance against the deployed environment.",
-      "nightly":     "Everything, plus scanners and DAST."
+      "nightly": "Every tagged test in the repo. The scanners and DAST are a SEPARATE, manual CI mode \u2014 see .gitlab-ci.yml \u2014 not part of this selection, because they are jobs rather than test files."
     }
   },
-
   "environments": {
-    "_doc": "Browser tiers run against the deployed demo environment, by decision — an MR's code is not deployed anywhere, so E2E on an MR would test the previous release. E2E therefore runs post-deploy, nightly, and on demand.",
+    "_doc": "Browser tiers run against the deployed demo environment, by decision \u2014 an MR's code is not deployed anywhere, so E2E on an MR would test the previous release. E2E therefore runs post-deploy, nightly, and on demand.",
     "demo": {
       "app": "https://demo.photonpulse.ai",
       "api": "https://demo-api.photonpulse.ai",
