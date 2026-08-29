@@ -20,7 +20,7 @@
  * qa/.sessions/ is gitignored and MUST NEVER be published as a CI artifact:
  * it holds live authentication cookies for the demo accounts.
  */
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -30,6 +30,33 @@ export const APP = CONTRACT.environments.demo.app;
 
 const SESSIONS = join(QA, '.sessions');
 const MAX_SESSION_AGE_MS = 12 * 60 * 1000;   // the access cookie lives 15 min
+
+/**
+ * QA_TRACE_API=1 records every /v1 request a tier makes, one JSON line per
+ * call, into qa/.api-trace.jsonl. It exists to answer a question the suite
+ * could not previously answer about ITSELF: which of the API's routes do these
+ * tests actually exercise? Coverage claimed from reading test source is a
+ * guess — a tier drives a UI, and which endpoints the UI calls is the app's
+ * business, not the test's.
+ *
+ * Off by default and free when off. The trace is gitignored: it records URLs
+ * from an authenticated session against real data.
+ */
+const TRACE = process.env.QA_TRACE_API === '1';
+const TRACE_FILE = join(QA, '.api-trace.jsonl');
+
+function attachTrace(ctx, role) {
+  if (!TRACE) return;
+  ctx.on('request', (r) => {
+    let path;
+    try { path = new URL(r.url()).pathname; } catch { return; }
+    if (!path.startsWith('/v1')) return;
+    const route = path
+      .replace(/\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '/{id}')
+      .replace(/\/\d+/g, '/{id}');
+    try { appendFileSync(TRACE_FILE, JSON.stringify({ role, method: r.method(), route }) + '\n'); } catch { /* best effort */ }
+  });
+}
 
 export const ACCOUNTS = {
   PHOTON_ADMIN:   'demo.admin@photonlegal.com',
@@ -65,6 +92,7 @@ export async function openSession(browser, role, {
 
   if (existsSync(file) && (Date.now() - statSync(file).mtimeMs) < MAX_SESSION_AGE_MS) {
     const ctx = await browser.newContext({ viewport, storageState: file });
+    attachTrace(ctx, role);
     const page = await ctx.newPage();
     await page.goto(`${base}/`, { waitUntil: 'domcontentloaded' }).catch(() => {});
     await page.waitForTimeout(1500);
@@ -75,6 +103,7 @@ export async function openSession(browser, role, {
   }
 
   const ctx = await browser.newContext({ viewport });
+  attachTrace(ctx, role);
   const page = await ctx.newPage();
   await page.goto(`${base}/login`, { waitUntil: 'domcontentloaded' });
   await page.fill('input[type="email"]', email);
