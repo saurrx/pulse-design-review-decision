@@ -28,6 +28,13 @@ const EXCEPTIONS = existsSync(exceptionsFile)
   ? JSON.parse(readFileSync(exceptionsFile, 'utf8')).exceptions ?? [] : [];
 
 const ROLES = [
+  // PHOTON_SUPERADMIN has no screens of its own and falls through to the
+  // operational UI, which is exactly why the layout rules are worth running
+  // against it: nobody designed those pages with this role in mind. It is
+  // deliberately NOT in the conformance tier — its structure is the admin's
+  // structure, so a baseline would duplicate 5 surfaces to assert nothing new.
+  // What distinguishes the role is data reach, and that is a journey.
+  { role: 'PHOTON_SUPERADMIN', email: 'demo.superadmin@photonlegal.com', pages: ['/', '/clients', '/ideas', '/patents', '/due-dates', '/actions', '/profile'] },
   { role: 'PHOTON_ADMIN',   email: 'demo.admin@photonlegal.com',     pages: ['/', '/clients', '/ideas', '/patents', '/due-dates', '/actions', '/workspace', '/profile'] },
   { role: 'CASE_OWNER',     email: 'demo.caseowner@photonlegal.com', pages: ['/', '/clients', '/ideas', '/patents', '/due-dates', '/actions', '/profile'] },
   { role: 'LEGAL_COUNSEL',  email: 'demo.counsel@demo.com',          pages: ['/', '/ideas', '/patents', '/due-dates', '/actions', '/workspace', '/profile'] },

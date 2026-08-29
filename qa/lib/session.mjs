@@ -59,6 +59,11 @@ function attachTrace(ctx, role) {
 }
 
 export const ACCOUNTS = {
+  // The sixth role finally has an account. PHOTON_SUPERADMIN has no screens of
+  // its own — it falls through to the operational UI — so it is covered by the
+  // invariant and conformance tiers plus one journey asserting the thing that
+  // actually distinguishes it: unbounded reach, and no client scope.
+  PHOTON_SUPERADMIN: 'demo.superadmin@photonlegal.com',
   PHOTON_ADMIN:   'demo.admin@photonlegal.com',
   CASE_OWNER:     'demo.caseowner@photonlegal.com',
   LEGAL_COUNSEL:  'demo.counsel@demo.com',

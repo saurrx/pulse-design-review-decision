@@ -12,7 +12,7 @@ import API_CONFIG from "@/lib/apiConfig";
 
 // Workspace administration only. Everyone else (inventor, committee, case
 // owner) now has a standalone /profile page instead of a profile tab here.
-const WORKSPACE_ADMIN_ROLES = ["PHOTON_ADMIN", "LEGAL_COUNSEL"];
+const WORKSPACE_ADMIN_ROLES = ["PHOTON_ADMIN", "PHOTON_SUPERADMIN", "LEGAL_COUNSEL"];
 
 const WorkspacePage: React.FC = () => {
   const { user } = useUserCookie();
@@ -43,7 +43,7 @@ const WorkspacePage: React.FC = () => {
 
   // PHOTON_ADMIN lands on the case-owner access view, which is not client
   // scoped, so it must not wait on the client query.
-  const needsClient = user?.role !== "PHOTON_ADMIN";
+  const needsClient = user?.role !== "PHOTON_ADMIN" && user?.role !== "PHOTON_SUPERADMIN";
 
   return (
     <DashboardLayout>

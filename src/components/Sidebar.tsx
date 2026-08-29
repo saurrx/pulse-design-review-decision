@@ -38,7 +38,7 @@ interface SidebarProps {
   toggleSidebar: () => void;
 }
 
-type Role = "INVENTOR" | "TECH_COMMITTEE" | "LEGAL_COUNSEL" | "CASE_OWNER" | "PHOTON_ADMIN";
+type Role = "INVENTOR" | "TECH_COMMITTEE" | "LEGAL_COUNSEL" | "CASE_OWNER" | "PHOTON_ADMIN" | "PHOTON_SUPERADMIN";
 
 type NavItem = {
   label: string;
@@ -126,7 +126,7 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
   // Workspace administration is photon-admin only now; every other role gets
   // the standalone profile page instead (see WorkspacePage's redirect).
   operationalItems.push(
-    role === "PHOTON_ADMIN"
+    role === "PHOTON_ADMIN" || role === "PHOTON_SUPERADMIN"
       ? { label: "Workspace", path: "/workspace", icon: UsersRound }
       : { label: "Profile", path: "/profile", icon: UserRound },
   );
@@ -140,7 +140,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
   const role = user?.role as Role | undefined;
   const isReviewer =
     role === "TECH_COMMITTEE" || role === "LEGAL_COUNSEL" ||
-    role === "PHOTON_ADMIN" || role === "CASE_OWNER";
+    role === "PHOTON_ADMIN" || role === "PHOTON_SUPERADMIN" || role === "CASE_OWNER";
 
   // Counts only. The sidebar is on every page and this badge is one integer;
   // it used to fetch the whole idea corpus — each row hydrated with author,
