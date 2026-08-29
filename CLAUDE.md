@@ -422,3 +422,18 @@ tier exists for) and the Patents `Export CSV` button produced 17 failures across
 9 surfaces — `table-columns … dropped=[action]`, `missing-signature:
 columnheader:action`, `missing-signature: button:export csv` — exit 1; restoring
 both returned it to 0.
+
+### Running the browser tiers
+All three — invariants, conformance, journeys — run in ONE CI job, in sequence,
+and that is not tidiness. The login throttle is 5 requests / 5 min / IP. Two
+parallel jobs on one runner, each logging in as five roles, is ten logins from
+one address in about three minutes: the first tier passes and everything after
+it gets a 429. That is exactly how the first scheduled run failed.
+
+One job means one `qa/.sessions/` directory on one filesystem, so five logins
+happen once and every tier after the first reuses them. Do not "parallelise"
+them, and do not pass the cache between jobs as an artifact — those files are
+live authentication cookies for the demo accounts and a CI artifact is
+downloadable.
+
+Locally the same applies: run them one after another, not concurrently.

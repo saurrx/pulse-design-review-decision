@@ -94,36 +94,23 @@ dependencies:
     # vulnerability actually stops the pipeline.
     - /osv-scanner scan source --lockfile=package-lock.json --config=osv-scanner.toml
 
-# Layout invariants against the DEPLOYED app. Manual (and scheduled) rather
-# than automatic on main: Vercel's deploy finishes asynchronously and GitLab is
-# never told when, so an automatic run here races the deploy it means to test.
-invariants:
-  stage: verify
-  image: mcr.microsoft.com/playwright:v1.62.0-noble
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: manual
-      allow_failure: true
-  before_script:
-    - npm ci --cache .npm --prefer-offline
-  script:
-    - node qa/invariant/layout.qa.mjs
-  # No artifacts. qa/.sessions/ holds live authentication cookies for the demo
-  # accounts; publishing it would put working sessions in a downloadable
-  # artifact. The job's log is the output.
-
-# Role journeys against the DEPLOYED app. Same rules as `invariants` and for the
-# same reason: Vercel finishes its deploy asynchronously and never tells GitLab,
-# so an automatic run on main races the deploy it means to test.
+# Every tier that drives a browser, in ONE job, in sequence.
 #
-# The five files log in once each and cache storageState in qa/.sessions/. A
-# cold runner therefore spends exactly five logins, which is exactly the API's
-# throttle (5 / 5 min / IP) — so they run SEQUENTIALLY in one job rather than as
-# five parallel jobs, and a re-run inside the window will report LOGIN FAILED
-# rather than a mysterious empty page. Failures are collected so one broken role
-# does not hide the other four.
-journeys:
+# They were two parallel jobs and the scheduled run failed on its first
+# outing: the login throttle is 5 requests / 5 min / IP, and two jobs on the
+# same runner each logging in as five roles is ten logins from one address in
+# about three minutes. The inventor journey passed and the next three got 429s.
+#
+# One job means one qa/.sessions/ directory on one filesystem, so the five
+# logins happen once and every tier after the first reuses them. The obvious
+# alternative — passing the cache between jobs as an artifact — is exactly what
+# must not happen: those files are live authentication cookies for the demo
+# accounts, and a CI artifact is downloadable.
+#
+# Manual on main, automatic on a schedule: Vercel deploys asynchronously and
+# never tells GitLab, so running automatically on merge races the deploy this
+# is meant to inspect.
+browser-tiers:
   stage: verify
   image: mcr.microsoft.com/playwright:v1.62.0-noble
   rules:
@@ -136,11 +123,16 @@ journeys:
   script:
     - |
       failed=""
+      # Invariants first: it logs in as all five roles and populates the cache
+      # the journeys then reuse.
+      echo "=== layout invariants"
+      node qa/invariant/layout.qa.mjs || failed="$failed invariants"
+      echo "=== structural conformance"
+      node qa/conformance/structure.qa.mjs || failed="$failed conformance"
       for f in qa/journey/*.qa.mjs; do
         echo "=== $f"
         node "$f" || failed="$failed $f"
       done
-      if [ -n "$failed" ]; then echo "FAILED JOURNEYS:$failed"; exit 1; fi
-  # No artifacts, for the same reason as `invariants`: qa/.sessions/ holds live
-  # authentication cookies for the demo accounts, and a journey run writes one
-  # per role. The job's log is the output.
+      if [ -n "$failed" ]; then echo "FAILED:$failed"; exit 1; fi
+  # No artifacts: qa/.sessions/ holds live authentication cookies. The log is
+  # the output.
