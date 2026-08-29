@@ -7,6 +7,14 @@
   ],
   "runners": [
     {
+      "_doc": "Static security gates under qa/security/ are standalone node scripts (no browser, no build). Declared before the generic runner so the tier's intent is explicit; same command, so behaviour is identical.",
+      "match": "qa/security/.*\\.mjs$",
+      "command": [
+        "node"
+      ],
+      "each": true
+    },
+    {
       "_doc": "Browser + node tiers are standalone scripts. each:true keeps them sequential, which is what stops five role logins racing the login throttle.",
       "match": "\\.qa\\.mjs$",
       "command": [
@@ -149,6 +157,9 @@
       "infra"
     ],
     ".gitlab-ci.yml": [
+      "infra"
+    ],
+    "qa/security/**": [
       "infra"
     ],
     "qa/journey/**": [
