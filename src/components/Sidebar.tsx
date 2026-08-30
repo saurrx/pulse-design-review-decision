@@ -115,11 +115,13 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
     { label: "Clients", path: "/clients", icon: Building2 },
     { label: "Ideas", path: "/ideas", icon: Lightbulb, badge: reviewCount },
     { label: "Patents", path: "/patents", icon: FileStack },
-    // ONE "Actions" now, and it is /actions — the Photon operations queue,
-    // which IS this side's action items. The old pair ("Actions" -> the
-    // read-only due-dates calendar, "Operations" -> the real queue) made the
-    // label point at the wrong screen; /due-dates stays reachable from rows
-    // and links, it just is not a second nav item pretending to be Actions.
+    // Two screens, two names, neither pretending to be the other. "Due Dates"
+    // is the deadline calendar and list — the clock. "Actions" is the
+    // operations queue — the work clients have instructed. The earlier round
+    // collapsed them into one item because both were called Actions, which
+    // pointed the label at the wrong screen; naming the calendar after what it
+    // shows fixes that without hiding it.
+    { label: "Due Dates", path: "/due-dates", icon: CalendarDays },
     { label: "Actions", path: "/actions", icon: FolderKanban },
   ];
   // Workspace administration is photon-admin only. Profile is deliberately

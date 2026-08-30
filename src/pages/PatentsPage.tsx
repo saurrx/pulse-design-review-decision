@@ -431,8 +431,19 @@ const PatentsPage: React.FC = () => {
             }
       }
     >
-      <div className="pulse-product-page pulse-table-page relative mx-auto flex min-h-[calc(100dvh-64px)] w-full max-w-[1680px] flex-col px-6 py-6 lg:px-8">
-        <div className="flex min-w-0 w-full flex-col">
+      {/* min-h-[100dvh-64px] made this page GROW: every filter chip row added
+          height, the page passed the viewport, and the whole thing — header
+          included — scrolled. /due-dates has always been bounded instead
+          (min-h-0 flex-1 + overflow-hidden), so its table takes whatever space
+          is left at that moment and scrolls inside itself. Same shape here.
+          The detail view keeps the old behaviour: it is a document, and a
+          document should scroll. */}
+      <div
+        className={`pulse-product-page pulse-table-page relative mx-auto flex w-full max-w-[1680px] flex-col px-6 py-6 lg:px-8 ${
+          patentId ? "min-h-[calc(100dvh-64px)]" : "min-h-0 flex-1 overflow-hidden"
+        }`}
+      >
+        <div className={`flex min-w-0 w-full flex-col ${patentId ? "" : "min-h-0 flex-1"}`}>
           {patentId ? (
             <PatentDetailsContent patentId={patentId} />
           ) : (

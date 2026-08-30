@@ -1438,7 +1438,7 @@ const PatentsContent = (props: PatentsContentProps) => {
   };
 
   return (
-    <div className="relative flex min-w-0 w-full flex-col">
+    <div className="relative flex min-h-0 w-full min-w-0 flex-1 flex-col">
       {/* Animated Gradient Background */}
       <div className="hidden">
         {theme === "dark" ? (
@@ -1515,7 +1515,7 @@ const PatentsContent = (props: PatentsContentProps) => {
           </>
         )}
       </div>
-      <div className="flex w-full flex-col bg-transparent">
+      <div className="flex min-h-0 w-full flex-1 flex-col bg-transparent">
         <div className="pulse-toolbar !mx-0 !mb-5 !mt-0 items-center">
           <div className="pulse-toolbar-tight flex w-full flex-wrap items-center gap-2">
             {/* The search box gives up width before any labelled control does:
@@ -2368,7 +2368,7 @@ const PatentsContent = (props: PatentsContentProps) => {
           <Loader />
         ) : (
           <div
-            className={`pulse-table-frame !mx-0 !mb-3 flex min-w-0 w-auto flex-col ${
+            className={`pulse-table-frame !mx-0 !mb-3 flex min-h-0 w-auto min-w-0 flex-1 flex-col overflow-auto ${
               theme === "dark" ? "border-[#cccccc20]" : ""
             }`}
           >
