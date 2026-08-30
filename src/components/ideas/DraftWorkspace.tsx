@@ -304,29 +304,32 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
   /* --------------------------------- saving --------------------------------- */
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveNow = useCallback(
+    async (next: any[], prov: Record<string, Provenance>, pct: number) => {
+      const meta = next.map((s) => ({
+        ...s,
+        questions: s.questions.map((q: any) => ({
+          ...q,
+          provenance: prov[q.id] ?? null,
+        })),
+      }));
+      await API_CONFIG.post(`/api/v1/idea/update/draft/${draftId}`, {
+        meta_data: meta,
+        completion_percentage: pct,
+      });
+      setSavedAt(new Date());
+    },
+    [draftId],
+  );
+
   const persist = useCallback(
     (next: any[], prov: Record<string, Provenance>, pct: number) => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
-      saveTimer.current = setTimeout(async () => {
-        try {
-          const meta = next.map((s) => ({
-            ...s,
-            questions: s.questions.map((q: any) => ({
-              ...q,
-              provenance: prov[q.id] ?? null,
-            })),
-          }));
-          await API_CONFIG.post(`/api/v1/idea/update/draft/${draftId}`, {
-            meta_data: meta,
-            completion_percentage: pct,
-          });
-          setSavedAt(new Date());
-        } catch {
-          toast.error("Autosave failed");
-        }
+      saveTimer.current = setTimeout(() => {
+        saveNow(next, prov, pct).catch(() => toast.error("Autosave failed"));
       }, 800);
     },
-    [draftId],
+    [saveNow],
   );
 
   const setAnswer = (qid: string, value: string, viaAI = false) => {
@@ -384,6 +387,12 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
         toast.error("A few sentences at least — there has to be something to read.");
         return;
       }
+      // The questionnaire's structure lives in the DRAFT, and the server fills
+      // the questions it finds there — deliberately, so a client cannot rename
+      // the novelty section to get it written. A draft nobody has typed into
+      // yet has never been saved, so it carries no structure at all: save it
+      // first, or the server correctly answers "no questionnaire to fill".
+      await saveNow(sections, provenance, completion).catch(() => undefined);
       const res = await API_CONFIG.post(`/api/v1/idea/autofill/${draftId}`, { text: source });
       const filled: Record<string, string> = res?.data?.data?.answers ?? {};
       const filledCount = Object.keys(filled).length;
