@@ -2048,8 +2048,12 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
             className={`${theme === "dark" ? "text-zinc-500" : "text-gray-600"
               } text-sm font-sans tracking-wide`}
           >
+            {/* The reference, not the uuid. A uuid is not an identity anyone
+                can read down a phone or spot twice in a list; the workspace's
+                own reference is. Older ideas are backfilled server-side, so
+                the fallback is the title rather than the raw id. */}
             Ideas <span className="mx-1 text-gray-500">/</span>{" "}
-            {mainIdeaData?.id?.toUpperCase() || ""}
+            {mainIdeaData?.reference_number || mainIdeaData?.title || ""}
           </span>
         </div>
         <div className="mt-5 flex items-center gap-7">
@@ -2352,6 +2356,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                         </div>
                         <div className="px-5 py-5">
                           <PatentNoveltyReport
+                            reference={mainIdeaData?.reference_number}
                             embedded
                             displayScale={10}
                             expandFirstReference={false}
@@ -2496,7 +2501,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                     <div>
                       <p className="text-sm font-medium text-[#0C0C0C]">Evaluation in progress…</p>
                       <p className="mt-0.5 font-mono text-[11px] text-[#727272]">
-                        ref {String(ideaDraft?.[0]?.api_evaluation_id).slice(0, 8)} · prior-art search and scoring usually take a few minutes
+                        {mainIdeaData?.reference_number ? `${mainIdeaData.reference_number} · ` : ""}prior-art search and scoring usually take a few minutes
                       </p>
                     </div>
                   </div>
@@ -2508,6 +2513,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                     Patent Analysis Report
                   </div>
                   <PatentNoveltyReport
+                    reference={mainIdeaData?.reference_number}
                     title={mainIdeaData?.title}
                     api_evaluation_id={
                       ideaDraft?.[0]?.CheckDraftSoreLog?.[0]?.score_meta_data
@@ -2547,6 +2553,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                       Patent Analysis Report
                     </div>
                     <PatentNoveltyReport
+                    reference={mainIdeaData?.reference_number}
                       title={mainIdeaData?.title}
                       api_evaluation_id={
                         ideaDraft?.[0]?.CheckDraftSoreLog?.[0]?.score_meta_data
@@ -2841,6 +2848,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
             >
               {/* <PatentAnalysisContent data={draftReport} /> */}
               <PatentNoveltyReport
+                    reference={mainIdeaData?.reference_number}
                 title={mainIdeaData?.title ?? ""}
                 api_evaluation_id={draftApiEvaluationId ?? ""}
                 scoringResult={draftReport?.scoringResult}

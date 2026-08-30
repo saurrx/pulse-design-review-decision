@@ -739,7 +739,7 @@ const ReviewQueueWorkspace = () => {
                     {selected && <span className="absolute inset-y-0 left-0 w-[2px] bg-[#0C0C0C]" />}
                     <div className="flex items-start justify-between gap-3">
                       <span className="font-mono text-xs font-medium uppercase text-[var(--pulse-ink-muted)]">
-                        {idea.reference_number || idea.id}
+                        {idea.reference_number || "—"}
                       </span>
                       <span className="text-right text-xs font-medium tabular-nums text-[var(--pulse-ink-secondary)]">
                         {age}d

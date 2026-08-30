@@ -109,6 +109,11 @@ const STATUS_TO_STATE: Record<string, string[]> = {
 const oldIdea = (i: any) => i && ({
   ...i,
   status: STATE_TO_STATUS[i.state] ?? i.state,
+  // The screens have always read `reference_number` and the API had nothing
+  // to put in it, so every list fell back to the uuid. It carries the real
+  // reference now (DEMO07); the spread would pass it through anyway, and it
+  // is named here so the dialect is legible in one place.
+  reference_number: i.reference_number ?? i.reference ?? null,
   created_by_id: i.author_id,
   created_by: i.author,
   summary: i.body,
