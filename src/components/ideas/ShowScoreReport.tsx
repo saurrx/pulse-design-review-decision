@@ -25,6 +25,7 @@ import React from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
+import { track } from "@/lib/analytics";
 
 // Extended interfaces for the report
 interface ScoringResult {
@@ -121,6 +122,11 @@ export default function PatentNoveltyReport({
   reference,
 }: PatentNoveltyReportProps) {
   const { theme } = useTheme();
+  // Report rendered — id only, never the report body or prior-art text. Skip the
+  // embedded (inline) render so only a real full-report view counts.
+  React.useEffect(() => {
+    if (!embedded) track("evaluation_report_opened", { evaluation_id: api_evaluation_id });
+  }, [embedded, api_evaluation_id]);
   const [reEvalOpen, setReEvalOpen] = React.useState(false);
   const [patentInput, setPatentInput] = React.useState("");
   // First prior-art reference expanded by default; the rest collapse to rows.
@@ -165,6 +171,8 @@ export default function PatentNoveltyReport({
       return response.data;
     },
     onSuccess: () => {
+      // Evaluation id only — never the patent numbers the reviewer typed.
+      track("re_evaluation_started", { evaluation_id: api_evaluation_id });
       setReEvalOpen(false);
       setPatentInput("");
       toast.success("Re-evaluation started successfully.");
@@ -287,7 +295,7 @@ const sortedPriorArt = [...enrichedPriorArt].sort((a, b) => {
 const topPriorArt = sortedPriorArt.slice(0, 5);
 
   return (
-    <div className={embedded ? "w-full space-y-6" : "max-w-7xl mx-auto p-6 space-y-6"}>
+    <div className={`ph-no-capture ${embedded ? "w-full space-y-6" : "max-w-7xl mx-auto p-6 space-y-6"}`}>
       {!embedded && (
       <Dialog open={reEvalOpen} onOpenChange={setReEvalOpen}>
         <DialogContent className="max-w-lg">

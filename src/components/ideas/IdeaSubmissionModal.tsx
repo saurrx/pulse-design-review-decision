@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   ClipboardPaste,
@@ -19,6 +19,7 @@ import { useMutation } from "@tanstack/react-query";
 import API_CONFIG from "@/lib/apiConfig";
 import ideaDraftQuestions from "@/lib/IdeaDraftQuestion";
 import { useTheme } from "@/hooks/useTheme";
+import { track } from "@/lib/analytics";
 
 interface IdeaSubmissionModalProps {
   open: boolean;
@@ -51,6 +52,11 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const hasSource = sourceFiles.length > 0 || sourceText.trim().length > 0;
+
+  // Modal opened — a funnel entry point. No content, just the event.
+  useEffect(() => {
+    if (open) track("idea_create_opened");
+  }, [open]);
 
   const resetForm = () => {
     setTitle("");
@@ -89,6 +95,9 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
         // can distinguish inventor-provided source material.
         prefill,
       });
+
+      // Idea + draft created — opaque ids only, never the title or source text.
+      track("idea_created", { idea_id: response?.data?.data?.id });
 
       refetchIdeas();
       if (silent) {

@@ -553,7 +553,7 @@ export default function RequestUpdateModal({
               onChange={handleNoteChange}
               placeholder="Describe what updates are needed (e.g., 'Please provide more details on the technical implementation of the AI algorithm...')"
               rows={6}
-              className={`w-full px-4 py-3 rounded-lg border resize-none transition-all focus:outline-none focus:ring-2 focus:ring-[#F9B418]/50 ${
+              className={`ph-no-capture w-full px-4 py-3 rounded-lg border resize-none transition-all focus:outline-none focus:ring-2 focus:ring-[#F9B418]/50 ${
                 theme === "light"
                   ? "bg-transparent border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-[#F9B418]"
                   : "bg-transparent border-white/10 text-white placeholder:text-neutral-500 focus:border-[#F9B418]/50"

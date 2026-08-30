@@ -11,6 +11,28 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import ProtectedRoutes from "./lib/ProtectedRoutes";
 import DesktopOnlyGate from "./components/DesktopOnlyGate";
 import PublicRoutes from "./lib/PublicRoutes";
+import { PostHogProvider } from "@posthog/react";
+import { posthog, analyticsEnabled, beforeSend } from "@/lib/analytics";
+
+// Init once, at module scope, and ONLY behind the fail-closed env gate. When the
+// gate is off (dev/local/preview, or no key) init never runs, so every
+// posthog.capture is an uninitialised no-op and NOTHING is sent — the
+// `<PostHogProvider>` below still mounts safely with the inert client.
+// NO session replay (disable_session_recording) is the load-bearing privacy line
+// for unfiled disclosures; before_send is the denylist + route-id-normalise belt.
+if (analyticsEnabled()) {
+  posthog.init(import.meta.env.VITE_POSTHOG_KEY as string, {
+    defaults: "2026-05-30",
+    api_host: import.meta.env.VITE_POSTHOG_HOST,
+    ui_host: "https://us.posthog.com",
+    autocapture: true,
+    enable_heatmaps: true,
+    capture_pageview: "history_change",
+    disable_session_recording: true,
+    person_profiles: "identified_only",
+    before_send: beforeSend,
+  });
+}
 
 const Index = lazy(() => import("./pages/Index"));
 const IdeasPage = lazy(() => import("./pages/IdeasPage"));
@@ -100,6 +122,7 @@ const App = () => {
   }));
 
   return (
+    <PostHogProvider client={posthog}>
     <ThemeProvider>
       {/* A Google OAuth *client ID* is public — it ships in the bundle either
           way — but hardcoding it means every environment shares one OAuth
@@ -161,6 +184,7 @@ const App = () => {
         </QueryClientProvider>
       </GoogleOAuthProvider>
     </ThemeProvider>
+    </PostHogProvider>
   );
 };
 

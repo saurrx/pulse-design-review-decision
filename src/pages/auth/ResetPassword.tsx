@@ -448,7 +448,7 @@ const ResetPassword: React.FC = () => {
           </div>
 
           {currentPageStatus === "PENDING" && (
-            <form onSubmit={handleSubmit} className="font-sans space-y-5">
+            <form onSubmit={handleSubmit} className="ph-no-capture font-sans space-y-5">
               <div>
                 <label
                   htmlFor="new-password"

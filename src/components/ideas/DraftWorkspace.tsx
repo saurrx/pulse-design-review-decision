@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import EvaluationProgress from "@/components/ideas/EvaluationProgress";
 import API_CONFIG from "@/lib/apiConfig";
 import { extractDocumentText } from "@/lib/documentText";
+import { track } from "@/lib/analytics";
 import ideaDraftQuestions from "@/lib/IdeaDraftQuestion";
 import useUserCookie from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/useTheme";
@@ -136,10 +137,22 @@ const ProvenanceChip = ({ p }: { p: Provenance }) => {
   );
 };
 
-// Lightweight event sink — the demo logs; production wires this to the
-// analytics pipeline.
-const track = (event: string, payload: Record<string, unknown>) =>
-  console.info("[track]", event, payload);
+// Coarse size band — an enum, never the exact byte count.
+const sizeBand = (bytes: number): string => {
+  if (bytes < 100_000) return "xs";
+  if (bytes < 1_000_000) return "s";
+  if (bytes < 5_000_000) return "m";
+  return "l";
+};
+
+// Novelty band from the 0–100 raw score — an enum, never the number itself, so
+// it groups cleanly in a funnel and carries no disclosure signal.
+const noveltyBand = (raw: unknown): string | undefined => {
+  if (typeof raw !== "number") return undefined;
+  if (raw >= 70) return "high";
+  if (raw >= 40) return "moderate";
+  return "low";
+};
 
 const savedLabel = (savedAt: Date | null) => {
   if (!savedAt) return null;
@@ -217,6 +230,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
   useEffect(() => {
     if (draftData && !loadedRef.current) {
       loadedRef.current = true;
+      track("draft_opened", { idea_id: ideaId });
       // Fall back to the default questionnaire when a draft has no (or
       // empty) meta_data, so the workspace never renders without sections.
       const meta =
@@ -378,6 +392,13 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
       if (payload.file) {
         try {
           source = (await extractDocumentText(payload.file)).text;
+          // Content-type + char count only — the extracted text never leaves the
+          // browser and is NEVER put in an event.
+          track("document_parsed", {
+            idea_id: ideaId,
+            content_type: payload.file.type || "unknown",
+            char_count: source.length,
+          });
         } catch (err: any) {
           toast.error(err?.message ?? "That file could not be read");
           return;
@@ -433,6 +454,12 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
         return next;
       });
       setAutofillRan(true);
+      // Count of fields filled + the source kind — never the text or the answers.
+      track("draft_autofill_used", {
+        idea_id: ideaId,
+        source: payload.file ? "document" : "paste",
+        fields_filled: filledCount,
+      });
       // Say what it did NOT do, in the same breath as what it did: novelty is
       // the one section the assistant will not write (draft-assist.ts).
       toast.success(
@@ -461,6 +488,13 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
       });
       const review = res?.data?.data;
       if (review?.message) setProposals((p) => ({ ...p, [qid]: review }));
+      // Field id + the verdict ENUM only — never the answer text or the
+      // suggestion message.
+      track("draft_field_review_requested", {
+        idea_id: ideaId,
+        field: qid,
+        verdict: review?.verdict,
+      });
     } catch (err: any) {
       toast.error(
         err?.response?.data?.message ?? "Couldn't review this answer",
@@ -505,9 +539,15 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
     }
     if (scored && !scoreAnnouncedRef.current) {
       scoreAnnouncedRef.current = true;
-      track("score_completed", { draftId, score: scoreRaw });
+      // Enum band only — never the raw score number (a disclosure signal).
+      track("evaluation_completed_viewed", {
+        idea_id: ideaId,
+        evaluation_id: runningEvaluationId ?? undefined,
+        state: serverEvaluationStatus ?? "SUCCEEDED",
+        novelty_band: noveltyBand(scoreRaw),
+      });
     }
-  }, [scored, scoringActive, draftId, scoreRaw]);
+  }, [scored, scoringActive, draftId, scoreRaw, ideaId, runningEvaluationId, serverEvaluationStatus]);
 
   /* ---------------------------- preliminary signal ---------------------------- */
 
@@ -542,6 +582,20 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
   });
   const signal = signalData?.data;
 
+  // The rail landed — record state/source enums only (both may be absent, in
+  // which case sanitize drops them). Fires once per content digest.
+  const railShownRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (signal && railShownRef.current !== signalKey) {
+      railShownRef.current = signalKey;
+      track("patentability_rail_shown", {
+        idea_id: ideaId,
+        state: signal?.state,
+        source: signal?.source,
+      });
+    }
+  }, [signal, signalKey, ideaId]);
+
   /* -------------------------------- attachments -------------------------------- */
 
   const { mutate: uploadAttachment } = useMutation({
@@ -550,8 +604,18 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
         files: files.map((f) => ({ originalName: f.name, key: f.name })),
       });
     },
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["workspace_idea", ideaId] }),
+    onSuccess: (_data, files) => {
+      // Metadata only: content-type + a coarse size band, never the filename or
+      // the file contents.
+      (files ?? []).forEach((f) =>
+        track("file_uploaded", {
+          idea_id: ideaId,
+          content_type: f.type || "unknown",
+          size_band: sizeBand(f.size),
+        }),
+      );
+      queryClient.invalidateQueries({ queryKey: ["workspace_idea", ideaId] });
+    },
     onError: () => toast.error("Upload failed"),
   });
 
@@ -565,7 +629,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
       scoreAnnouncedRef.current = false;
       queryClient.setQueryData(["draft_score", draftId], null);
       setScoringActive(true);
-      track("scoring_started", { draftId });
+      track("evaluation_started", { idea_id: ideaId });
     },
     onError: () => toast.error("Failed to start scoring"),
   });
@@ -578,10 +642,10 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
       );
     },
     onSuccess: () => {
-      track("sent_to_committee", {
-        draftId,
-        score: scoreRaw,
-        stale: dirtySinceScore,
+      track("idea_submitted", {
+        idea_id: ideaId,
+        kind: "submit",
+        appeal_count: 0,
       });
       toast.success("Sent for review");
       navigate(`/ideas/${ideaId}`);
@@ -848,7 +912,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                 value={pasteText}
                 onChange={(e) => setPasteText(e.target.value)}
                 placeholder="Paste anything — an email, meeting notes, a rough description. We'll structure it for you."
-                className={fieldCls}
+                className={`ph-no-capture ${fieldCls}`}
               />
               <div className="mt-2 flex justify-end gap-2">
                 <button
@@ -961,7 +1025,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                                   }
                                 }}
                                 placeholder="Type here..."
-                                className={`${fieldCls} ${meta.core ? "" : "pb-9"}`}
+                                className={`ph-no-capture ${fieldCls} ${meta.core ? "" : "pb-9"}`}
                               />
                               {!meta.core && (
                                 <button
@@ -1005,7 +1069,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                                 });
                               return (
                                 <div
-                                  className="mt-2 rounded-xl px-3 py-2.5"
+                                  className="ph-no-capture mt-2 rounded-xl px-3 py-2.5"
                                   style={{ backgroundColor: `${tone.bg}0F` }}
                                 >
                                   <div className="mb-1 flex items-center gap-1.5">

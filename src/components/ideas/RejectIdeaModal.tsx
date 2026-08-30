@@ -85,7 +85,7 @@ export function RejectIdeaModal({ isOpen, onClose, ideaName, onSubmit, reason, s
               onChange={(e) => setReason(e.target.value)}
               placeholder="Provide a clear, constructive explanation for why this disclosure is being rejected (e.g., 'This invention lacks novelty as similar solutions exist in the market...')"
               rows={6}
-              className={`w-full px-4 py-3 rounded-lg border resize-none transition-all focus:outline-none focus:ring-2 focus:ring-red-500/30 ${
+              className={`ph-no-capture w-full px-4 py-3 rounded-lg border resize-none transition-all focus:outline-none focus:ring-2 focus:ring-red-500/30 ${
                 theme === "light"
                   ? "bg-transparent border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-red-500/50"
                   : "bg-transparent border-white/10 text-white placeholder:text-neutral-500 focus:border-red-500/50"

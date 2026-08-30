@@ -18,6 +18,7 @@ import {
 import API_CONFIG from "@/lib/apiConfig";
 import useUserCookie from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/useTheme";
+import { track } from "@/lib/analytics";
 
 /**
  * Optional co-inventors control for the draft workspace details area.
@@ -73,7 +74,10 @@ const CoInventorsField = ({ ideaId }: { ideaId?: string }) => {
     mutationFn: async (inventorId: string) => {
       await API_CONFIG.post(`/api/v1/idea/add/inventor/${ideaId}/${inventorId}`);
     },
-    onSuccess: refresh,
+    onSuccess: () => {
+      track("co_inventor_added", { idea_id: ideaId });
+      refresh();
+    },
     onError: () => toast.error("Failed to add co-inventor"),
   });
 
@@ -89,6 +93,7 @@ const CoInventorsField = ({ ideaId }: { ideaId?: string }) => {
       }
     },
     onSuccess: () => {
+      track("co_inventor_added", { idea_id: ideaId });
       refresh();
       toast.success("Co-inventor invited and added");
     },
@@ -101,7 +106,10 @@ const CoInventorsField = ({ ideaId }: { ideaId?: string }) => {
         `/api/v1/idea/remove/inventor/${ideaInventorId}`,
       );
     },
-    onSuccess: refresh,
+    onSuccess: () => {
+      track("co_inventor_removed", { idea_id: ideaId });
+      refresh();
+    },
     onError: () => toast.error("Failed to remove co-inventor"),
   });
 
