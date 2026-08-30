@@ -1362,6 +1362,30 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                       >
                         Oldest First
                       </DropdownMenuRadioItem>
+                      {/* The two event orderings have had a label and a
+                          SortOption all along and were never offered — there
+                          was nothing behind them until /v1/due-dates learned to
+                          sort by event name. */}
+                      <DropdownMenuRadioItem
+                        value="eventAZ"
+                        className={`cursor-pointer ${
+                          theme === "dark"
+                            ? "text-zinc-200 hover:!text-zinc-200 focus:!text-zinc-200 hover:!bg-white/5 focus:!bg-white/5"
+                            : "text-[#404040] hover:!text-[#404040] focus:!text-[#404040]"
+                        } data-[state=checked]:bg-photon-background-light text-sm`}
+                      >
+                        Event (A-Z)
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem
+                        value="eventZA"
+                        className={`cursor-pointer ${
+                          theme === "dark"
+                            ? "text-zinc-200 hover:!text-zinc-200 focus:!text-zinc-200 hover:!bg-white/5 focus:!bg-white/5"
+                            : "text-[#404040] hover:!text-[#404040] focus:!text-[#404040]"
+                        } data-[state=checked]:bg-photon-background-light text-sm`}
+                      >
+                        Event (Z-A)
+                      </DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
