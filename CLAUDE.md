@@ -203,7 +203,11 @@ DashboardLayout.defaultHeaderForRoute):
   Photon: cross-client variants.
 - **/ideas** IdeasPage → role branch: INVENTOR = DraftListView/EmptyDraftsView
   cards; TECH_COMMITTEE + LEGAL_COUNSEL = review/ReviewQueueWorkspace;
-  photon roles = IdeasContent table.
+  photon roles = IdeasContent table. Every row is named by its **reference**
+  (`reference_number`, e.g. DEMO07 — pulse-backend F-052), never by an id: the
+  fallback is an em dash, because a screen with nothing to show should say so
+  rather than print a database key. `qa/invariant/no-visible-uuid.qa.mjs`
+  fails the build if any screen renders a uuid to a reader.
 - **/ideas/:id** IdeaDetailsPage → IdeaDetailsContent (the monster; branch
   `useDisclosureWorkspace` for reviewers vs inventor card layout; rail =
   score + prior art + StatusTimeline; modals: RejectIdeaModal, SendToOCModal,
