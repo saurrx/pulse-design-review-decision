@@ -5,18 +5,17 @@
     {
       "index": 0,
       "headers": [
-        "s.no",
-        "event",
         "application no.",
         "title",
-        "due date",
+        "next event",
+        "deadline",
         "days",
         "action",
         "status",
         "last updated"
       ],
       "bodyWidths": [
-        9
+        8
       ]
     }
   ],
@@ -45,10 +44,9 @@
     "columnheader:action",
     "columnheader:application no.",
     "columnheader:days",
-    "columnheader:due date",
-    "columnheader:event",
+    "columnheader:deadline",
     "columnheader:last updated",
-    "columnheader:s.no",
+    "columnheader:next event",
     "columnheader:status",
     "columnheader:title",
     "combobox:",
@@ -526,35 +524,7 @@
       "textAlign": "left",
       "textTransform": "none"
     },
-    "columnheader:due date": {
-      "alignItems": "normal",
-      "backgroundColor": "rgba(0, 0, 0, 0)",
-      "borderBottomWidth": "0px",
-      "borderColor": "rgb(230, 231, 235)",
-      "borderRadius": "0px",
-      "borderTopWidth": "0px",
-      "color": "rgb(123, 126, 140)",
-      "display": "table-cell",
-      "flexDirection": "row",
-      "fontFamily": "Instrument Sans",
-      "fontSize": "13px",
-      "fontStyle": "normal",
-      "fontWeight": "600",
-      "gap": "normal",
-      "justifyContent": "normal",
-      "letterSpacing": "0.26px",
-      "lineHeight": "18px",
-      "marginBottom": "0px",
-      "marginTop": "0px",
-      "opacity": "1",
-      "paddingBottom": "0px",
-      "paddingLeft": "16px",
-      "paddingRight": "16px",
-      "paddingTop": "0px",
-      "textAlign": "left",
-      "textTransform": "none"
-    },
-    "columnheader:event": {
+    "columnheader:deadline": {
       "alignItems": "normal",
       "backgroundColor": "rgba(0, 0, 0, 0)",
       "borderBottomWidth": "0px",
@@ -610,7 +580,7 @@
       "textAlign": "left",
       "textTransform": "none"
     },
-    "columnheader:s.no": {
+    "columnheader:next event": {
       "alignItems": "normal",
       "backgroundColor": "rgba(0, 0, 0, 0)",
       "borderBottomWidth": "0px",
@@ -635,7 +605,7 @@
       "paddingLeft": "16px",
       "paddingRight": "16px",
       "paddingTop": "0px",
-      "textAlign": "center",
+      "textAlign": "left",
       "textTransform": "none"
     },
     "columnheader:status": {
