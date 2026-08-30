@@ -176,7 +176,7 @@
    "route": "/",
    "page": "Index",
    "entry": "src/pages/Index.tsx",
-   "components": 28,
+   "components": 30,
    "calls": [
     {
      "method": "POST",
@@ -301,7 +301,7 @@
    "route": "/clients",
    "page": "ClientsPage",
    "entry": "src/pages/client/ClientsPage.tsx",
-   "components": 31,
+   "components": 33,
    "calls": [
     {
      "method": "POST",
@@ -372,7 +372,7 @@
    "route": "/clients/:clientId",
    "page": "ClientDetailPage",
    "entry": "src/pages/client/ClientDetailPage.tsx",
-   "components": 35,
+   "components": 37,
    "calls": [
     {
      "method": "POST",
@@ -560,7 +560,7 @@
    "route": "/ideas",
    "page": "IdeasPage",
    "entry": "src/pages/IdeasPage.tsx",
-   "components": 41,
+   "components": 43,
    "calls": [
     {
      "method": "POST",
@@ -730,7 +730,7 @@
    "route": "/assistant",
    "page": "AssistantPage",
    "entry": "src/pages/client/AssistantPage.tsx",
-   "components": 14,
+   "components": 16,
    "calls": [
     {
      "method": "POST",
@@ -765,7 +765,7 @@
    "route": "/ideas/:id",
    "page": "IdeaDetailsPage",
    "entry": "src/pages/IdeaDetailsPage.tsx",
-   "components": 63,
+   "components": 65,
    "calls": [
     {
      "method": "POST",
@@ -1116,7 +1116,7 @@
    "route": "/ideas/:id/draft",
    "page": "IdeaDraftPage",
    "entry": "src/pages/IdeaDraftPage.tsx",
-   "components": 23,
+   "components": 25,
    "calls": [
     {
      "method": "POST",
@@ -1284,7 +1284,7 @@
    "route": "/patents",
    "page": "PatentsPage",
    "entry": "src/pages/PatentsPage.tsx",
-   "components": 41,
+   "components": 43,
    "calls": [
     {
      "method": "POST",
@@ -1400,7 +1400,7 @@
    "route": "/patents/:patentId",
    "page": "PatentsPage",
    "entry": "src/pages/PatentsPage.tsx",
-   "components": 41,
+   "components": 43,
    "calls": [
     {
      "method": "POST",
@@ -1516,7 +1516,7 @@
    "route": "/due-dates",
    "page": "DueDatesPage",
    "entry": "src/pages/DueDatesPage.tsx",
-   "components": 33,
+   "components": 35,
    "calls": [
     {
      "method": "GET",
@@ -1596,7 +1596,7 @@
    "route": "/workspace",
    "page": "WorkspacePage",
    "entry": "src/pages/WorkspacePage.tsx",
-   "components": 30,
+   "components": 32,
    "calls": [
     {
      "method": "POST",
@@ -1730,7 +1730,7 @@
    "route": "/profile",
    "page": "ProfilePage",
    "entry": "src/pages/ProfilePage.tsx",
-   "components": 28,
+   "components": 30,
    "calls": [
     {
      "method": "POST",
@@ -1792,7 +1792,7 @@
    "route": "/actions",
    "page": "ActionsPage",
    "entry": "src/pages/ActionsPage.tsx",
-   "components": 33,
+   "components": 35,
    "calls": [
     {
      "method": "GET",
