@@ -1,5 +1,32 @@
 import Cookies from "js-cookie";
 import type { SessionUser } from "@/hooks/use-auth";
+import posthog from "posthog-js";
+import { envEnabled, ANALYTICS_HOST_ALLOWLIST } from "@/lib/analytics/catalog";
+
+/**
+ * Local fail-closed gate. Import `posthog` from `posthog-js` directly (NOT from
+ * `@/lib/analytics`) because `@/lib/analytics` imports `readUserCookie` from this
+ * file — going the other way would be an import cycle. The catalogue has no
+ * imports, so reading the allowlists from it is cycle-free.
+ */
+function analyticsOn(): boolean {
+  return (
+    envEnabled(import.meta.env.VITE_ANALYTICS_ENV) &&
+    !!import.meta.env.VITE_POSTHOG_KEY &&
+    typeof window !== "undefined" &&
+    (ANALYTICS_HOST_ALLOWLIST as readonly string[]).includes(window.location.hostname)
+  );
+}
+
+/** Clear the identified person on session teardown. No-op unless the gate is on. */
+function resetAnalytics(): void {
+  if (!analyticsOn()) return;
+  try {
+    posthog.reset();
+  } catch {
+    // best-effort — teardown must never throw
+  }
+}
 
 /**
  * Reads the signed-in user from the `pl_user` cookie.
@@ -38,6 +65,10 @@ export function readUserCookie(): SessionUser | null {
  * backend (`POST /api/v1/auth/logout`); callers should fire that separately.
  */
 export function clearAuthSession(): void {
+  // Analytics identity dies with the session — reset before we clear the cookie
+  // so a subsequent login is a fresh distinctId, not merged into the old person.
+  resetAnalytics();
+
   // Cookies (path "/" matches how they're set on login)
   Cookies.remove("pl_user", { path: "/" });
   Cookies.remove("pl_user");

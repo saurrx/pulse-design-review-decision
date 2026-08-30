@@ -309,7 +309,7 @@ const Invite = () => {
             </p>
           </div>
 
-          <form className="space-y-5" onSubmit={handleSubmit}>
+          <form className="ph-no-capture space-y-5" onSubmit={handleSubmit}>
             {!isSent && <div>
               <label
                 data-slot="label"

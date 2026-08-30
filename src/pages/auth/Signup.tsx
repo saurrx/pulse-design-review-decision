@@ -567,7 +567,7 @@ const Signup = () => {
             <div className="flex-1 h-px bg-neutral-900" />
           </div>
 
-          <form className="space-y-5" onSubmit={handleSubmit}>
+          <form className="ph-no-capture space-y-5" onSubmit={handleSubmit}>
             <div>
               <label
                 data-slot="label"

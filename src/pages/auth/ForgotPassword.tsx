@@ -322,7 +322,7 @@ const ForgotPassword = () => {
           </button>
 
           {status === "PENDING" && (
-            <form className="font-sans space-y-5" onSubmit={handleSubmit}>
+            <form className="ph-no-capture font-sans space-y-5" onSubmit={handleSubmit}>
               <div>
                 <label
                   data-slot="label"

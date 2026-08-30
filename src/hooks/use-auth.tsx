@@ -1,6 +1,7 @@
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import type { Role } from "@/lib/roles";
+import { identifyUser } from "@/lib/analytics";
 
 /**
  * The signed-in user, as stored in the `pl_user` cookie.
@@ -32,7 +33,17 @@ const useUserCookie = () => {
     const cookieValue = Cookies.get("pl_user");
     if (cookieValue) {
       try {
-        setUser(JSON.parse(cookieValue) as SessionUser);
+        const parsed = JSON.parse(cookieValue) as SessionUser;
+        setUser(parsed);
+        // Identify by the opaque user id, with role + client_id as person
+        // properties only. NEVER email/name (both denylisted). client_id as a
+        // free property — no paid group() add-on. No-op unless the env gate is on.
+        if (parsed.id) {
+          identifyUser(parsed.id, {
+            role: parsed.role,
+            client_id: parsed.client_id ?? parsed.clientId,
+          });
+        }
       } catch (error) {
         console.error("Error parsing user cookie:", error);
         Cookies.remove("pl_user");

@@ -886,7 +886,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
 
 
     return (
-      <div className="mx-auto w-full max-w-[960px] space-y-6">
+      <div className="ph-no-capture mx-auto w-full max-w-[960px] space-y-6">
         <section
           className={`overflow-hidden rounded-2xl border [box-shadow:var(--pulse-shadow-card)] ${
             theme === "dark"

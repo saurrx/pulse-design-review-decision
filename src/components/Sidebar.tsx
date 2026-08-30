@@ -22,6 +22,7 @@ import { toast } from "sonner";
 
 import API_CONFIG from "@/lib/apiConfig";
 import { clearAuthSession } from "@/lib/auth";
+import { track, identifyUser, resetUser } from "@/lib/analytics";
 import { getClientLogoSrc } from "@/lib/clientBranding";
 import useUserCookie from "@/hooks/use-auth";
 import {
@@ -193,6 +194,14 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
       sessionStorage.removeItem("pl_original_admin_user");
       const restored = r?.data?.user ? JSON.stringify({ ...JSON.parse(original ?? "{}"), ...r.data.user }) : original;
       if (restored) Cookies.set("pl_user", restored, { secure: true, sameSite: "lax", path: "/" });
+      // Leaving the view-as session: drop the viewed identity, then re-identify
+      // the restored admin so events land on the right person. Ids/enums only.
+      resetUser();
+      try {
+        const admin = restored ? JSON.parse(restored) : null;
+        if (admin?.id) identifyUser(admin.id, { role: admin.role, client_id: admin.client_id ?? admin.clientId });
+      } catch { /* best-effort */ }
+      track("view_as_exited");
       window.location.replace("/clients");
     } catch {
       window.location.replace("/clients");
@@ -200,6 +209,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
   };
 
   const logout = async () => {
+    track("logout_clicked");
     try {
       await API_CONFIG.post("/api/v1/auth/logout");
     } finally {
@@ -268,6 +278,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
               <li key={item.path}>
                 <Link
                   to={item.path}
+                  onClick={() => track("nav_item_clicked", { item: item.path })}
                   title={collapsed ? item.label : undefined}
                   className={`group flex h-10 items-center rounded-lg text-sm font-medium transition-colors ${
                     collapsed ? "justify-center px-2" : "gap-3 px-2"

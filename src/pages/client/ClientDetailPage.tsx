@@ -23,6 +23,7 @@ import Cookies from "js-cookie";
 import { useTheme } from "@/hooks/useTheme";
 import useUserCookie from "@/hooks/use-auth";
 import { isOutsideCounselRole } from "@/lib/roleAccess";
+import { track, identifyUser } from "@/lib/analytics";
 
 const ClientDetailPage: React.FC = () => {
   const { theme } = useTheme();
@@ -133,6 +134,17 @@ const ClientDetailPage: React.FC = () => {
             Cookies.set("pl_user", JSON.stringify(userData), { secure: true, sameSite: "lax", path: "/" });
 
             toast.success("Entered client mode successfully");
+
+            // Entering a view-as session: re-identify as the viewed user with the
+            // view flag, and record the transition. Ids/enums only, never name/email.
+            if (userData.id) {
+              identifyUser(userData.id, {
+                role: userData.role,
+                client_id: userData.client_id ?? userData.clientId ?? clientId,
+                view: true,
+              });
+            }
+            track("view_as_entered", { client_id: clientId });
 
             // Force a full page reload
             window.location.replace("/");

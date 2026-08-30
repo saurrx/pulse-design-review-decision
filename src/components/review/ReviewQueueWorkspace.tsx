@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 import API_CONFIG from "@/lib/apiConfig";
+import { track } from "@/lib/analytics";
 import useUserCookie from "@/hooks/use-auth";
 import {
   Dialog,
@@ -549,6 +550,12 @@ const ReviewQueueWorkspace = () => {
       });
     },
     onSuccess: async () => {
+      // Decision ENUM + stage only — never the instruction note text.
+      track("review_decided", {
+        idea_id: selectedIdea?.id,
+        decision: "APPROVED",
+        stage: isCommittee ? "technical" : "legal",
+      });
       toast.success("Approved and sent to Photon Legal");
       setSelectedId(nextQueueId);
       await refreshWorkspace();
@@ -571,6 +578,13 @@ const ReviewQueueWorkspace = () => {
       );
     },
     onSuccess: async () => {
+      // The note text NEVER travels — only the decision enum + stage.
+      track("review_decided", {
+        idea_id: selectedIdea?.id,
+        decision: "CHANGES_REQUESTED",
+        stage: isCommittee ? "technical" : "legal",
+      });
+      track("request_update_submitted", { idea_id: selectedIdea?.id });
       toast.success("Update requested from the inventor");
       setDecisionDialog(null);
       setDecisionNote("");
@@ -589,6 +603,16 @@ const ReviewQueueWorkspace = () => {
       );
     },
     onSuccess: async () => {
+      // reason_len is a COUNT — the reject reason text itself never travels.
+      track("review_decided", {
+        idea_id: selectedIdea?.id,
+        decision: "REJECTED",
+        stage: isCommittee ? "technical" : "legal",
+      });
+      track("reject_submitted", {
+        idea_id: selectedIdea?.id,
+        reason_len: decisionNote.trim().length,
+      });
       toast.success("Disclosure declined");
       setDecisionDialog(null);
       setDecisionNote("");
@@ -597,6 +621,22 @@ const ReviewQueueWorkspace = () => {
     },
     onError: () => toast.error("Unable to decline this disclosure"),
   });
+
+  // Queue landed — fire once. Enum stage only.
+  const queueViewedRef = React.useRef(false);
+  React.useEffect(() => {
+    if (!queueViewedRef.current) {
+      queueViewedRef.current = true;
+      track("review_queue_viewed");
+    }
+  }, []);
+
+  // A decision dialog opened — carry only which kind.
+  React.useEffect(() => {
+    if (decisionDialog) {
+      track("review_decision_opened", { kind: decisionDialog });
+    }
+  }, [decisionDialog]);
 
   React.useEffect(() => {
     const handleDecisionShortcut = (event: KeyboardEvent) => {
@@ -1129,7 +1169,7 @@ const ReviewQueueWorkspace = () => {
               value={decisionNote}
               onChange={(event) => setDecisionNote(event.target.value)}
               placeholder={decisionDialog === "request" ? "For example: clarify how the heater traces are patterned and attach the latest test results." : "Explain why this disclosure should not proceed."}
-              className="mt-2 min-h-32 rounded-lg border-[var(--pulse-line)] bg-white text-sm leading-6 focus-visible:ring-[var(--pulse-focus)]"
+              className="ph-no-capture mt-2 min-h-32 rounded-lg border-[var(--pulse-line)] bg-white text-sm leading-6 focus-visible:ring-[var(--pulse-focus)]"
               autoFocus
             />
             <p className="mt-2 text-xs text-[var(--pulse-ink-muted)]">Be specific and use plain language. The inventor will see this verbatim.</p>
