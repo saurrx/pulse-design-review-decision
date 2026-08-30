@@ -129,10 +129,24 @@ for (const { role, paths, drill = [] } of SURFACES) {
     if (drill.includes(path)) {
       // Open the first record on this list and read its page.
       const before = new URL(page.url()).pathname;
-      const row = page.locator('main a[href], main tbody tr, main [role="button"], main button').first();
-      await row.click({ timeout: 5000 }).catch(() => {});
-      await page.waitForTimeout(5000);
-      const landed = new URL(page.url()).pathname;
+      // Try a few shapes of "the first record": these lists are variously a
+      // table, a stack of cards, and a grid of buttons. Stop at the first one
+      // that actually navigates.
+      const candidates = [
+        'main tbody tr',
+        'main a[href^="/ideas/"], main a[href^="/clients/"], main a[href^="/patents/"]',
+        'main [data-row], main article',
+        'main button',
+      ];
+      let landed = before;
+      for (const sel of candidates) {
+        const el = page.locator(sel).first();
+        if (!(await el.count())) continue;
+        await el.click({ timeout: 4000 }).catch(() => {});
+        await page.waitForTimeout(4000);
+        landed = new URL(page.url()).pathname;
+        if (landed !== before) break;
+      }
       if (landed !== before && !/\/login$/.test(landed)) {
         checked++;
         await scan(`${landed}  (opened from ${path})`);
