@@ -18,6 +18,11 @@ interface SendToOCModalProps {
   onSubmit: (message?: string) => void;
   instructions: string;
   setInstructions: (text: string) => void;
+  /** Who this hand-off actually goes to. The committee passes a disclosure to
+   *  legal counsel; counsel passes it to Photon Legal. One dialog served both
+   *  and told the committee it was sending to outside counsel, which is not
+   *  what the button they pressed said and not what the chain does. */
+  recipient?: "LEGAL_COUNSEL" | "PHOTON_LEGAL";
 }
 
 export function SendToOCModal({
@@ -27,8 +32,11 @@ export function SendToOCModal({
   onSubmit,
   instructions,
   setInstructions,
+  recipient = "PHOTON_LEGAL",
 }: SendToOCModalProps) {
   const { theme } = useTheme();
+  const toCounsel = recipient === "LEGAL_COUNSEL";
+  const who = toCounsel ? "Legal Counsel" : "Photon Legal";
 
   const handleSubmit = () => {
     onSubmit();
@@ -49,14 +57,16 @@ export function SendToOCModal({
                 theme === "light" ? "text-gray-900" : "text-white"
               }`}
             >
-              Send to Outside Counsel
+              Send to {who}
             </DialogTitle>
             <DialogDescription
               className={`text-sm mt-0.5 ${
                 theme === "light" ? "text-gray-500" : "text-neutral-400"
               }`}
             >
-              Forward this disclosure for patent application filing
+              {toCounsel
+                ? "Pass this disclosure to legal counsel for review"
+                : "Forward this disclosure for patent application filing"}
             </DialogDescription>
           </div>
         </DialogHeader>
@@ -95,7 +105,7 @@ export function SendToOCModal({
                 theme === "light" ? "text-gray-700" : "text-neutral-300"
               }`}
             >
-              Instructions for Outside Counsel{" "}
+              Instructions for {who}{" "}
               <span
                 className={`text-xs ${
                   theme === "light" ? "text-gray-400" : "text-neutral-500"
@@ -130,9 +140,9 @@ export function SendToOCModal({
                 theme === "light" ? "text-blue-700" : "text-blue-400"
               }`}
             >
-              The complete disclosure document, including all sections and
-              supporting files, will be sent to your outside counsel team for
-              patent application processing.
+              {toCounsel
+                ? "The complete disclosure, including all sections and supporting files, goes to legal counsel for the next stage of review."
+                : "The complete disclosure, including all sections and supporting files, goes to the Photon Legal team for patent application processing."}
             </p>
           </div>
         </div>
@@ -154,7 +164,7 @@ export function SendToOCModal({
             className="bg-[#F9B418] hover:bg-[#F9B418]/90 text-black px-6"
           >
             <Send className="w-4 h-4 mr-2" />
-            Send to OC
+            Send to {who}
           </Button>
         </DialogFooter>
       </DialogContent>
