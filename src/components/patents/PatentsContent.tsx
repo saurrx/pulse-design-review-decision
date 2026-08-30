@@ -1517,8 +1517,11 @@ const PatentsContent = (props: PatentsContentProps) => {
       </div>
       <div className="flex w-full flex-col bg-transparent">
         <div className="pulse-toolbar !mx-0 !mb-5 !mt-0 items-center">
-          <div className="flex w-full flex-wrap items-center gap-3">
-            <div className="min-w-[240px] flex-[1_1_320px]">
+          <div className="pulse-toolbar-tight flex w-full flex-wrap items-center gap-2">
+            {/* The search box gives up width before any labelled control does:
+                it stays usable at 200px, and a filter whose word is cut off
+                does not. */}
+            <div className="min-w-[160px] flex-[1_1_200px]">
               <div className="relative w-full">
                 <Search
                   className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 z-10 pointer-events-none ${

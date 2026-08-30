@@ -367,6 +367,15 @@ const RULES: Rule[] = [
       if (page) out.set("page", page);
       if (limit !== null) out.set("limit", limit);
       if (q.get("filter_client_id")) out.set("client_id", q.get("filter_client_id")!);
+      // The screen has always sent a window, a search and a sort; this rule
+      // dropped all three, so every control on the deadline page was
+      // decoration — the list never changed. See pulse-backend F-047.
+      const search = q.get("search"); if (search) out.set("search", search);
+      const filter = q.get("filter"); if (filter && filter !== "all") out.set("filter", filter);
+      // The screen sorts by deadline or by event name; `sort` names the field
+      // and `order` the direction, which is what the API takes.
+      const sort = q.get("sort"); if (sort) out.set("sort", sort);
+      const order = q.get("order"); if (order) out.set("order", order);
       const qs = out.toString();
       return {
         url: `/v1/due-dates${qs ? `?${qs}` : ""}`, method: "GET",
