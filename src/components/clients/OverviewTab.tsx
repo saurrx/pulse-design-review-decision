@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useTheme } from "@/hooks/useTheme";
 import API_CONFIG from "@/lib/apiConfig";
+import { isUuid } from "@/lib/realAdapter";
 import { MAX_FILE_SIZE } from "@/utils/constants";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Ban, BriefcaseBusiness, CalendarDays, Check, CircleAlert, CircleCheck, CircleX, Copy, Download, FileText, Globe2, Hash, History, Plus, RefreshCw, TrendingUp, Upload, UserPlus } from "lucide-react";
@@ -81,7 +82,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
       const response = await API_CONFIG.get(`/api/v1/clients/${clientId}/invite-link`);
       return response.data.data;
     },
-    enabled: !!canManageTeam,
+    // Photon roles carry the "photon-legal" sentinel rather than a client id;
+    // asking for that client's link is a guaranteed 400.
+    enabled: !!canManageTeam && isUuid(clientId),
   });
 
   const { mutate: uploadPatentFile, isPending: isUploadingPatentFile } = useMutation({
@@ -316,7 +319,11 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
               <p className="mt-1 text-xs text-neutral-500">Import a portfolio file or add an individual patent</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {importHistory.length > 0 && <Button variant="outline" size="sm" onClick={() => setHistoryDialogOpen(true)}><History className="mr-1.5 h-4 w-4" />Import history</Button>}
+              {/* Always offered. Hiding it when the list is empty meant every
+                  client imported before imports were recorded looked as though
+                  the feature did not exist; the dialog can say "nothing yet"
+                  far more honestly than an absent button can. */}
+              <Button variant="outline" size="sm" onClick={() => setHistoryDialogOpen(true)}><History className="mr-1.5 h-4 w-4" />Import history</Button>
               <input id="data-upload" type="file" className="hidden" accept=".xls,.xlsx,.csv" onChange={handleFileUpload} disabled={isUploadingPatentFile} />
               <Button asChild variant="outline" size="sm"><label htmlFor="data-upload" className="cursor-pointer"><Upload className="mr-1.5 h-4 w-4" />{isUploadingPatentFile ? "Uploading…" : "Upload portfolio"}</label></Button>
               <Button size="sm" onClick={() => setShowAddPatentModal(true)} className="bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]"><Plus className="mr-1.5 h-4 w-4" />Add patent</Button>
@@ -334,7 +341,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
               </div>
             </div>
           ) : (
-            <div className="rounded-lg border border-dashed border-neutral-300 px-5 py-8 text-center dark:border-neutral-700"><FileText className="mx-auto mb-2 h-6 w-6 text-neutral-400" /><p className="text-sm font-medium">No portfolio file imported</p><p className="mt-1 text-xs text-neutral-500">Upload Excel or CSV to add this client’s patent records.</p></div>
+            <div className="rounded-lg border border-dashed border-neutral-300 px-5 py-8 text-center dark:border-neutral-700"><FileText className="mx-auto mb-2 h-6 w-6 text-neutral-400" /><p className="text-sm font-medium">{(metricsData?.data?.total_patents ?? 0) > 0 ? "No import on record for these patents" : "No portfolio file imported"}</p><p className="mt-1 text-xs text-neutral-500">{(metricsData?.data?.total_patents ?? 0) > 0 ? "This client’s patents predate import tracking. New uploads are recorded here." : "Upload Excel or CSV to add this client’s patent records."}</p></div>
           )}
         </section>
 
@@ -428,9 +435,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
                   </div>
                 </div>
                 <div className="mt-5 grid grid-cols-3 divide-x rounded-lg border border-neutral-200 py-3 text-center dark:border-neutral-700">
-                  <div><p className="text-xs uppercase tracking-wider text-neutral-500">Validity</p><p className="mt-1 text-xs font-semibold">Never expires</p></div>
-                  <div><p className="text-xs uppercase tracking-wider text-neutral-500">Joined</p><p className="mt-1 text-xs font-semibold">{inviteLinkData.uses}</p></div>
-                  <div><p className="text-xs uppercase tracking-wider text-neutral-500">Created by</p><p className="mt-1 truncate px-2 text-xs font-semibold">{inviteLinkData.createdBy}</p></div>
+                  <div><p className="text-xs uppercase tracking-wider text-neutral-500">Validity</p><p className="mt-1 text-xs font-semibold">{inviteLinkData.expires_at ? `Until ${new Date(inviteLinkData.expires_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : "14 days"}</p></div>
+                  <div><p className="text-xs uppercase tracking-wider text-neutral-500">Joined</p><p className="mt-1 text-xs font-semibold">{typeof inviteLinkData.uses === "number" ? inviteLinkData.uses : "—"}</p></div>
+                  <div><p className="text-xs uppercase tracking-wider text-neutral-500">Created by</p><p className="mt-1 truncate px-2 text-xs font-semibold">{inviteLinkData.createdBy || "—"}</p></div>
                 </div>
                 <div className="mt-4 flex flex-wrap items-center justify-end gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-700">
                   <div className="flex gap-2"><Button size="sm" variant="outline" onClick={() => window.confirm("Generate a new link? The current QR code and link will stop working immediately.") && regenerateInviteMutation.mutate()} disabled={regenerateInviteMutation.isPending}><RefreshCw className="mr-1.5 h-3.5 w-3.5" />Regenerate</Button><Button size="sm" variant="ghost" onClick={() => window.confirm("Deactivate this invite link? Anyone who has it will no longer be able to join.") && deactivateInviteMutation.mutate()} disabled={deactivateInviteMutation.isPending} className="text-red-600 hover:bg-red-50 hover:text-red-700"><Ban className="mr-1.5 h-3.5 w-3.5" />Deactivate</Button></div>
@@ -445,6 +452,13 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
         <DialogContent className="max-w-2xl bg-white/95 backdrop-blur-xl dark:bg-neutral-950">
           <DialogHeader><DialogTitle>Portfolio import history</DialogTitle><DialogDescription>Previous patent portfolio uploads for this client.</DialogDescription></DialogHeader>
           <div className="mt-3 max-h-[380px] space-y-3 overflow-auto">
+            {importHistory.length === 0 && (
+              <div className="rounded-lg border border-dashed border-neutral-300 px-5 py-8 text-center dark:border-neutral-700">
+                <FileText className="mx-auto mb-2 h-6 w-6 text-neutral-400" />
+                <p className="text-sm font-medium">No imports recorded yet</p>
+                <p className="mt-1 text-xs text-neutral-500">Patents added before import tracking do not appear here. Every upload from now on is recorded with who ran it and how many rows landed.</p>
+              </div>
+            )}
             {importHistory.map((row) => <div key={row?.id} className="flex items-center gap-3 rounded-lg border p-4"><FileText className="h-5 w-5 text-neutral-400" /><div className="min-w-0"><p className="truncate text-sm font-medium">{row?.created ?? 0} imported{row?.failed ? ` · ${row.failed} failed` : ""}{row?.rows ? ` · of ${row.rows} row(s)` : ""}</p><p className="mt-1 text-xs text-neutral-500">{formatDate(row?.at)} · {row?.by || "Unknown"}</p></div></div>)}
           </div>
         </DialogContent>

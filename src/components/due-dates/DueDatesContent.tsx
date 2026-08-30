@@ -157,10 +157,13 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     Record<string, { templateId: string; updatedAt: string }>
   >({});
 
-  // Column visibility state - order matches the Actions workflow table.
+  // Column visibility state — the Photon-side Operations table's order and
+  // vocabulary, which is the design's: identity first, then what is coming and
+  // when. The row number column is gone: it numbered the CURRENT page of a
+  // sorted, filtered list, so it identified nothing and moved whenever either
+  // changed. Event/Due Date are Next Event/Deadline, the words the rest of the
+  // product already uses.
   const [columns, setColumns] = useState([
-    { id: "Sr", label: "S.No", visible: true, sticky: false },
-    { id: "event", label: "Event", visible: true, sticky: false },
     {
       id: "applicationNumber",
       label: "Application No.",
@@ -178,7 +181,8 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     // The invention title belongs on the default view — a docket row identified
     // only by application number tells you nothing about what is at stake.
     { id: "title", label: "Title", visible: true, sticky: false },
-    { id: "dueDate", label: "Due Date", visible: true, sticky: false },
+    { id: "event", label: "Next Event", visible: true, sticky: false },
+    { id: "dueDate", label: "Deadline", visible: true, sticky: false },
     // Urgency, not just the date. The countdown is the at-a-glance overdue
     // signal the deadline list exists for.
     { id: "days", label: "Days", visible: true, sticky: false },
@@ -485,7 +489,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
             <p className="truncate">{dueDate.patent}</p>
           </div>
           <div>
-            <p className="text-gray-500 text-xs">Due Date</p>
+            <p className="text-gray-500 text-xs">Deadline</p>
             <p>{formatDate(dueDate.dueDate)}</p>
           </div>
           <div>
@@ -524,17 +528,6 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
   // Helper function to render cell content based on column ID
   const renderCellContent = (columnId: string, client: any, index: number) => {
     switch (columnId) {
-      case "Sr":
-        return (
-          <td
-            key={columnId}
-            className={`p-4 text-sm text-center ${
-              theme === "dark" ? "text-neutral-400" : "text-neutral-600"
-            }`}
-          >
-            {startIndex + index + 1}
-          </td>
-        );
       case "event":
         return (
           <td
@@ -1838,10 +1831,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                         {visibleColumns.map((column) => (
                           <th
                             key={column.id}
-                            className={`${
-                              column.id === "Sr" ? "text-center" : "text-left"
-                            } p-4 text-xs font-semibold dark:text-neutral-500 text-neutral-600`}
-                            style={column.id === "Sr" ? { width: "70px" } : {}}
+                            className="p-4 text-left text-xs font-semibold text-neutral-600 dark:text-neutral-500"
                           >
                             {column.label}
                           </th>

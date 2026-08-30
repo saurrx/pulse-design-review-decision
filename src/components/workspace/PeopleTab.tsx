@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ROLE_LABEL } from "@/lib/roles";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Copy, Download, Link2, Trash2, UserPlus, Users } from "lucide-react";
+import { Ban, Check, Copy, Download, Link2, RefreshCw, Trash2, UserPlus, Users } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import API_CONFIG from "@/lib/apiConfig";
+import { isUuid } from "@/lib/realAdapter";
 import useUserCookie from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,7 +33,10 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
       const response = await API_CONFIG.get(`/api/v1/clients/${clientId}/invite-link`);
       return response?.data?.data;
     },
-    enabled: !!clientId,
+    // A Photon user carries the "photon-legal" sentinel, not a client id, and
+    // the API answers 400 for it — this fired on every load of the Photon
+    // workspace, which has no invite link to show in the first place.
+    enabled: isUuid(clientId),
   });
 
   const generateLinkMutation = useMutation({
@@ -42,12 +46,41 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
       toast.success("Inventor invite link generated");
     },
+    onError: () => toast.error("Could not generate the link. Try again."),
+  });
+
+  // Regenerating REVOKES the live link server-side and mints a new one, so the
+  // old URL and QR stop working — say that before doing it.
+  const regenerateLinkMutation = useMutation({
+    mutationFn: async () =>
+      API_CONFIG.post(`/api/v1/clients/${clientId}/invite-link`, {}),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
+      toast.success("New link generated. The previous link and QR no longer work.");
+    },
+    onError: () => toast.error("Could not regenerate the link. Try again."),
+  });
+
+  const deactivateLinkMutation = useMutation({
+    // The revoke route takes the invite's id, not its short code.
+    mutationFn: async () =>
+      API_CONFIG.delete(`/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
+      toast.success("Invite link deactivated");
+    },
+    onError: () => toast.error("Could not deactivate the link. Try again."),
   });
 
   const inviteLink = inviteLinkData?.token
     ? `${window.location.origin}/i/${inviteLinkData.token}`
     : "";
   const joinedCount = Number(inviteLinkData?.uses) || 0;
+  const expiryLabel = inviteLinkData?.expires_at
+    ? `Expires ${new Date(inviteLinkData.expires_at).toLocaleDateString("en-US", {
+        month: "short", day: "numeric", year: "numeric",
+      })}`
+    : "Expires in 14 days";
   const lastJoinedLabel = inviteLinkData?.lastUsedAt
     ? new Date(inviteLinkData.lastUsedAt).toLocaleDateString("en-US", {
         month: "short",
@@ -196,10 +229,15 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
                     <p className="mt-1 text-xs leading-5 text-[var(--pulse-ink-muted)]">
                       Anyone at {domain} with this link can join as an inventor. Administrator access is never granted through shared links.
                     </p>
+                    {/* The link is NOT non-expiring: the API gives a share
+                        link 14 days, because its lifetime is its blast radius
+                        (F-008). Saying "non-expiring" here promised the one
+                        thing the server refuses to do. */}
                     <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">
+                      {expiryLabel}
                       {joinedCount > 0
-                        ? `Non-expiring · ${joinedCount} joined${lastJoinedLabel ? ` · Last joined ${lastJoinedLabel}` : ""}`
-                        : "Non-expiring · No one has joined through this link yet"}
+                        ? ` · ${joinedCount} joined${lastJoinedLabel ? ` · Last joined ${lastJoinedLabel}` : ""}`
+                        : ""}
                     </p>
                   </div>
                 </div>
@@ -242,6 +280,35 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
                   </button>
                 </div>
               </div>
+              <div className="flex flex-wrap items-center gap-2 border-t border-[var(--pulse-line)] pt-4 lg:col-span-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={regenerateLinkMutation.isPending}
+                  onClick={() =>
+                    window.confirm(
+                      "Generate a new link? The current link and QR code stop working immediately.",
+                    ) && regenerateLinkMutation.mutate()
+                  }
+                >
+                  <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+                  {regenerateLinkMutation.isPending ? "Regenerating…" : "Regenerate"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  disabled={deactivateLinkMutation.isPending || !inviteLinkData?.id}
+                  onClick={() =>
+                    window.confirm(
+                      "Deactivate this invite link? Anyone holding it can no longer join.",
+                    ) && deactivateLinkMutation.mutate()
+                  }
+                  className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                >
+                  <Ban className="mr-1.5 h-3.5 w-3.5" />
+                  {deactivateLinkMutation.isPending ? "Deactivating…" : "Deactivate"}
+                </Button>
+              </div>
             </>
           ) : (
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:col-span-2">
@@ -251,7 +318,7 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
                 </span>
                 <div>
                   <h3 className="text-sm font-semibold text-[var(--pulse-ink)]">Invite inventors</h3>
-                  <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">Generate a non-expiring, inventor-only link for {domain}.</p>
+                  <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">Generate an inventor-only link for {domain}. It lasts 14 days and can be regenerated at any time.</p>
                 </div>
               </div>
               <Button

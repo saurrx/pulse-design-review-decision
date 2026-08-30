@@ -1816,14 +1816,19 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
     user?.id !== reviewDraft?.idea?.created_by_id;
 
   // Two-stage chain: the committee acts at UNDER_REVIEW, counsel at
-  // SENT_TO_IHC (and at UNDER_REVIEW when the client runs no committee —
-  // the server derives the stage and is the final arbiter either way).
+  // SENT_TO_IHC. Counsel used to be offered UNDER_REVIEW as well, on the
+  // theory that a client with no committee needs it — but an idea only ever
+  // REACHES that state when the client HAS a committee (review-chain
+  // firstStage), so the concession bought nothing and every decision taken
+  // through it came back 403 "You cannot review at this stage". The queue has
+  // gated this correctly since the last round; the detail page, which is what
+  // every link in the product opens, did not. See findings.md F-045.
+  const isUnderCommitteeReview =
+    mainIdeaData?.status?.toUpperCase() === "UNDER_REVIEW";
   const isReviewPending =
     user?.role === "TECH_COMMITTEE"
-      ? mainIdeaData?.status?.toUpperCase() === "UNDER_REVIEW"
-      : ["UNDER_REVIEW", "SENT_TO_IHC"].includes(
-          mainIdeaData?.status?.toUpperCase() ?? "",
-        );
+      ? isUnderCommitteeReview
+      : mainIdeaData?.status?.toUpperCase() === "SENT_TO_IHC";
 
   const isOCReadOnlyWorkspace =
     isOutsideCounselRole(user?.role) &&
@@ -2120,19 +2125,43 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                     value={ocWorkflowStatus}
                     onValueChange={handleOCWorkflowChange}
                   >
+                    {/* Filing is the only transition this side owns; the
+                        other three describe where the idea already is. They
+                        used to be selectable and answered with a toast, which
+                        is a menu that argues with you — they are disabled now,
+                        and the note below says who moves them. */}
                     {OC_WORKFLOW_OPTIONS.map((option) => (
                       <DropdownMenuRadioItem
                         key={option.value}
                         value={option.value}
-                        className="cursor-pointer"
+                        disabled={
+                          option.value !== "FILED" &&
+                          option.value !== ocWorkflowStatus
+                        }
+                        className={
+                          option.value === "FILED" ||
+                          option.value === ocWorkflowStatus
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed opacity-60"
+                        }
                       >
                         {option.label}
                       </DropdownMenuRadioItem>
                     ))}
+                    <p className="border-t border-[var(--pulse-line)] px-2 py-2 text-xs text-[var(--pulse-ink-muted)]">
+                      Stages advance on their own as the idea progresses. Filing
+                      is the one action taken here.
+                    </p>
                   </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+          )}
+
+          {isReviewWorkspace && user?.role !== "TECH_COMMITTEE" && isUnderCommitteeReview && (
+            <p className="ml-auto self-center rounded-lg border border-dashed border-[var(--pulse-line-strong)] bg-[var(--pulse-surface-subtle)] px-4 py-2.5 text-sm text-[var(--pulse-ink-muted)]">
+              Under Tech Committee review — it reaches your queue once the committee sends it on.
+            </p>
           )}
 
           {isReviewWorkspace && isReviewPending && (
@@ -2577,7 +2606,11 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                         </Button>
                       )}
 
-                    {selectedDraftId && user?.role === "LEGAL_COUNSEL" && (
+                    {/* Same stage gate as the header action: this second
+                        "Send To OC" had none at all, so it stayed clickable on
+                        a committee-stage idea and 403'd exactly like the
+                        first one. */}
+                    {selectedDraftId && user?.role === "LEGAL_COUNSEL" && isReviewPending && (
                       <Button
                         className={` bg-[#F9B418] font-semibold h-9 font-sans ${theme === "dark"
                           ? "text-neutral-900 hover:bg-[#F9B418]"

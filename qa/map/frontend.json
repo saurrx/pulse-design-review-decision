@@ -1655,7 +1655,7 @@
      "v1": [
       "/v1/invites/{id}"
      ],
-     "from": "src/components/clients/ClientInviteDialog.tsx"
+     "from": "src/components/workspace/PeopleTab.tsx"
     },
     {
      "method": "GET",

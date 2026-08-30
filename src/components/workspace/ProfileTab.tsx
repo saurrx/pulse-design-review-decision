@@ -696,8 +696,18 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
       payload.profile_image = updatedProfileImage.id;
     }
 
-    // Validate phone number based on selected country
-    if (payload.phone && payload.phone.trim()) {
+    // Validate the phone ONLY when this edit touched it.
+    //
+    // The pattern is stricter than the data: an account holding a number saved
+    // before this rule existed (or entered in another format) failed it on
+    // every submit, so the form refused to save a NAME or an ADDRESS and never
+    // sent a request at all — the "nothing gets saved" report, still true after
+    // the API side was fixed. Judge what the user typed, not what they
+    // inherited. See findings.md F-046.
+    const phoneUnchanged =
+      !!originalFormValues &&
+      (payload.phone ?? "") === (originalFormValues.phone ?? "");
+    if (!phoneUnchanged && payload.phone && payload.phone.trim()) {
       const cleanedPhone = payload.phone.replace(/\D/g, ""); // Remove all non-digits
       const isValid = selectedCountry.pattern.test(cleanedPhone);
       if (!isValid) {
