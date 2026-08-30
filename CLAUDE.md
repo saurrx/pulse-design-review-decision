@@ -225,7 +225,15 @@ DashboardLayout.defaultHeaderForRoute):
 - **/ideas/:id/draft** IdeaDraftPage → DraftWorkspace (5-section
   questionnaire, autosave, CoInventorsField, AudioInput dictation) /
   DraftCreationContent; reviewer read view = IHCAdminDraftView/OCDraftView/
-  PatentPaperView.
+  PatentPaperView. Three AI surfaces, all server-enforced (pulse-backend
+  draft-assist.ts + preliminary-signal.ts): **autofill** from pasted text or an
+  uploaded file — the file is parsed HERE, in the browser (lib/documentText.ts,
+  pdf.js and mammoth both lazily imported), so the document never leaves the
+  machine; **Review this** beside each field, returning unusable / improve
+  (with a rewrite to accept) / good; and the **rail**, which follows the
+  writing through a debounced content digest rather than a section count.
+  NEITHER aid touches the Novelty section — that is the inventor's claim, and
+  the refusal is enforced on the server, not here.
 - **/patents** PatentsPage → PatentsContent (14-col table, URL-synced filters,
   PatentTagsCell, CSV export); **/patents/:id** PatentDetailsContent (events,
   timeline, documents, next steps). The toolbar carries `pulse-toolbar-tight`

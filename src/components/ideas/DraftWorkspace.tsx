@@ -20,6 +20,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import EvaluationProgress from "@/components/ideas/EvaluationProgress";
 import API_CONFIG from "@/lib/apiConfig";
+import { extractDocumentText } from "@/lib/documentText";
 import ideaDraftQuestions from "@/lib/IdeaDraftQuestion";
 import useUserCookie from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/useTheme";
@@ -168,8 +169,13 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
   const [autofillRan, setAutofillRan] = useState(false);
   const [pasteOpen, setPasteOpen] = useState(false);
   const [pasteText, setPasteText] = useState("");
-  // One AI proposal per field, shown as a card until inserted or discarded.
-  const [proposals, setProposals] = useState<Record<string, string>>({});
+  // One review per field, shown as a card until dismissed. A review is a
+  // VERDICT on what the inventor wrote — not a blob of text to accept blindly:
+  // "this does not answer the question yet", "here is what is missing, and
+  // here is a version with your own facts in it", or "this works, and here is
+  // why". See pulse-backend draft-assist.ts.
+  type FieldReview = { verdict: string; message: string; example?: string };
+  const [proposals, setProposals] = useState<Record<string, FieldReview>>({});
   const [finishNote, setFinishNote] = useState<string | null>(null);
   const [showCoInvPrompt, setShowCoInvPrompt] = useState(false);
   const [draftingField, setDraftingField] = useState<string | null>(null);
@@ -273,7 +279,6 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
     { id: "attachments", title: "Attachments" },
   ];
 
-  const sectionsWithContent = outline.filter((o) => sectionHasContent(o.id)).length;
 
   const requiredIds = Object.keys(FIELD_META).filter((k) => FIELD_META[k].required);
   const missingRequired = requiredIds.filter((id) => !answers[id]?.trim());
@@ -363,25 +368,41 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
   const runAutofill = async (payload: { file?: File; text?: string }) => {
     setIsAutofilling(true);
     try {
-      // Existing pipeline; provenance is inventor-provided source material.
-      const res = await API_CONFIG.post("/api/v1/idea/analyze-document", {
-        source: "inventor-provided",
-        file_name: payload.file?.name ?? null,
-        text: payload.text ?? null,
-      });
-      const filled: any[] = res?.data?.data ?? [];
+      // A dropped file is read HERE and only its text travels — see
+      // lib/documentText.ts on why the document itself never leaves the
+      // machine.
+      let source = (payload.text ?? "").trim();
+      if (payload.file) {
+        try {
+          source = (await extractDocumentText(payload.file)).text;
+        } catch (err: any) {
+          toast.error(err?.message ?? "That file could not be read");
+          return;
+        }
+      }
+      if (source.length < 40) {
+        toast.error("A few sentences at least — there has to be something to read.");
+        return;
+      }
+      const res = await API_CONFIG.post(`/api/v1/idea/autofill/${draftId}`, { text: source });
+      const filled: Record<string, string> = res?.data?.data?.answers ?? {};
+      const filledCount = Object.keys(filled).length;
+      if (!filledCount) {
+        toast.error(
+          res?.data?.data?.source === "unavailable"
+            ? "The drafting assistant is unavailable right now — your text is safe, try again in a moment."
+            : "Nothing in that text answered these questions. Try a fuller description.",
+        );
+        return;
+      }
       setSections((prev) => {
-        const next = prev.map((s) => {
-          const src = filled.find((f) => f.id === s.id);
-          return {
-            ...s,
-            questions: s.questions.map((q: any) => {
-              const fq = src?.questions?.find((x: any) => x.id === q.id);
-              // Never overwrite what the inventor already wrote.
-              return q.answer?.trim() || !fq?.answer ? q : { ...q, answer: fq.answer };
-            }),
-          };
-        });
+        const next = prev.map((s) => ({
+          ...s,
+          questions: s.questions.map((q: any) =>
+            // Never overwrite what the inventor already wrote.
+            q.answer?.trim() || !filled[q.id] ? q : { ...q, answer: filled[q.id] },
+          ),
+        }));
         setProvenance((pp) => {
           const nextProv = { ...pp };
           next.forEach((s) =>
@@ -403,9 +424,15 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
         return next;
       });
       setAutofillRan(true);
-      toast.success("Draft pre-filled — review and edit each section");
-    } catch {
-      toast.error("Autofill failed");
+      // Say what it did NOT do, in the same breath as what it did: novelty is
+      // the one section the assistant will not write (draft-assist.ts).
+      toast.success(
+        `${filledCount} ${filledCount === 1 ? "section" : "sections"} pre-filled — review each one. Novelty is yours to write.`,
+      );
+    } catch (err: any) {
+      toast.error(
+        err?.response?.data?.message ?? "Could not pre-fill from that text",
+      );
     } finally {
       setIsAutofilling(false);
       setPasteOpen(false);
@@ -415,21 +442,20 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
 
   /* ------------------------------ per-field AI ------------------------------ */
 
-  const draftField = async (qid: string, questionText: string) => {
+  const draftField = async (qid: string, _questionText: string) => {
     setDraftingField(qid);
     try {
-      const res = await API_CONFIG.post(`/api/v1/idea/draft-field/${draftId}`, {
+      const res = await API_CONFIG.post(`/api/v1/idea/suggest-field/${draftId}`, {
         question_id: qid,
-        question_text: questionText,
-        context: {
-          title: idea?.title,
-          answers,
-        },
+        // What is in the box right now — autosave may not have flushed yet.
+        answer: answers?.[qid] ?? "",
       });
-      const text = res?.data?.data?.text;
-      if (text) setProposals((p) => ({ ...p, [qid]: text }));
-    } catch {
-      toast.error("Couldn't draft this field");
+      const review = res?.data?.data;
+      if (review?.message) setProposals((p) => ({ ...p, [qid]: review }));
+    } catch (err: any) {
+      toast.error(
+        err?.response?.data?.message ?? "Couldn't review this answer",
+      );
     } finally {
       setDraftingField(null);
     }
@@ -476,17 +502,34 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
 
   /* ---------------------------- preliminary signal ---------------------------- */
 
+  // The rail follows what is WRITTEN, not how many boxes are non-empty. Keying
+  // on the count meant editing a section never refreshed it, and — worse —
+  // clearing every field left the previous read on screen, because the query
+  // was disabled below two sections and react-query kept the last answer.
+  // The key is a digest of the content, debounced so typing does not bill.
+  const answersDigest = useMemo(() => {
+    const body = sections
+      .flatMap((s: any) => s.questions.map((q: any) => `${q.id}:${(q.answer ?? "").trim()}`))
+      .join("|");
+    // A cheap, stable 32-bit hash — this only has to change when the text does.
+    let h = 0;
+    for (let i = 0; i < body.length; i++) h = (Math.imul(31, h) + body.charCodeAt(i)) | 0;
+    return `${body.length}:${h}`;
+  }, [sections]);
+  const [signalKey, setSignalKey] = useState(answersDigest);
+  useEffect(() => {
+    const t = setTimeout(() => setSignalKey(answersDigest), 1200);
+    return () => clearTimeout(t);
+  }, [answersDigest]);
+
   const { data: signalData } = useQuery({
-    queryKey: ["preliminary_signal", draftId, sectionsWithContent],
-    enabled: !!draftId && sectionsWithContent >= 2,
-    // Section completion changes at typing cadence; keep refreshes calm.
+    queryKey: ["preliminary_signal", draftId, signalKey],
+    enabled: !!draftId,
+    // The server caches identical content, so a re-ask after a round trip of
+    // edits and undos costs nothing.
     staleTime: 15000,
     queryFn: async () =>
-      (
-        await API_CONFIG.get(
-          `/api/v1/idea/preliminary-signal/${draftId}?sections=${sectionsWithContent}`,
-        )
-      )?.data,
+      (await API_CONFIG.get(`/api/v1/idea/preliminary-signal/${draftId}`))?.data,
   });
   const signal = signalData?.data;
 
@@ -771,7 +814,8 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                     </button>
                   </div>
                   <p className={`mt-2 text-xs ${muted}`}>
-                    Supported: PDF, DOC, DOCX, PPTX
+                    Read here in your browser: PDF, DOCX, TXT. For slides or
+                    an old .doc, paste the text.
                   </p>
                 </div>
               </div>
@@ -780,7 +824,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".pdf,.doc,.docx,.pptx"
+            accept=".pdf,.docx,.txt,.md"
             className="hidden"
             onChange={(e) => {
               const f = e.target.files?.[0];
@@ -923,53 +967,85 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                                 >
                                   <Sparkles className="h-3.5 w-3.5 text-[#F9B418]" />
                                   {draftingField === q.id
-                                    ? "Suggesting..."
-                                    : "Suggest"}
+                                    ? "Reading..."
+                                    : "Review this"}
                                 </button>
                               )}
                             </div>
-                            {proposals[q.id] && (
-                              <div className="mt-2 rounded-xl bg-[#4351C0]/[0.06] px-3 py-2.5">
-                                <div className="mb-1 flex items-center gap-1.5">
-                                  <Sparkles className="h-3 w-3 text-[#4351C0]" />
-                                  <span className="font-mono text-xs font-semibold uppercase tracking-[0.05em] text-[#333F99]">
-                                    Suggestion
-                                  </span>
+                            {proposals[q.id] && (() => {
+                              const review = proposals[q.id];
+                              // Three verdicts, three different things to show:
+                              // a nudge with nothing to accept, a note plus a
+                              // rewrite built from the inventor's own words, or
+                              // a compliment that offers no edit at all.
+                              const tone =
+                                review.verdict === "good"
+                                  ? { bg: "#1E7B4D", label: "Reads well" }
+                                  : review.verdict === "unusable"
+                                    ? { bg: "#B3261E", label: "Not there yet" }
+                                    : review.verdict === "refused"
+                                      ? { bg: "#7D7D7D", label: "Yours to write" }
+                                      : review.verdict === "unavailable"
+                                        ? { bg: "#7D7D7D", label: "Unavailable" }
+                                        : { bg: "#4351C0", label: "One thing to add" };
+                              const dismiss = () =>
+                                setProposals((p) => {
+                                  const n = { ...p };
+                                  delete n[q.id];
+                                  return n;
+                                });
+                              return (
+                                <div
+                                  className="mt-2 rounded-xl px-3 py-2.5"
+                                  style={{ backgroundColor: `${tone.bg}0F` }}
+                                >
+                                  <div className="mb-1 flex items-center gap-1.5">
+                                    <Sparkles className="h-3 w-3" style={{ color: tone.bg }} />
+                                    <span
+                                      className="font-mono text-xs font-semibold uppercase tracking-[0.05em]"
+                                      style={{ color: tone.bg }}
+                                    >
+                                      {tone.label}
+                                    </span>
+                                  </div>
+                                  <p className={`text-[13px] leading-relaxed ${ink}`}>
+                                    {review.message}
+                                  </p>
+                                  {review.example && (
+                                    <div
+                                      className={`mt-2 rounded-lg border px-3 py-2 text-[13px] leading-relaxed ${
+                                        dark
+                                          ? "border-white/10 bg-white/[0.04] text-neutral-300"
+                                          : "border-[#E8E8E8] bg-white text-[#444444]"
+                                      }`}
+                                    >
+                                      {review.example}
+                                    </div>
+                                  )}
+                                  <div className="mt-2 flex items-center gap-2">
+                                    {review.example && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setAnswer(q.id, review.example!, true);
+                                          dismiss();
+                                        }}
+                                        className="rounded-xl bg-[#F9B418] px-3 py-1 text-xs font-semibold text-[#0C0C0C] hover:bg-[#DA9700]"
+                                      >
+                                        Replace my answer
+                                      </button>
+                                    )}
+                                    <button
+                                      type="button"
+                                      onClick={dismiss}
+                                      className={`px-2 py-1 text-xs font-medium ${muted} hover:underline`}
+                                    >
+                                      {review.example ? "Keep mine" : "Dismiss"}
+                                    </button>
+                                  </div>
                                 </div>
-                                <p className={`text-[13px] leading-relaxed ${ink}`}>
-                                  {proposals[q.id]}
-                                </p>
-                                <div className="mt-2 flex gap-2">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      setAnswer(q.id, proposals[q.id], true);
-                                      setProposals((p) => {
-                                        const n = { ...p };
-                                        delete n[q.id];
-                                        return n;
-                                      });
-                                    }}
-                                    className="rounded-xl bg-[#F9B418] px-3 py-1 text-xs font-semibold text-[#0C0C0C] hover:bg-[#DA9700]"
-                                  >
-                                    Insert
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setProposals((p) => {
-                                        const n = { ...p };
-                                        delete n[q.id];
-                                        return n;
-                                      })
-                                    }
-                                    className={`px-2 py-1 text-xs font-medium ${muted} hover:underline`}
-                                  >
-                                    Discard
-                                  </button>
-                                </div>
-                              </div>
-                            )}
+                              );
+                            })()}
                           </div>
                         );
                       })}
@@ -1148,32 +1224,44 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
               <>
                 {signal ? (
                   <>
-                    <div className={`mt-2 text-xl font-semibold ${ink}`}>
-                      {signal.band ?? signal.headline ?? "Keep going"}
+                    {/* No grade before the search has run: the rail names the
+                        FIELD it is reading and says something true about it.
+                        Every number under here was either counted in this
+                        workspace or comes from the fixed facts list — see
+                        pulse-backend preliminary-signal.ts. */}
+                    {signal.field && (
+                      <div
+                        className={`mt-2 font-mono text-[11px] uppercase tracking-[0.05em] ${muted}`}
+                      >
+                        {signal.field}
+                      </div>
+                    )}
+                    <div className={`mt-1 text-[15px] font-semibold leading-snug ${ink}`}>
+                      {signal.headline}
                     </div>
-                    {/* The model's honest-persuasion line — facts only, spam
-                        gets the no-push copy with band null. Falls back to
-                        the plain section count when the heuristic answered. */}
-                    {signal.message ? (
-                      <p className={`mt-1 text-xs leading-relaxed ${muted}`}>
-                        {signal.message}
+                    {signal.note && (
+                      <p className={`mt-1.5 text-xs leading-relaxed ${muted}`}>
+                        {signal.note}
                       </p>
-                    ) : (
-                      <p className={`mt-1 text-xs ${muted}`}>
-                        based on {signal.sections_with_content} of{" "}
-                        {signal.total_sections} sections
-                      </p>
+                    )}
+                    {(signal.facts ?? []).length > 0 && (
+                      <ul className="mt-2.5 space-y-1.5">
+                        {(signal.facts as string[]).map((f, i) => (
+                          <li
+                            key={i}
+                            className={`flex gap-2 text-[11px] leading-relaxed ${muted}`}
+                          >
+                            <span className="mt-[6px] h-1 w-1 shrink-0 rounded-full bg-[#F9B418]" />
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
                     )}
                   </>
                 ) : (
                   <p className={`mt-2 text-xs leading-relaxed ${muted}`}>
-                    Fill in any two sections and we'll show an early read on
-                    patentability.
-                  </p>
-                )}
-                {requiredComplete && (
-                  <p className={`mt-2 text-xs font-medium ${ink}`}>
-                    You're done — get your full score.
+                    Write a couple of sections and this panel will read them
+                    back to you.
                   </p>
                 )}
                 <p

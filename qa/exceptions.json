@@ -55,13 +55,12 @@
         "rule": "adapter-coverage",
         "paths": [
           "/api/v1/idea/analyze-document",
-          "/api/v1/idea/draft-field/",
           "/api/v1/idea/generate-summary/",
           "/api/v1/idea/upload-idea-file/",
           "/api/v1/idea/update-requested-change/"
         ]
       },
-      "reason": "The copilot trio (analyze-document, draft-field, generate-summary) plus the multipart upload-idea-file path and update-requested-change are 501 BY DESIGN until agent support exists — CLAUDE.md 'Known-not-built'. They are deliberately unmapped so the failure is named rather than silent. Listed explicitly so a SIXTH unmapped call fails the check instead of hiding among them.",
+      "reason": "Two of the original five are BUILT now and mapped: the autofill and the per-field review answer /v1/drafts/:id/autofill and /v1/drafts/:id/suggest (pulse-backend draft-assist.ts). What is left is unmapped on purpose: analyze-document and generate-summary are called only from DraftCreationContent, the pre-DraftWorkspace screen that nothing renders any more — a stale-code question, not a missing feature — and upload-idea-file (multipart) and update-requested-change have no endpoint yet. Listed one by one so a FIFTH unmapped call fails the check instead of hiding among them.",
       "owner": "aakash",
       "expires": "2027-06-30"
     },

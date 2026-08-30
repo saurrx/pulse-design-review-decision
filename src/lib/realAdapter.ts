@@ -742,6 +742,17 @@ const RULES: Rule[] = [
   { m: /^\/api\/v1\/idea\/re-evaluate\/([^/]+)$/, method: "POST",
     to: m => ({ url: `/v1/drafts/${m[1]}/re-evaluate`, method: "POST", wrap: p => ({ data: p }) }) },
 
+  // The two writing aids. Both were 501-by-design placeholders ("the copilot
+  // trio", CLAUDE.md known-not-built) until the endpoints behind them existed;
+  // they do now, and what they will NOT do — touch the novelty section, invent
+  // a number — is enforced server-side in draft-assist.ts, not here.
+  { m: /^\/api\/v1\/idea\/autofill\/([^/]+)$/, method: "POST",
+    to: (m, b) => ({ url: `/v1/drafts/${m[1]}/autofill`, method: "POST",
+      body: { text: b?.text ?? "" }, wrap: p => ({ data: p }) }) },
+  { m: /^\/api\/v1\/idea\/suggest-field\/([^/]+)$/, method: "POST",
+    to: (m, b) => ({ url: `/v1/drafts/${m[1]}/suggest`, method: "POST",
+      body: { question_id: b?.question_id, answer: b?.answer }, wrap: p => ({ data: p }) }) },
+
   // -- people management ----------------------------------------------------
   { m: /^\/api\/v1\/users\/([^/]+)$/, method: "DELETE",
     to: m => ({ url: `/v1/users/${m[1]}`, method: "DELETE", wrap: p => ({ data: p }) }) },
