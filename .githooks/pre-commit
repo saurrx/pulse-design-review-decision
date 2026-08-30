@@ -31,4 +31,48 @@ if git worktree list 2>/dev/null | tail -n +2 | grep -q .; then
   echo "pre-commit: note — this repo has other worktrees:"
   git worktree list | tail -n +2 | sed 's/^/    /'
 fi
+
+# --- The lockfile trap: verify the manifests the way CI will -----------------
+#
+# `npm install` here can leave package.json and package-lock.json out of sync,
+# and ONLY a real `npm ci` on Linux notices: tailwindcss wants yaml@^2 while
+# cosmiconfig wants yaml@^1, npm hoists a single v1 and does not reliably record
+# the nested v2 entry that `npm ci` then demands. It has now broken the pipeline
+# three times, each time hours after the push, and CLAUDE.md documenting the fix
+# has not stopped it happening again.
+#
+# `npm ci --dry-run` is NOT a substitute — measured: on a lock with the nested
+# entry deleted it exits 0 on macOS while node:22-slim exits 1. The check has to
+# be the real command in the real image, so it runs only when the manifests are
+# actually staged, against their STAGED content rather than the working tree.
+# (Copies, never the mounted tree: npm ci in a Linux container over the checkout
+# installs Linux rollup binaries on top of the macOS ones. That has happened.)
+if git diff --cached --name-only | grep -qE '^package(-lock)?\.json$'; then
+  if [ -n "$ALLOW_LOCK_UNVERIFIED" ]; then
+    echo "pre-commit: skipping the lockfile check (ALLOW_LOCK_UNVERIFIED set)."
+  elif ! docker info >/dev/null 2>&1; then
+    echo "pre-commit: package.json/package-lock.json are staged, but Docker is not"
+    echo "  running, so the check that catches the desync cannot run. Start Docker, or"
+    echo "  accept that CI is where you will find out:"
+    echo "      ALLOW_LOCK_UNVERIFIED=1 git commit ..."
+    exit 1
+  else
+    tmp=$(mktemp -d)
+    git show :package.json      > "$tmp/package.json"
+    git show :package-lock.json > "$tmp/package-lock.json"
+    echo "pre-commit: npm ci against the staged manifests (node:22-slim)..."
+    if ! docker run --rm -v "$tmp:/w" -w /w node:22-slim npm ci >"$tmp/log" 2>&1; then
+      echo
+      grep -iE "npm error" "$tmp/log" | head -8 | sed "s/^/    /"
+      echo
+      echo "  The staged lockfile is out of sync — this is the failure CI would hit."
+      echo "  Fix it the documented way (CLAUDE.md, The lockfile trap):"
+      echo "      rm -rf node_modules package-lock.json && npm install"
+      rm -rf "$tmp"; exit 1
+    fi
+    echo "pre-commit: npm ci ok."
+    rm -rf "$tmp"
+  fi
+fi
+
 exit 0

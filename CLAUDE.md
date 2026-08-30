@@ -520,7 +520,7 @@ downloadable.
 
 Locally the same applies: run them one after another, not concurrently.
 
-### The lockfile trap (has bitten twice)
+### The lockfile trap (has bitten three times — now gated)
 `npm install` can leave package.json and package-lock.json out of sync here, and
 only `npm ci` notices — so it passes locally and fails in CI with
 `Missing: yaml@2.9.0 from lock file`.
@@ -541,6 +541,19 @@ record the nested v2 entry that `npm ci` then demands.
 Copies, not the working tree: `npm ci` inside a Linux container against the
 mounted tree installs Linux rollup binaries over the macOS ones and breaks your
 local build. That has also happened.
+
+Writing that procedure down did not stop the third occurrence, because nothing
+ran it. `.githooks/pre-commit` now does, automatically and only when
+`package.json` or `package-lock.json` is staged: it copies the **staged**
+manifests out of the index and runs the real `npm ci` in `node:22-slim`. Enable
+it per clone with `git config core.hooksPath .githooks`; `ALLOW_LOCK_UNVERIFIED=1`
+skips it, and it also refuses (rather than passing quietly) when Docker is not
+running.
+
+**`npm ci --dry-run` is not a substitute** — measured, not assumed: on a lock
+with the nested yaml entry deleted it exits 0 on macOS while `node:22-slim`
+exits 1. It has to be the real command in the real image. See
+pulse-backend/docs/qa/findings.md F-055.
 
 ### The Atlas (cross-repo map)
 
