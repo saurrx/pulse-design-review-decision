@@ -765,7 +765,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
               <span className={`text-[13px] ${muted}`}>
                 <Sparkles className="mr-1.5 inline h-3.5 w-3.5 text-[#F9B418]" />
                 {autofillRan
-                  ? "Draft pre-filled from your material — review each section."
+                  ? "Pre-filled from your material — review each section. Novelty is yours to write."
                   : "Have a write-up? Pre-fill the rest of this draft."}
               </span>
               <div className="flex shrink-0 gap-2">
