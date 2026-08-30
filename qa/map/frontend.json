@@ -1116,7 +1116,7 @@
    "route": "/ideas/:id/draft",
    "page": "IdeaDraftPage",
    "entry": "src/pages/IdeaDraftPage.tsx",
-   "components": 22,
+   "components": 23,
    "calls": [
     {
      "method": "POST",
@@ -1174,9 +1174,11 @@
     },
     {
      "method": "POST",
-     "call": "/api/v1/idea/analyze-document",
-     "rule": null,
-     "v1": [],
+     "call": "/api/v1/idea/autofill/${draftId}",
+     "rule": "^\\/api\\/v1\\/idea\\/autofill\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/autofill"
+     ],
      "from": "src/components/ideas/DraftWorkspace.tsx"
     },
     {
@@ -1198,13 +1200,6 @@
      "from": "src/components/Sidebar.tsx"
     },
     {
-     "method": "POST",
-     "call": "/api/v1/idea/draft-field/${draftId}",
-     "rule": null,
-     "v1": [],
-     "from": "src/components/ideas/DraftWorkspace.tsx"
-    },
-    {
      "method": "GET",
      "call": "/api/v1/idea/fetch-score/${draftId}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-score\\/([^/]+)$",
@@ -1224,7 +1219,7 @@
     },
     {
      "method": "GET",
-     "call": "/api/v1/idea/preliminary-signal/${draftId}?sections=${sectionsWithContent}",
+     "call": "/api/v1/idea/preliminary-signal/${draftId}",
      "rule": "^\\/api\\/v1\\/idea\\/preliminary-signal\\/([^/?]+)(?:\\?(.*))?$",
      "v1": [
       "/v1/drafts/{id}/signal"
@@ -1255,6 +1250,15 @@
      "rule": "^\\/api\\/v1\\/idea\\/single-draft\\/([^/]+)$",
      "v1": [
       "/v1/drafts/{id}"
+     ],
+     "from": "src/components/ideas/DraftWorkspace.tsx"
+    },
+    {
+     "method": "POST",
+     "call": "/api/v1/idea/suggest-field/${draftId}",
+     "rule": "^\\/api\\/v1\\/idea\\/suggest-field\\/([^/]+)$",
+     "v1": [
+      "/v1/drafts/{id}/suggest"
      ],
      "from": "src/components/ideas/DraftWorkspace.tsx"
     },
@@ -1874,6 +1878,6 @@
    ]
   }
  ],
- "adapterRules": 82,
+ "adapterRules": 84,
  "unusedAdapterRules": []
 }
