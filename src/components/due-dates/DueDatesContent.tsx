@@ -116,6 +116,14 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
   const [viewType, setViewType] = useState<DueDatesViewType>(initialView);
   const [rowHeight, setRowHeight] = useState<string>("medium");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  // The search term now reaches the API, so the query key needs to settle
+  // rather than fire once per keystroke. The INPUT stays instant; only the
+  // request waits.
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  useEffect(() => {
+    const t = setTimeout(() => setSearchTerm(searchQuery.trim()), 350);
+    return () => clearTimeout(t);
+  }, [searchQuery]);
   const [filterOption, setFilterOption] = useState<FilterOption>("all");
   const [sortOption, setSortOption] = useState<SortOption>("oldest");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -216,12 +224,11 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
   const {
     isLoading: isFetchingDueDates,
     data: dueDatesData,
-    refetch,
   } = useQuery({
     queryKey: [
       "all_due_dates",
       currentPage,
-      searchQuery,
+      searchTerm,
       filterOption,
       itemsPerPage,
       sortOption,
@@ -240,7 +247,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
       const response = await API_CONFIG.get(
         `/api/v1/patent/fetch/all-due-dates?${params?.toString()}&limit=${itemsPerPage}&order=${order}&sort=${
           sort
-        }&search=${searchQuery}&filter=${filterOption}&filter_client_id=${selectedClientIds.join(
+        }&search=${encodeURIComponent(searchTerm)}&filter=${filterOption}&filter_client_id=${selectedClientIds.join(
           ",",
         )}`,
       );
@@ -329,10 +336,6 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
       setAppliedFilters([]);
     }
   }, [viewType]);
-
-  useEffect(() => {
-    refetch();
-  }, [sortOption]);
 
   // Reset to page 1 when search query changes
   useEffect(() => {
