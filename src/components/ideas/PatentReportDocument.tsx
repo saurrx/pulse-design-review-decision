@@ -300,7 +300,7 @@ export function PatentReportDocument({ payload }: { payload: PatentReportPayload
         )}
 
         <Text style={styles.footer}>
-          Generated on: {new Date().toLocaleDateString()} | Document ID: {result.id}
+          Generated on: {new Date().toLocaleDateString()} | Reference: {result.id}
         </Text>
       </Page>
 

@@ -1006,7 +1006,10 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
 
         // Create a result object expected by the PDF generator
         const reportResult = {
-          id: selectedDraft.id,
+          // The PDF footer prints this as "Document ID". A draft's uuid means
+          // nothing to whoever opens the file months later; the idea's
+          // reference is what the workspace files it under.
+          id: mainIdeaData?.reference_number || selectedDraft.id,
           score: reportData.scoringResult?.score || 0,
           report: JSON.stringify(reportData),
           scoringResult: reportData.scoringResult || {},

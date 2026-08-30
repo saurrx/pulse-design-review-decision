@@ -783,7 +783,7 @@ const ReviewQueueWorkspace = () => {
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-mono text-xs font-semibold uppercase text-[var(--pulse-ink-muted)]">
-                        {selectedIdea.id}
+                        {selectedIdea.reference_number || "—"}
                       </span>
                       <StatusTag status={selectedIdea.status} />
                     </div>
