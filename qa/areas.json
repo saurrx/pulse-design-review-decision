@@ -181,6 +181,9 @@
     "README.md": [],
     ".vscode/**": [],
     ".github/**": [],
+    ".githooks/**": [
+      "infra"
+    ],
     ".gitignore": [],
     "LICENSE": []
   }

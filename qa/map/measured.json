@@ -1,5 +1,5 @@
 {
- "_measured": "2026-08-29",
+ "_measured": "2026-08-30",
  "_against": "https://demo.photonpulse.ai",
  "roles": {
   "PHOTON_SUPERADMIN": {
@@ -65,8 +65,7 @@
     "landed": "/workspace",
     "reachable": true,
     "calls": [
-     "GET /v1/ideas/counts",
-     "GET /v1/invites/share-link"
+     "GET /v1/ideas/counts"
     ]
    },
    "/profile": {
@@ -148,8 +147,7 @@
     "reachable": true,
     "calls": [
      "GET /v1/case-owners",
-     "GET /v1/ideas/counts",
-     "GET /v1/invites/share-link"
+     "GET /v1/ideas/counts"
     ]
    },
    "/profile": {
