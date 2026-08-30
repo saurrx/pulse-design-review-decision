@@ -23,7 +23,7 @@
     "complementary:",
     "navigation:primary navigation",
     "main:",
-    "heading[1]:operations",
+    "heading[1]:actions",
     "table:"
   ],
   "signatures": [
@@ -50,7 +50,7 @@
     "combobox:<data>",
     "combobox:<data>+disabled",
     "complementary:",
-    "heading[1]:operations",
+    "heading[1]:actions",
     "img:<data>",
     "link:actions",
     "link:overview",
@@ -603,7 +603,7 @@
       "textAlign": "left",
       "textTransform": "none"
     },
-    "heading[1]:operations": {
+    "heading[1]:actions": {
       "alignItems": "normal",
       "backgroundColor": "rgba(0, 0, 0, 0)",
       "borderBottomWidth": "0px",

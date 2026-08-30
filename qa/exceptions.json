@@ -192,6 +192,17 @@
       "reason": "ACCEPTED design deviation, in our favour. The reference's counsel workspace is a profile card; ours is a real members table (Team member / Email / Role / Status / Action) with Invite administrator and Generate inventor link. Built beyond the design against real endpoints — CLAUDE.md §12 'people/roles/suspend'.",
       "owner": "aakash",
       "expires": "2027-08-31"
+    },
+    {
+      "id": "dashboard-overflow-cta-is-data",
+      "match": {
+        "tier": "conformance",
+        "page": "/",
+        "selContains": "pending actions review all"
+      },
+      "reason": "DashboardStats renders the '<n>+ pending actions - Review all' button only when the awaiting-action list has MORE rows than fit (hiddenCount > 0, DashboardStats.tsx:598). Whether it exists is therefore a property of how many ideas are awaiting a decision on demo that day, not of the page's structure, and it flapped in and out of the baseline as ideas were submitted and reviewed. The card ITSELF is still asserted; only this overflow affordance is suppressed. Recording it either way would bake a data state into a structural baseline.",
+      "owner": "aakash",
+      "expires": "2027-02-28"
     }
   ]
 }
