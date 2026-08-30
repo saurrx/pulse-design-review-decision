@@ -230,8 +230,13 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append("page", currentPage.toString());
-      const order = sortOption === "oldest" ? "asc" : "desc";
-      const sort = "event_date";
+      // The four sort options are two fields x two directions. This sent
+      // `event_date` for all of them and then re-sorted the page in the
+      // browser, which can only ever order the rows the server already chose —
+      // "Event (A-Z)" over page 1 of 11 is not A-Z.
+      const byEvent = sortOption === "eventAZ" || sortOption === "eventZA";
+      const order = sortOption === "oldest" || sortOption === "eventAZ" ? "asc" : "desc";
+      const sort = byEvent ? "event_name" : "due_at";
       const response = await API_CONFIG.get(
         `/api/v1/patent/fetch/all-due-dates?${params?.toString()}&limit=${itemsPerPage}&order=${order}&sort=${
           sort
@@ -306,29 +311,14 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     [sendReminder],
   );
 
-  // Sort due dates (filtering is now backend)
-  const filteredAndSortedDueDates = useMemo(() => {
-    if (!dueDatesData?.data) return [];
-    // Only sort, do not filter by due status here
-    return dueDatesData.data.sort((a: any, b: any) => {
-      switch (sortOption) {
-        case "newest":
-          return (
-            moment(b.event_date).valueOf() - moment(a.event_date).valueOf()
-          );
-        case "oldest":
-          return (
-            moment(a.event_date).valueOf() - moment(b.event_date).valueOf()
-          );
-        case "eventAZ":
-          return (a.event_name || "").localeCompare(b.event_name || "");
-        case "eventZA":
-          return (b.event_name || "").localeCompare(a.event_name || "");
-        default:
-          return 0;
-      }
-    });
-  }, [dueDatesData, sortOption]);
+  // Filtering AND sorting are the server's: the list is paginated, so a sort
+  // applied here would only reorder the 10 rows this page happens to hold and
+  // present them as the whole ordering. It also mutated the query cache in
+  // place (Array.sort sorts the array react-query handed it).
+  const filteredAndSortedDueDates = useMemo(
+    () => dueDatesData?.data ?? [],
+    [dueDatesData],
+  );
 
   useEffect(() => {
     if (viewType === "calendar") {

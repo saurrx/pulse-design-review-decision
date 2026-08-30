@@ -222,12 +222,20 @@ DashboardLayout.defaultHeaderForRoute):
   PatentPaperView.
 - **/patents** PatentsPage → PatentsContent (14-col table, URL-synced filters,
   PatentTagsCell, CSV export); **/patents/:id** PatentDetailsContent (events,
-  timeline, documents, next steps).
+  timeline, documents, next steps). The toolbar carries `pulse-toolbar-tight`
+  (index.css): the Photon side's Clients filter pushed Sort onto a second line
+  at 1280, so the controls are narrower rather than fewer, and the search field
+  gives up width first. It still wraps below ~1100px — a safety valve, not the
+  normal state.
 - **/due-dates** DueDatesPage → DueDatesContent list + DueDatesCalendar +
   RemindButton (24h cooldown). Columns lead with Application No., then Title,
   **Next Event**, **Deadline** — the Photon Operations table's order and
   vocabulary, one table's worth of words for the whole product. No row-number
-  column: it numbered the current page of a sorted, filtered list.
+  column: it numbered the current page of a sorted, filtered list. Search,
+  window filter and sort are the SERVER's (`search`/`filter`/`sort`/`order` on
+  /v1/due-dates): the list is paginated, so a browser-side sort would only
+  order the rows the server already picked. See pulse-backend F-047 — every
+  control here was decoration until the adapter stopped dropping them.
 - **/actions** ActionsPage → IHCActionsContent (client selects actions;
   CountrySelector, SubmitActionsDialog) vs OCActionsContent (Photon queue,
   RequestStatusBadge, resolve). Titled "Actions" for both, and that is not a

@@ -230,6 +230,24 @@
     box-shadow: var(--pulse-shadow-card);
   }
 
+  /* One row, at the width this app is actually used at.
+     The Patents toolbar grew a Clients filter for the Photon side and stopped
+     fitting: at 1280 the Sort control wrapped onto a line of its own under a
+     half-empty row, which reads as a layout bug rather than a filter. The
+     controls are labelled buttons, so the honest fix is to make each of them
+     narrower rather than to hide any of them: tighter horizontal padding, a
+     smaller gap between a control's icon and its word, and a search field that
+     gives up width first (it is the one control that stays usable narrow).
+     Wrapping still happens below ~1100px — it is a safety valve, not the
+     normal state. */
+  .pulse-toolbar-tight > button,
+  .pulse-toolbar-tight [data-slot="popover-trigger"] > button {
+    @apply px-3;
+  }
+  .pulse-toolbar-tight > button > svg:first-child {
+    @apply mr-0.5;
+  }
+
   .pulse-table-frame {
     @apply mx-6 mb-6 overflow-hidden rounded-2xl border;
     background: var(--pulse-surface);
