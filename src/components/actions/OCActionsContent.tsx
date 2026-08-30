@@ -85,7 +85,6 @@ const OCActionsContent: React.FC = () => {
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
-  const [deadlineWindow, setDeadlineWindow] = useState("all");
   const [filterOption, setFilterOption] = useState<FilterOption>("all");
   const [sortOption, setSortOption] = useState<SortOption>("oldest");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -107,6 +106,17 @@ const OCActionsContent: React.FC = () => {
     );
     return () => clearTimeout(timer);
   }, [clientSearchInput]);
+
+  // ...and the row search, which now reaches the API: the box stays instant,
+  // the request waits for the typing to stop.
+  const [searchTerm, setSearchTerm] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchTerm(searchQuery.trim());
+      setCurrentPage(1);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   // Column visibility
   const [columns, setColumns] = useState([
@@ -156,7 +166,7 @@ const OCActionsContent: React.FC = () => {
       "oc_action_queue",
       currentPage,
       itemsPerPage,
-      searchQuery,
+      searchTerm,
       filterOption,
       statusFilter,
       clientFilter,
@@ -166,7 +176,7 @@ const OCActionsContent: React.FC = () => {
       const params = new URLSearchParams();
       params.append("page", currentPage.toString());
       params.append("limit", itemsPerPage.toString());
-      if (searchQuery) params.append("search", searchQuery);
+      if (searchTerm) params.append("search", searchTerm);
       if (filterOption !== "all") params.append("filter", filterOption);
       if (statusFilter !== "all")
         params.append("request_status", statusFilter);
@@ -629,7 +639,6 @@ const OCActionsContent: React.FC = () => {
                     }`}
                   >
                     {searchQuery ||
-                    deadlineWindow !== "all" ||
                     filterOption !== "all" ||
                     statusFilter !== "all" ||
                     clientFilter !== "all"

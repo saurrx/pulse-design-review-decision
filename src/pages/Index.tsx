@@ -520,10 +520,14 @@ const Index = () => {
                 <TopInventors
                   inventors={
                     isOC
-                      ? data?.data?.top_clients?.map((k: any, ik: number) => ({
-                          name: k?.client?.name,
+                      // The API returns {id, name, total_patents}; this read
+                      // k.client.name, a nesting it has never had, so every row
+                      // rendered a number with no name beside it.
+                      ? (data?.data?.top_clients ?? []).map((k: any, ik: number) => ({
+                          id: k?.id,
+                          name: k?.name ?? k?.client?.name ?? "Unnamed client",
                           country: "",
-                          count: k?.total_patents,
+                          count: k?.total_patents ?? 0,
                           avatar: ik + 1,
                         }))
                       : undefined

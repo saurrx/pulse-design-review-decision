@@ -153,6 +153,16 @@ const withLogo = (c: any) => c && ({
   logo_file: c.logo_file?.id
     ? { ...c.logo_file, file_path: `v1/files/${c.logo_file.id}/raw` }
     : c.logo_file ?? null,
+  // The client cards read Prisma's OLD model names (_count.Patent), the API
+  // returns the current ones (_count.patents) — so every card showed a blank
+  // where its patent count belongs. Both spellings ride along; this is the
+  // file whose job is to speak both dialects.
+  _count: c._count && {
+    ...c._count,
+    Patent: c._count.patents ?? c._count.Patent ?? 0,
+    Idea: c._count.ideas ?? c._count.Idea ?? 0,
+    User: c._count.users ?? c._count.User ?? 0,
+  },
 });
 
 const oldPatent = (r: any) => r && ({
@@ -481,6 +491,14 @@ const RULES: Rule[] = [
       const out = new URLSearchParams();
       if (q.get("page")) out.set("page", q.get("page")!);
       if (q.get("limit")) out.set("limit", q.get("limit")!);
+      // Every other control on the operations queue — the deadline window, the
+      // request status, the client, the sort and the search — was dropped
+      // here, so the screen's filters changed nothing. Same shape as the
+      // deadline screen's. See pulse-backend F-049.
+      for (const k of ["search", "filter", "request_status", "client_id", "sort"]) {
+        const v = q.get(k);
+        if (v && v !== "all") out.set(k, v);
+      }
       const qs = out.toString();
       return ({ url: `/v1/actions/queue${qs ? `?${qs}` : ""}`, method: "GET",
       wrap: (rows: any[]) => ({ data: (rows ?? []).map(r => ({

@@ -133,7 +133,11 @@ const TopInventors = ({
         )}
       </div>
 
-      <div className="mt-2 flex min-h-0 flex-col justify-start overflow-y-auto">
+      {/* No inner scroll: the card is a leaderboard, and a five-row list that
+          scrolls inside a fixed card is a list you cannot see. Both branches
+          cap at five, and long names truncate rather than pushing the count
+          off the card. */}
+      <div className="mt-2 flex min-h-0 flex-col justify-start overflow-hidden">
         {hasToggle ? (
           <>
             {ranked.map((e, index) => (
@@ -170,18 +174,29 @@ const TopInventors = ({
           </>
         ) : (
           <>
-            {inventors?.map((inventor, index) => (
+            {inventors?.slice(0, 5).map((inventor, index) => (
               <div
-                key={index}
-                className={`flex items-center justify-between gap-3 py-2.5 ${
+                key={inventor.id ?? index}
+                className={`flex min-w-0 items-center justify-between gap-3 py-2.5 ${
                   index > 0 ? "border-t border-[var(--pulse-line)]" : ""
                 }`}
               >
-                <div className="text-[13px] font-medium text-[var(--pulse-ink-secondary)]">
-                  {inventor.name}
+                <div className="flex min-w-0 items-center gap-3">
+                  <span
+                    className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[var(--pulse-surface-subtle)] text-xs font-semibold text-[var(--pulse-ink-muted)]"
+                    style={NUMS}
+                  >
+                    {index + 1}
+                  </span>
+                  <span
+                    className="truncate text-[13px] font-medium text-[var(--pulse-ink-secondary)]"
+                    title={inventor.name}
+                  >
+                    {inventor.name}
+                  </span>
                 </div>
                 <span
-                  className="text-lg font-semibold text-[var(--pulse-ink)]"
+                  className="shrink-0 text-lg font-semibold text-[var(--pulse-ink)]"
                   style={NUMS}
                 >
                   {inventor.count}
