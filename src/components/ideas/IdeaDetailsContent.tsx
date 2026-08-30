@@ -2772,6 +2772,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         ideaName={mainIdeaData?.title || "-"}
         instructions={instructions}
         setInstructions={setInstructions}
+        recipient={user?.role === "TECH_COMMITTEE" ? "LEGAL_COUNSEL" : "PHOTON_LEGAL"}
       />
 
       <RejectIdeaModal
