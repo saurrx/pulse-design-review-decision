@@ -1579,7 +1579,7 @@
     },
     {
      "method": "GET",
-     "call": "/api/v1/patent/fetch/all-due-dates?${params?.toString()}&limit=${itemsPerPage}&order=${order}&sort=${ sort }&search=${searchQuery}&filter=${filterOption}&filter_client_id=${selectedClientIds.join( \",\", )}",
+     "call": "/api/v1/patent/fetch/all-due-dates?${params?.toString()}&limit=${itemsPerPage}&order=${order}&sort=${ sort }&search=${encodeURIComponent(searchTerm)}&filter=${filterOption}&filter_client_id=${selectedClientIds.join( \",\", )}",
      "rule": "^\\/api\\/v1\\/patent\\/fetch\\/(upcoming-due-dates|all-due-dates)(?:\\?(.*))?$",
      "v1": [
       "/v1/due-dates"
