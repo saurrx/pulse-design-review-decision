@@ -331,6 +331,23 @@ world geojsons — the map uses world-india-pov.json — placeholder/6sense
 svgs). lovable-uploads and public/fonts are now deleted — the fonts had a
 single consumer, the dead pdfGenerator.ts.
 
+## 14. Analytics (PostHog — product events, autocapture + heatmaps, NO session replay)
+
+Events go to PostHog Cloud (US) only on **demo.photonpulse.ai**. The catalogue is
+`src/lib/analytics/catalog.ts` — **byte-identical across the three repos**, sha256
+drift-gated (`qa/security/analytics-guard.qa.mjs`); edit it in atlas and copy to all
+three, never one. `src/lib/analytics/index.ts` wraps `posthog-js`: `track(event,
+props)` no-ops unless `analyticsEnabled()` (env `VITE_ANALYTICS_ENV=demo` ∧
+`VITE_POSTHOG_KEY` set ∧ hostname in `ANALYTICS_HOST_ALLOWLIST`) and `sanitize()`s
+first. Init is in `App.tsx` (`disable_session_recording:true`, `autocapture`,
+`enable_heatmaps`, `capture_pageview:'history_change'`). identify/reset in
+`use-auth.tsx`/`auth.ts`; view-as re-identify in `Sidebar.tsx`. **Never send
+content/PII/`reference`** — only ids/enums/counts (the denylist + gate enforce it);
+mask rendered disclosure with `ph-no-capture`. **A new user-facing feature needs a
+catalogue event** — the atlas coverage guard enforces it. Env vars live in Vercel
+(production target only, so preview/dev never fire). See the analytics plan + atlas
+`analytics/`.
+
 ## QA — the test corpus and how to run only what matters
 
 `qa/` holds one tagged corpus, sliced by filter. There is no separate "security
