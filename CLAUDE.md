@@ -208,7 +208,13 @@ DashboardLayout.defaultHeaderForRoute):
   `useDisclosureWorkspace` for reviewers vs inventor card layout; rail =
   score + prior art + StatusTimeline; modals: RejectIdeaModal, SendToOCModal,
   FileIdeaModal, RequestUpdate/ViewRequestUpdate, IdeaSubmissionModal,
-  ShowScoreReport/DownloadReport/PatentReportDocument). **Stage gate:** counsel
+  ShowScoreReport/DownloadReport/PatentReportDocument). A prior-art card shows
+  the five things the design shows — abstract (clamped at 320 chars with Read
+  more; patent abstracts run past 1,500), key similarities, distinct
+  differences, a novelty bar, overlapping concepts — all PER DOCUMENT, from the
+  agent's per-document analysis. The whole-search overlaps/differentiators are
+  a separate "What the search found" block; they are one set per evaluation and
+  are never copied onto a card. **Stage gate:** counsel
   acts at SENT_TO_IHC only, the committee at UNDER_REVIEW; a counsel looking at
   a committee-stage idea gets the same "Under Tech Committee review" banner the
   queue shows. Reaching UNDER_REVIEW already proves the client runs a
