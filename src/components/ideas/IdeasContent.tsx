@@ -965,7 +965,7 @@ const IdeasContent: React.FC = () => {
                             className="font-mono text-xs text-[#727272]"
                             title="Idea Reference Number"
                           >
-                            {idea.reference_number || idea.id}
+                            {idea.reference_number || "—"}
                           </span>
                           <div className="flex items-center gap-2">
                             <ScoreChip score={idea?.score} />
@@ -1212,7 +1212,7 @@ const IdeasContent: React.FC = () => {
                     <CardContent className="p-4 pt-2">
                       <div className="text-xs text-muted-foreground mb-3">
                         <span className="font-medium text-photon-primary">
-                          {idea.reference_number || idea.id}
+                          {idea.reference_number || "—"}
                         </span>
                       </div>
                       <div className="text-sm mb-3">

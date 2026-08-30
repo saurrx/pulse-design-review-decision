@@ -105,6 +105,8 @@ interface PatentNoveltyReportProps {
   embedded?: boolean;
   displayScale?: 10 | 100;
   expandFirstReference?: boolean;
+  /** The idea's human reference, e.g. DEMO07 — shown instead of an id. */
+  reference?: string;
 }
 
 export default function PatentNoveltyReport({
@@ -116,6 +118,7 @@ export default function PatentNoveltyReport({
   embedded = false,
   displayScale = 100,
   expandFirstReference = true,
+  reference,
 }: PatentNoveltyReportProps) {
   const { theme } = useTheme();
   const [reEvalOpen, setReEvalOpen] = React.useState(false);
@@ -344,7 +347,7 @@ const topPriorArt = sortedPriorArt.slice(0, 5);
             Generated on {formatDate()}
             {scoringResult.evaluationId && <span className="mx-1">•</span>}
             {scoringResult.evaluationId && (
-              <span>ID: {scoringResult.evaluationId.substring(0, 8)}</span>
+              <span>{reference || "Evaluation report"}</span>
             )}
           </p>
         </div> */}
