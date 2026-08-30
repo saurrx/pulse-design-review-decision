@@ -29,8 +29,8 @@
     "img:<data>",
     "link:actions",
     "link:clients",
+    "link:due dates",
     "link:ideas #",
-    "link:operations",
     "link:overview",
     "link:patents",
     "link:workspace",
@@ -439,7 +439,7 @@
       "textAlign": "start",
       "textTransform": "none"
     },
-    "link:ideas #": {
+    "link:due dates": {
       "alignItems": "center",
       "backgroundColor": "rgba(0, 0, 0, 0)",
       "borderBottomWidth": "0px",
@@ -467,7 +467,7 @@
       "textAlign": "start",
       "textTransform": "none"
     },
-    "link:operations": {
+    "link:ideas #": {
       "alignItems": "center",
       "backgroundColor": "rgba(0, 0, 0, 0)",
       "borderBottomWidth": "0px",
