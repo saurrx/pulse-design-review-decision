@@ -32,6 +32,9 @@ interface ScoringResult {
   score_meta_data: any;
   evaluationId?: string;
   summary: string;
+  // Result-level, from synthesise.ts — one set per evaluation, not per card.
+  overlappingConcepts?: string[];
+  distinctDifferences?: string[];
   noveltyScore: number | null;
   similarityScore: number | null;
   confidenceLevel: string;
@@ -122,6 +125,21 @@ export default function PatentNoveltyReport({
     () => new Set(expandFirstReference ? [0] : [])
   );
   const [summaryExpanded, setSummaryExpanded] = React.useState(false);
+  // A patent abstract is one unbroken paragraph and routinely runs past 1,500
+  // characters, which pushed Key Similarities and the novelty bar below the
+  // fold — the reader saw an abstract and concluded that was all there was.
+  // Clamped by default, per reference, with the full text one click away.
+  const [expandedAbstracts, setExpandedAbstracts] = React.useState<Set<number>>(
+    () => new Set()
+  );
+  const ABSTRACT_CLAMP = 320;
+  const toggleAbstract = (i: number) =>
+    setExpandedAbstracts((prev) => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i);
+      else next.add(i);
+      return next;
+    });
   const toggleArt = (i: number) =>
     setExpandedArts((prev) => {
       const next = new Set(prev);
@@ -397,6 +415,82 @@ const topPriorArt = sortedPriorArt.slice(0, 5);
           )}
         </div>
 
+        {/* ---------- WHAT THE SEARCH FOUND ----------
+            overlappingConcepts and distinctDifferences are produced ONCE per
+            evaluation (synthesise.ts), not per reference, so they belong here
+            and not on the cards — copying them onto every card would present a
+            result-level finding as evidence about a specific document. They
+            were carried in the payload and rendered by nothing until now. */}
+        {((scoringResult?.overlappingConcepts?.length ?? 0) > 0 ||
+          (scoringResult?.distinctDifferences?.length ?? 0) > 0) && (
+          <div className="mb-12">
+            <h2
+              className={`text-xl font-semibold mb-1 ${
+                theme === "dark" ? "text-zinc-200" : "text-zinc-800"
+              }`}
+            >
+              What the search found
+            </h2>
+            <p
+              className={`mb-5 text-sm ${
+                theme === "dark" ? "text-neutral-400" : "text-gray-600"
+              }`}
+            >
+              Across every reference returned, not any single one.
+            </p>
+            <div className="grid gap-6 md:grid-cols-2">
+              {(scoringResult?.overlappingConcepts?.length ?? 0) > 0 && (
+                <div>
+                  <h4
+                    className={`mb-3 text-xs font-semibold uppercase ${
+                      theme === "dark" ? "text-gray-500" : "text-gray-800"
+                    }`}
+                  >
+                    Overlapping concepts
+                  </h4>
+                  <ul className="space-y-2">
+                    {(scoringResult.overlappingConcepts ?? []).map((concept, i) => (
+                      <li
+                        key={i}
+                        className={`flex gap-2 text-sm ${
+                          theme === "dark" ? "text-neutral-400" : "text-gray-600"
+                        }`}
+                      >
+                        <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+                        <span>{concept}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {(scoringResult?.distinctDifferences?.length ?? 0) > 0 && (
+                <div>
+                  <h4
+                    className={`mb-3 text-xs font-semibold uppercase ${
+                      theme === "dark" ? "text-gray-500" : "text-gray-800"
+                    }`}
+                  >
+                    Distinct differences
+                  </h4>
+                  <ul className="space-y-2">
+                    {(scoringResult.distinctDifferences ?? []).map((diff, i) => (
+                      <li
+                        key={i}
+                        className={`flex gap-2 text-sm ${
+                          theme === "dark" ? "text-neutral-400" : "text-gray-600"
+                        }`}
+                      >
+                        <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-600" />
+                        <span>{diff}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* ---------- PRIOR ART ANALYSIS SECTION ---------- */}
         <div className="mb-12">
           <h2
@@ -489,15 +583,42 @@ const topPriorArt = sortedPriorArt.slice(0, 5);
                           >
                             Abstract
                           </h4>
-                          <p
-                            className={`text-sm font-sans ${
-                              theme === "dark"
-                                ? "text-neutral-400"
-                                : "text-gray-600"
-                            }`}
-                          >
-                            {matchSummary?.abstract || art?.abstract}
-                          </p>
+                          {(() => {
+                            const abstract = String(
+                              matchSummary?.abstract || art?.abstract || ""
+                            );
+                            const long = abstract.length > ABSTRACT_CLAMP;
+                            const open = expandedAbstracts.has(index);
+                            return (
+                              <>
+                                <p
+                                  className={`text-sm font-sans ${
+                                    theme === "dark"
+                                      ? "text-neutral-400"
+                                      : "text-gray-600"
+                                  }`}
+                                >
+                                  {long && !open
+                                    ? `${abstract.slice(0, ABSTRACT_CLAMP).trimEnd()}…`
+                                    : abstract}
+                                </p>
+                                {long && (
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleAbstract(index)}
+                                    aria-expanded={open}
+                                    className={`mt-1 text-sm font-medium underline-offset-2 hover:underline ${
+                                      theme === "dark"
+                                        ? "text-zinc-300"
+                                        : "text-zinc-700"
+                                    }`}
+                                  >
+                                    {open ? "Read less" : "Read more"}
+                                  </button>
+                                )}
+                              </>
+                            );
+                          })()}
                         </div>
                       )}
 

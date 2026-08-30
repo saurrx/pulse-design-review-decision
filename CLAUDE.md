@@ -119,13 +119,18 @@ checks silently broke during the rename once.
   card whose "Edit workspace" opens OrganizationDetails in a dialog, then
   PeopleTab; PHOTON_ADMIN still short-circuits to CaseOwnersTab. Profile left
   the workspace entirely — /profile (pages/ProfilePage.tsx) is its own route
-  and /workspace redirects every non-admin there. PeopleTab (role select incl. IP Committee; suspended→"Disabled"+
-  Reactivate), CaseOwnersTab (Manage Access: composed {owners, clients}
+  and /workspace redirects every non-admin there. PeopleTab (role select incl.
+  Tech Committee — the OPTIONAL pre-counsel stage, never "IP Committee";
+  suspended→"Disabled"+Reactivate; invite link block renders on `active` and
+  carries Regenerate/Deactivate — F-044), CaseOwnersTab (Manage Access: composed {owners, clients}
   payload; drawer has Access type Permanent/Temporary/Step-in + reason+expiry)
 - clients/: ClientsPage (cards navigate via handleClientClick), OnboardClientModal
   (submit label "Onboard Client"; domain field name=allowed_domain, validated
-  as "@domain.com" — adapter strips the @), OverviewTab (defensive prop
-  defaults — undefined team/history once crashed the page)
+  as "@domain.com", a bare domain or a full address — the adapter keeps the
+  domain either way, and READS it back bare, not as a fabricated "x@…"),
+  OverviewTab (defensive prop defaults — undefined team/history once crashed
+  the page; Import history is always offered and says so when empty, because
+  hiding it made every pre-tracking client look unsupported)
 - DesktopOnlyGate.tsx — <1024px overlay (pure CSS visibility, app stays
   mounted: cannot cause state bugs). Mobile layout is NOT built, but the gate
   itself now fits: `body{min-width:1024px}` is scoped to `@media(min-width:
@@ -203,7 +208,14 @@ DashboardLayout.defaultHeaderForRoute):
   `useDisclosureWorkspace` for reviewers vs inventor card layout; rail =
   score + prior art + StatusTimeline; modals: RejectIdeaModal, SendToOCModal,
   FileIdeaModal, RequestUpdate/ViewRequestUpdate, IdeaSubmissionModal,
-  ShowScoreReport/DownloadReport/PatentReportDocument).
+  ShowScoreReport/DownloadReport/PatentReportDocument). **Stage gate:** counsel
+  acts at SENT_TO_IHC only, the committee at UNDER_REVIEW; a counsel looking at
+  a committee-stage idea gets the same "Under Tech Committee review" banner the
+  queue shows. Reaching UNDER_REVIEW already proves the client runs a
+  committee, so there is no "no committee" exception to make (F-045). The
+  inventor's rail reads the report cached on the draft, the reviewer's view
+  reads the live evaluation — they must render the same evidence, which is what
+  pulse-backend's REPORT_SHAPE_VERSION keeps true (F-043).
 - **/ideas/:id/draft** IdeaDraftPage → DraftWorkspace (5-section
   questionnaire, autosave, CoInventorsField, AudioInput dictation) /
   DraftCreationContent; reviewer read view = IHCAdminDraftView/OCDraftView/
@@ -212,10 +224,16 @@ DashboardLayout.defaultHeaderForRoute):
   PatentTagsCell, CSV export); **/patents/:id** PatentDetailsContent (events,
   timeline, documents, next steps).
 - **/due-dates** DueDatesPage → DueDatesContent list + DueDatesCalendar +
-  RemindButton (24h cooldown).
+  RemindButton (24h cooldown). Columns lead with Application No., then Title,
+  **Next Event**, **Deadline** — the Photon Operations table's order and
+  vocabulary, one table's worth of words for the whole product. No row-number
+  column: it numbered the current page of a sorted, filtered list.
 - **/actions** ActionsPage → IHCActionsContent (client selects actions;
   CountrySelector, SubmitActionsDialog) vs OCActionsContent (Photon queue,
-  RequestStatusBadge, resolve).
+  RequestStatusBadge, resolve). Titled "Actions" for both, and that is not a
+  collision: no role has both /actions and /due-dates in its nav, and each is
+  the action list of whoever arrives there. RequestStatusBadge disables the
+  stages behind the current one — the queue is forward-only server-side.
 - **/clients** (photon only) ClientsPage cards → **/clients/:clientId**
   ClientDetailPage (ClientTabs: OverviewTab, PatentsTab + AddPatentModal +
   DuplicatePatentsModal import, people via ClientInviteDialog;

@@ -56,11 +56,13 @@ const defaultHeaderForRoute = (
   }
   if (pathname === "/patents") return { title: "Patents" };
   if (pathname === "/due-dates") return { title: "Actions" };
-  // "Operations", not "Actions": the sidebar deliberately labels /due-dates
-  // "Actions" and /actions "Operations" so the two are tellable apart, and
-  // titling this page "Actions" gave the app two different pages under one
-  // heading — one of them contradicting the nav item you arrived through.
-  if (pathname === "/actions") return { title: "Operations" };
+  // Both pages are titled "Actions", and that is not a collision: no role has
+  // both in its nav. Client-side roles reach /due-dates through "Actions";
+  // Photon-side roles reach /actions through their single "Actions" item, and
+  // this queue IS their action list. Titling it "Operations" contradicted the
+  // nav item they arrived through, which is the confusion the earlier comment
+  // here was trying to prevent.
+  if (pathname === "/actions") return { title: "Actions" };
   if (pathname === "/assistant") return { title: "AI assistant" };
   if (pathname === "/profile") return { title: "My profile" };
   if (pathname === "/workspace") {

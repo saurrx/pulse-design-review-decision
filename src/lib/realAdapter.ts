@@ -44,8 +44,26 @@ type Rule = {
   };
 };
 
+/**
+ * The share link as the invite screens read it.
+ *
+ * Both screens render the link, the QR and the Regenerate/Deactivate controls
+ * only when `active` is true. The API now says so itself; the fallback keeps
+ * this build honest against an API that predates that field, because the
+ * failure it caused was invisible — a link was minted and the page went on
+ * saying there was none. See pulse-backend docs/qa/findings.md F-044.
+ */
+const shareLinkView = (p: any) => ({
+  ...p,
+  token: p?.code,
+  link: p?.url,
+  invite_link: p?.url,
+  active: p?.active ?? (!!p?.code &&
+    (!p?.expires_at || new Date(p.expires_at).getTime() > Date.now())),
+});
+
 const PHOTON_SENTINEL = "photon-legal";
-const isUuid = (v: unknown) =>
+export const isUuid = (v: unknown) =>
   typeof v === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
 /** Photon roles have no tenant; the design's queries gate on client_id, so
  *  they get the same sentinel the original app used. Real ids pass through. */
@@ -582,8 +600,13 @@ const RULES: Rule[] = [
   { m: /^\/api\/v1\/clients\/([0-9a-f-]{36})$/,
     to: m => ({ url: `/v1/clients/${m[1]}`, method: "GET", wrap: (c: any) => ({ data: {
       ...withLogo(c),
-      // The screen speaks the old field names; translate rather than teach it new ones.
-      allowed_domain: c?.domain ? `x@${c.domain}` : "",
+      // The screen speaks the old field names; translate rather than teach it
+      // new ones. The value is the DOMAIN — this used to hand back a fabricated
+      // "x@" local part, so the edit field showed "x@acme.com" as though a
+      // mailbox called x were the client's setting, and the reader could not
+      // tell the invention from the data. The writer strips a local part
+      // either way, so a bare domain round-trips.
+      allowed_domain: c?.domain ?? "",
       about: c?.about ?? "",
       plan: c?.plan ?? "STANDARD",
       logo: c?.logo ?? null,
@@ -716,7 +739,7 @@ const RULES: Rule[] = [
   { m: /^\/api\/v1\/clients\/([^/]+)\/invite-link/, method: "POST",
     to: m => ({
       url: `/v1/invites/share-link/regenerate${isUuid(m[1]) ? `?client_id=${m[1]}` : ""}`, method: "POST",
-      wrap: (p: any) => ({ data: { ...p, token: p?.code, link: p?.url, invite_link: p?.url } }),
+      wrap: (p: any) => ({ data: shareLinkView(p) }),
     }) },
   // Photon roles carry the "photon-legal" sentinel as their client_id; sending
   // it as a real client reference 400s. isUuid drops it, and the API then falls
@@ -725,7 +748,7 @@ const RULES: Rule[] = [
   { m: /^\/api\/v1\/clients\/([^/]+)\/invite-link/, method: "GET",
     to: m => ({
       url: `/v1/invites/share-link${isUuid(m[1]) ? `?client_id=${m[1]}` : ""}`, method: "GET",
-      wrap: (p: any) => ({ data: { ...p, token: p?.code, link: p?.url, invite_link: p?.url } }),
+      wrap: (p: any) => ({ data: shareLinkView(p) }),
     }) },
 
   { m: /^\/api\/v1\/clients\/([^/]+)\/request-access$/, method: "POST",

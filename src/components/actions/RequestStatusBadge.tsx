@@ -36,6 +36,9 @@ const STATUS_CONFIG: Record<string, { label: string; tone: ProductChipTone }> = 
   },
 };
 
+/** The server's ladder, in the server's order (ActionsService.PROGRESSION). */
+const PROGRESSION: string[] = ["NEW", "ACKNOWLEDGED", "IN_PROGRESS", "COMPLETED"];
+
 const RequestStatusBadge: React.FC<RequestStatusBadgeProps> = ({
   status,
   editable = false,
@@ -52,16 +55,27 @@ const RequestStatusBadge: React.FC<RequestStatusBadgeProps> = ({
     );
   }
 
+  // An action only moves forward — the API refuses NEW after ACKNOWLEDGED, and
+  // rightly so. Offering the earlier stages anyway made every such click a
+  // round trip that came back as an error toast, so they are shown in place
+  // (the reader still sees the whole ladder) but not selectable.
+  const reachable = PROGRESSION.slice(PROGRESSION.indexOf(normalizedStatus));
+
   return (
     <Select value={normalizedStatus} onValueChange={onChange}>
       <SelectTrigger className="w-[140px] h-8 text-xs">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="NEW">New</SelectItem>
-        <SelectItem value="ACKNOWLEDGED">Acknowledged</SelectItem>
-        <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-        <SelectItem value="COMPLETED">Completed</SelectItem>
+        {PROGRESSION.map((value) => (
+          <SelectItem
+            key={value}
+            value={value}
+            disabled={!reachable.includes(value)}
+          >
+            {STATUS_CONFIG[value].label}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );
