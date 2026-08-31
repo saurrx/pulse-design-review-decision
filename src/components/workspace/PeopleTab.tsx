@@ -8,6 +8,7 @@ import API_CONFIG from "@/lib/apiConfig";
 import { isUuid } from "@/lib/realAdapter";
 import useUserCookie from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import ClientInviteDialog from "@/components/clients/ClientInviteDialog";
 
@@ -368,7 +369,7 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
                 <tr key={person.id || person.email} className="hover:bg-neutral-50/70 dark:hover:bg-white/[0.03]">
                   <td className="px-5 py-4"><div className="flex items-center gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-800">{initials(person)}</span><span className="font-semibold">{displayName(person)}</span></div></td>
                   <td className="px-5 py-4 text-neutral-500">{person.email}</td>
-                  <td className="px-5 py-4"><select value={["LEGAL_COUNSEL", "TECH_COMMITTEE"].includes(person.role) ? person.role : "INVENTOR"} onChange={(event) => changeRole(person, event.target.value as "INVENTOR" | "TECH_COMMITTEE" | "LEGAL_COUNSEL")} disabled={person.id === user?.id} className="h-8 rounded-md border border-neutral-200 bg-transparent px-2 text-xs disabled:cursor-not-allowed disabled:opacity-60 dark:border-neutral-700"><option value="INVENTOR">Inventor</option><option value="TECH_COMMITTEE">Tech Committee</option><option value="LEGAL_COUNSEL">Administrator</option></select></td>
+                  <td className="px-5 py-4"><Select value={["LEGAL_COUNSEL", "TECH_COMMITTEE"].includes(person.role) ? person.role : "INVENTOR"} onValueChange={(value) => changeRole(person, value as "INVENTOR" | "TECH_COMMITTEE" | "LEGAL_COUNSEL")} disabled={person.id === user?.id}><SelectTrigger className="h-8 w-40 text-xs"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="INVENTOR">Inventor</SelectItem><SelectItem value="TECH_COMMITTEE">Tech Committee</SelectItem><SelectItem value="LEGAL_COUNSEL">Administrator</SelectItem></SelectContent></Select></td>
                   <td className="px-5 py-4"><span className={`inline-flex items-center gap-1.5 text-xs font-medium ${isActive(person) ? "text-emerald-700" : "text-amber-700"}`}><span className={`h-1.5 w-1.5 rounded-full ${isActive(person) ? "bg-emerald-500" : "bg-amber-500"}`} />{isActive(person) ? "Active" : person.suspended ? "Disabled" : "Invited"}</span></td>
                   <td className="px-5 py-4 text-right">{person.id === user?.id ? <span className="text-xs text-neutral-400">You</span> : person.suspended ? <Button variant="ghost" size="sm" onClick={() => reactivateMutation.mutate(String(person.id))} className="text-emerald-700 hover:bg-emerald-50">Reactivate</Button> : <Button variant="ghost" size="icon" onClick={() => removeMember(person)} className="text-neutral-400 hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></Button>}</td>
                 </tr>
