@@ -43,12 +43,17 @@ function withAliases(r: any): FileRecord {
   };
 }
 
-async function presign(file: File, category: "image" | "idea" | "patent") {
+async function presign(file: File, category: "image" | "idea" | "patent", clientId?: string) {
   const { data } = await rawApi.post("/v1/files/presign-upload", {
     filename: file.name,
     content_type: file.type || "application/octet-stream",
     size: file.size,
     category,
+    // Whose file this is. Without it the API falls back to the CALLER's client,
+    // which is null for a Photon-side user — so a portfolio uploaded for a
+    // client by a PHOTON_ADMIN landed under `photon/` with no client_id, fenced
+    // to nobody and invisible on the client's own page.
+    ...(clientId ? { client_id: clientId } : {}),
   });
   return { ...withAliases(data), put_url: (data as any).put_url } as FileRecord & { put_url: string };
 }
@@ -67,8 +72,9 @@ async function putToSpaces(url: string, file: File) {
 export async function s3Upload(
   file: File,
   category: "image" | "idea" | "patent" = "image",
+  clientId?: string,
 ): Promise<FileRecord> {
-  const p = await presign(file, category);
+  const p = await presign(file, category, clientId);
   await putToSpaces(p.put_url, file);
   const { data } = await rawApi.post("/v1/files/confirm-upload", { id: p.id });
   return withAliases(data);
@@ -86,6 +92,9 @@ export async function s3UploadMultiple(
   return out;
 }
 
-/** Import path used the "ForImport" name; keep it pointing at the real upload. */
-export const s3UploadForImport = (file: File, category: "patent" | "idea" = "patent") =>
-  s3Upload(file, category);
+/** Import path used the "ForImport" name; keep it pointing at the real upload.
+ *  Takes the client explicitly: a portfolio belongs to the client it describes,
+ *  not to whoever happened to upload it. */
+export const s3UploadForImport = (
+  file: File, category: "patent" | "idea" = "patent", clientId?: string,
+) => s3Upload(file, category, clientId);

@@ -130,7 +130,16 @@ checks silently broke during the rename once.
   domain either way, and READS it back bare, not as a fabricated "x@…"),
   OverviewTab (defensive prop defaults — undefined team/history once crashed
   the page; Import history is always offered and says so when empty, because
-  hiding it made every pre-tracking client look unsupported)
+  hiding it made every pre-tracking client look unsupported. **Upload portfolio**
+  presigns the .xlsx/.csv to Spaces and then POSTs `{file_id, client_id}` — the
+  API parses the sheet server-side. It used to POST `{key, originalName, size,
+  contentType}`, none of which the endpoint declares, so LegacyBody stripped the
+  body and every upload 400'd on a missing `rows`: no portfolio import had ever
+  succeeded (F-060). `s3UploadForImport` takes the **clientId explicitly** and
+  passes it to presign, because the API otherwise falls back to the CALLER's
+  client — null for a Photon user — and the file landed under `photon/`, fenced
+  to nobody. Results land in DuplicatePatentsModal, which reports added/updated/
+  deadlines/errors plus a field-level diff of anything the sheet overwrote)
 - DesktopOnlyGate.tsx — <1024px overlay (pure CSS visibility, app stays
   mounted: cannot cause state bugs). Mobile layout is NOT built, but the gate
   itself now fits: `body{min-width:1024px}` is scoped to `@media(min-width:
@@ -175,8 +184,11 @@ https://demo.photonpulse.ai. Demo accounts: see pulse-backend/CLAUDE.md
 Mobile layout · notification bell (backend emits; no UI surface — product
 decision pending) · copilot trio analyze-document/draft-field/generate-summary
 (+ upload-idea-file multipart path, update-requested-change) — 501 by design
-until agent support exists · patents CSV-file import UI path untested with a
-real XLSX · SSO.
+until agent support exists · SSO.
+
+(The patent import path is no longer untested against a real XLSX: the actual
+94-row client file is a fixture at pulse-backend `qa/fixtures/`, imported end to
+end by `qa/behaviour/patent-import.spec.ts`.)
 
 ---
 

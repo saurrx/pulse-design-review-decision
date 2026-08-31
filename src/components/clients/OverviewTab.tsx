@@ -19,7 +19,6 @@ import DuplicatePatentsModal from "./DuplicatePatentsModal";
 
 type OverviewTabProps = {
   clientTeam: any[];
-  patentFileHistory: any[];
   clientId: string;
   clientData: any;
   caseOwnerName?: string;
@@ -27,7 +26,7 @@ type OverviewTabProps = {
   canManageTeam?: boolean;
 };
 
-const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHistory = [], clientId, clientData, caseOwnerName, onChangeCaseOwner, canManageTeam }) => {
+const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, clientData, caseOwnerName, onChangeCaseOwner, canManageTeam }) => {
   const { user: sessionUser } = useUserCookie();
   // Off-assignment case owners see this page read-only: the server would 403
   // their writes anyway (client:configure is assignment-scoped through RLS),
@@ -35,9 +34,11 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
   const readOnlyForCaseOwner =
     sessionUser?.role === "CASE_OWNER" &&
     !((sessionUser as any)?.assigned_client_ids ?? []).includes(clientId);
-  // Import history now comes from the backend audit trail — the old
-  // PatentFileHistory prop read a key the clean API has never returned, so
-  // the button was permanently hidden even right after an import.
+  // Import history comes from the PatentImport run records: one row per
+  // portfolio upload, with the spreadsheet that produced it. (The predecessor
+  // was a `patentFileHistory` prop reading a key the clean API has never
+  // returned, so the button stayed hidden even right after an import; the prop
+  // is gone.)
   const { data: importHistoryData } = useQuery({
     queryKey: ["client_import_history", clientId],
     queryFn: async () =>
@@ -54,7 +55,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
   const [excelDuplicateEntries, setExcelDuplicateEntries] = useState<any[]>([]);
   const [errorCount, setErrorCount] = useState(0);
   const [successCount, setSuccessCount] = useState(0);
-  const [totalPatentImported, setTotalPatentImported] = useState(0);
+  const [updatedCount, setUpdatedCount] = useState(0);
+  const [dueDatesCreated, setDueDatesCreated] = useState(0);
+  const [unmappedColumns, setUnmappedColumns] = useState<string[]>([]);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [inviteMode, setInviteMode] = useState<"email" | "share">("email");
   const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
@@ -92,10 +95,13 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
     mutationKey: ["upload_patent_file", clientId],
     mutationFn: async (file: File) => {
       const { s3UploadForImport } = await import("@/lib/api-service/s3Upload");
-      const uploaded = await s3UploadForImport(file, "patent");
+      const uploaded = await s3UploadForImport(file, "patent", clientId);
+      // The API reads and parses the spreadsheet from storage, so all it needs
+      // is which file. This used to send {key, originalName, size, contentType}
+      // — none of which the endpoint declares, so the body was stripped to
+      // nothing and every portfolio upload 400'd on a missing `rows` (F-060).
       const response = await API_CONFIG.post("/api/v1/patent/import", {
-        key: uploaded.key, client_id: clientId, originalName: uploaded.originalName,
-        size: uploaded.size, contentType: uploaded.contentType,
+        file_id: uploaded.id, client_id: clientId,
       });
       return response.data;
     },
@@ -107,11 +113,19 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
         setExcelDuplicateEntries(patentData.excel_duplicate_entries || []);
         setErrorCount(patentData.error_count || 0);
         setSuccessCount(patentData.success_count || 0);
-        setTotalPatentImported(patentData.data?.length || 0);
+        setUpdatedCount(patentData.updated_count || 0);
+        setDueDatesCreated(patentData.due_dates_created || 0);
+        setUnmappedColumns(patentData.unmapped_columns || []);
         setDuplicateModalOpen(true);
       }
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
       queryClient.invalidateQueries({ queryKey: ["client_metrics", clientId] });
+      queryClient.invalidateQueries({ queryKey: ["client_import_history", clientId] });
+      // The deadlines this import just created are what the Due Dates and
+      // Actions screens read; without this they show the pre-import docket
+      // until something else happens to refetch.
+      queryClient.invalidateQueries({ queryKey: ["due_dates"] });
+      queryClient.invalidateQueries({ queryKey: ["actions"] });
     },
     onError: (error: any) => toast.error(error?.response?.data?.message || "An error occurred while uploading the file"),
   });
@@ -174,6 +188,33 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
     }
     uploadPatentFile(file);
     event.target.value = "";
+  };
+
+  /**
+   * Fetch the original spreadsheet behind an import.
+   *
+   * Goes through the API's presigned-download route rather than linking at the
+   * bucket: the object is private, and the signed URL is short-lived by design.
+   */
+  const downloadImportFile = async (fileId: string, name: string) => {
+    try {
+      // rawApi, not the adapter: /v1/files/* is a new-style endpoint with
+      // nothing to translate, and the adapter answers an unmapped path with a
+      // synthetic 501 rather than passing it through.
+      const { rawApi } = await import("@/lib/apiConfig");
+      const { data } = await rawApi.get(`/v1/files/${fileId}/download`);
+      const url = data?.url ?? data?.data?.url;
+      if (!url) throw new Error("no url");
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = name || "portfolio";
+      link.rel = "noopener";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch {
+      toast.error("Could not download that file");
+    }
   };
 
   const formatDate = (value?: string) => value
@@ -460,12 +501,48 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
                 <p className="mt-1 text-xs text-neutral-500">Patents added before import tracking do not appear here. Every upload from now on is recorded with who ran it and how many rows landed.</p>
               </div>
             )}
-            {importHistory.map((row) => <div key={row?.id} className="flex items-center gap-3 rounded-lg border p-4"><FileText className="h-5 w-5 text-neutral-400" /><div className="min-w-0"><p className="truncate text-sm font-medium">{row?.created ?? 0} imported{row?.failed ? ` · ${row.failed} failed` : ""}{row?.rows ? ` · of ${row.rows} row(s)` : ""}</p><p className="mt-1 text-xs text-neutral-500">{formatDate(row?.at)} · {row?.by || "Unknown"}</p></div></div>)}
+            {importHistory.map((row) => (
+              <div key={row?.id} className="flex items-start gap-3 rounded-lg border p-4">
+                <FileText className="mt-0.5 h-5 w-5 shrink-0 text-neutral-400" />
+                <div className="min-w-0 flex-1">
+                  {/* The spreadsheet itself, kept in storage. A portfolio is
+                      whatever the client asserted in the file they sent, so the
+                      file is the record — not just a count of rows. */}
+                  <p className="truncate text-sm font-medium">{row?.file?.original_name || "Portfolio import"}</p>
+                  <p className="mt-1 text-xs text-neutral-500">
+                    {formatDate(row?.at)} · {row?.by || "Unknown"}
+                    {row?.status && row.status !== "COMPLETED" ? ` · ${row.status}` : ""}
+                  </p>
+                  <p className="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+                    {row?.created ?? 0} added
+                    {row?.updated ? ` · ${row.updated} updated` : ""}
+                    {row?.unchanged ? ` · ${row.unchanged} unchanged` : ""}
+                    {row?.failed ? ` · ${row.failed} failed` : ""}
+                    {row?.due_dates_created ? ` · ${row.due_dates_created} deadlines` : ""}
+                    {row?.rows ? ` · of ${row.rows} row(s)` : ""}
+                  </p>
+                  {row?.unmapped_columns?.length > 0 && (
+                    <p className="mt-1 text-xs text-amber-700 dark:text-amber-500">
+                      Columns not imported: {row.unmapped_columns.join(", ")}
+                    </p>
+                  )}
+                </div>
+                {row?.file?.id && (
+                  <Button
+                    variant="ghost" size="sm" className="shrink-0"
+                    title={`Download ${row.file.original_name}`}
+                    onClick={() => downloadImportFile(row.file.id, row.file.original_name)}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
           </div>
         </DialogContent>
       </Dialog>
 
-      <DuplicatePatentsModal open={duplicateModalOpen} onOpenChange={(open) => { setDuplicateModalOpen(open); if (!open) queryClient.invalidateQueries({ queryKey: ["client", clientId] }); }} duplicatePatents={duplicatePatents} excelDuplicateEntries={excelDuplicateEntries} errorCount={errorCount} successCount={successCount} totalPatentImported={totalPatentImported} />
+      <DuplicatePatentsModal open={duplicateModalOpen} onOpenChange={(open) => { setDuplicateModalOpen(open); if (!open) queryClient.invalidateQueries({ queryKey: ["client", clientId] }); }} duplicatePatents={duplicatePatents} excelDuplicateEntries={excelDuplicateEntries} errorCount={errorCount} successCount={successCount} updatedCount={updatedCount} dueDatesCreated={dueDatesCreated} unmappedColumns={unmappedColumns} />
       {showAddPatentModal && <AddPatentModal open={showAddPatentModal} onOpenChange={setShowAddPatentModal} clientId={clientId} onAdded={() => { queryClient.invalidateQueries({ queryKey: ["client", clientId] }); queryClient.invalidateQueries({ queryKey: ["client_metrics", clientId] }); }} />}
     </div>
   );
