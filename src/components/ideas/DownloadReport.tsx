@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import useUserCookie from "@/hooks/use-auth";
 import { Download } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 async function svgToPngDataUrl(
   svgUrl: string,

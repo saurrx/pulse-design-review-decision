@@ -15,7 +15,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import {
   Upload,
   IdCard,

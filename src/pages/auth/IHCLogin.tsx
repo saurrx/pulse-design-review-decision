@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import API_CONFIG from "@/lib/apiConfig";
 import Cookies from "js-cookie";
 import { useSearchParams, useNavigate } from "react-router-dom";

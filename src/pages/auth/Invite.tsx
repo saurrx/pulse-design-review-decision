@@ -1,8 +1,9 @@
 import API_CONFIG from "@/lib/apiConfig";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "@/lib/toast";
+import { track } from "@/lib/analytics";
 import Cookies from "js-cookie";
 import { Loader2 } from "lucide-react";
 import { useFormik } from "formik";
@@ -41,6 +42,16 @@ const Invite = () => {
 
   const code = searchParams.get("code") || inviteCode;
   const domain = searchParams.get("domain");
+
+  // Someone followed an invite or share link and landed here. The code itself is
+  // a credential and never travels; this is only "a link was opened", which is
+  // the missing first step of invite_opened → invite_accepted / share_link_accepted.
+  const openedRef = useRef(false);
+  useEffect(() => {
+    if (openedRef.current || !code) return;
+    openedRef.current = true;
+    track("invite_opened");
+  }, [code]);
 
   // Formik for email form
   const {

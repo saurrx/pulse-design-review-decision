@@ -1,5 +1,6 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { useTrackOnce } from "@/lib/analytics";
+import BlockedRedirect from "@/lib/BlockedRedirect";
 import DashboardLayout from "@/components/DashboardLayout";
 import IHCActionsContent from "@/components/actions/IHCActionsContent";
 import OCActionsContent from "@/components/actions/OCActionsContent";
@@ -9,6 +10,10 @@ import { canReadDocket, isOutsideCounselRole } from "@/lib/roleAccess";
 const ActionsPage: React.FC = () => {
   const { user } = useUserCookie();
   const isOC = isOutsideCounselRole(user?.role);
+  // Only for someone the docket is actually FOR — an inventor is redirected two
+  // lines down, and counting that bounce as a view would flatter the number with
+  // the very people the screen refuses.
+  useTrackOnce("docket_viewed", {}, !!user && canReadDocket(user.role));
 
   // The operations docket is the whole client portfolio — every patent's
   // deadlines and the instruction standing against each. The sidebar has never
@@ -18,7 +23,7 @@ const ActionsPage: React.FC = () => {
   // a 403 on `docket:read`; this redirect is so the product says no first,
   // rather than rendering a screen that can only fill with errors.
   if (user && !canReadDocket(user.role)) {
-    return <Navigate to="/" replace />;
+    return <BlockedRedirect from="/actions" to="/" />;
   }
 
   return (

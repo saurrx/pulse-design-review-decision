@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { differenceInCalendarDays, format } from "date-fns";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 import API_CONFIG from "@/lib/apiConfig";
 import { track } from "@/lib/analytics";
@@ -767,6 +767,10 @@ const ReviewQueueWorkspace = () => {
                     key={idea.id}
                     type="button"
                     onClick={() => {
+                      // A reviewer actually opened this one. review_queue_viewed
+                      // says they reached the queue; this says they read something
+                      // out of it, and the ratio is the queue's real throughput.
+                      track("review_disclosure_opened", { idea_id: idea.id });
                       setSelectedId(idea.id);
                       setDetailTab("brief");
                     }}
@@ -837,6 +841,7 @@ const ReviewQueueWorkspace = () => {
                     </div>
                   </div>
                   <Link
+                    onClick={() => track("review_full_record_opened", { idea_id: selectedIdea.id })}
                     to={`/ideas/${selectedIdea.id}`}
                     className="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-[var(--pulse-line)] bg-white px-3 text-sm font-semibold text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]"
                     aria-label={`Open full record for ${selectedIdea.title}`}
@@ -856,7 +861,15 @@ const ReviewQueueWorkspace = () => {
                     <button
                       key={value}
                       type="button"
-                      onClick={() => setDetailTab(value)}
+                      onClick={() => {
+                        // Only Activity has its own event: the others are the
+                        // reading path itself, while "did anyone open the audit
+                        // trail" is a question the compliance story asks.
+                        if (value === "activity") {
+                          track("review_activity_tab_viewed", { idea_id: selectedIdea.id });
+                        }
+                        setDetailTab(value);
+                      }}
                       className={`border-b-2 pb-3 text-sm font-semibold transition-colors ${
                         detailTab === value
                           ? "border-[var(--pulse-ink)] text-[var(--pulse-ink)]"

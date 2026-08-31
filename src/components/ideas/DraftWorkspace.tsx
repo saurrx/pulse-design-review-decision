@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import EvaluationProgress from "@/components/ideas/EvaluationProgress";
 import API_CONFIG from "@/lib/apiConfig";
 import { extractDocumentText } from "@/lib/documentText";
@@ -312,12 +312,31 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
     10 + Math.round((answered / totalFields) * 90),
   );
 
+  // Readiness, reported in 10-point BANDS. The raw percentage moves on nearly
+  // every keystroke; the band moves when the draft actually got further, which is
+  // the only version of this that a retention or drop-off chart can read.
+  const readinessBand = Math.floor(completion / 10) * 10;
+  const bandRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!loadedRef.current) return;
+    if (bandRef.current === readinessBand) return;
+    // The first band after load is the starting point, not a change.
+    const first = bandRef.current === null;
+    bandRef.current = readinessBand;
+    if (!first) track("draft_readiness_changed", { idea_id: ideaId, pct: readinessBand });
+  }, [readinessBand, ideaId]);
+
   const anyContent = answered > 0;
   const slimBanner = autofillRan || anyContent;
 
   /* --------------------------------- saving --------------------------------- */
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // The field whose edit triggered the pending save. Rides the SAME 800ms
+  // debounce as the write itself, so a sentence typed into one box is one event
+  // and not forty — a per-keystroke event here would be the loudest thing in the
+  // whole project and would say nothing the autosave does not already say.
+  const pendingFieldRef = useRef<string | null>(null);
   const saveNow = useCallback(
     async (next: any[], prov: Record<string, Provenance>, pct: number) => {
       const meta = next.map((s) => ({
@@ -340,14 +359,31 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
     (next: any[], prov: Record<string, Provenance>, pct: number) => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
       saveTimer.current = setTimeout(() => {
-        saveNow(next, prov, pct).catch(() => toast.error("Autosave failed"));
+        const field = pendingFieldRef.current;
+        pendingFieldRef.current = null;
+        saveNow(next, prov, pct)
+          .then(() => {
+            // Field and section IDS, never the answer. Which boxes people fill,
+            // and in what order, is the whole question behind the draft stall.
+            if (field) {
+              track("draft_field_saved", {
+                idea_id: ideaId,
+                field,
+                section: next.find((sec) =>
+                  sec.questions.some((q: any) => q.id === field),
+                )?.id,
+              });
+            }
+          })
+          .catch(() => toast.error("Autosave failed"));
       }, 800);
     },
-    [saveNow],
+    [saveNow, ideaId],
   );
 
   const setAnswer = (qid: string, value: string, viaAI = false) => {
     if (scored) setDirtySinceScore(true);
+    pendingFieldRef.current = qid;
     setSections((prev) => {
       const next = prev.map((s) => ({
         ...s,
@@ -678,6 +714,10 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
   };
 
   const handleSend = () => {
+    // "Send for review" was pressed. Fired here rather than on success, because
+    // the gap between this and idea_submitted IS the submit stall — a person who
+    // reaches this point and does not finish is the one worth knowing about.
+    track("idea_submit_opened", { idea_id: ideaId });
     if (coInventorCount === 0 && !showCoInvPrompt) {
       setShowCoInvPrompt(true);
       return;

@@ -135,6 +135,15 @@
     "src/components/ui/**": [
       "*"
     ],
+    "src/lib/**": [
+      "*"
+    ],
+    "src/hooks/**": [
+      "*"
+    ],
+    "src/contexts/**": [
+      "*"
+    ],
     "src/index.css": [
       "*"
     ],

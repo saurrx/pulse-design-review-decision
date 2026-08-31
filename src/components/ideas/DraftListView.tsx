@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { track } from "@/lib/analytics";
 import useUserCookie from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,7 +33,7 @@ import {
 import moment from "moment";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import API_CONFIG from "@/lib/apiConfig";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useTheme } from "@/hooks/useTheme";
 import { useBackgroundAnalysis } from "@/contexts/BackgroundAnalysisContext";
 
@@ -402,6 +403,13 @@ const DraftListView: React.FC<DraftListViewProps> = ({
                                   draft?.CheckDraftSoreLog?.[0]
                                     ?.score_meta_data?.id,
                                 );
+                                // The stored prior-art report was opened from
+                                // the draft list. evaluation_report_opened covers
+                                // the in-draft rail; this is the other door.
+                                track("patent_report_opened", {
+                                  evaluation_id:
+                                    draft?.CheckDraftSoreLog?.[0]?.score_meta_data?.id,
+                                });
                                 setShowPatentReportModal(true);
                               }}
                               className={`rounded-lg border font-medium font-sans ${

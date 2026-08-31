@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { FormikProps } from "formik";
 import { iClientOnboardForm } from "@/pages/client/ClientsPage";
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import API_CONFIG from "@/lib/apiConfig";
 import { useTheme } from "@/hooks/useTheme";
 import { MAX_FILE_SIZE } from "@/utils/constants";

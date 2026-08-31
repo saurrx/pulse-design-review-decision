@@ -23,7 +23,7 @@ import { Input } from "../ui/input";
 import API_CONFIG from "@/lib/apiConfig";
 import React from "react";
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useTheme } from "@/hooks/useTheme";
 import { track } from "@/lib/analytics";
 

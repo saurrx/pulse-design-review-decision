@@ -2,7 +2,8 @@ import API_CONFIG from "@/lib/apiConfig";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useLayoutEffect, useState, useRef } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
+import { track } from "@/lib/analytics";
 import Cookies from "js-cookie";
 import { Loader2 } from "lucide-react";
 import { useFormik } from "formik";
@@ -189,6 +190,10 @@ const Login = () => {
     initialValues: formInitialValues,
     validationSchema,
     onSubmit: (values: iLoginForm) => {
+      // The ATTEMPT, not the credentials — `method` is an enum and nothing else
+      // from this form is ever sent. Paired with the server's login_succeeded /
+      // login_failed, this is what turns "logins are down" into "which method".
+      track("login_attempted", { method: "password" });
       loginMutate(values);
     },
   });
@@ -220,6 +225,7 @@ const Login = () => {
   });
 
   const microsoftLogin = () => {
+    track("login_attempted", { method: "microsoft" });
     const oauthState = crypto.randomUUID();
     sessionStorage.setItem("ms_oauth_state", oauthState);
     const params = new URLSearchParams({
@@ -476,7 +482,10 @@ const Login = () => {
                 delay: 0.06,
               }}
               style={{ transformOrigin: "center" }}
-              onClick={() => handleLogin()}
+              onClick={() => {
+                track("login_attempted", { method: "google" });
+                handleLogin();
+              }}
               disabled={isLoading || isPending}
               className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >

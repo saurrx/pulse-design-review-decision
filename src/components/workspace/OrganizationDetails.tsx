@@ -5,7 +5,7 @@ import API_CONFIG, { assetUrl } from "@/lib/apiConfig";
 import { Button } from "../ui/button";
 import { Check, Edit, X } from "lucide-react";
 import { Textarea } from "../ui/textarea";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useMutation } from "@tanstack/react-query";
 import { useTheme } from "@/hooks/useTheme";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";

@@ -27,7 +27,7 @@ import { cn } from "@/lib/utils";
 import { useFileUpload } from "@/lib/api-service/commonApi.service";
 import API_CONFIG, { assetUrl } from "@/lib/apiConfig";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useTheme } from "@/hooks/useTheme";
 
 interface Inventor {

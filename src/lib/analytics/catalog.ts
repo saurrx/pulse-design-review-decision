@@ -88,10 +88,7 @@ export const EVENTS = {
   list_filtered: ['list'],
   list_sorted: ['list'],
   list_paginated: ['list'],
-  global_search_used: [],
   ui_error_toast_shown: ['kind'],
-  partial_result_shown: [],
-  evaluation_timeout_shown: [],
 
   // ---- inventor loop (web + api) ----
   idea_create_opened: [],
@@ -119,6 +116,10 @@ export const EVENTS = {
   evaluation_requested: [],
   re_evaluation_started: [],
   re_evaluation_requested: [],
+  // The degraded outcomes (PARTIAL / TIMED_OUT) are read off `state` HERE and on
+  // the agent's own `agent_evaluation_finished` — there is no second screen and
+  // so no second event. A dedicated one would have to be fired from the same
+  // place as this one, which is how a funnel ends up double-counting.
   evaluation_completed_viewed: ['state', 'novelty_band'],
   evaluation_persisted: ['state'],
   evaluation_report_opened: [],
@@ -143,8 +144,9 @@ export const EVENTS = {
   reject_submitted: ['reason_len'],
 
   // ---- docket & actions (web + api) ----
+  // /actions. Named for the `docket:read` capability that gates it, so the event
+  // and the authorisation it depends on read the same in both repos.
   docket_viewed: [],
-  operations_queue_viewed: [],
   instruction_picked: ['template_id'],
   countries_selected: ['count'],
   instruction_cancelled: [],
@@ -168,7 +170,6 @@ export const EVENTS = {
   import_history_viewed: [],
   patents_exported: [],
   due_dates_viewed: [],
-  due_date_reminder_sent: [],
   due_date_reminded: [],
   due_date_status_changed: [],
 
@@ -186,22 +187,18 @@ export const EVENTS = {
   user_role_changed: [],
   user_suspended: [],
   user_reactivated: [],
-  user_deleted: [],
   invite_dialog_opened: [],
-  invites_sent: ['count'],
+  // One event for "an invite was issued", fired server-side where it is true.
   invite_created: ['count'],
   invite_revoked: [],
   share_link_copied: [],
   share_link_regenerated: [],
 
-  // ---- profile / notifications / assistant (web) ----
+  // ---- profile / notifications (web) ----
   profile_viewed: [],
   profile_updated: [],
   notification_pref_changed: ['pref_key', 'enabled'],
-  notification_bell_opened: [],
   notification_marked_read: [],
-  assistant_opened: [],
-  assistant_message_sent: [],
 
   // ---- backend triggers (api) ----
   rejected_signup_pruned: ['count'],

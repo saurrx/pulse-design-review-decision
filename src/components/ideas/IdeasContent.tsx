@@ -61,7 +61,7 @@ import moment from "moment";
 import StatusChip from "@/components/ui/StatusChip";
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import Loader from "../Loader";
 import IdeaSubmissionModal from "./IdeaSubmissionModal";
 import ShowScoreReport from "./ShowScoreReport";

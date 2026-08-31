@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import API_CONFIG from "@/lib/apiConfig";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { iIHCLoginForm } from "./IHCLogin";
