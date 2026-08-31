@@ -7,7 +7,6 @@ import { useTheme } from "@/hooks/useTheme";
 
 type ClientTabsProps = {
   clientTeam: any[];
-  patentFileHistory: any[];
   clientId: string;
   clientData: any;
   caseOwnerName?: string;
@@ -17,7 +16,6 @@ type ClientTabsProps = {
 
 const ClientTabs: React.FC<ClientTabsProps> = ({
   clientTeam,
-  patentFileHistory,
   clientId,
   clientData,
   caseOwnerName,
@@ -95,7 +93,6 @@ const ClientTabs: React.FC<ClientTabsProps> = ({
       <TabsContent value="overview" className="mt-0 min-w-0">
         <OverviewTab
           clientTeam={clientTeam}
-          patentFileHistory={patentFileHistory}
           clientId={clientId}
           clientData={clientData}
           caseOwnerName={caseOwnerName}

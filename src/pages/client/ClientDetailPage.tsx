@@ -406,7 +406,6 @@ const ClientDetailPage: React.FC = () => {
                     onChangeCaseOwner={user?.role === "PHOTON_ADMIN" ? () => setIsOwnerDialogOpen(true) : undefined}
                     canManageTeam={user?.role === "PHOTON_ADMIN"}
                     clientTeam={clientData?.data?.User}
-                    patentFileHistory={clientData?.data?.PatentFileHistory}
                   />
               )}
             </div>
