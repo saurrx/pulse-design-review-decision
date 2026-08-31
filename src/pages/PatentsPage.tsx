@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useTrackOnce } from "@/lib/analytics";
 import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import PatentsContent from "@/components/patents/PatentsContent";
@@ -380,6 +381,11 @@ const injectGlobalStyles = () => {
 
 const PatentsPage: React.FC = () => {
   const { patentId } = useParams();
+  // One route, two screens: the portfolio list and a single record. They answer
+  // different questions ("is anyone browsing patents?" vs "which records get
+  // opened?"), so they are two events, each fired only on its own branch.
+  useTrackOnce("patents_viewed", {}, !patentId);
+  useTrackOnce("patent_opened", { patent_id: patentId }, !!patentId);
   const navigate = useNavigate();
   const [totalPatents, setTotalPatents] = useState(0);
   const [isExporting, setIsExporting] = useState(false);

@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useMutation } from "@tanstack/react-query";
 import API_CONFIG from "@/lib/apiConfig";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { X, Plus, Loader2 } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
 

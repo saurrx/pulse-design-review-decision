@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useTrackOnce } from "@/lib/analytics";
 import { Save, X } from "lucide-react";
 
 import DashboardLayout from "@/components/DashboardLayout";
@@ -8,6 +9,7 @@ import useUserCookie from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/useTheme";
 
 const ProfilePage: React.FC = () => {
+  useTrackOnce("profile_viewed");
   const { theme } = useTheme();
   const { user } = useUserCookie();
   const [isEditMode, setIsEditMode] = useState(false);

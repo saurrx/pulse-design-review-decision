@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
+import { track } from "@/lib/analytics";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -351,6 +352,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     daysOverdue > 0 ? "danger" : daysOverdue === 0 ? "warning" : "success";
 
   const handleFilterChange = (value: FilterOption) => {
+    track("list_filtered", { list: "due_dates" });
     setFilterOption(value);
     setCurrentPage(1); // Reset to first page when filter changes
 
@@ -364,6 +366,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
   };
 
   const handleStatusFilterChange = (value: StatusFilter) => {
+    track("list_filtered", { list: "due_dates" });
     setStatusFilter(value);
     setCurrentPage(1); // Reset to first page when filter changes
 
@@ -379,6 +382,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
   };
 
   const handleCountryFilterChange = (value: CountryFilter) => {
+    track("list_filtered", { list: "due_dates" });
     setCountryFilter(value);
     setCurrentPage(1); // Reset to first page when filter changes
 
@@ -394,6 +398,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
   };
 
   const handleSortChange = (value: SortOption) => {
+    track("list_sorted", { list: "due_dates" });
     setSortOption(value);
     setCurrentPage(1); // Reset to first page when sort changes
     toast.success(`Sort applied: ${getSortLabel(value)}`);
@@ -503,6 +508,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
   };
 
   const handleItemsPerPageChange = (value: string) => {
+    track("list_paginated", { list: "due_dates" });
     setItemsPerPage(Number(value));
     setCurrentPage(1); // Reset to first page when changing items per page
   };

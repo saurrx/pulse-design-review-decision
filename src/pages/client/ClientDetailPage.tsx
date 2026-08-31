@@ -5,7 +5,8 @@ import ClientDetails, {
 } from "@/components/clients/ClientDetails";
 import ClientTabs from "@/components/clients/ClientTabs";
 import ClientLogo from "@/components/clients/ClientLogo";
-import { useParams, Navigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import BlockedRedirect from "@/lib/BlockedRedirect";
 import { User, Pen, X, Save, Globe2, BriefcaseBusiness } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API_CONFIG, { assetUrl } from "@/lib/apiConfig";
@@ -18,12 +19,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import Cookies from "js-cookie";
 import { useTheme } from "@/hooks/useTheme";
 import useUserCookie from "@/hooks/use-auth";
 import { isOutsideCounselRole } from "@/lib/roleAccess";
-import { track, identifyUser } from "@/lib/analytics";
+import { track, identifyUser, useTrackOnce } from "@/lib/analytics";
 
 const ClientDetailPage: React.FC = () => {
   const { theme } = useTheme();
@@ -50,6 +51,9 @@ const ClientDetailPage: React.FC = () => {
     user?.role === "PHOTON_ADMIN" ||
     (isCaseOwner && !!clientId && assignedClientIds.includes(clientId));
   const [isEditMode, setIsEditMode] = useState(false);
+  // Only once the role check below has passed — a record the caller is bounced
+  // off was never opened, it was refused, and redirect_blocked says that.
+  useTrackOnce("client_record_opened", { client_id: clientId }, !!user && canViewClient);
   const [isClientModeModalOpen, setIsClientModeModalOpen] = useState(false);
   const [isOwnerDialogOpen, setIsOwnerDialogOpen] = useState(false);
   const clientDetailsRef = useRef<ClientDetailsRef>(null);
@@ -176,10 +180,10 @@ const ClientDetailPage: React.FC = () => {
        return <Loader />;
      }
      if (user && !allowedRoles.includes(user.role)) {
-       return <Navigate to="/" replace />;
+       return <BlockedRedirect from="/clients/:id" to="/" />;
      }
      if (user && !canViewClient) {
-       return <Navigate to="/clients" replace />;
+       return <BlockedRedirect from="/clients/:id" to="/clients" />;
      }
 
   return (
@@ -231,7 +235,13 @@ const ClientDetailPage: React.FC = () => {
                   variant="outline"
                   size="sm"
                   className="h-9 rounded-lg"
-                  onClick={() => setIsClientModeModalOpen(true)}
+                  onClick={() => {
+                    // The confirmation opened, not the session — the pair with
+                    // view_as_entered is what shows how often an admin thinks
+                    // better of stepping into a client's workspace.
+                    track("view_as_prompted", { client_id: clientId });
+                    setIsClientModeModalOpen(true);
+                  }}
                 >
                   <User className="h-4 w-4" />
                   <span className="hidden lg:inline">View as client</span>

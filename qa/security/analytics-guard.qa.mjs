@@ -16,12 +16,20 @@
  *     patent-agent). A silent edit that widens the vocabulary, weakens the
  *     denylist, or loosens `sanitize()` reddens here.
  *
- *  2. NO RAW CONTENT IN EMITTERS — walk src/, find every `track(` and
- *     `.capture(` call, and fail if its props carry a denylisted KEY
+ *  2. NO RAW CONTENT IN EMITTERS — walk src/, find every `track(`,
+ *     `useTrackOnce(` and `.capture(` call, and fail if its props carry a
+ *     denylisted KEY
  *     (`note:`, `reason:`, `email:` …) or SPREAD a variable whose name reads as
  *     raw content (`...disclosure`, `...answer`, `...ideaText` …). Heuristic and
  *     conservative — a tripwire, not a type system. The `*_len` / `*_count`
  *     shape (`reason_len`, `char_count`) is explicitly allowed: it is a count.
+ *
+ *  3. ONE TOAST DOOR — `src/lib/toast.ts` is the only module allowed to import
+ *     `toast` from "sonner". It is what fires `ui_error_toast_shown`, so a
+ *     screen importing sonner directly would show an error nobody counts, and
+ *     the UI-error-rate insight would quietly under-report forever. Exactly the
+ *     rot this file exists to prevent, one level up: the FIRST time someone
+ *     re-adds the direct import is the only moment it is cheap to catch.
  *
  * Static — no build, no browser. That is the point of a pre-deploy gate.
  */
@@ -36,7 +44,7 @@ const CATALOG = join(SRC, 'lib', 'analytics', 'catalog.ts');
 
 // The pinned sha of the shared catalogue. Re-pin ONLY when the catalogue is
 // deliberately changed in all three repos together (see the cross-repo drift note).
-const PINNED_SHA = '9590b13361b9b5e1b80bc21a00da421829f033076db89e0667ec61fff4b14548';
+const PINNED_SHA = '7a60c96a12714201f531905bf341daf936f4c83b1d2fbcd37489370972c591c5';
 
 // Denylisted property KEYS — content, PII, the client-identifying reference, and
 // secrets. Mirrors PROPERTY_DENYLIST in the catalogue. Matched EXACTLY against an
@@ -77,7 +85,7 @@ function walk(dir, out = []) {
 /** Read the balanced-paren argument text of every `track(` / `.capture(` call. */
 function callArgs(txt) {
   const calls = [];
-  const re = /(?:\btrack|\.capture)\s*\(/g;
+  const re = /(?:\btrack|\buseTrackOnce|\.capture)\s*\(/g;
   let m;
   while ((m = re.exec(txt))) {
     let depth = 1;
@@ -161,9 +169,33 @@ for (const f of files) {
   }
 }
 
+// ---- assertion 3: one toast door ----
+// `@/components/ui/sonner.tsx` RENDERS toasts (it wraps <Toaster/>), it does not
+// raise them, so it is allowed its own sonner import.
+const TOAST_DOOR = join(SRC, 'lib', 'toast.ts');
+const TOASTER = join(SRC, 'components', 'ui', 'sonner.tsx');
+let toastDoors = 0;
+for (const f of files) {
+  if (f === TOAST_DOOR || f === TOASTER) continue;
+  const txt = readFileSync(f, 'utf8');
+  if (/import\s*\{[^}]*\btoast\b[^}]*\}\s*from\s*['"]sonner['"]/.test(txt)) {
+    failed = true;
+    problems.push(
+      `${relative(ROOT, f)}: imports \`toast\` from "sonner" directly — import it ` +
+      `from "@/lib/toast", the one door that counts ui_error_toast_shown`,
+    );
+  }
+  if (/from\s*['"]@\/lib\/toast['"]/.test(txt)) toastDoors++;
+}
+if (!existsSync(TOAST_DOOR)) {
+  failed = true;
+  problems.push('src/lib/toast.ts is missing — nothing counts ui_error_toast_shown');
+}
+
 console.log(
   `analytics-guard: catalogue sha ${actualSha === PINNED_SHA ? 'OK' : 'DRIFTED'}; ` +
-  `scanned ${files.length} file(s), ${callSites} emitter call site(s)`,
+  `scanned ${files.length} file(s), ${callSites} emitter call site(s), ` +
+  `${toastDoors} file(s) through the toast door`,
 );
 
 if (failed) {

@@ -1,7 +1,7 @@
 import { readUserCookie } from "@/lib/auth";
 import { useMutation } from "@tanstack/react-query";
 import API_CONFIG from "../apiConfig";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import Cookies from "js-cookie";
 
 /**

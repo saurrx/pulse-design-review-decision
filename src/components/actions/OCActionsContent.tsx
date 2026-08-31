@@ -1,8 +1,9 @@
 import React, { useState, useCallback, useEffect } from "react";
+import { track } from "@/lib/analytics";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API_CONFIG from "@/lib/apiConfig";
 import { useTheme } from "@/hooks/useTheme";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -150,12 +151,17 @@ const OCActionsContent: React.FC = () => {
     }
   };
 
+  // Same `list` name as the IHC table on purpose: /actions is one screen with
+  // two role-specific bodies, and splitting the label would make the breakdown
+  // read as two products.
   const handleFilterChange = (value: FilterOption) => {
+    track("list_filtered", { list: "actions" });
     setFilterOption(value);
     setCurrentPage(1);
   };
 
   const handleSortChange = (value: SortOption) => {
+    track("list_sorted", { list: "actions" });
     setSortOption(value);
     setCurrentPage(1);
   };

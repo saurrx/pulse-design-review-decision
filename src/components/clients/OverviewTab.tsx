@@ -1,4 +1,5 @@
 import useUserCookie from "@/hooks/use-auth";
+import { track } from "@/lib/analytics";
 import { Badge } from "@/components/ui/badge";
 import { ROLE_LABEL } from "@/lib/roles";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Ban, BriefcaseBusiness, CalendarDays, Check, CircleAlert, CircleCheck, CircleX, Copy, Download, FileText, Globe2, Hash, History, Plus, RefreshCw, TrendingUp, Upload, UserPlus } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import React, { useRef, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import AddPatentModal from "./AddPatentModal";
 import DuplicatePatentsModal from "./DuplicatePatentsModal";
 
@@ -323,7 +324,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], patentFileHi
                   client imported before imports were recorded looked as though
                   the feature did not exist; the dialog can say "nothing yet"
                   far more honestly than an absent button can. */}
-              <Button variant="outline" size="sm" onClick={() => setHistoryDialogOpen(true)}><History className="mr-1.5 h-4 w-4" />Import history</Button>
+              <Button variant="outline" size="sm" onClick={() => { track("import_history_viewed", { client_id: clientId }); setHistoryDialogOpen(true); }}><History className="mr-1.5 h-4 w-4" />Import history</Button>
               <input id="data-upload" type="file" className="hidden" accept=".xls,.xlsx,.csv" onChange={handleFileUpload} disabled={isUploadingPatentFile} />
               <Button asChild variant="outline" size="sm"><label htmlFor="data-upload" className="cursor-pointer"><Upload className="mr-1.5 h-4 w-4" />{isUploadingPatentFile ? "Uploading…" : "Upload portfolio"}</label></Button>
               <Button size="sm" onClick={() => setShowAddPatentModal(true)} className="bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]"><Plus className="mr-1.5 h-4 w-4" />Add patent</Button>

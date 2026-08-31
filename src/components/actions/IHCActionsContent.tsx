@@ -1,9 +1,10 @@
 import React, { useState, useCallback } from "react";
+import { track } from "@/lib/analytics";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import API_CONFIG from "@/lib/apiConfig";
 import useUserCookie from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/useTheme";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
@@ -119,7 +120,11 @@ const IHCActionsContent: React.FC = () => {
     }
   };
 
+  // `list` is the table's name and the value is a preset ENUM — the free-text
+  // search box deliberately does NOT emit, because the query is what a user
+  // typed and can name an invention.
   const handleFilterChange = (value: FilterOption) => {
+    track("list_filtered", { list: "actions" });
     setFilterOption(value);
     setCurrentPage(1);
   };
@@ -134,11 +139,20 @@ const IHCActionsContent: React.FC = () => {
   };
 
   const handleStatusChange = (value: StatusFilter) => {
+    track("list_filtered", { list: "actions" });
     setStatusFilter(value);
     setCurrentPage(1);
   };
 
+  // The four pagers go through one helper so the event cannot drift away from
+  // three of them the next time someone edits a button.
+  const goToPage = (next: number | ((p: number) => number)) => {
+    track("list_paginated", { list: "actions" });
+    setCurrentPage(next);
+  };
+
   const handleSortChange = (value: SortOption) => {
+    track("list_sorted", { list: "actions" });
     setSortOption(value);
     setCurrentPage(1);
   };
@@ -240,6 +254,9 @@ const IHCActionsContent: React.FC = () => {
         requires_countries: boolean;
       },
     ) => {
+      // The TEMPLATE id — an id from a fixed 195-row catalogue, never the label
+      // (which carries the deadline's wording).
+      track("instruction_picked", { template_id: template.id, patent_id: patentId });
       if (template.requires_countries) {
         setPendingCountryAction({
           eventId,
@@ -277,6 +294,7 @@ const IHCActionsContent: React.FC = () => {
         application_number: pendingCountryAction.applicationNumber,
         selected_countries: countries,
       });
+      track("countries_selected", { count: countries.length });
       setPendingCountryAction(null);
       setShowSubmitDialog(true);
     },
@@ -285,6 +303,9 @@ const IHCActionsContent: React.FC = () => {
 
   // Handle submit — single action
   const handleSubmit = useCallback(() => {
+    // The confirm button. actions_submitted_all is the server's record of what
+    // landed; this is the click, so the two together show failed submissions.
+    track("actions_submit_all_clicked");
     if (!pendingSubmitAction) {
       toast.error("No action selected to submit");
       return;
@@ -809,7 +830,7 @@ const IHCActionsContent: React.FC = () => {
               title="First page"
               aria-label="First page"
               disabled={currentPage === 1}
-              onClick={() => setCurrentPage(1)}
+              onClick={() => goToPage(1)}
             >
               <ChevronsLeft className="w-4 h-4" />
             </Button>
@@ -820,7 +841,7 @@ const IHCActionsContent: React.FC = () => {
               title="Previous page"
               aria-label="Previous page"
               disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => p - 1)}
+              onClick={() => goToPage((p) => p - 1)}
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
@@ -831,7 +852,7 @@ const IHCActionsContent: React.FC = () => {
               title="Next page"
               aria-label="Next page"
               disabled={currentPage === pagination.totalPages}
-              onClick={() => setCurrentPage((p) => p + 1)}
+              onClick={() => goToPage((p) => p + 1)}
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
@@ -842,7 +863,7 @@ const IHCActionsContent: React.FC = () => {
               title="Last page"
               aria-label="Last page"
               disabled={currentPage === pagination.totalPages}
-              onClick={() => setCurrentPage(pagination.totalPages)}
+              onClick={() => goToPage(pagination.totalPages)}
             >
               <ChevronsRight className="w-4 h-4" />
             </Button>
@@ -854,6 +875,8 @@ const IHCActionsContent: React.FC = () => {
       <SubmitActionsDialog
         open={showSubmitDialog}
         onOpenChange={(open) => {
+          // Closed WITHOUT confirming: an instruction was picked and abandoned.
+          if (!open && pendingSubmitAction) track("instruction_cancelled");
           setShowSubmitDialog(open);
           if (!open) setPendingSubmitAction(null);
         }}

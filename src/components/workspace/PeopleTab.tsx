@@ -3,7 +3,7 @@ import { ROLE_LABEL } from "@/lib/roles";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Ban, Check, Copy, Download, Link2, RefreshCw, Trash2, UserPlus, Users } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import API_CONFIG from "@/lib/apiConfig";
 import { isUuid } from "@/lib/realAdapter";
 import useUserCookie from "@/hooks/use-auth";

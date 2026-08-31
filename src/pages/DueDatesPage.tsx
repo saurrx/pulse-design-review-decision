@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTrackOnce } from "@/lib/analytics";
 import { useLocation } from 'react-router-dom';
 import DashboardLayout from '@/components/DashboardLayout';
 import DueDatesContent, {
@@ -9,6 +10,7 @@ import DueDatesContent, {
 import { CalendarDays, List } from 'lucide-react';
 
 const DueDatesPage: React.FC = () => {
+  useTrackOnce("due_dates_viewed");
   const location = useLocation();
   const initialView = (location.state?.initialView || 'list') as DueDatesViewType;
   const [headerState, setHeaderState] = React.useState<DueDatesHeaderState>({

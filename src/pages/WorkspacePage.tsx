@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import BlockedRedirect from "@/lib/BlockedRedirect";
 import { useQuery } from "@tanstack/react-query";
 
 import DashboardLayout from "@/components/DashboardLayout";
@@ -38,7 +38,7 @@ const WorkspacePage: React.FC = () => {
   });
 
   if (user && !isWorkspaceAdmin) {
-    return <Navigate to="/profile" replace />;
+    return <BlockedRedirect from="/workspace" to="/profile" />;
   }
 
   // PHOTON_ADMIN lands on the case-owner access view, which is not client

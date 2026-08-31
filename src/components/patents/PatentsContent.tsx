@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { track } from "@/lib/analytics";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,7 +63,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { isOutsideCounselRole } from "@/lib/roleAccess";
 import {
   Popover,
@@ -879,6 +880,7 @@ const PatentsContent = (props: PatentsContentProps) => {
   };
 
   const handleSortChange = (value: SortOption) => {
+    track("list_sorted", { list: "patents" });
     let newSortConfig: SortConfig;
 
     switch (value) {
@@ -908,6 +910,7 @@ const PatentsContent = (props: PatentsContentProps) => {
   // column sorts ascending; clicking the already-active column toggles
   // asc/desc. Sorting is applied server-side via sortConfig in the query.
   const handleHeaderSort = (field: string) => {
+    track("list_sorted", { list: "patents" });
     setSortConfig((prev) => {
       const sortOrder =
         prev.sortBy === field && prev.sortOrder === "asc" ? "desc" : "asc";
@@ -950,6 +953,9 @@ const PatentsContent = (props: PatentsContentProps) => {
   // Apply a date preset (or switch to custom). Custom keeps whatever from/to
   // the user has already typed; switching away from custom clears them.
   const handleDatePresetChange = (preset: DatePreset) => {
+    // The PRESET is an enum. The search box next to it is not wired, on purpose:
+    // a patent search query is free text and can name an unfiled invention.
+    track("list_filtered", { list: "patents" });
     setDatePreset(preset);
     if (preset !== "custom") {
       setCustomFrom("");
@@ -996,6 +1002,7 @@ const PatentsContent = (props: PatentsContentProps) => {
   };
 
   const handleItemsPerPageChange = async (value: string) => {
+    track("list_paginated", { list: "patents" });
     await setItemsPerPage(Number(value));
     setCurrentPage(1); // Reset to first page when changing items per page
     refetch();

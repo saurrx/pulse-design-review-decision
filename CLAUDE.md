@@ -343,10 +343,23 @@ first. Init is in `App.tsx` (`disable_session_recording:true`, `autocapture`,
 `enable_heatmaps`, `capture_pageview:'history_change'`). identify/reset in
 `use-auth.tsx`/`auth.ts`; view-as re-identify in `Sidebar.tsx`. **Never send
 content/PII/`reference`** — only ids/enums/counts (the denylist + gate enforce it);
-mask rendered disclosure with `ph-no-capture`. **A new user-facing feature needs a
-catalogue event** — the atlas coverage guard enforces it. Env vars live in Vercel
-(production target only, so preview/dev never fire). See the analytics plan + atlas
-`analytics/`.
+mask rendered disclosure with `ph-no-capture`.
+
+Three emitters, and no fourth: `track(event, props)` for an action;
+`useTrackOnce(event, props, when)` for anything "opened" — it guards the
+strict-mode double-invoke and RE-ARMS on the falling edge, so a screen fires once
+per mount and a dialog once per opening; and `src/lib/toast.ts`, the app's ONLY
+toast import (`import { toast } from "@/lib/toast"`, never from `"sonner"`),
+which counts `ui_error_toast_shown` centrally rather than at 153 call sites. It
+sends the toast VARIANT and never the message — a message is free text and
+routinely an API error echoing what the user typed.
+
+**A new user-facing feature needs a catalogue event**, and two atlas guards
+enforce it from opposite directions: `analytics/coverage.mjs` (a route with no
+event) and `analytics/emitters.mjs` (an event with no emitter — 51 of 145 were
+in that state until 2026-08-31; a funnel step nobody fires reads as 100%
+drop-off, see findings F-059). Env vars live in Vercel (production target only,
+so preview/dev never fire). See the analytics plan + atlas `analytics/`.
 
 ## QA — the test corpus and how to run only what matters
 

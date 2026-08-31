@@ -1,9 +1,10 @@
 import React, { useRef, useState } from "react";
+import { track, useTrackOnce } from "@/lib/analytics";
 import { ROLE_LABEL } from "@/lib/roles";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Ban, Check, Copy, Download, RefreshCw } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import API_CONFIG from "@/lib/apiConfig";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,10 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
   const [linkCopied, setLinkCopied] = useState(false);
   const qrCodeRef = useRef<SVGSVGElement>(null);
   const domain = allowedDomain.split("@").pop() || "company.com";
+  // The dialog opened. Against invite_created / share_link_copied this is the
+  // "opened it and sent nothing" number, which is the only way to see an admin
+  // who could not work out which of the two invite modes they needed.
+  useTrackOnce("invite_dialog_opened", { client_id: clientId }, open);
   const effectiveRole = adminOnly ? "LEGAL_COUNSEL" : role;
 
   const { data: inviteLinkData } = useQuery({
@@ -94,6 +99,8 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(inviteLink);
+    // The link is a credential and never travels — only that one was taken.
+    track("share_link_copied", { client_id: clientId });
     setLinkCopied(true);
     toast.success("Inventor invite link copied");
     window.setTimeout(() => setLinkCopied(false), 2000);

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { X, Eye, Download } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import API_CONFIG, { assetUrl } from "@/lib/apiConfig";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 // Utility function to format file size
 const formatFileSize = (bytes: number): string => {

@@ -18,7 +18,7 @@ import { Dialog, DialogContentNoClose } from "@/components/ui/dialog";
 import useUserCookie from "@/hooks/use-auth";
 import moment from "moment";
 import { useTheme } from "@/hooks/useTheme";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { motion } from "framer-motion";
 import { isOutsideCounselRole } from "@/lib/roleAccess";
 

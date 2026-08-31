@@ -2,7 +2,8 @@ import API_CONFIG from "@/lib/apiConfig";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
+import { track } from "@/lib/analytics";
 import Cookies from "js-cookie";
 import { Loader2 } from "lucide-react";
 import { useFormik } from "formik";
@@ -42,6 +43,15 @@ const formInitialValues: iLoginForm = {
 
 const Signup = () => {
   const loaction = useLocation();
+  // The screen was reached. Fired once per mount (the ref survives the strict-mode
+  // double-invoke), so signup_started → signup_submitted → signup_succeeded reads
+  // as three real steps rather than a render count.
+  const startedRef = useRef(false);
+  useEffect(() => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    track("signup_started");
+  }, []);
   const { state } = loaction;
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -166,6 +176,7 @@ const Signup = () => {
   });
 
   const microsoftLogin = () => {
+    track("signup_submitted");
     const clientId = import.meta.env.VITE_MS_CLIENT_ID;
     if (!clientId) {
       toast.error("Microsoft login is not configured. Set VITE_MS_CLIENT_ID in .env");
@@ -218,6 +229,10 @@ const Signup = () => {
     initialValues: formInitialValues,
     validationSchema,
     onSubmit: (values: iLoginForm) => {
+      // The submit, not the form. The gap between this and the server's
+      // signup_succeeded / signup_rejected_domain is the domain allow-list
+      // turning people away — invisible from either end alone.
+      track("signup_submitted");
       loginMutate(values);
     },
   });
@@ -495,7 +510,10 @@ const Signup = () => {
                 delay: 0.06,
               }}
               style={{ transformOrigin: "center" }}
-              onClick={() => handleLogin()}
+              onClick={() => {
+                track("signup_submitted");
+                handleLogin();
+              }}
               disabled={isLoading || isPending}
               className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >

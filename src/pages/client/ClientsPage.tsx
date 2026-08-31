@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { track, useTrackOnce } from "@/lib/analytics";
 import {
   Plus,
   Calendar,
@@ -21,7 +22,8 @@ import {
   ChevronDown,
   LayoutGridIcon,
 } from "lucide-react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import BlockedRedirect from "@/lib/BlockedRedirect";
 import { isOutsideCounselRole } from "@/lib/roleAccess";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -58,7 +60,7 @@ import {
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import Loader from "@/components/Loader";
 import API_CONFIG, { assetUrl } from "@/lib/apiConfig";
 import moment from "moment";
@@ -144,6 +146,11 @@ const ClientsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUserCookie();
   const isCaseOwner = user?.role === "CASE_OWNER";
+  // `scope` is the enum that makes this readable: a case owner sees only their
+  // assigned clients, an OC admin the whole book, and the two are not the same
+  // screen even though they share a route.
+  useTrackOnce("client_book_viewed", { scope: isCaseOwner ? "assigned" : "all" },
+    !!user && isOutsideCounselRole(user.role));
   const [isOnboardModalOpen, setIsOnboardModalOpen] =
     useState<iClientOnboardModal>(initialValuesClientOnboardModal);
   const [searchQuery, setSearchQuery] = useState("");
@@ -382,7 +389,7 @@ const ClientsPage: React.FC = () => {
    // Client portfolio access is available to OC admins (which includes
    // superadmins — see isOCAdminRole) and scoped case owners.
    if (user && !isOutsideCounselRole(user.role)) {
-     return <Navigate to="/" replace />;
+     return <BlockedRedirect from="/clients" to="/" />;
    }
 
   return (
@@ -394,8 +401,10 @@ const ClientsPage: React.FC = () => {
           : {
               label: "Onboard a client",
               icon: <Plus className="h-4 w-4" />,
-              onClick: () =>
-                setIsOnboardModalOpen((prev) => ({ ...prev, open: true })),
+              onClick: () => {
+                track("client_onboard_opened");
+                setIsOnboardModalOpen((prev) => ({ ...prev, open: true }));
+              },
             },
       }}
     >

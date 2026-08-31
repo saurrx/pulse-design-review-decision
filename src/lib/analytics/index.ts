@@ -14,6 +14,7 @@
  * the browser origin is allowlisted. Dev / local / preview are guaranteed no-ops,
  * so wiring `track(...)` anywhere is safe.
  */
+import { useEffect, useRef } from "react";
 import posthog, { type CaptureResult } from "posthog-js";
 import { readUserCookie } from "@/lib/auth";
 import {
@@ -87,6 +88,44 @@ export function track(event: EventName, props: Record<string, unknown> = {}): vo
   } catch {
     // swallow — a broken metric must never break a click
   }
+}
+
+/**
+ * Fire a catalogue event once each time `when` becomes true.
+ *
+ * Every "this was opened" event wants exactly this and nothing else: a ref guard
+ * so React's strict-mode double-invoke and any re-render do not turn one visit
+ * into three, and an effect so it never fires during render. Written once here
+ * because a dozen screens copying the same four lines is a dozen chances to get
+ * the guard wrong, and a view event that over-counts is worse than an absent one
+ * — it silently inflates every funnel it starts.
+ *
+ * The guard RE-ARMS on the falling edge, which is what makes one hook serve both
+ * shapes: a screen passing a stable `when` fires once for the mount, while a
+ * dialog that stays mounted and toggles `open` fires once per opening rather
+ * than once, ever.
+ *
+ * `props` is read at fire time, so a value that arrives late is fine — but gate
+ * the call with `when` if the event is meaningless until it does.
+ */
+export function useTrackOnce(
+  event: EventName,
+  props: Record<string, unknown> = {},
+  when = true,
+): void {
+  const firedRef = useRef(false);
+  // Kept in a ref so a fresh props object each render never re-fires the effect.
+  const propsRef = useRef(props);
+  propsRef.current = props;
+  useEffect(() => {
+    if (!when) {
+      firedRef.current = false;
+      return;
+    }
+    if (firedRef.current) return;
+    firedRef.current = true;
+    track(event, propsRef.current);
+  }, [event, when]);
 }
 
 /** Identify the signed-in user. No-op unless enabled. Never pass email/name. */

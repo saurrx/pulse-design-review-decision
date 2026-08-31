@@ -42,7 +42,7 @@ import Loader from "../Loader";
 import moment from "moment";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useFileUpload } from "@/lib/api-service/commonApi.service";
 import useUserCookie from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/useTheme";

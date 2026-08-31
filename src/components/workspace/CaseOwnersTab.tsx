@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { track } from "@/lib/analytics";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BriefcaseBusiness,
@@ -7,7 +8,7 @@ import {
   Search,
   UserPlus,
 } from "lucide-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import API_CONFIG from "@/lib/apiConfig";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -140,6 +141,9 @@ const CaseOwnersTab: React.FC = () => {
   });
 
   const openAssignments = (caseOwner: CaseOwner) => {
+    // Opened, not saved — case_owner_assignments_saved already covers the write.
+    // The gap between the two is the drawer people back out of.
+    track("case_owner_assignments_opened");
     setOwner(caseOwner);
     setSelectedClientIds(caseOwner.assigned_client_ids || []);
     setClientSearch("");

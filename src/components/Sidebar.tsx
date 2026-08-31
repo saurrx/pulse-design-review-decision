@@ -18,7 +18,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ROLE_LABEL } from "@/lib/roles";
 import { useQuery } from "@tanstack/react-query";
 import Cookies from "js-cookie";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 import API_CONFIG from "@/lib/apiConfig";
 import { clearAuthSession } from "@/lib/auth";
