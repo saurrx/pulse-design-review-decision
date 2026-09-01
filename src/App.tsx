@@ -145,6 +145,12 @@ const App = () => {
               <Sonner />
               <BrowserRouter>
               <RouteErrorBoundary>
+              {/* The OUTER boundary, for routes with no chrome to preserve:
+                  /login, /signup, /invite, and the 404. Protected routes have
+                  their own inside DashboardLayout, and the nearest boundary
+                  wins — which is the whole point, because this fallback is
+                  full-viewport and would otherwise blank the sidebar and
+                  header on every navigation (it did). */}
               <Suspense fallback={<PageFallback />}>
               <Routes>
                 <Route element={<PublicRoutes />}>
