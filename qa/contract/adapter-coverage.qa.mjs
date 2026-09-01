@@ -33,13 +33,23 @@ function walk(dir, out = []) {
 
 /* ---- what the app calls -------------------------------------------------- */
 /**
- * A call site: API_CONFIG.<verb>(<string literal>).
+ * A call site: API_CONFIG.<verb>(<url>), where the url may be a literal OR a
+ * ternary choosing between several.
  *
  * The delimiter is captured and back-referenced so the match ends at the
  * MATCHING quote. A non-greedy `[\\s\\S]*?` up to any quote instead ran across
  * whole files and produced paths containing half a component.
+ *
+ * The optional non-quote prefix is the second lesson, and it is the same one
+ * qa/map/generate.mjs learned: `API_CONFIG.get(cond ? "a" : \`b\`)` starts with
+ * an identifier, so the strict form matched nothing at all and the call site
+ * vanished from coverage — the failure mode this gate exists to prevent, in
+ * the gate itself. Brackets are excluded from the prefix so a match cannot run
+ * past its own call, and EVERY literal in the argument list is taken, because
+ * a ternary's branches can resolve to different rules.
  */
-const CALL = /API_CONFIG\s*\.\s*(get|post|put|patch|delete)\s*\(\s*(['"`])((?:(?!\2)[\s\S])*?)\2/g;
+const CALL = /API_CONFIG\s*\.\s*(get|post|put|patch|delete)\s*\(\s*(?:[^'"`()]*?)?(['"`])((?:(?!\2)[\s\S])*?)\2([\s\S]{0,400}?)\)/g;
+const LITERALS = /(['"`])((?:(?!\1)[\s\S])*?)\1/g;
 // Interpolations stand in for a real id. A uuid, not "X": one rule is
 // /clients\/([0-9a-f-]{36})$/ and a short placeholder fails it for the wrong
 // reason — the call site does pass a uuid.
@@ -49,15 +59,17 @@ const calls = [];
 for (const f of walk(SRC)) {
   if (f.endsWith('realAdapter.ts')) continue;
   for (const m of readFileSync(f, 'utf8').matchAll(CALL)) {
-    if (!m[3].includes('/api/v1/')) continue;
-    // `${expr}` becomes a placeholder segment so the path matches structurally.
-    calls.push({
-      method: m[1].toUpperCase(),
-      // Collapse an interpolation — possibly spanning lines and containing
-      // nested braces — down to one id-shaped segment.
-      path: m[3].replace(/\$\{[^{}]*\}/g, ID).replace(/\s+/g, ''),
-      file: f.replace(ROOT + '/', ''),
-    });
+    for (const url of [m[3], ...[...(m[4] ?? '').matchAll(LITERALS)].map(x => x[2])]) {
+      if (!url.includes('/api/v1/')) continue;
+      // `${expr}` becomes a placeholder segment so the path matches structurally.
+      calls.push({
+        method: m[1].toUpperCase(),
+        // Collapse an interpolation — possibly spanning lines and containing
+        // nested braces — down to one id-shaped segment.
+        path: url.replace(/\$\{[^{}]*\}/g, ID).replace(/\s+/g, ''),
+        file: f.replace(ROOT + '/', ''),
+      });
+    }
   }
 }
 

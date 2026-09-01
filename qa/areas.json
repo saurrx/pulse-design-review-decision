@@ -43,6 +43,10 @@
     "src/components/dashboard/**": [
       "dashboard"
     ],
+    "src/components/TimelineAndEvents.tsx": [
+      "dashboard",
+      "duedates"
+    ],
     "src/pages/IdeasPage.tsx": [
       "ideas"
     ],

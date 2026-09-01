@@ -127,21 +127,40 @@ if (rules.length !== declared) {
 // captured and back-referenced so the match ends at the MATCHING quote, and
 // interpolations collapse repeatedly (they nest) before whitespace is
 // stripped.
-const CALL_RE = /API_CONFIG\s*\.\s*(get|post|put|patch|delete)\s*\(\s*(['"\`])((?:(?!\2)[\s\S])*?)\2/g;
+//
+// The `\s*(?:[^'"\`()]*)?` before the delimiter is the second lesson: a call
+// whose url is chosen by a TERNARY — `API_CONFIG.get(isInventor ? "a" : \`b\`)`
+// — begins with an identifier, not a quote, so the strict form skipped it
+// entirely and the route silently left the map. The dashboard's review-queue
+// loader was exactly that shape. The class excludes brackets so the scan
+// cannot wander past the call it is reading, and ALL_LITERALS below then takes
+// every branch rather than only the first.
+const CALL_RE = /API_CONFIG\s*\.\s*(get|post|put|patch|delete)\s*\(\s*(?:[^'"\`()]*?)?(['"\`])((?:(?!\2)[\s\S])*?)\2([\s\S]{0,400}?)\)/g;
+/** Every remaining literal in the same argument list — the ternary's other arms. */
+const ALL_LITERALS = /(['"\`])((?:(?!\1)[\s\S])*?)\1/g;
 const PLACEHOLDER = '0f0e0d0c-0b0a-4908-8706-050403020100';
 const collapseCall = (raw) => {
   let t = raw, prev;
   do { prev = t; t = t.replace(/\$\{[^{}]*\}/g, PLACEHOLDER); } while (t !== prev);
   return t.replace(/\s+/g, '');
 };
-const callsOf = (f) =>
-  [...body[f].matchAll(CALL_RE)]
-    .filter((m) => m[3].includes('/api/v1/'))
-    .map((m) => ({
-      method: m[1].toUpperCase(),
-      path: collapseCall(m[3]),
-      raw: m[3].replace(/\s+/g, ' '),
-    }));
+const callsOf = (f) => {
+  const out = [];
+  const seen = new Set();
+  for (const m of body[f].matchAll(CALL_RE)) {
+    const method = m[1].toUpperCase();
+    const literals = [m[3], ...[...(m[4] ?? '').matchAll(ALL_LITERALS)].map((x) => x[2])];
+    for (const lit of literals) {
+      if (!lit.includes('/api/v1/')) continue;
+      const path = collapseCall(lit);
+      const key = `${method} ${path}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ method, path, raw: lit.replace(/\s+/g, ' ') });
+    }
+  }
+  return out;
+};
 
 const ruleFor = (c) => rules.findIndex((r) => r.re.test(c.path) && (!r.method || r.method === c.method));
 

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Calendar, CheckCircle2, ChevronLeft, ChevronRight, List, RotateCcw } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useTheme } from "@/hooks/useTheme";
 import useUserCookie from "@/hooks/use-auth";
 import {
@@ -76,6 +77,104 @@ const getFirstDayOfMonth = (date: Date) => {
   return (firstDay.getDay() + 6) % 7;
 };
 
+/**
+ * One deadline in the calendar, with its detail in a POPOVER.
+ *
+ * The detail used to expand INSIDE the day cell — a fixed `h-[84px]` box with
+ * `overflow: visible`. Measured on demo 2026-09-01: clicking one event grew its
+ * cell's content to 91px, so the panel escaped the cell and drew across the
+ * grid line into the week below, over whatever was there. With three events, or
+ * with the "Mark done" button a Photon role also gets, it ran further still.
+ *
+ * A popover is the right shape for it: it floats above the grid, is positioned
+ * for the viewport rather than the cell, closes on Escape and outside click,
+ * and returns focus. The cell keeps its fixed height and now CLIPS, so nothing
+ * can spill out of it again.
+ *
+ * The open flag also used to be the APPLICATION NUMBER, shared state across the
+ * whole month — clicking one chip opened the panel on every other event of the
+ * same patent, wherever it appeared. Each chip owns its own popover now, so it
+ * cannot be keyed by anything but itself.
+ */
+const EventChip = ({ event, showClientName, canManageEvents, eventCompletion }: {
+  event: any;
+  showClientName: boolean;
+  canManageEvents: boolean;
+  eventCompletion: { mutate: (v: { eventId: string; completed: boolean }) => void; isPending: boolean };
+}) => {
+  const tone = getEventTone(event);
+  const eventTitle = event.event_name || event.event || "Event";
+  const clientName =
+    event.patent?.assignee_original || event.patent?.client_name || event.counsel || "";
+  const applicationNumber = event.patent?.application_number;
+  const done = isPatentEventCompleted(event);
+
+  return (
+    <div className="space-y-1">
+      <Popover>
+        <PopoverTrigger asChild>
+          <button type="button" className="block w-full cursor-pointer text-left" title={eventTitle}>
+            <ProductChip
+              kind="status"
+              tone={tone}
+              className="pointer-events-none w-full max-w-full justify-start"
+            >
+              {eventTitle}
+            </ProductChip>
+          </button>
+        </PopoverTrigger>
+        <PopoverContent align="start" className="w-72 space-y-2 p-3 text-xs">
+          <div className="text-[13px] font-semibold leading-snug text-[var(--pulse-ink)]">
+            {eventTitle}
+          </div>
+          <dl className="space-y-1 text-[var(--pulse-ink-muted)]">
+            {applicationNumber && (
+              <div className="flex gap-1.5">
+                <dt>Application</dt>
+                <dd className="font-medium text-[var(--pulse-ink)]">{applicationNumber}</dd>
+              </div>
+            )}
+            {event.patent?.title && (
+              <div className="flex gap-1.5">
+                <dt>Title</dt>
+                <dd className="font-medium text-[var(--pulse-ink)]">{event.patent.title}</dd>
+              </div>
+            )}
+            {clientName && (
+              <div className="flex gap-1.5">
+                <dt>Client</dt>
+                <dd className="font-medium text-[var(--pulse-ink)]">{clientName}</dd>
+              </div>
+            )}
+            {event.event_date && (
+              <div className="flex gap-1.5">
+                <dt>Deadline</dt>
+                <dd className="font-medium text-[var(--pulse-ink)]">
+                  {moment(event.event_date).format("MMM D, YYYY")}
+                </dd>
+              </div>
+            )}
+          </dl>
+          {canManageEvents && (
+            <button
+              type="button"
+              disabled={eventCompletion.isPending}
+              onClick={() => eventCompletion.mutate({ eventId: event.id, completed: !done })}
+              className="inline-flex items-center gap-1.5 font-semibold text-[var(--pulse-info)] disabled:opacity-50"
+            >
+              {done ? <RotateCcw className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
+              {done ? "Reopen event" : "Mark done"}
+            </button>
+          )}
+        </PopoverContent>
+      </Popover>
+      {showClientName && clientName && (
+        <div className="truncate px-2 text-[11px] text-[var(--pulse-ink-muted)]">{clientName}</div>
+      )}
+    </div>
+  );
+};
+
 const TimelineAndEvents = ({
   dueDates,
   isLoading,
@@ -121,19 +220,14 @@ const TimelineAndEvents = ({
       /* private mode: the choice just does not persist */
     }
   };
-  const [isShowApplication, setIsShowApplication] = useState<string | null>(
-    null,
-  );
+  // The calendar's open-detail state is gone: each EventChip owns its own
+  // popover. It used to live here as ONE application number for the whole
+  // month, which is why clicking a chip opened the panel on every other event
+  // of the same patent at the same time.
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggle = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
-  };
-
-  const handleShowApplication = (applicationNumber) => {
-    setIsShowApplication(
-      isShowApplication === applicationNumber ? null : applicationNumber,
-    );
   };
 
   // Generate calendar days for current month
@@ -348,7 +442,7 @@ const TimelineAndEvents = ({
                         return (
                           <div
                             key={`empty-${globalIndex}`}
-                            className="h-[84px] border-r border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] last:border-r-0"
+                            className="min-h-[84px] border-r border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] last:border-r-0"
                           />
                         );
                       }
@@ -358,104 +452,58 @@ const TimelineAndEvents = ({
                       return (
                         <div
                           key={day}
-                          className="h-[84px] border-r border-[var(--pulse-line)] p-2 transition-colors last:border-r-0 hover:bg-[var(--pulse-surface-subtle)]"
+                          // min-h, not h. Measured: the design's 84px cell has
+                          // 46px under the day number, and ONE chip is 24.5px —
+                          // 45px once a client name is printed beneath it. Two
+                          // chips never fitted, so the old fixed height did not
+                          // hold the content in, it just let it draw over the
+                          // week below. Growing the row is what a calendar does;
+                          // rows in a grid stretch together, so a busy day
+                          // lengthens its own week and overlaps nothing. Empty
+                          // and one-event days still measure exactly 84px, which
+                          // is every cell in the common case.
+                          className="min-h-[84px] border-r border-[var(--pulse-line)] p-2 transition-colors last:border-r-0 hover:bg-[var(--pulse-surface-subtle)]"
                         >
                           <div className="mb-1 text-[12px] font-medium text-[var(--pulse-ink-muted)]">
                             {day}
                           </div>
                           <div className="space-y-1">
-                            {dayEvents.slice(0, 2).map((event, eventIndex) => {
-                              const tone = getEventTone(event);
-                              const eventTitle =
-                                event.event_name ||
-                                event.event ||
-                                "Event";
-                              const clientName =
-                                event.patent?.assignee_original ||
-                                event.patent?.client_name ||
-                                event.counsel ||
-                                "";
-                              const applicationNumber =
-                                event.patent?.application_number;
-
-                              return (
-                                <div key={event.id || eventIndex} className="space-y-1">
-                                  <button
-                                    onClick={() =>
-                                      handleShowApplication(applicationNumber)
-                                    }
-                                    className="block w-full cursor-pointer text-left"
-                                    title={eventTitle}
-                                  >
-                                    <ProductChip kind="status" tone={tone} className="pointer-events-none w-full max-w-full justify-start">
-                                      {eventTitle}
-                                    </ProductChip>
-                                  </button>
-                                  {showClientName && clientName && (
-                                    <div className="truncate px-2 text-[11px] text-[var(--pulse-ink-muted)]">{clientName}</div>
-                                  )}
-
-                                  {isShowApplication === applicationNumber && (
-                                    <div
-                                      className="text-xs px-2 py-1.5 rounded space-y-0.5 bg-black/[0.02] border-black/[0.08] dark:bg-white/[0.03] border dark:border-white/[0.08] text-zinc-600 dark:text-zinc-400"
-                                      style={{ opacity: "1", height: "auto" }}
-                                    >
-                                      <motion.div
-                                        className="flex items-start gap-1"
-                                        initial={
-                                          isShowApplication
-                                            ? { scaleY: 0, display: "none" }
-                                            : false
-                                        }
-                                        animate={
-                                          isShowApplication
-                                            ? { scaleY: 1, display: "flex" }
-                                            : false
-                                        }
-                                        transition={{
-                                          ease: "easeInOut",
-                                          duration: 0.1,
-                                          delay: 0.06,
-                                        }}
-                                        style={{ transformOrigin: "top" }}
-                                      >
-                                        <span className="text-zinc-500">
-                                          App:
-                                        </span>
-                                        <span className="font-medium">
-                                          {applicationNumber}
-                                        </span>
-                                      </motion.div>
-                                      {canManageEvents && (
-                                        <button
-                                          type="button"
-                                          disabled={eventCompletion.isPending}
-                                          onClick={(clickEvent) => {
-                                            clickEvent.stopPropagation();
-                                            eventCompletion.mutate({
-                                              eventId: event.id,
-                                              completed: !isPatentEventCompleted(event),
-                                            });
-                                          }}
-                                          className="mt-2 inline-flex items-center gap-1.5 font-semibold text-[var(--pulse-info)] disabled:opacity-50"
-                                        >
-                                          {isPatentEventCompleted(event) ? (
-                                            <RotateCcw className="h-3.5 w-3.5" />
-                                          ) : (
-                                            <CheckCircle2 className="h-3.5 w-3.5" />
-                                          )}
-                                          {isPatentEventCompleted(event) ? "Reopen event" : "Mark done"}
-                                        </button>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
+                            {dayEvents.slice(0, 2).map((event, eventIndex) => (
+                              <EventChip
+                                key={event.id ?? `${day}-${eventIndex}`}
+                                event={event}
+                                showClientName={showClientName}
+                                canManageEvents={canManageEvents}
+                                eventCompletion={eventCompletion}
+                              />
+                            ))}
                             {dayEvents.length > 2 && (
-                              <div className="px-1 text-[11px] font-medium text-[var(--pulse-ink-muted)]">
-                                +{dayEvents.length - 2} more
-                              </div>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <button
+                                    type="button"
+                                    className="px-1 text-[11px] font-medium text-[var(--pulse-ink-muted)] underline-offset-2 hover:text-[var(--pulse-ink)] hover:underline"
+                                  >
+                                    +{dayEvents.length - 2} more
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent align="start" className="w-80 max-h-[320px] overflow-y-auto p-2">
+                                  <div className="mb-1 px-1 text-[12px] font-semibold text-[var(--pulse-ink)]">
+                                    {currentDate.toLocaleString("en-US", { month: "long" })} {day}
+                                  </div>
+                                  <div className="space-y-1">
+                                    {dayEvents.map((event, eventIndex) => (
+                                      <EventChip
+                                        key={event.id ?? `all-${day}-${eventIndex}`}
+                                        event={event}
+                                        showClientName={showClientName}
+                                        canManageEvents={canManageEvents}
+                                        eventCompletion={eventCompletion}
+                                      />
+                                    ))}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
                             )}
                           </div>
                         </div>

@@ -195,10 +195,18 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     // Urgency, not just the date. The countdown is the at-a-glance overdue
     // signal the deadline list exists for.
     { id: "days", label: "Days", visible: true, sticky: false },
-    // Selecting an action against a deadline. Counsel and the committee have no
-    // /actions nav item, so this column is their ONLY surface for it — dropping
-    // it made choosing an instruction impossible for those two roles.
-    { id: "action", label: "Action", visible: true, sticky: false },
+    // Selecting an action against a deadline. This is the CLIENT's side of the
+    // two action axes: which instruction they want standing against a deadline.
+    // Counsel and the committee have no /actions nav item, so this column is
+    // their ONLY surface for it — dropping it outright made choosing an
+    // instruction impossible for those two roles, which is the regression the
+    // conformance tier was written to catch.
+    //
+    // The Photon side is the other axis: they RECEIVE those instructions and
+    // work them through the queue at /actions, which every photon role has in
+    // its nav. Offering them the client's picker here put a control on the
+    // screen that belongs to the other party.
+    ...(isOC ? [] : [{ id: "action", label: "Action", visible: true, sticky: false }]),
     { id: "status", label: "Status", visible: true, sticky: false },
     { id: "lastUpdated", label: "Last Updated", visible: true, sticky: false },
     {
@@ -213,9 +221,12 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
       visible: false,
       sticky: false,
     },
-    ...(isOC
-      ? [{ id: "remind", label: "Remind", visible: true, sticky: false }]
-      : []),
+    // "Remind" (nudge the client's legal team about a deadline) was offered to
+    // the photon roles only, and is no longer offered here: the docket table is
+    // for reading the deadline, and the reminder belongs with the action it is
+    // chasing. RemindButton and POST /v1/patents/due-dates/:id/remind are
+    // deliberately kept — the capability is intact, it simply has no column on
+    // this screen. See docs/qa/findings.md F-063.
     { id: "legalStatus", label: "Legal Status", visible: false, sticky: false },
     { id: "assignee", label: "Assignee", visible: false, sticky: false },
     { id: "inventors", label: "Inventors", visible: false, sticky: false },

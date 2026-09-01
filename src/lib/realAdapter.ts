@@ -272,6 +272,13 @@ const RULES: Rule[] = [
       body: { email: b?.email, password: b?.password, name: b?.name }, wrap: asUser }) },
   { m: /^\/api\/v1\/auth\/logout$/, method: "POST",
     to: () => ({ url: "/v1/auth/logout", method: "POST" }) },
+  // "Sign out everywhere" on /profile. The route has existed on the API since
+  // the saurrx#2 port and never had a rule here, so the button hit the
+  // adapter's synthetic 501 and then cleared the local session anyway — it
+  // LOOKED like it worked while every other session stayed alive. Invisible to
+  // adapter-coverage until its scan learned to read a ternary call site.
+  { m: /^\/api\/v1\/auth\/logout-all$/, method: "POST",
+    to: () => ({ url: "/v1/auth/logout-all", method: "POST" }) },
   { m: /^\/api\/v1\/auth\/forgot-password$/, method: "POST",
     to: (_m, b) => ({ url: "/v1/auth/password-reset/request", method: "POST", body: b }) },
   { m: /^\/api\/v1\/auth\/ihc\/invite-user$/, method: "POST",
@@ -290,7 +297,35 @@ const RULES: Rule[] = [
         Object.entries(p ?? {}).map(([state, n]) => [STATE_TO_STATUS[state] ?? state, n]),
       ) }) }) },
   { m: /^\/api\/v1\/idea\/fetch-by-user(?:\?(.*))?$/,
-    to: m => ({ url: "/v1/ideas", method: "GET", wrap: ideaListWrap(m[1] ?? "") }) },
+    to: m => {
+      const q = new URLSearchParams(m[1] ?? "");
+      // The status filter now travels to the SERVER as `state`. It was applied
+      // only in the browser, so a screen wanting five review rows downloaded
+      // the tenant's whole hydrated corpus first — 520 KB and ~1.1 s on the
+      // demo dashboard. /v1/ideas takes one state or a comma-separated list,
+      // which is what a review queue actually needs (two states, one request).
+      // The client-side pass in ideaListWrap stays: it is a no-op on an
+      // already-filtered list, and it is what still honours search and sort.
+      const states = [...new Set((q.get("status") ?? "").split(",").filter(Boolean)
+        .flatMap(status => STATUS_TO_STATE[status] ?? []))];
+      const qs = states.length ? `?state=${states.join(",")}` : "";
+      return { url: `/v1/ideas${qs}`, method: "GET", wrap: ideaListWrap(m[1] ?? "") };
+    } },
+  // The dashboard's "Ideas by stage" card, as ONE server-side answer. It used
+  // to be counted in the browser from a 100-row page of the list — so on demo
+  // it read 62/31/31/1 where the truth was 138/56/86/14 — with `Granted`
+  // coming from the patent portfolio instead, and switching definition again
+  // whenever a client filter was applied.
+  { m: /^\/api\/v1\/idea\/pipeline(?:\?(.*))?$/,
+    to: m => {
+      const q = new URLSearchParams(m[1] ?? "");
+      const cid = q.get("filter_client_id") ?? q.get("client_id");
+      return {
+        url: `/v1/ideas/pipeline${cid && isUuid(cid) ? `?client_id=${cid}` : ""}`,
+        method: "GET",
+        wrap: (p: any) => ({ data: p ?? null }),
+      };
+    } },
   { m: /^\/api\/v1\/idea\/fetch\/([^/]+)$/,
     to: m => ({ url: `/v1/ideas/${m[1]}`, method: "GET",
       wrap: (idea: any) => ({ data: oldIdea(idea) }) }) },
@@ -391,6 +426,18 @@ const RULES: Rule[] = [
       // and `order` the direction, which is what the API takes.
       const sort = q.get("sort"); if (sort) out.set("sort", sort);
       const order = q.get("order"); if (order) out.set("order", order);
+      // The calendar asks for ONE month, and this rule used to drop it. The
+      // screen then filtered page 1 of the whole docket in the browser, so it
+      // showed whichever of 13,672 deadlines happened to be in the first 25
+      // rows and paging a month changed nothing (F-061). `month` is 1-based on
+      // the wire; the window is half-open, so December rolls the year.
+      const month = Number(q.get("month"));
+      const year = Number(q.get("year"));
+      if (month >= 1 && month <= 12 && year > 1970) {
+        const pad = (n: number) => String(n).padStart(2, "0");
+        out.set("from", `${year}-${pad(month)}-01`);
+        out.set("to", month === 12 ? `${year + 1}-01-01` : `${year}-${pad(month + 1)}-01`);
+      }
       const qs = out.toString();
       return {
         url: `/v1/due-dates${qs ? `?${qs}` : ""}`, method: "GET",

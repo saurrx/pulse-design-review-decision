@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRight, ChevronDown, Users } from "lucide-react";
+import { ArrowRight, ChevronDown, RotateCcw, Users } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -37,6 +37,42 @@ const CHART_TEAL = "#2F8D70";
 const StatLabel = ({ children }: { children: React.ReactNode }) => (
   <div className={PRODUCT_CARD_TITLE_CLASS}>
     {children}
+  </div>
+);
+
+/**
+ * What a card shows when its data did not arrive.
+ *
+ * There was no such state. Every dashboard query swallowed its own error and
+ * resolved with `undefined`, and the cards rendered the zeros that `?? 0`
+ * produces — so a failed request and a firm with no patents looked identical.
+ * Reproduced on demo by failing /v1/dashboard once: "0 Total patents, Granted
+ * 0 · 0%" for a portfolio of 14,260. A number nobody can distrust is worse
+ * than a gap.
+ *
+ * Deliberately small and in-card: the rest of the dashboard is still true, and
+ * blanking the page over one failed panel trades one wrong impression for
+ * another.
+ */
+const CardError = ({ onRetry, label = "Could not load this" }: {
+  onRetry?: () => void;
+  label?: string;
+}) => (
+  <div
+    role="status"
+    className="flex flex-1 flex-col items-start justify-center gap-2 py-6 text-[13px] text-[var(--pulse-ink-muted)]"
+  >
+    <span>{label}</span>
+    {onRetry && (
+      <button
+        type="button"
+        onClick={onRetry}
+        className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--pulse-line)] px-2.5 py-1 text-[12px] font-semibold text-[var(--pulse-ink)] transition-colors hover:bg-[var(--pulse-surface-subtle)]"
+      >
+        <RotateCcw className="h-3.5 w-3.5" />
+        Retry
+      </button>
+    )}
   </div>
 );
 
@@ -116,9 +152,14 @@ const PortfolioMotion = ({
   clientOptions = [],
   selectedClientIds,
   onClientSelectionChange,
+  hasError = false,
+  onRetry,
 }: {
   ideas30: number;
   filings90: number;
+  /** The series did not arrive. A flat line at zero is not a trend. */
+  hasError?: boolean;
+  onRetry?: () => void;
   /** Role-aware: admins see "Ideas received", inventors "Ideas submitted". */
   ideasLabel?: string;
   series?: MotionPoint[];
@@ -190,6 +231,18 @@ const PortfolioMotion = ({
       next.length === allClientIds.length ? null : next,
     );
   };
+
+  if (hasError) {
+    return (
+      <div className={`${CARD_CLASS} flex h-full min-h-[320px] flex-col`}>
+        <div>
+          <StatLabel>Ideas and filings</StatLabel>
+          <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">Cumulative, last 3 months</p>
+        </div>
+        <CardError onRetry={onRetry} label="Could not load the trend." />
+      </div>
+    );
+  }
 
   return (
     <div className={`${CARD_CLASS} flex h-full min-h-[320px] flex-col`}>
@@ -326,12 +379,17 @@ const IdeaPipeline = ({
   clientOptions = [],
   selectedClientIds,
   onClientSelectionChange,
+  hasError = false,
+  onRetry,
 }: {
   submitted: number;
   reviewPending: number;
   sentToOC: number;
   filed: number;
   granted: number;
+  /** The numbers did not arrive. Renders a stated failure, never zeros. */
+  hasError?: boolean;
+  onRetry?: () => void;
   /** "My pipeline" on the inventor dashboard; company-wide default elsewhere. */
   title?: string;
   /** When provided, each stage row links to the filtered list. */
@@ -369,6 +427,18 @@ const IdeaPipeline = ({
       next.length === allClientIds.length ? null : next,
     );
   };
+
+  if (hasError) {
+    return (
+      <div className={`${CARD_CLASS} flex h-full min-h-[320px] flex-col`}>
+        <div>
+          <StatLabel>{title}</StatLabel>
+          <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">Ideas by stage</p>
+        </div>
+        <CardError onRetry={onRetry} label="Could not load the pipeline." />
+      </div>
+    );
+  }
 
   return (
     <div className={`${CARD_CLASS} flex h-full min-h-[320px] flex-col`}>
@@ -499,9 +569,18 @@ const NeedsReview = ({
   actionLabel = "Review all",
   showScore = true,
   waitingLabel = "waiting",
+  hasError = false,
+  onRetry,
 }: {
   /** Ideas waiting on the viewer, oldest first. */
   rows: ReviewQueueRow[];
+  /**
+   * The queue did not load. An empty list and a failed request both used to
+   * render "This queue is clear" — the most reassuring possible way to be
+   * wrong about a reviewer's workload.
+   */
+  hasError?: boolean;
+  onRetry?: () => void;
   /** Ideas already past review, for the caught-up empty state. */
   laterCount: number;
   onOpen: (id: string) => void;
@@ -540,9 +619,11 @@ const NeedsReview = ({
       <div>
         <StatLabel>{title === "Needs your review" ? "Review queue" : title}</StatLabel>
         <p className="mt-1 flex flex-wrap items-center gap-x-2 text-xs text-[var(--pulse-ink-muted)]">
-          <span>{rows.length} awaiting decision</span>
-          <span aria-hidden="true">·</span>
-          <span>Oldest {oldestWait > 0 ? `${oldestWait}d` : "—"}</span>
+          {hasError ? <span>Not loaded</span> : (<>
+            <span>{rows.length} awaiting decision</span>
+            <span aria-hidden="true">·</span>
+            <span>Oldest {oldestWait > 0 ? `${oldestWait}d` : "—"}</span>
+          </>)}
         </p>
       </div>
       {onReviewAll && (
@@ -556,7 +637,10 @@ const NeedsReview = ({
         </button>
       )}
     </div>
-    {rows.length === 0 ? (
+    {hasError ? (
+      // Never "all caught up" for a request that failed.
+      <CardError onRetry={onRetry} label="Could not load the review queue." />
+    ) : rows.length === 0 ? (
       <div className="flex flex-1 flex-col items-center justify-center gap-1 py-6 text-center">
         <div className="text-base font-semibold text-[#0C0C0C]">
           You're all caught up ✓
@@ -845,11 +929,16 @@ const PortfolioComposition = ({
   pending,
   inactive,
   statuses,
+  hasError = false,
+  onRetry,
 }: {
   total: number;
   granted: number;
   pending: number;
   inactive: number;
+  /** The numbers did not arrive. Renders a stated failure, never zeros. */
+  hasError?: boolean;
+  onRetry?: () => void;
   /** Optional client-specific legal statuses. The compact layout supports 3–6 cleanly. */
   statuses?: PortfolioStatus[];
 }) => {
@@ -869,6 +958,18 @@ const PortfolioComposition = ({
     ? segments.filter((s) => s.count > 0)
     : [{ label: "Empty", count: 1, color: "#F5F5F5" }];
   const useCompactLegend = segments.length > 3;
+
+  if (hasError) {
+    return (
+      <div className={`${CARD_CLASS} flex h-full min-h-0 flex-col`}>
+        <div>
+          <StatLabel>Patent portfolio</StatLabel>
+          <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">By legal status</p>
+        </div>
+        <CardError onRetry={onRetry} label="Could not load the portfolio." />
+      </div>
+    );
+  }
 
   return (
     <div className={`${CARD_CLASS} flex h-full min-h-0 flex-col`}>
