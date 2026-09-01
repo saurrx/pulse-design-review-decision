@@ -275,7 +275,10 @@ DashboardLayout.defaultHeaderForRoute):
   gives up width first. It still wraps below ~1100px — a safety valve, not the
   normal state.
 - **/due-dates** DueDatesPage → DueDatesContent list + DueDatesCalendar +
-  RemindButton (24h cooldown). The **Action** column is CLIENT-side only —
+  RemindButton (24h cooldown — kept, and NOT dead: the deadline reminder is
+  queued to become an email trigger when the mailer lands, so its route, its
+  cooldown and its render branch stay put; atlas stale.md F11). The **Action**
+  column is CLIENT-side only —
   counsel and the committee have no /actions nav item, so it is their only
   surface for choosing an instruction, and dropping it globally is the exact
   regression the conformance tier exists to catch. Photon roles work the other
