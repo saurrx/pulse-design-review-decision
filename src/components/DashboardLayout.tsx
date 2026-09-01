@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header, { type DashboardHeaderConfig } from "./Header";
@@ -72,6 +72,21 @@ const defaultHeaderForRoute = (
   }
   return { title: "Pulse" };
 };
+
+/**
+ * Shown while a page chunk loads. Fills the CONTENT area only — it sits inside
+ * <main>, under the header, beside the sidebar, so the chrome stays put and the
+ * transition reads as "this panel is loading" rather than "the app went away".
+ */
+const ContentFallback = () => (
+  <div className="flex min-h-0 flex-1 items-center justify-center py-16">
+    <div
+      className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--pulse-line-strong)] border-t-[var(--pulse-brand)] motion-reduce:animate-none"
+      aria-label="Loading"
+      role="status"
+    />
+  </div>
+);
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   children,
@@ -171,7 +186,20 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             titleSlotFilled={titleSlotFilled}
           />
         )}
-        {children ?? <Outlet />}
+        {/* The page's OWN Suspense boundary.
+            Every page is React.lazy, and the app's only <Suspense> used to sit
+            outside <Routes> — so while a chunk loaded, its fallback replaced
+            the entire tree, sidebar and header included. Measured on demo: the
+            sidebar was gone for ~700-960ms on every first navigation, which is
+            the "it reloads the whole page" people were reporting. Making the
+            layout a route stopped it REMOUNTING; only a boundary inside the
+            layout stops it DISAPPEARING. The nearest boundary wins, so the
+            outer one never fires for these routes any more. */}
+        {children ?? (
+          <Suspense fallback={<ContentFallback />}>
+            <Outlet />
+          </Suspense>
+        )}
       </main>
     </div>
     </DashboardSlotProvider>
