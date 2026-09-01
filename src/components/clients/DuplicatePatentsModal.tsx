@@ -150,7 +150,13 @@ const DuplicatePatentsModal: React.FC<DuplicatePatentsModalProps> = ({
             </ul>
             <p className="mt-2 text-xs opacity-80">
               We need all four of Title, Application number, Filing date and Country to
-              track a filing and its deadlines. Every other row in the sheet was imported.
+              track a filing and its deadlines.{" "}
+              {/* Only true when some rows actually made it. On a sheet missing a
+                  whole column NOTHING imports, and telling someone the rest went
+                  through is the one sentence that would stop them re-uploading. */}
+              {successCount + updatedCount > 0
+                ? "Every other row in the sheet was imported."
+                : "No rows were imported from this file."}
             </p>
           </div>
         )}
