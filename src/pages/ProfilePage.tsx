@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { useTrackOnce } from "@/lib/analytics";
 import { Save, X } from "lucide-react";
 
-import DashboardLayout from "@/components/DashboardLayout";
+import { PageHeader } from "@/components/DashboardChrome";
 import ProductPage from "@/components/layout/ProductPage";
 import ProfileTab from "@/components/workspace/ProfileTab";
 import useUserCookie from "@/hooks/use-auth";
@@ -17,9 +17,9 @@ const ProfilePage: React.FC = () => {
   const cancelProfileRef = useRef<(() => void) | null>(null);
 
   return (
-    <DashboardLayout
-      header={{
-        actions: isEditMode ? (
+    <>
+      <PageHeader
+        actions={isEditMode ? (
           <>
             <button
               onClick={() => {
@@ -41,9 +41,8 @@ const ProfilePage: React.FC = () => {
               <Save className="h-4 w-4" /> Save
             </button>
           </>
-        ) : null,
-      }}
-    >
+        ) : null}
+      />
       <ProductPage maxWidth="max-w-[960px]">
         <ProfileTab
           clientDetails={user?.client || {
@@ -55,7 +54,7 @@ const ProfilePage: React.FC = () => {
           cancelProfileRef={cancelProfileRef}
         />
       </ProductPage>
-    </DashboardLayout>
+    </>
   );
 };
 

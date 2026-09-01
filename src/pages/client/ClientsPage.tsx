@@ -25,7 +25,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import BlockedRedirect from "@/lib/BlockedRedirect";
 import { isOutsideCounselRole } from "@/lib/roleAccess";
-import DashboardLayout from "@/components/DashboardLayout";
+import { MainClass, PageHeader } from "@/components/DashboardChrome";
 import { Button } from "@/components/ui/button";
 import OnboardClientModal from "@/components/clients/OnboardClientModal";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -393,10 +393,10 @@ const ClientsPage: React.FC = () => {
    }
 
   return (
-    <DashboardLayout
-      className="relative"
-      header={{
-        primaryAction: isCaseOwner
+    <>
+      <MainClass className="relative" />
+      <PageHeader
+        primaryAction={isCaseOwner
           ? undefined
           : {
               label: "Onboard a client",
@@ -405,9 +405,8 @@ const ClientsPage: React.FC = () => {
                 track("client_onboard_opened");
                 setIsOnboardModalOpen((prev) => ({ ...prev, open: true }));
               },
-            },
-      }}
-    >
+            }}
+      />
       <div className="pulse-product-page pulse-table-page relative mx-auto flex min-h-0 flex-1 w-full max-w-[1680px] flex-col overflow-hidden px-6 py-6 lg:px-8">
         {/* Animated Gradient Background */}
         <div className="hidden">
@@ -1339,7 +1338,7 @@ const ClientsPage: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </DashboardLayout>
+    </>
   );
 };
 

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import BlockedRedirect from "@/lib/BlockedRedirect";
 import { useQuery } from "@tanstack/react-query";
 
-import DashboardLayout from "@/components/DashboardLayout";
 import ProductPage from "@/components/layout/ProductPage";
 import Loader from "@/components/Loader";
 import WorkspaceTabs from "@/components/workspace/WorkspaceTabs";
@@ -46,7 +45,7 @@ const WorkspacePage: React.FC = () => {
   const needsClient = user?.role !== "PHOTON_ADMIN" && user?.role !== "PHOTON_SUPERADMIN";
 
   return (
-    <DashboardLayout>
+    <>
       <ProductPage maxWidth="max-w-[1440px]">
         {needsClient && (isLoading || !clientId) ? (
           <Loader />
@@ -58,7 +57,7 @@ const WorkspacePage: React.FC = () => {
           />
         )}
       </ProductPage>
-    </DashboardLayout>
+    </>
   );
 };
 

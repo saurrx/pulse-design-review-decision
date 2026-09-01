@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import DashboardLayout from "../components/DashboardLayout";
 import {
   PortfolioMotion,
   IdeaPipeline,
@@ -412,7 +411,7 @@ const Index = () => {
 
   const totalPatents = Number(data?.data?.total_patents) || 0;
   return (
-    <DashboardLayout>
+    <>
       <div className="mx-auto w-full max-w-[1680px] px-6 pb-24 pt-6 lg:px-8 md:pb-8">
         <div className="mb-6 grid grid-cols-12 gap-6">
           {isInventor ? (
@@ -623,7 +622,7 @@ const Index = () => {
           </DialogContentNoClose>
         </Dialog>
       )}
-    </DashboardLayout>
+    </>
   );
 };
 

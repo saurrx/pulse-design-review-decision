@@ -2,7 +2,7 @@
 import React from 'react';
 import { useTrackOnce } from "@/lib/analytics";
 import { useLocation } from 'react-router-dom';
-import DashboardLayout from '@/components/DashboardLayout';
+import { PageHeader } from '@/components/DashboardChrome';
 import DueDatesContent, {
   type DueDatesHeaderState,
   type DueDatesViewType,
@@ -20,9 +20,9 @@ const DueDatesPage: React.FC = () => {
   });
   
   return (
-    <DashboardLayout
-      header={{
-        actions: (
+    <>
+      <PageHeader
+        actions={(
           <>
             <div className="hidden h-9 items-center gap-1 rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] p-1 sm:flex">
               <button
@@ -59,14 +59,13 @@ const DueDatesPage: React.FC = () => {
               </strong>
             </div>
           </>
-        ),
-      }}
-    >
+        )}
+      />
       <DueDatesContent
         initialView={initialView}
         onHeaderStateChange={setHeaderState}
       />
-    </DashboardLayout>
+    </>
   );
 };
 

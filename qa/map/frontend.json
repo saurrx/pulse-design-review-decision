@@ -176,26 +176,8 @@
    "route": "/",
    "page": "Index",
    "entry": "src/pages/Index.tsx",
-   "components": 32,
+   "components": 28,
    "calls": [
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/logout",
-     "rule": "^\\/api\\/v1\\/auth\\/logout$",
-     "v1": [
-      "/v1/auth/logout"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
     {
      "method": "GET",
      "call": "/api/v1/clients/fetch-all-inventors/${user?.client_id}",
@@ -213,15 +195,6 @@
       "/v1/dashboard"
      ],
      "from": "src/pages/Index.tsx"
-    },
-    {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
@@ -319,26 +292,8 @@
    "route": "/clients",
    "page": "ClientsPage",
    "entry": "src/pages/client/ClientsPage.tsx",
-   "components": 35,
+   "components": 34,
    "calls": [
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/logout",
-     "rule": "^\\/api\\/v1\\/auth\\/logout$",
-     "v1": [
-      "/v1/auth/logout"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
     {
      "method": "GET",
      "call": "/api/v1/clients?${params.toString()}",
@@ -367,15 +322,6 @@
      "from": "src/pages/client/ClientsPage.tsx"
     },
     {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
      "method": "DELETE",
      "call": "/api/v1/remove-file/${id}",
      "rule": "^\\/api\\/v1\\/remove-file\\/([^/]+)$",
@@ -390,17 +336,8 @@
    "route": "/clients/:clientId",
    "page": "ClientDetailPage",
    "entry": "src/pages/client/ClientDetailPage.tsx",
-   "components": 39,
+   "components": 37,
    "calls": [
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
     {
      "method": "POST",
      "call": "/api/v1/auth/login-as-client/${clientId}",
@@ -409,15 +346,6 @@
       "/v1/auth/view-as/{id}"
      ],
      "from": "src/pages/client/ClientDetailPage.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/logout",
-     "rule": "^\\/api\\/v1\\/auth\\/logout$",
-     "v1": [
-      "/v1/auth/logout"
-     ],
-     "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
@@ -537,15 +465,6 @@
      "from": "src/components/clients/ClientDetails.tsx"
     },
     {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
      "method": "POST",
      "call": "/api/v1/patent/client/${clientId}",
      "rule": "^\\/api\\/v1\\/patent\\/(?:fetch-all-patents\\/)?client\\/([^/?]+)(\\?.*)?$",
@@ -578,26 +497,8 @@
    "route": "/ideas",
    "page": "IdeasPage",
    "entry": "src/pages/IdeasPage.tsx",
-   "components": 44,
+   "components": 40,
    "calls": [
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/logout",
-     "rule": "^\\/api\\/v1\\/auth\\/logout$",
-     "v1": [
-      "/v1/auth/logout"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
     {
      "method": "GET",
      "call": "/api/v1/clients/lookup",
@@ -624,15 +525,6 @@
       "/v1/ideas/{id}/clone"
      ],
      "from": "src/components/ideas/IdeasContent.tsx"
-    },
-    {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
@@ -739,52 +631,15 @@
    "route": "/assistant",
    "page": "AssistantPage",
    "entry": "src/pages/client/AssistantPage.tsx",
-   "components": 17,
-   "calls": [
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/logout",
-     "rule": "^\\/api\\/v1\\/auth\\/logout$",
-     "v1": [
-      "/v1/auth/logout"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    }
-   ]
+   "components": 1,
+   "calls": []
   },
   {
    "route": "/ideas/:id",
    "page": "IdeaDetailsPage",
    "entry": "src/pages/IdeaDetailsPage.tsx",
-   "components": 66,
+   "components": 64,
    "calls": [
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
     {
      "method": "POST",
      "call": "/api/v1/auth/ihc/invite-user",
@@ -793,15 +648,6 @@
       "/v1/invites"
      ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/logout",
-     "rule": "^\\/api\\/v1\\/auth\\/logout$",
-     "v1": [
-      "/v1/auth/logout"
-     ],
-     "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
@@ -890,15 +736,6 @@
       "/v1/ideas/{id}/clone"
      ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
-    },
-    {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
@@ -1116,17 +953,8 @@
    "route": "/ideas/:id/draft",
    "page": "IdeaDraftPage",
    "entry": "src/pages/IdeaDraftPage.tsx",
-   "components": 26,
+   "components": 21,
    "calls": [
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
     {
      "method": "POST",
      "call": "/api/v1/auth/ihc/invite-user",
@@ -1135,15 +963,6 @@
       "/v1/invites"
      ],
      "from": "src/components/ideas/CoInventorsField.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/logout",
-     "rule": "^\\/api\\/v1\\/auth\\/logout$",
-     "v1": [
-      "/v1/auth/logout"
-     ],
-     "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
@@ -1180,15 +999,6 @@
       "/v1/drafts/{id}/evaluate"
      ],
      "from": "src/components/ideas/DraftWorkspace.tsx"
-    },
-    {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "GET",
@@ -1275,26 +1085,8 @@
    "route": "/patents",
    "page": "PatentsPage",
    "entry": "src/pages/PatentsPage.tsx",
-   "components": 44,
+   "components": 42,
    "calls": [
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/logout",
-     "rule": "^\\/api\\/v1\\/auth\\/logout$",
-     "v1": [
-      "/v1/auth/logout"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
     {
      "method": "GET",
      "call": "/api/v1/auth/user/${present_user?.id}",
@@ -1312,15 +1104,6 @@
       "/v1/clients"
      ],
      "from": "src/components/patents/PatentsContent.tsx"
-    },
-    {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "DELETE",
@@ -1400,26 +1183,8 @@
    "route": "/patents/:patentId",
    "page": "PatentsPage",
    "entry": "src/pages/PatentsPage.tsx",
-   "components": 44,
+   "components": 42,
    "calls": [
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/logout",
-     "rule": "^\\/api\\/v1\\/auth\\/logout$",
-     "v1": [
-      "/v1/auth/logout"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
     {
      "method": "GET",
      "call": "/api/v1/auth/user/${present_user?.id}",
@@ -1437,15 +1202,6 @@
       "/v1/clients"
      ],
      "from": "src/components/patents/PatentsContent.tsx"
-    },
-    {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "DELETE",
@@ -1525,7 +1281,7 @@
    "route": "/due-dates",
    "page": "DueDatesPage",
    "entry": "src/pages/DueDatesPage.tsx",
-   "components": 36,
+   "components": 34,
    "calls": [
     {
      "method": "GET",
@@ -1537,24 +1293,6 @@
      "from": "src/components/actions/ActionDropdown.tsx"
     },
     {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/logout",
-     "rule": "^\\/api\\/v1\\/auth\\/logout$",
-     "v1": [
-      "/v1/auth/logout"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
      "method": "GET",
      "call": "/api/v1/clients/lookup?${params.toString()}",
      "rule": "^\\/api\\/v1\\/clients\\/lookup",
@@ -1562,15 +1300,6 @@
       "/v1/clients"
      ],
      "from": "src/components/due-dates/DueDatesContent.tsx"
-    },
-    {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "PATCH",
@@ -1605,26 +1334,8 @@
    "route": "/workspace",
    "page": "WorkspacePage",
    "entry": "src/pages/WorkspacePage.tsx",
-   "components": 35,
+   "components": 31,
    "calls": [
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/logout",
-     "rule": "^\\/api\\/v1\\/auth\\/logout$",
-     "v1": [
-      "/v1/auth/logout"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
     {
      "method": "PUT",
      "call": "/api/v1/auth/update-profile/${userId}",
@@ -1716,15 +1427,6 @@
      "from": "src/components/workspace/OrganizationDetails.tsx"
     },
     {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
      "method": "DELETE",
      "call": "/api/v1/users/${userId}",
      "rule": "^\\/api\\/v1\\/users\\/([^/]+)$",
@@ -1739,7 +1441,7 @@
    "route": "/profile",
    "page": "ProfilePage",
    "entry": "src/pages/ProfilePage.tsx",
-   "components": 31,
+   "components": 28,
    "calls": [
     {
      "method": "POST",
@@ -1749,15 +1451,6 @@
       "/v1/auth/change-password"
      ],
      "from": "src/components/workspace/ProfileTab.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
     },
     {
      "method": "POST",
@@ -1794,15 +1487,6 @@
       "/v1/auth/me"
      ],
      "from": "src/lib/api-service/commonApi.service.ts"
-    },
-    {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
     }
    ]
   },
@@ -1810,7 +1494,7 @@
    "route": "/actions",
    "page": "ActionsPage",
    "entry": "src/pages/ActionsPage.tsx",
-   "components": 37,
+   "components": 33,
    "calls": [
     {
      "method": "GET",
@@ -1858,24 +1542,6 @@
      "from": "src/components/actions/ActionDropdown.tsx"
     },
     {
-     "method": "POST",
-     "call": "/api/v1/auth/exit-client-view",
-     "rule": "^\\/api\\/v1\\/auth\\/exit-client-view$",
-     "v1": [
-      "/v1/auth/view-as/exit"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/auth/logout",
-     "rule": "^\\/api\\/v1\\/auth\\/logout$",
-     "v1": [
-      "/v1/auth/logout"
-     ],
-     "from": "src/components/Sidebar.tsx"
-    },
-    {
      "method": "GET",
      "call": "/api/v1/clients/lookup?${params.toString()}",
      "rule": "^\\/api\\/v1\\/clients\\/lookup",
@@ -1883,15 +1549,6 @@
       "/v1/clients"
      ],
      "from": "src/components/actions/OCActionsContent.tsx"
-    },
-    {
-     "method": "GET",
-     "call": "/api/v1/idea/counts",
-     "rule": "^\\/api\\/v1\\/idea\\/counts$",
-     "v1": [
-      "/v1/ideas/counts"
-     ],
-     "from": "src/components/Sidebar.tsx"
     }
    ]
   }

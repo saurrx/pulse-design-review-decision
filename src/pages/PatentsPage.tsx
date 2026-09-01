@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useTrackOnce } from "@/lib/analytics";
 import { useParams, useNavigate } from "react-router-dom";
-import DashboardLayout from "@/components/DashboardLayout";
+import { PageHeader } from "@/components/DashboardChrome";
 import PatentsContent from "@/components/patents/PatentsContent";
 import PatentDetailsContent from "@/components/patents/PatentDetailsContent";
 import { Button } from "@/components/ui/button";
@@ -410,33 +410,32 @@ const PatentsPage: React.FC = () => {
   }, []);
 
   return (
-    <DashboardLayout
-      header={
-        patentId
-          ? undefined
-          : {
-              actions: (
-                <>
-                  <span className="hidden text-xs font-medium text-[var(--pulse-ink-muted)] md:inline">
-                    {totalPatents} total patents
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleExportClick}
-                    disabled={isExporting || totalPatents === 0}
-                    className="pulse-filter-control h-9 gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    <span className="hidden sm:inline">
-                      {isExporting ? "Exporting..." : "Export CSV"}
-                    </span>
-                  </Button>
-                </>
-              ),
-            }
-      }
-    >
+    <>
+      {/* The page's own header controls, rendered here and portalled into the
+          layout's header — which now outlives the navigation. */}
+      {!patentId && (
+        <PageHeader
+          actions={
+            <>
+              <span className="hidden text-xs font-medium text-[var(--pulse-ink-muted)] md:inline">
+                {totalPatents} total patents
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportClick}
+                disabled={isExporting || totalPatents === 0}
+                className="pulse-filter-control h-9 gap-2"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">
+                  {isExporting ? "Exporting..." : "Export CSV"}
+                </span>
+              </Button>
+            </>
+          }
+        />
+      )}
       {/* min-h-[100dvh-64px] made this page GROW: every filter chip row added
           height, the page passed the viewport, and the whole thing — header
           included — scrolled. /due-dates has always been bounded instead
@@ -463,7 +462,7 @@ const PatentsPage: React.FC = () => {
           )}
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

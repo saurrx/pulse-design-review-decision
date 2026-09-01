@@ -1,11 +1,13 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header, { type DashboardHeaderConfig } from "./Header";
 import useUserCookie from "@/hooks/use-auth";
+import { DashboardSlotProvider } from "./DashboardChrome";
 
 interface DashboardLayoutProps {
-  children: React.ReactNode;
+  /** Omitted when used as a ROUTE layout — the router's Outlet fills it. */
+  children?: React.ReactNode;
   className?: string;
   header?: Partial<DashboardHeaderConfig> | false;
 }
@@ -124,7 +126,34 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
     };
   }, [header, pathname, user?.role]);
 
+  // The header slots. Refs rather than state so a page's portal targets a
+  // stable DOM node; `ready` flips once after mount so the portals attach on
+  // the next paint instead of throwing into null on the first.
+  const titleSlotRef = React.useRef<HTMLSpanElement | null>(null);
+  const actionsSlotRef = React.useRef<HTMLSpanElement | null>(null);
+  const [ready, setReady] = React.useState(0);
+  React.useEffect(() => { setReady(n => n + 1); }, []);
+  const [titleSlotFilled, setTitleSlotFilled] = React.useState(false);
+  // A page's title arrives by portal, so React does not tell us it happened.
+  // Watching the slot is what lets the default title hide exactly when a real
+  // one appears, and come back when the page leaves.
+  React.useEffect(() => {
+    const node = titleSlotRef.current;
+    if (!node) return;
+    const sync = () => setTitleSlotFilled(node.childNodes.length > 0);
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(node, { childList: true });
+    return () => observer.disconnect();
+  }, [ready]);
+
+  const slots = React.useMemo(
+    () => ({ title: titleSlotRef.current, actions: actionsSlotRef.current, ready }),
+    [ready],
+  );
+
   return (
+    <DashboardSlotProvider value={slots}>
     <div className="flex h-dvh min-h-[640px] bg-[var(--pulse-canvas)] text-[var(--pulse-ink)]">
       <Sidebar collapsed={sidebarCollapsed} toggleSidebar={toggleSidebarCollapse} />
       {/* A flex column, so a page can say flex-1 and mean "the space left under
@@ -134,10 +163,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           overflow-auto: short pages scroll main, tall ones own their scrolling
           via min-h-0 flex-1. */}
       <main className={`flex min-w-0 flex-1 flex-col overflow-auto bg-[var(--pulse-canvas)] ${className || ""}`}>
-        {resolvedHeader && <Header {...resolvedHeader} />}
-        {children}
+        {resolvedHeader && (
+          <Header
+            {...resolvedHeader}
+            titleSlotRef={titleSlotRef}
+            actionsSlotRef={actionsSlotRef}
+            titleSlotFilled={titleSlotFilled}
+          />
+        )}
+        {children ?? <Outlet />}
       </main>
     </div>
+    </DashboardSlotProvider>
   );
 };
 

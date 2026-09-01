@@ -1,7 +1,6 @@
 import React from "react";
 import { useTrackOnce } from "@/lib/analytics";
 import BlockedRedirect from "@/lib/BlockedRedirect";
-import DashboardLayout from "@/components/DashboardLayout";
 import IHCActionsContent from "@/components/actions/IHCActionsContent";
 import OCActionsContent from "@/components/actions/OCActionsContent";
 import useUserCookie from "@/hooks/use-auth";
@@ -27,9 +26,9 @@ const ActionsPage: React.FC = () => {
   }
 
   return (
-    <DashboardLayout>
+    <>
       {isOC ? <OCActionsContent /> : <IHCActionsContent />}
-    </DashboardLayout>
+    </>
   );
 };
 
