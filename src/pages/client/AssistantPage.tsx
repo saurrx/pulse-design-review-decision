@@ -1,9 +1,8 @@
-import DashboardLayout from "@/components/DashboardLayout";
 import { MessageSquareText } from "lucide-react";
 
 const AssistantPage = () => {
   return (
-    <DashboardLayout>
+    <>
       <div className="flex min-h-full flex-col bg-[#f7f7f5]">
         <div className="flex flex-1 items-start justify-center p-6">
           <section className="w-full max-w-2xl rounded-2xl border border-neutral-200 bg-white px-8 py-12 text-center shadow-sm">
@@ -23,7 +22,7 @@ const AssistantPage = () => {
           </section>
         </div>
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

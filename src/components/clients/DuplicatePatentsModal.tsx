@@ -54,6 +54,16 @@ interface DuplicatePatentsModalProps {
   updatedCount?: number;
   dueDatesCreated?: number;
   unmappedColumns?: string[];
+  /** Required fields the sheet did not supply — by column, or by row. */
+  missingRequired?: MissingRequirement[];
+}
+
+export interface MissingRequirement {
+  field: string;
+  label: string;
+  /** No column in the sheet matched this field at all. */
+  missingColumn: boolean;
+  rows: number[];
 }
 
 /** Values are strings, dates, lists or null; render them the way a cell reads. */
@@ -82,6 +92,7 @@ const DuplicatePatentsModal: React.FC<DuplicatePatentsModalProps> = ({
   updatedCount = 0,
   dueDatesCreated = 0,
   unmappedColumns = [],
+  missingRequired = [],
 }) => {
   const hasDetail = duplicatePatents.length > 0 || excelDuplicateEntries.length > 0;
 
@@ -107,6 +118,42 @@ const DuplicatePatentsModal: React.FC<DuplicatePatentsModalProps> = ({
             tone={errorCount ? "bg-red-50 text-red-700" : "bg-neutral-50 text-neutral-600"}
           />
         </div>
+
+        {/* Required fields the sheet did not supply.
+            The previous product dropped these rows silently — a filing-date
+            column blank on twelve rows imported the other eighty-two and said
+            nothing, so the only way to find out was to miss a patent months
+            later. Stated first, and above the "columns not imported" note,
+            because this is the part that cost the uploader rows. */}
+        {missingRequired.length > 0 && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+            <span className="font-medium">
+              Required information is missing, so some rows could not be imported:
+            </span>
+            <ul className="mt-2 space-y-1.5">
+              {missingRequired.map((m) => (
+                <li key={m.field}>
+                  <span className="font-medium">{m.label}</span>
+                  {m.missingColumn ? (
+                    <>
+                      {" "}— no column in your file matched this. Add a{" "}
+                      <span className="font-medium">{m.label}</span> column and upload again.
+                    </>
+                  ) : (
+                    <>
+                      {" "}— empty on {m.rows.length} {m.rows.length === 1 ? "row" : "rows"}
+                      {m.rows.length <= 12 ? ` (${m.rows.join(", ")})` : ` (${m.rows.slice(0, 12).join(", ")}…)`}
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-xs opacity-80">
+              We need all four of Title, Application number, Filing date and Country to
+              track a filing and its deadlines. Every other row in the sheet was imported.
+            </p>
+          </div>
+        )}
 
         {unmappedColumns.length > 0 && (
           <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">

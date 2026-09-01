@@ -15,7 +15,7 @@ import { QRCodeSVG } from "qrcode.react";
 import React, { useRef, useState } from "react";
 import { toast } from "@/lib/toast";
 import AddPatentModal from "./AddPatentModal";
-import DuplicatePatentsModal from "./DuplicatePatentsModal";
+import DuplicatePatentsModal, { type MissingRequirement } from "./DuplicatePatentsModal";
 
 type OverviewTabProps = {
   clientTeam: any[];
@@ -58,6 +58,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
   const [updatedCount, setUpdatedCount] = useState(0);
   const [dueDatesCreated, setDueDatesCreated] = useState(0);
   const [unmappedColumns, setUnmappedColumns] = useState<string[]>([]);
+  const [missingRequired, setMissingRequired] = useState<MissingRequirement[]>([]);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [inviteMode, setInviteMode] = useState<"email" | "share">("email");
   const [inviteLinkCopied, setInviteLinkCopied] = useState(false);
@@ -116,6 +117,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
         setUpdatedCount(patentData.updated_count || 0);
         setDueDatesCreated(patentData.due_dates_created || 0);
         setUnmappedColumns(patentData.unmapped_columns || []);
+        setMissingRequired(patentData.missing_required || []);
         setDuplicateModalOpen(true);
       }
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
@@ -542,7 +544,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
         </DialogContent>
       </Dialog>
 
-      <DuplicatePatentsModal open={duplicateModalOpen} onOpenChange={(open) => { setDuplicateModalOpen(open); if (!open) queryClient.invalidateQueries({ queryKey: ["client", clientId] }); }} duplicatePatents={duplicatePatents} excelDuplicateEntries={excelDuplicateEntries} errorCount={errorCount} successCount={successCount} updatedCount={updatedCount} dueDatesCreated={dueDatesCreated} unmappedColumns={unmappedColumns} />
+      <DuplicatePatentsModal open={duplicateModalOpen} onOpenChange={(open) => { setDuplicateModalOpen(open); if (!open) queryClient.invalidateQueries({ queryKey: ["client", clientId] }); }} duplicatePatents={duplicatePatents} excelDuplicateEntries={excelDuplicateEntries} errorCount={errorCount} successCount={successCount} updatedCount={updatedCount} dueDatesCreated={dueDatesCreated} unmappedColumns={unmappedColumns} missingRequired={missingRequired} />
       {showAddPatentModal && <AddPatentModal open={showAddPatentModal} onOpenChange={setShowAddPatentModal} clientId={clientId} onAdded={() => { queryClient.invalidateQueries({ queryKey: ["client", clientId] }); queryClient.invalidateQueries({ queryKey: ["client_metrics", clientId] }); }} />}
     </div>
   );

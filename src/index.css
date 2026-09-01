@@ -106,26 +106,66 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* The desktop layout needs 1024px of room, but the floor must apply ONLY
-     where the layout is actually shown. Applied unconditionally it also
-     inflated the MOBILE layout viewport to 1024px x full-document-height,
-     and a fixed inset-0 element resolves against that viewport — so
-     DesktopOnlyGate became a ~1024x2200 box that centred its message
-     hundreds of px right of and below the fold. Hence: floor above lg,
-     scroll lock below it (the gate covers the app, nothing underneath is
-     meant to be reachable). */
-  @media (min-width: 1024px) {
-    body {
-      min-width: 1024px;
-    }
+  /* ------------------------------------------------------------------
+     THE DESKTOP GATE, and the two rules that must move with it.
+
+     Pulse is a desktop product, and the gate used to be pure WIDTH:
+     anything under 1024px CSS pixels got "please use a desktop". But CSS
+     pixels shrink with browser zoom — a 1440px laptop at 150% reports a
+     960px viewport — so people sitting at a desktop, on a desktop, were
+     told to go and find a desktop, with no way out of it. Zoom is also
+     exactly what a person with low vision reaches for first, which makes
+     a width-only gate an accessibility failure, not just an annoyance.
+
+     So the gate asks what the DEVICE is, not how many pixels are left:
+     `pointer: coarse` and `hover: none` together mean the primary input
+     is a finger and there is no cursor — a phone or tablet. A zoomed
+     desktop still reports `pointer: fine` / `hover: hover`, and a
+     touchscreen laptop reports fine/hover too because its PRIMARY input
+     is the trackpad. Below 640px nothing can lay this app out on any
+     device, so that stays a hard floor.
+
+     `.pulse-desktop-gate` (DesktopOnlyGate) and these two rules share one
+     condition and must keep sharing it — qa/invariant/desktop-gate.qa.mjs
+     fails if they drift. Getting it wrong in either direction is a real
+     bug: a gate with no scroll lock leaves the app scrolling underneath
+     it, and a scroll lock with no gate freezes a desktop user's page.
+     ------------------------------------------------------------------ */
+  .pulse-desktop-gate {
+    display: none;
   }
 
-  @media (max-width: 1023.98px) {
+  @media (max-width: 639.98px),
+         (max-width: 1023.98px) and (pointer: coarse) and (hover: none) {
+    .pulse-desktop-gate {
+      display: block;
+    }
+
+    /* The gate covers the app; nothing underneath is meant to be reachable,
+       and the gate is its own scroll container. */
     html,
     body {
       height: 100%;
       overflow: hidden;
       overscroll-behavior: none;
+    }
+  }
+
+  /* The floor applies wherever the app is actually SHOWN — which now includes
+     a zoomed desktop below 1024px. Horizontal scroll is the right answer
+     there: the layout keeps its proportions and the reader can pan or zoom
+     out. Applied unconditionally it would inflate the layout viewport a
+     `fixed inset-0` gate sizes against, which is what once pushed the gate's
+     message off-screen. */
+  @media not all and (max-width: 639.98px) {
+    body {
+      min-width: 1024px;
+    }
+  }
+
+  @media (max-width: 1023.98px) and (pointer: coarse) and (hover: none) {
+    body {
+      min-width: 0;
     }
   }
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
+import { MainClass, PageHeader } from "@/components/DashboardChrome";
 import ClientDetails, {
   ClientDetailsRef,
 } from "@/components/clients/ClientDetails";
@@ -187,15 +187,13 @@ const ClientDetailPage: React.FC = () => {
      }
 
   return (
-    <DashboardLayout
-      className="relative"
-      header={{
-        title: !isFetching && clientData?.data?.name
+    <>
+      <MainClass className="relative" />
+      <PageHeader
+        title={!isFetching && clientData?.data?.name
           ? clientData.data.name
-          : "Client workspace",
-        back: { label: "Back to clients", to: "/clients" },
-        actions:
-          isOutsideCounselRole(user?.role) ? (
+          : "Client workspace"}
+        actions={isOutsideCounselRole(user?.role) ? (
             isEditMode ? (
               <>
                 <button
@@ -260,9 +258,8 @@ const ClientDetailPage: React.FC = () => {
                 )}
               </>
             )
-          ) : null,
-      }}
-    >
+          ) : null}
+      />
       <div className="pulse-product-page h-full dark:bg-[#0a0a0a]">
         {/* Animated Gradient Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
@@ -522,7 +519,7 @@ const ClientDetailPage: React.FC = () => {
           </Dialog>
         )}
       </div>
-    </DashboardLayout>
+    </>
   );
 };
 

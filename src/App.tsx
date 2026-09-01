@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { BackgroundAnalysisProvider } from "@/contexts/BackgroundAnalysisContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import ProtectedRoutes from "./lib/ProtectedRoutes";
+import DashboardLayout from "./components/DashboardLayout";
 import DesktopOnlyGate from "./components/DesktopOnlyGate";
 import PublicRoutes from "./lib/PublicRoutes";
 import { PostHogProvider } from "@posthog/react";
@@ -155,7 +156,14 @@ const App = () => {
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                 </Route>
 
+                {/* ONE layout for every protected route. Each page used to
+                    wrap itself in <DashboardLayout>, so the sidebar and header
+                    were torn down and rebuilt on every navigation — measured,
+                    the sidebar DOM node was replaced four times out of four.
+                    As a layout route it mounts once per session and only the
+                    Outlet swaps. */}
                 <Route element={<ProtectedRoutes />}>
+                  <Route element={<DashboardLayout />}>
                   <Route path="/" element={<Index />} />
                   <Route path="/clients" element={<ClientsPage />} />
                   <Route
@@ -172,6 +180,7 @@ const App = () => {
                   <Route path="/workspace" element={<WorkspacePage />} />
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/actions" element={<ActionsPage />} />
+                  </Route>
                 </Route>
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />

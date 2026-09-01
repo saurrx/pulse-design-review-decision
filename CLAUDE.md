@@ -150,8 +150,15 @@ checks silently broke during the rename once.
   client — null for a Photon user — and the file landed under `photon/`, fenced
   to nobody. Results land in DuplicatePatentsModal, which reports added/updated/
   deadlines/errors plus a field-level diff of anything the sheet overwrote)
-- DesktopOnlyGate.tsx — <1024px overlay (pure CSS visibility, app stays
-  mounted: cannot cause state bugs). Mobile layout is NOT built, but the gate
+- DesktopOnlyGate.tsx — overlay for phones and tablets (pure CSS visibility,
+  app stays mounted: cannot cause state bugs). It gates on the DEVICE
+  (`pointer: coarse` and `hover: none`) plus a 640px hard floor, NOT on width:
+  it was `lg:hidden`, and CSS pixels shrink with zoom, so a 1440px laptop at
+  150% reported 960px and desktop users were told to find a desktop — an
+  accessibility failure, since zoom is the first thing low vision reaches for
+  (pulse-backend F-069). The condition lives in index.css and is shared with the
+  body scroll lock and the 1024px floor; `qa/invariant/desktop-gate.qa.mjs`
+  fails if the three drift apart. Mobile layout is NOT built, but the gate
   itself now fits: `body{min-width:1024px}` is scoped to `@media(min-width:
   1024px)` and html/body scroll-lock below it (index.css). Unscoped, that
   floor inflated the mobile LAYOUT VIEWPORT to 1024px x full-doc-height —
@@ -217,8 +224,16 @@ the full deviation table.
 Public: /login (Login.tsx; OCLogin.tsx is deleted. IHCLogin.tsx is NOT dead —
 ResetPassword.tsx imports its `iIHCLoginForm` type, so it stays) · /signup (domain-gated; NotOnboarded.tsx when domain unknown) ·
 /invite (accept + share-link path) · /forgot-password · /reset-password.
-Protected (all inside DashboardLayout = Sidebar + Header, title logic in
-DashboardLayout.defaultHeaderForRoute):
+Protected routes sit under ONE layout route (`<Route element={<DashboardLayout/>}>`
+in App.tsx) so Sidebar + Header mount once per session. Each page used to wrap
+ITSELF in `<DashboardLayout>`, so every navigation tore the chrome down and
+rebuilt it — measured, the sidebar DOM node was replaced on four routes out of
+four (pulse-backend F-068). A page that needs its own header controls renders
+`<PageHeader title=… actions=… primaryAction=…/>` from `components/DashboardChrome`,
+which PORTALS them into the header's slot; `<MainClass/>` does the same for
+per-page classes on `<main>`. Portals rather than context because the controls
+are live JSX bound to page state, and an effect keyed on JSX re-fires every
+render and loops. Title logic stays in DashboardLayout.defaultHeaderForRoute:
 - **/** Index.tsx — role-branched dashboard. Inventor: pipeline tiles (drafts
   excluded) + my disclosures. Counsel/committee: DashboardStats 6 tiles,
   Ideas-and-filings chart, PatentWorldMap, TopInventors, TimelineAndEvents.
