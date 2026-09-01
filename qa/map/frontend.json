@@ -176,7 +176,7 @@
    "route": "/",
    "page": "Index",
    "entry": "src/pages/Index.tsx",
-   "components": 31,
+   "components": 32,
    "calls": [
     {
      "method": "POST",
@@ -243,10 +243,28 @@
     },
     {
      "method": "GET",
+     "call": "/api/v1/idea/fetch-by-user?page=1&limit=100&status=${reviewStatusParam}",
+     "rule": "^\\/api\\/v1\\/idea\\/fetch-by-user(?:\\?(.*))?$",
+     "v1": [
+      "/v1/ideas"
+     ],
+     "from": "src/pages/Index.tsx"
+    },
+    {
+     "method": "GET",
      "call": "/api/v1/idea/fetch-by-user?page=1&limit=100",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-by-user(?:\\?(.*))?$",
      "v1": [
       "/v1/ideas"
+     ],
+     "from": "src/pages/Index.tsx"
+    },
+    {
+     "method": "GET",
+     "call": "/api/v1/idea/pipeline",
+     "rule": "^\\/api\\/v1\\/idea\\/pipeline(?:\\?(.*))?$",
+     "v1": [
+      "/v1/ideas/pipeline"
      ],
      "from": "src/pages/Index.tsx"
     },
@@ -288,7 +306,7 @@
     },
     {
      "method": "GET",
-     "call": "/api/v1/patent/fetch/upcoming-due-dates?month=${month}&year=${year}",
+     "call": "/api/v1/patent/fetch/upcoming-due-dates?month=${month}&year=${year}&limit=0",
      "rule": "^\\/api\\/v1\\/patent\\/fetch\\/(upcoming-due-dates|all-due-dates)(?:\\?(.*))?$",
      "v1": [
       "/v1/due-dates"
@@ -663,15 +681,6 @@
     },
     {
      "method": "GET",
-     "call": "/api/v1/idea/fetch-drafts/${nextIdea.id}",
-     "rule": "^\\/api\\/v1\\/idea\\/fetch-drafts\\/([^/]+)$",
-     "v1": [
-      "/v1/ideas/{id}/drafts"
-     ],
-     "from": "src/components/review/ReviewQueueWorkspace.tsx"
-    },
-    {
-     "method": "GET",
      "call": "/api/v1/idea/fetch-drafts/${selectedId}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-drafts\\/([^/]+)$",
      "v1": [
@@ -838,15 +847,6 @@
       "/v1/ideas/{id}/review"
      ],
      "from": "src/components/ideas/RequestUpdate.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/idea/add/inventor/${ideaId}/${id}",
-     "rule": "^\\/api\\/v1\\/idea\\/add\\/inventor\\/([^/]+)\\/([^/]+)$",
-     "v1": [
-      "/v1/ideas/{id}/inventors/{id}"
-     ],
-     "from": "src/components/ideas/CoInventorsField.tsx"
     },
     {
      "method": "POST",
@@ -1040,7 +1040,7 @@
      "v1": [
       "/v1/ideas/inventor-credits/{id}"
      ],
-     "from": "src/components/ideas/IdeaDetailsContent.tsx"
+     "from": "src/components/ideas/CoInventorsField.tsx"
     },
     {
      "method": "POST",
@@ -1151,15 +1151,6 @@
      "rule": "^\\/api\\/v1\\/clients\\/fetch-all-inventors\\/([^/?]+)",
      "v1": [
       "/v1/ideas/colleagues"
-     ],
-     "from": "src/components/ideas/CoInventorsField.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/idea/add/inventor/${ideaId}/${id}",
-     "rule": "^\\/api\\/v1\\/idea\\/add\\/inventor\\/([^/]+)\\/([^/]+)$",
-     "v1": [
-      "/v1/ideas/{id}/inventors/{id}"
      ],
      "from": "src/components/ideas/CoInventorsField.tsx"
     },
@@ -1393,6 +1384,15 @@
       "/v1/patents/{id}"
      ],
      "from": "src/components/patents/PatentDetailsContent.tsx"
+    },
+    {
+     "method": "PUT",
+     "call": "/api/v1/patent/update/${patentId}",
+     "rule": "^\\/api\\/v1\\/patent\\/update(?:-single)?\\/([^/]+)$",
+     "v1": [
+      "/v1/patents/{id}"
+     ],
+     "from": "src/components/patents/PatentDetailsContent.tsx"
     }
    ]
   },
@@ -1504,6 +1504,15 @@
     {
      "method": "PUT",
      "call": "/api/v1/patent/update-single/${patentId}",
+     "rule": "^\\/api\\/v1\\/patent\\/update(?:-single)?\\/([^/]+)$",
+     "v1": [
+      "/v1/patents/{id}"
+     ],
+     "from": "src/components/patents/PatentDetailsContent.tsx"
+    },
+    {
+     "method": "PUT",
+     "call": "/api/v1/patent/update/${patentId}",
      "rule": "^\\/api\\/v1\\/patent\\/update(?:-single)?\\/([^/]+)$",
      "v1": [
       "/v1/patents/{id}"
@@ -1752,12 +1761,21 @@
     },
     {
      "method": "POST",
+     "call": "/api/v1/auth/logout-all",
+     "rule": "^\\/api\\/v1\\/auth\\/logout-all$",
+     "v1": [
+      "/v1/auth/logout-all"
+     ],
+     "from": "src/components/workspace/ProfileTab.tsx"
+    },
+    {
+     "method": "POST",
      "call": "/api/v1/auth/logout",
      "rule": "^\\/api\\/v1\\/auth\\/logout$",
      "v1": [
       "/v1/auth/logout"
      ],
-     "from": "src/components/Sidebar.tsx"
+     "from": "src/components/workspace/ProfileTab.tsx"
     },
     {
      "method": "PUT",
@@ -1878,6 +1896,6 @@
    ]
   }
  ],
- "adapterRules": 84,
+ "adapterRules": 86,
  "unusedAdapterRules": []
 }

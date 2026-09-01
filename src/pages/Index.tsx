@@ -44,89 +44,116 @@ const Index = () => {
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
 
-  const { isLoading, data } = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: async () => {
-      try {
-        const response = await API_CONFIG.get("/api/v1/dashboard");
-        if (response.status === 200) {
-          return response?.data;
-        }
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      }
-    },
+  /* ------------------------------- data ------------------------------------
+   * Two rules hold this whole section together, and BOTH were broken.
+   *
+   * 1. A FAILED REQUEST MUST LOOK FAILED. Every query here used to wrap its
+   *    call in `try { … } catch { console.error() }` and fall off the end
+   *    returning undefined. React Query sees a RESOLVED promise, so `isError`
+   *    is never true, `retry` never fires, and the undefined is cached as a
+   *    success. The screen then renders the zeros that `?? 0` produces:
+   *    reproduced on demo 2026-09-01 by failing /v1/dashboard exactly once —
+   *    "Patent portfolio: 0 total, Granted 0 · 0%" for a firm holding 14,260
+   *    patents, with no spinner, no message and no way to tell. Letting the
+   *    error propagate is the entire fix; the cards below render an explicit
+   *    failed state with a retry.
+   *
+   * 2. A CACHE KEY MUST NAME ITS SUBJECT. `["dashboard"]` is the same key for
+   *    every identity the app can hold, including a Photon admin stepping into
+   *    a client's workspace and back out. `scope` puts the viewer in the key.
+   *
+   * The queries wait for `user` because useUserCookie resolves in an effect —
+   * firing before it produces a request for the wrong scope, then a second one.
+   */
+  // The statuses that mean "waiting on the viewer" differ by role: outside
+  // Counsel reviews ideas sent to Photon Legal; the client committee reviews new submissions.
+  const pendingStatuses = isOC
+    ? ["SEND_TO_OC"]
+    : ["UNDER_REVIEW", "SENT_TO_IHC"];
+
+  const reviewStatusParam = pendingStatuses.join(",");
+
+  const scope = user ? `${user.id}:${user.role}:${user.client_id ?? "none"}` : null;
+  const ready = !!scope;
+
+  const {
+    isLoading,
+    isError: isDashboardError,
+    data,
+    refetch: refetchDashboard,
+  } = useQuery({
+    queryKey: ["dashboard", scope],
+    enabled: ready,
+    queryFn: async () => (await API_CONFIG.get("/api/v1/dashboard"))?.data,
   });
 
-  // Full idea list for this tenant — the action bar and inventor ranking are
-  // derived client-side from submission timestamps and statuses.
+  /**
+   * The five stage numbers, from the server, as one answer.
+   *
+   * They used to be counted in the browser from a 100-row page of the idea
+   * list, so on demo the card read Submitted 62 against a true 138 — and
+   * `Granted` came from the patent portfolio instead (5,964 granted beside 1
+   * filed idea), switching definition to a pipeline-only count the moment a
+   * client filter was applied. One endpoint, one population.
+   */
+  const {
+    data: pipelineData,
+    isError: isPipelineError,
+    refetch: refetchPipeline,
+  } = useQuery({
+    queryKey: ["dashboard_pipeline", scope],
+    enabled: ready && !isInventor,
+    queryFn: async () => (await API_CONFIG.get("/api/v1/idea/pipeline"))?.data,
+  });
+
+  // The review-queue rows. Filtered SERVER-side now (the adapter turns `status`
+  // into /v1/ideas?state=…): this used to pull the tenant's whole hydrated
+  // corpus — 520 KB on demo — to show five rows and a count.
   const {
     isLoading: isLoadingIdeas,
+    isError: isQueueError,
     data: ideasData,
     refetch: refetchIdeas,
   } = useQuery({
-    queryKey: ["dashboard_ideas"],
-    queryFn: async () => {
-      try {
-        const response = await API_CONFIG.get(
-          "/api/v1/idea/fetch-by-user?page=1&limit=100"
-        );
-        if (response.status === 200) return response?.data;
-      } catch (error) {
-        console.error("Error fetching ideas:", error);
-      }
-    },
+    queryKey: ["dashboard_ideas", scope, isInventor],
+    enabled: ready,
+    // An inventor's card lists their own disclosures whatever the state; a
+    // reviewer's lists only what is waiting on them.
+    // Written as a ternary INSIDE the call, not as a `url` variable: the atlas
+    // map and qa/contract/adapter-coverage both find call sites by the literal
+    // passed to API_CONFIG, and hiding one behind a local drops the route from
+    // the cross-repo map without failing anything.
+    queryFn: async () => (await API_CONFIG.get(isInventor
+      ? "/api/v1/idea/fetch-by-user?page=1&limit=100"
+      : `/api/v1/idea/fetch-by-user?page=1&limit=100&status=${reviewStatusParam}`))?.data,
   });
 
   // Inventor roster, used to detect inventors with zero submissions.
   const { data: inventorsData } = useQuery({
-    queryKey: ["dashboard_inventors", user?.client_id],
-    enabled: !isOC && !!user?.client_id,
-    queryFn: async () => {
-      try {
-        const response = await API_CONFIG.get(
-          `/api/v1/clients/fetch-all-inventors/${user?.client_id}`
-        );
-        if (response.status === 200) return response?.data;
-      } catch (error) {
-        console.error("Error fetching inventors:", error);
-      }
-    },
+    queryKey: ["dashboard_inventors", scope],
+    enabled: ready && !isOC && !!user?.client_id,
+    queryFn: async () => (await API_CONFIG.get(`/api/v1/clients/fetch-all-inventors/${user?.client_id}`))?.data,
   });
 
   const {
     isLoading: isFetchingDueDates,
+    isError: isDueDatesError,
     data: dueDatesData,
     refetch,
   } = useQuery({
-    queryKey: ["all_due_dates", month, year, currentPage, itemsPerPage],
-    queryFn: async () => {
-      const response = await API_CONFIG.get(
-        `/api/v1/patent/fetch/upcoming-due-dates?month=${month}&year=${year}`
-      );
-      if (response.status === 200) {
-        return response?.data;
-      }
-    },
-    refetchOnMount: true,
+    // month/year reach the server now, so they select the data rather than
+    // just re-requesting the same page (F-061).
+    queryKey: ["all_due_dates", scope, month, year, currentPage, itemsPerPage],
+    enabled: ready,
+    queryFn: async () => (await API_CONFIG.get(`/api/v1/patent/fetch/upcoming-due-dates?month=${month}&year=${year}&limit=0`))?.data,
   });
 
   // Patent list for this tenant — used to attribute filed patents per inventor
   // on the Top Inventors card (admin view only).
   const { data: patentsData } = useQuery({
-    queryKey: ["dashboard_patents", user?.client_id],
-    enabled: !!user?.client_id && !isInventor && !isOC,
-    queryFn: async () => {
-      try {
-        const response = await API_CONFIG.get(
-          `/api/v1/patent/fetch-all-patents/client/${user?.client_id}?limit=500`
-        );
-        return response?.data;
-      } catch (error) {
-        console.error("Error fetching patents:", error);
-        return { data: [] };
-      }
-    },
+    queryKey: ["dashboard_patents", scope],
+    enabled: ready && !!user?.client_id && !isInventor && !isOC,
+    queryFn: async () => (await API_CONFIG.get(`/api/v1/patent/fetch-all-patents/client/${user?.client_id}?limit=500`))?.data,
   });
 
   /* -------- derived: review queue + inventor engagement (client-side) -------- */
@@ -209,12 +236,6 @@ const Index = () => {
       );
   }, [ideas, isInventor, user?.id]);
 
-  // The statuses that mean "waiting on the viewer" differ by role: outside
-  // Counsel reviews ideas sent to Photon Legal; the client committee reviews new submissions.
-  const pendingStatuses = isOC
-    ? ["SEND_TO_OC"]
-    : ["UNDER_REVIEW", "SENT_TO_IHC"];
-
   // Review queue for the admin dashboard: oldest first, with wait times.
   const queueStartedAt = (idea: any) =>
     isOC
@@ -249,70 +270,47 @@ const Index = () => {
     [ideas, isOC],
   );
 
-  // The dropdown's data source. The old code read data.data.client_metrics,
-  // a key the dashboard endpoint has never returned, so clientOptions was
-  // forever [] and the whole (already-built) dropdown never rendered. The
-  // ideas list this page already fetches carries client_id + client.name on
-  // every row — derive the options and the per-client stage counts from it.
-  const derivedClientMetrics = React.useMemo(() => {
-    const byId = new Map<string, { id: string; name: string; pipeline: Record<string, number> }>();
-    for (const idea of ideas as any[]) {
-      const cid = idea.client_id ?? idea.client?.id;
-      if (!cid) continue;
-      const entry = byId.get(cid) ?? {
-        id: cid,
-        name: idea.client?.name ?? "Unknown client",
-        pipeline: { submitted: 0, review_pending: 0, sent_to_oc: 0, filed: 0, granted: 0 },
-      };
-      if (idea.status !== "IN_DRAFT") entry.pipeline.submitted++;
-      if (pendingStatuses.includes(idea.status)) entry.pipeline.review_pending++;
-      if (idea.status === "SEND_TO_OC") entry.pipeline.sent_to_oc++;
-      if (idea.status === "FILED") entry.pipeline.filed++;
-      if ((idea.IdeaPatentLink ?? []).some((l: any) => l?.patent?.status === "GRANTED")) entry.pipeline.granted++;
-      byId.set(cid, entry);
-    }
-    return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
-  }, [ideas]);
+  /**
+   * The pipeline card, and the client list its dropdown offers.
+   *
+   * Both come from /v1/ideas/pipeline now. They were derived in the browser
+   * from the idea list, which is a PAGE — so every stage was capped at whatever
+   * fitted in 100 rows, and `granted` came from somewhere else entirely: the
+   * patent portfolio when no filter was set (5,964 granted beside 1 filed idea
+   * on demo), a pipeline-only count when one was. One tile cannot mean two
+   * things.
+   */
+  const pipeline = pipelineData?.data;
+  const pipelineClients: any[] = React.useMemo(
+    () => (Array.isArray(pipeline?.byClient) ? pipeline.byClient : []),
+    [pipeline],
+  );
 
   const filteredPipeline = React.useMemo(() => {
-    if (selectedPipelineClientIds == null) {
-      return {
-        submitted: ideas.filter((i) => i.status !== "IN_DRAFT").length,
-        reviewPending: reviewQueue.length,
-        sentToOC: ideas.filter((idea) => idea.status === "SEND_TO_OC").length,
-        filed: ideas.filter((idea) => idea.status === "FILED").length,
-        granted: Number(data?.data?.granted_patents) || 0,
-      };
-    }
-
-    const selected = derivedClientMetrics.filter((client) =>
-      selectedPipelineClientIds.includes(client.id),
-    );
-    const total = (key: string) =>
-      selected.reduce(
-        (sum, client) => sum + Number(client.pipeline?.[key] || 0),
-        0,
-      );
-
+    const rows = selectedPipelineClientIds == null
+      ? null
+      : pipelineClients.filter((c) => selectedPipelineClientIds.includes(c.client_id));
+    const total = (key: string) => rows === null
+      ? Number(pipeline?.[key]) || 0
+      : rows.reduce((sum, c) => sum + (Number(c[key]) || 0), 0);
     return {
       submitted: total("submitted"),
-      reviewPending: total("review_pending"),
-      sentToOC: total("sent_to_oc"),
+      reviewPending: total("reviewPending"),
+      sentToOC: total("sentToPhoton"),
       filed: total("filed"),
+      // Ideas that reached grant — the same unit as every other stage here.
+      // The firm's whole granted count, imported portfolios included, is the
+      // Patent portfolio card further down the page.
       granted: total("granted"),
     };
-  }, [
-    data,
-    ideas,
-    derivedClientMetrics,
-    reviewQueue.length,
-    selectedPipelineClientIds,
-  ]);
-  const laterStageCount = ideas.filter(
-    (i) => i.status !== "IN_DRAFT" && !pendingStatuses.includes(i.status),
-  ).length;
+  }, [pipeline, pipelineClients, selectedPipelineClientIds]);
 
-  const reviewStatusParam = pendingStatuses.join(",");
+  // "Everything past the review stage", for the queue card's overflow line.
+  const laterStageCount = Math.max(
+    0,
+    (Number(pipeline?.submitted) || 0) - (Number(pipeline?.reviewPending) || 0),
+  );
+
   const goToPipelineStage = (stage: string) => {
     if (stage === "granted") {
       navigate("/patents?status=ACTIVE_GRANTED");
@@ -470,6 +468,8 @@ const Index = () => {
                   // The overflow row always needs somewhere to go, including on
                   // the photon side where the header has no "review all" CTA.
                   onViewAll={() => navigate(`/ideas?status=${reviewStatusParam}`)}
+                  hasError={isQueueError}
+                  onRetry={() => refetchIdeas()}
                 />
               </div>
               <div className="col-span-12 xl:col-span-4">
@@ -481,8 +481,8 @@ const Index = () => {
                   granted={filteredPipeline.granted}
                   clientOptions={
                     isOC
-                      ? derivedClientMetrics.map((client) => ({
-                          id: client.id,
+                      ? pipelineClients.map((client) => ({
+                          id: client.client_id,
                           name: client.name,
                         }))
                       : []
@@ -492,6 +492,8 @@ const Index = () => {
                     isOC ? setSelectedPipelineClientIds : undefined
                   }
                   onStageClick={goToPipelineStage}
+                  hasError={isPipelineError}
+                  onRetry={() => refetchPipeline()}
                 />
               </div>
 
@@ -504,8 +506,8 @@ const Index = () => {
                   series={filteredMotion.series}
                   clientOptions={
                     isOC
-                      ? derivedClientMetrics.map((client) => ({
-                          id: client.id,
+                      ? pipelineClients.map((client) => ({
+                          id: client.client_id,
                           name: client.name,
                         }))
                       : []
@@ -514,6 +516,8 @@ const Index = () => {
                   onClientSelectionChange={
                     isOC ? setSelectedMotionClientIds : undefined
                   }
+                  hasError={isDashboardError}
+                  onRetry={() => refetchDashboard()}
                 />
               </div>
               <div className="col-span-12 h-[384px] xl:col-span-4">
@@ -555,6 +559,8 @@ const Index = () => {
                   data?.data?.inactive_patents ?? data?.data?.rejected_patents,
                 ) || 0
               }
+              hasError={isDashboardError}
+              onRetry={() => refetchDashboard()}
             />
           </div>
           <div className="col-span-12 h-[384px] xl:col-span-8">

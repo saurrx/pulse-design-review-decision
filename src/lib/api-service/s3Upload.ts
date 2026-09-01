@@ -1,12 +1,27 @@
 import { rawApi } from "@/lib/apiConfig";
 
 /**
- * Real file upload against DigitalOcean Spaces, via the API's presign flow.
+ * Real file upload, through the API's own origin.
  *
- * Bytes go straight from the browser to Spaces, never through the API:
- *   1. ask the API for a presigned PUT url (this also creates the DB row)
- *   2. PUT the file to Spaces directly
- *   3. tell the API to confirm — the row flips to STORED
+ *   1. ask the API to presign — this validates type and size and creates the
+ *      PENDING row
+ *   2. PUT the bytes to /v1/files/:id/content, which streams them into Spaces
+ *      and flips the row to STORED once the object is provably there
+ *
+ * Step 2 used to PUT straight at the presigned DigitalOcean Spaces URL, and
+ * that never worked in a browser here. It is cross-origin, so it needs a CORS
+ * rule on the bucket AND a `connect-src` entry for the bucket host in
+ * vercel.json's CSP. Neither existed: measured 2026-09-01, the preflight
+ * returned 403 with no Access-Control-Allow-Origin, and the CSP blocked the
+ * connection before even that. Every upload in the product failed the same
+ * way — portfolio imports, idea attachments, client logos — and, because a CSP
+ * block produces an Error with no HTTP response, every one of them surfaced as
+ * the generic "An error occurred while uploading the file" (F-062).
+ *
+ * Same-origin is not a workaround, it is the same decision the app already
+ * makes for cookies (see CLAUDE.md §3): /v1/* is proxied on this origin, so
+ * there is no preflight to satisfy, no bucket CORS to configure from a control
+ * panel nobody can script, and no external host in the CSP.
  *
  * The return shape is the FileRecord the screens already read (file_path,
  * original_name, …), so no call site changed when this stopped being a mock.
@@ -55,18 +70,23 @@ async function presign(file: File, category: "image" | "idea" | "patent", client
     // to nobody and invisible on the client's own page.
     ...(clientId ? { client_id: clientId } : {}),
   });
-  return { ...withAliases(data), put_url: (data as any).put_url } as FileRecord & { put_url: string };
+  return withAliases(data);
 }
 
-async function putToSpaces(url: string, file: File) {
-  // A bare PUT with the file body — the presigned url carries the auth. No
-  // credentials header, and no cookies (this is cross-origin to the bucket).
-  const res = await fetch(url, {
-    method: "PUT",
-    body: file,
-    headers: { "content-type": file.type || "application/octet-stream" },
+/**
+ * The bytes, same-origin.
+ *
+ * `application/octet-stream` is required by the route and is not a formality:
+ * Nest's global json parser would consume a body labelled application/json
+ * before the handler ran, leaving an empty stream behind. What the file
+ * actually IS was settled at presign, against the server's allowlist.
+ */
+async function putContent(id: string, file: File) {
+  await rawApi.put(`/v1/files/${id}/content`, file, {
+    headers: { "content-type": "application/octet-stream" },
+    // Axios would otherwise try to be helpful with a File.
+    transformRequest: [(body) => body],
   });
-  if (!res.ok) throw new Error(`Upload failed (${res.status})`);
 }
 
 export async function s3Upload(
@@ -75,9 +95,12 @@ export async function s3Upload(
   clientId?: string,
 ): Promise<FileRecord> {
   const p = await presign(file, category, clientId);
-  await putToSpaces(p.put_url, file);
-  const { data } = await rawApi.post("/v1/files/confirm-upload", { id: p.id });
-  return withAliases(data);
+  // No separate confirm step: the content route only answers once the bytes are
+  // in storage, so a successful PUT IS the confirmation. The old three-hop
+  // version could leave a PENDING row behind whenever the third call was the
+  // one that failed.
+  await putContent(p.id, file);
+  return p;
 }
 
 export async function s3UploadMultiple(

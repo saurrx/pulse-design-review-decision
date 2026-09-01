@@ -99,9 +99,19 @@ the name means PHOTON side (historical). `npm run lint:roles`
 checks silently broke during the rename once.
 
 ## 5. Component map (the big ones are 2000+ lines — grep, don't read whole)
-- pages/Index.tsx — role-branched dashboard (inventor pipeline counts exclude
-  drafts; Granted counts ideas whose linked patent is GRANTED — never an idea
-  status)
+- pages/Index.tsx — role-branched dashboard. **Every stage number comes from
+  `/v1/ideas/pipeline`** (one call, `byClient` for the Photon filter); it used
+  to be counted in the browser from a 100-row PAGE, with Granted taken from the
+  patent portfolio instead — "Filed 1 · Granted 5964" — and switching definition
+  the moment a client filter was applied (pulse-backend F-061). Granted counts
+  ideas whose linked patent is GRANTED, never an idea status; the firm's whole
+  granted count is the Patent portfolio card on the same screen, and they are
+  different populations on purpose. **No queryFn may swallow its own error**:
+  they all did, returning `undefined`, so React Query cached a failure as a
+  success and the cards rendered zeros — one failed /v1/dashboard showed "0 Total
+  patents" for a portfolio of 14,260. Errors propagate, the cards take
+  `hasError`/`onRetry`, and every key carries the viewer (`scope`), because
+  `["dashboard"]` is the same key for every identity the app can hold.
 - components/review/ReviewQueueWorkspace.tsx — committee/counsel queue; role-
   aware reviewStatuses; Full record → /ideas/:id
 - components/ideas/IdeaDetailsContent.tsx — THE monster. Branches:
@@ -212,7 +222,14 @@ DashboardLayout.defaultHeaderForRoute):
 - **/** Index.tsx — role-branched dashboard. Inventor: pipeline tiles (drafts
   excluded) + my disclosures. Counsel/committee: DashboardStats 6 tiles,
   Ideas-and-filings chart, PatentWorldMap, TopInventors, TimelineAndEvents.
-  Photon: cross-client variants.
+  Photon: cross-client variants. TimelineAndEvents' calendar asks the server for
+  ONE month (`month`/`year` → `from`/`to`); it used to filter page 1 of 13,672
+  deadlines in the browser, so most months rendered empty and paging changed
+  nothing. A day cell is `min-h-[84px]`, not `h-`: measured, 84px holds exactly
+  ONE chip, so the old fixed height did not contain two — it drew them over the
+  week below. Event detail is a Popover (floats, Escape closes, per-chip state);
+  it was an inline panel keyed on the APPLICATION NUMBER, so one click opened
+  every event of that patent across the month.
 - **/ideas** IdeasPage → role branch: INVENTOR = DraftListView/EmptyDraftsView
   cards; TECH_COMMITTEE + LEGAL_COUNSEL = review/ReviewQueueWorkspace;
   photon roles = IdeasContent table. Every row is named by its **reference**
@@ -258,7 +275,12 @@ DashboardLayout.defaultHeaderForRoute):
   gives up width first. It still wraps below ~1100px — a safety valve, not the
   normal state.
 - **/due-dates** DueDatesPage → DueDatesContent list + DueDatesCalendar +
-  RemindButton (24h cooldown). Columns lead with Application No., then Title,
+  RemindButton (24h cooldown). The **Action** column is CLIENT-side only —
+  counsel and the committee have no /actions nav item, so it is their only
+  surface for choosing an instruction, and dropping it globally is the exact
+  regression the conformance tier exists to catch. Photon roles work the other
+  axis at /actions and now carry neither Action nor Remind (pulse-backend
+  F-063). Columns lead with Application No., then Title,
   **Next Event**, **Deadline** — the Photon Operations table's order and
   vocabulary, one table's worth of words for the whole product. No row-number
   column: it numbered the current page of a sorted, filtered list. Search,
@@ -437,6 +459,18 @@ Two deliberate refusals to guess:
 intent and code disagree, each to a resolution (fix code / fix doc / accept).
 It lives in `pulse-backend/docs/qa/findings.md` (cross-repo by nature). Read it
 before concluding something is a bug; twelve are already recorded.
+
+### Uploads are same-origin
+`s3Upload.ts` presigns, then PUTs the bytes to **`/v1/files/:id/content`** on
+this origin. It used to PUT the presigned DigitalOcean Spaces URL directly,
+which needs a bucket CORS rule (settable only from the DO control panel — a
+scoped Spaces key cannot) AND a `connect-src` entry in vercel.json's CSP.
+Neither existed, so no upload in the product had ever succeeded, and every one
+surfaced as the generic "An error occurred while uploading the file" because a
+CSP block yields an Error with no `.response` (pulse-backend F-064). Do not
+reintroduce an external storage host in `connect-src` —
+`qa/security/upload-same-origin.qa.mjs` fails on that AND on any direct storage
+PUT, and either one alone reopens the hole.
 
 ### The rule that makes any of this worth having
 **Every gate must be proved to bite.** Plant the violation, watch the test fail,
