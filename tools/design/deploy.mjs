@@ -16,6 +16,7 @@ const targets = [
   { project: "pulse-design", dir: "dist", build: ["npm", ["run", "build:design"]], config: { rewrites: [{ source: "/((?!assets/|mockServiceWorker\\.js$).*)", destination: "/index.html" }], headers: [{ source: "/(.*)", headers: [{ key: "X-Content-Type-Options", value: "nosniff" }, { key: "X-Frame-Options", value: "DENY" }, { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" }] }, { source: "/mockServiceWorker.js", headers: [{ key: "Cache-Control", value: "no-store" }, { key: "Service-Worker-Allowed", value: "/" }] }] } },
   { project: "pulse-design-storybook", dir: "storybook-static", build: ["npm", ["run", "storybook:build"]], config: { headers: [{ source: "/mockServiceWorker.js", headers: [{ key: "Cache-Control", value: "no-store" }] }] } },
 ];
+const STABLE = { "pulse-design": "https://pulse-design-s-5ecc81c4.vercel.app", "pulse-design-storybook": "https://pulse-design-storybook.vercel.app" };
 const out = [];
 for (const t of targets) {
   if (!process.argv.includes("--no-build")) sh(t.build[0], t.build[1]);
@@ -26,8 +27,13 @@ for (const t of targets) {
   const exists = list.includes(`"name":"${t.project}"`) || list.includes(`"name": "${t.project}"`);
   if (!exists) sh("vercel", ["project", "add", t.project, ...scope]);
   sh("vercel", ["link", "--yes", "--project", t.project, ...scope], t.dir);
-  const url = sh("vercel", ["deploy", "--yes", ...scope], t.dir).split("\n").filter((l) => l.startsWith("https://")).at(-1);
-  out.push({ project: t.project, url });
-  console.log(`${t.project}: ${url}`);
+  // `--prod` publishes on the project's stable domain, which Vercel serves without authentication;
+  // plain preview deployments stay behind Vercel Authentication and are only for the account owner.
+  const prod = process.argv.includes("--prod");
+  const url = sh("vercel", ["deploy", "--yes", ...(prod ? ["--prod"] : []), ...scope], t.dir).split("\n").filter((l) => l.startsWith("https://")).at(-1);
+  // The stable alias is whatever Vercel assigned the project (the clean name may be taken); STABLE records the known ones.
+  const stable = prod ? (STABLE[t.project] ?? null) : null;
+  out.push({ project: t.project, url, stable, public: prod });
+  console.log(`${t.project}: ${stable ?? url}${prod ? " (production, public: Vercel Authentication is off for both projects)" : " (preview deployment URL)"}`);
 }
 fs.writeFileSync("changes/SPIKE/previews.json", JSON.stringify({ deployed: new Date().toISOString(), previews: out }, null, 2) + "\n");

@@ -19,7 +19,7 @@ Branch: tooling/spike. Run `node tools/design/gates.mjs` to reproduce the checkl
 | Patch applies in a disposable production worktree | met | export.mjs dry run at the recorded base and the latest head; typecheck, lint:roles, build green; worktree removed |
 | Sync preserves design instructions and reports a new rule | met | sync.mjs --dry-run against a simulated upstream change: preamble intact, probe text absent from the root file, rule diff in the report. It also caught a stale contract copy, since fixed |
 | Augmented lockfile installs reproducibly with one React runtime | met | npm ci in a clean directory; react, react-dom and vite one copy each |
-| App and Storybook previews deploy independently | not yet | needs the Vercel projects; a decision on preview protection is pending |
+| App and Storybook previews deploy independently | met | two Vercel projects deployed prebuilt; public at https://pulse-design-s-5ecc81c4.vercel.app and https://pulse-design-storybook.vercel.app; the smoke test passes against the public app |
 
 ## Decisions the spike forced
 - Story tests are serial. Parallelism is not a configuration flag to flip later; it needs a different session mechanism the app does not have.

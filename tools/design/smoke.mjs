@@ -1,11 +1,12 @@
 import { chromium } from "playwright";
-const base = "http://localhost:3700";
+const base = (process.env.SMOKE_BASE || "http://localhost:3700").replace(/\/$/, "");
+const baseHost = new URL(base).host;
 const shots = "/private/tmp/claude-501/-Users-saurabh-PL-pulsemain/a5b7f644-bc51-4732-ae5b-d1ba69131cab/scratchpad/shots";
 const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 const page = await ctx.newPage();
 const external = new Set(); const errors = []; const v1 = [];
-page.on("request", (r) => { const u = new URL(r.url()); if (u.host !== "localhost:3700") external.add(u.host); else if (u.pathname.startsWith("/v1")) v1.push(`${r.method()} ${u.pathname}${u.search}`); });
+page.on("request", (r) => { const u = new URL(r.url()); if (u.host !== baseHost) external.add(u.host); else if (u.pathname.startsWith("/v1")) v1.push(`${r.method()} ${u.pathname}${u.search}`); });
 page.on("console", (m) => { if (m.type() === "error") errors.push(m.text().slice(0, 200)); });
 page.on("pageerror", (e) => errors.push("pageerror: " + e.message.slice(0, 200)));
 const step = async (name, fn) => { try { await fn(); console.log("ok  ", name); } catch (e) { console.log("FAIL", name, "-", String(e.message || e).slice(0, 300)); } };
