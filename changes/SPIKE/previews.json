@@ -1,0 +1,13 @@
+{
+  "deployed": "2026-09-02T22:31:59.329Z",
+  "previews": [
+    {
+      "project": "pulse-design",
+      "url": "https://pulse-design-r5q49frdu-s-5ecc81c4.vercel.app"
+    },
+    {
+      "project": "pulse-design-storybook",
+      "url": "https://pulse-design-storybook-a9lfkzh47-s-5ecc81c4.vercel.app"
+    }
+  ]
+}
