@@ -2,6 +2,7 @@ import { http, HttpResponse, passthrough, type HttpHandler, type DefaultBodyType
 import backend from "../../contract/backend.json";
 import proposed from "../proposed-routes.json";
 import { routeKey } from "./canon";
+import { getDb } from "./db";
 
 /**
  * Every handler registers under `METHOD /v1/...` canonicalised the way Atlas
@@ -37,6 +38,11 @@ export function route(method: Method, path: string, resolve: (ctx: Ctx) => Resul
   return http[method](path, async ({ params, request }) => {
     if (PROPOSED.has(key)) stats.proposedHits.push(key);
     stats.served++;
+    // Scenario flags: latency for loading states, and a failing-writes mode for error states.
+    let flags: { latencyMs?: number; mutationsFail?: boolean } = {};
+    try { flags = getDb().flags ?? {}; } catch { /* no store yet */ }
+    if (flags.latencyMs) await new Promise((r) => setTimeout(r, flags.latencyMs));
+    if (flags.mutationsFail && method !== "get") return HttpResponse.json({ message: "This change could not be saved. Please try again." }, { status: 400 });
     const ctx: Ctx = {
       params,
       url: new URL(request.url),
@@ -56,10 +62,20 @@ export function route(method: Method, path: string, resolve: (ctx: Ctx) => Resul
  *  - any other host: a network error. Nothing leaves the machine.
  */
 export const EGRESS_ALLOW: string[] = [];
+
+/**
+ * One legacy call site still targets the old API host directly (the draft-files
+ * download). It is not a /v1 route, so it lives outside the registry guard as
+ * an explicit exception; the redesign must not depend on it.
+ */
+export function legacyHandlers(): HttpHandler[] {
+  return [http.get("https://api-pulse.photonlegal.com/api/v1/idea/download-draft-files/:id", () =>
+    new HttpResponse(new Blob(["mock archive"], { type: "application/zip" }), { status: 200, headers: { "content-type": "application/zip" } }))];
+}
 export function egressHandler(): HttpHandler {
   return http.all("*", ({ request }) => {
     const u = new URL(request.url);
-    if (u.origin === location.origin) {
+    if (typeof location !== "undefined" && u.origin === location.origin) {
       if (!u.pathname.startsWith("/v1")) return passthrough();
       const miss = `${request.method} ${u.pathname}`;
       stats.unhandled.push(miss);

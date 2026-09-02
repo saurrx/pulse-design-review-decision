@@ -10,6 +10,7 @@ import { clock, installFakeDate } from "./clock";
 import { createWorker, WORKER_OPTIONS } from "./worker";
 import { readSelection, writeSessionCookie, readSessionUser } from "./session";
 import { mountChip } from "./chip";
+import { stats } from "./registry";
 // The vendored typeface. Bundled here so the build emits the font files as assets; the design Vite config strips the Google Fonts links from index.html.
 import "../../design/fonts/fonts.css";
 
@@ -36,6 +37,8 @@ async function main() {
     history.replaceState(null, "", url.pathname + url.search + url.hash);
   }
 
+  // Tooling reads the runtime counters from here (unhandled /v1, blocked hosts, proposed-route hits).
+  (window as unknown as { __pulseDesign?: unknown }).__pulseDesign = { scenario: scenario.name, stats };
   mountChip(scenario.name);
   await import("../../src/main.tsx");
 }

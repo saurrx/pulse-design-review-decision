@@ -1,13 +1,15 @@
 import type { Db, ScenarioDef } from "./types";
+import { clearPortfolioMemo } from "../scenarios/portfolio";
 
 /**
  * The in-memory store. Rebuilt from a scenario on every boot; in the full app
  * it also snapshots to local storage so a click-through survives a reload and
  * a reset is one button. In Storybook and in CI persistence is off and every
- * story rebuilds it (frames share one origin, so a shared snapshot would leak
- * one story's mutations into the next).
+ * story rebuilds it. Large portfolios are never in here: they are generated on
+ * demand (scenarios/portfolio.ts) and only overrides and runtime-created rows
+ * are stored.
  */
-export const SEED_VERSION = 1;
+export const SEED_VERSION = 2;
 let db: Db | null = null;
 let persist = false;
 let saveTimer: number | undefined;
@@ -16,6 +18,7 @@ const key = (scenario: string) => `pulse-design.db.v${SEED_VERSION}.${scenario}`
 
 export function resetDb(scenario: ScenarioDef, options: { persist: boolean; fresh?: boolean }): Db {
   persist = options.persist;
+  clearPortfolioMemo();
   if (persist && !options.fresh) {
     try {
       const raw = localStorage.getItem(key(scenario.name));
