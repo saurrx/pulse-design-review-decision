@@ -20,8 +20,8 @@ import { recordHits } from '../lib/exception-hits.mjs';
 const QA = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i === -1 ? d : process.argv[i + 1]; };
 const contract = JSON.parse(readFileSync(join(QA, 'contract.json'), 'utf8'));
-const BASE = arg('base', contract.environments.demo.app);
-const PW = process.env.QA_PASSWORD ?? 'PulseDemo!2026';
+const BASE = arg('base', process.env.QA_MOCK !== '0' ? (process.env.QA_BASE ?? 'http://localhost:3700') : contract.environments.demo.app);
+const PW = process.env.QA_PASSWORD ?? '';
 
 const exceptionsFile = join(QA, 'exceptions.json');
 const EXCEPTIONS = existsSync(exceptionsFile)
@@ -73,6 +73,12 @@ mkdirSync(SESSIONS, { recursive: true });
 const MAX_SESSION_AGE_MS = 12 * 60 * 1000;
 
 async function contextFor(browser, r) {
+  // DESIGN FORK: mock mode logs in through the shared seam, same form, no cache.
+  if (process.env.QA_MOCK !== '0') {
+    const { openSession } = await import('../lib/session.mjs');
+    const s = await openSession(browser, r.role, { base: BASE, viewport: VIEWPORTS[0] });
+    return s ? { ctx: s.ctx, page: s.page, reused: false } : null;
+  }
   const file = join(SESSIONS, `${r.role}.json`);
   const fresh = existsSync(file) && (Date.now() - statSync(file).mtimeMs) < MAX_SESSION_AGE_MS;
   if (fresh) {

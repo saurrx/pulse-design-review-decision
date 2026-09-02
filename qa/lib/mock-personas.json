@@ -1,0 +1,9 @@
+{
+  "scenario": "qa/full",
+  "PHOTON_SUPERADMIN": "founder@photonlegal.test",
+  "PHOTON_ADMIN": "admin@photonlegal.test",
+  "CASE_OWNER": "owner@photonlegal.test",
+  "LEGAL_COUNSEL": "counsel@acme.test",
+  "TECH_COMMITTEE": "committee@acme.test",
+  "INVENTOR": "inventor@acme.test"
+}

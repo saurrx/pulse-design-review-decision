@@ -26,7 +26,15 @@ import { fileURLToPath } from 'node:url';
 
 const QA = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const CONTRACT = JSON.parse(readFileSync(join(QA, 'contract.json'), 'utf8'));
-export const APP = CONTRACT.environments.demo.app;
+/**
+ * DESIGN FORK: mock mode. QA_MOCK=1 (the default here) points every tier at
+ * the mock app, logs in through the real login form with the qa/full
+ * scenario's personas, ignores the password and caches nothing. The demo host
+ * in the shared contract is never read in this repository.
+ */
+export const MOCK = process.env.QA_MOCK !== '0';
+export const MOCK_PERSONAS = JSON.parse(readFileSync(join(QA, 'lib', 'mock-personas.json'), 'utf8'));
+export const APP = MOCK ? (process.env.QA_BASE ?? 'http://localhost:3700') : CONTRACT.environments.demo.app;
 
 const SESSIONS = join(QA, '.sessions');
 const MAX_SESSION_AGE_MS = 12 * 60 * 1000;   // the access cookie lives 15 min
@@ -77,9 +85,10 @@ export const ACCOUNTS = {
  */
 export async function openSession(browser, role, {
   base = APP,
-  password = process.env.QA_PASSWORD ?? 'PulseDemo!2026',
+  password = process.env.QA_PASSWORD ?? '',
   viewport = { width: 1440, height: 900 },
 } = {}) {
+  if (MOCK) return openMockSession(browser, role, { base, viewport });
   mkdirSync(SESSIONS, { recursive: true });
   // Cookies are host-scoped, so a session cached against one base is useless
   // against another - and worse than useless if it is silently reused, because
@@ -90,6 +99,7 @@ export async function openSession(browser, role, {
     : `${role}--${new URL(base).host.replace(/[:.]/g, '_')}.json`);
   const email = ACCOUNTS[role];
   if (!email) throw new Error(`no demo account for role ${role}`);
+  if (!password) throw new Error('QA_PASSWORD is required outside mock mode');
 
   const save = async (ctx) => {
     try { writeFileSync(file, JSON.stringify(await ctx.storageState())); } catch { /* closed */ }
@@ -121,4 +131,23 @@ export async function openSession(browser, role, {
   if (/\/login/.test(page.url())) { await ctx.close(); return null; }
   await save(ctx);
   return { ctx, page, role, reused: false, close: async () => { await save(ctx); await ctx.close(); } };
+}
+
+/** Mock mode: the real login form against the mock, on the qa/full scenario, no throttle, no cache. */
+async function openMockSession(browser, role, { base, viewport }) {
+  const email = MOCK_PERSONAS[role];
+  if (!email) throw new Error(`no mock persona for role ${role}`);
+  const ctx = await browser.newContext({ viewport });
+  attachTrace(ctx, role);
+  const page = await ctx.newPage();
+  await page.goto(`${base}/login?scenario=${encodeURIComponent(MOCK_PERSONAS.scenario)}`, { waitUntil: 'networkidle' });
+  await page.fill('input[type="email"]', email);
+  await page.fill('input[type="password"]', 'mock');
+  await Promise.all([
+    page.waitForURL(u => !/\/login/.test(u.toString()), { timeout: 30000 }).catch(() => {}),
+    page.click('button[type="submit"]'),
+  ]);
+  await page.waitForTimeout(800);
+  if (/\/login/.test(page.url())) { await ctx.close(); return null; }
+  return { ctx, page, role, reused: false, close: async () => { await ctx.close(); } };
 }

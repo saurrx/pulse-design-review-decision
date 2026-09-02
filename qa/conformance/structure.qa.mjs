@@ -37,7 +37,8 @@ import { SURFACES, VIEWPORT, key } from './surfaces.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const QA = join(HERE, '..');
-const BASELINE = join(HERE, 'baseline');
+// DESIGN FORK: the mock baseline lives beside production's, which stays untouched and merges cleanly.
+const BASELINE = join(HERE, process.env.QA_MOCK !== '0' ? 'baseline-mock' : 'baseline');
 
 const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i === -1 ? d : process.argv[i + 1]; };
 const has = (n) => process.argv.includes('--' + n);
