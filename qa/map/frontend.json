@@ -5,7 +5,7 @@
    "route": "/login",
    "page": "Login",
    "entry": "src/pages/auth/Login.tsx",
-   "components": 15,
+   "components": 14,
    "calls": [
     {
      "method": "POST",
@@ -66,7 +66,7 @@
    "route": "/invite",
    "page": "Invite",
    "entry": "src/pages/auth/Invite.tsx",
-   "components": 14,
+   "components": 13,
    "calls": [
     {
      "method": "POST",
@@ -86,7 +86,7 @@
    "route": "/i/:inviteCode",
    "page": "Invite",
    "entry": "src/pages/auth/Invite.tsx",
-   "components": 14,
+   "components": 13,
    "calls": [
     {
      "method": "POST",
@@ -106,7 +106,7 @@
    "route": "/reset-password",
    "page": "ResetPassword",
    "entry": "src/pages/auth/ResetPassword.tsx",
-   "components": 16,
+   "components": 15,
    "calls": [
     {
      "method": "POST",
@@ -159,7 +159,7 @@
    "route": "/forgot-password",
    "page": "ForgotPassword",
    "entry": "src/pages/auth/ForgotPassword.tsx",
-   "components": 14,
+   "components": 13,
    "calls": [
     {
      "method": "POST",

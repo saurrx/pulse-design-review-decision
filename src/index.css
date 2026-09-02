@@ -388,81 +388,85 @@
     backdrop-filter: blur(10px);
   }
 
+  /* ------------------------------------------------------------------
+     The auth screens (login, signup, invite, forgot/reset password).
+
+     These rules used to be selected POSITIONALLY —
+     `.pulse-auth-shell > :nth-last-child(2) > div:last-child` — which meant the
+     white card, the light background and every text-colour override depended on
+     the decorative panel still being the last child of the shell. Removing that
+     panel silently moved every selector onto the wrong element. They are now
+     anchored to real class names, so the markup can change without the theme
+     collapsing.
+
+     Radius is deliberately small (6px, the same as the input fields) rather than
+     the 24px pill this used to be: a corner, not a bubble.
+     ------------------------------------------------------------------ */
   .pulse-auth-shell {
     background: #f6f6f8 !important;
   }
 
-  .pulse-auth-shell .animate-blob,
-  .pulse-auth-shell .animate-float {
-    animation: none !important;
-  }
-
-  .pulse-auth-shell > .absolute.inset-0.pointer-events-none {
-    display: none;
-  }
-
-  .pulse-auth-shell > :nth-last-child(2) {
+  .pulse-auth-panel {
     background: #f6f6f8;
   }
 
-  .pulse-auth-shell > :nth-last-child(2) > div:not(:last-child) {
-    display: none;
-  }
-
-  .pulse-auth-shell > :nth-last-child(2) > div:last-child {
+  .pulse-auth-card {
+    width: 100%;
     max-width: 480px;
     padding: 32px;
     border: 1px solid #e3e2e8;
-    border-radius: 24px;
+    border-radius: 6px;
     background: #ffffff;
     box-shadow: var(--pulse-shadow-elevated);
   }
 
-  .pulse-auth-shell > :nth-last-child(2) h1,
-  .pulse-auth-shell > :nth-last-child(2) .text-white {
+  .pulse-auth-card h1,
+  .pulse-auth-card .text-white {
     color: #17161d !important;
   }
 
-  .pulse-auth-shell > :nth-last-child(2) .text-neutral-300 {
+  .pulse-auth-card .text-neutral-300 {
     color: #45434c !important;
   }
 
-  .pulse-auth-shell > :nth-last-child(2) .text-neutral-400,
-  .pulse-auth-shell > :nth-last-child(2) .text-neutral-500 {
+  .pulse-auth-card .text-neutral-400,
+  .pulse-auth-card .text-neutral-500 {
     color: #6f6d77 !important;
   }
 
-  .pulse-auth-shell > :nth-last-child(2) .text-neutral-600,
-  .pulse-auth-shell > :nth-last-child(2) .text-neutral-700 {
+  .pulse-auth-card .text-neutral-600,
+  .pulse-auth-card .text-neutral-700 {
     color: #96949d !important;
   }
 
-  .pulse-auth-shell > :nth-last-child(2) input {
+  .pulse-auth-card input {
     border-color: #d9d8df !important;
     background: #ffffff !important;
     color: #17161d !important;
   }
 
-  .pulse-auth-shell > :nth-last-child(2) input::placeholder {
+  /* The invalid state has to beat the generic input rule above, which is
+     !important and would otherwise repaint an errored field neutral grey. */
+  .pulse-auth-card input[aria-invalid="true"] {
+    border-color: #dc2626 !important;
+  }
+
+  .pulse-auth-card input::placeholder {
     color: #aaa8b0 !important;
   }
 
-  .pulse-auth-shell > :nth-last-child(2) button[class*="bg-white/5"] {
+  .pulse-auth-card button[class*="bg-white/5"] {
     border-color: #dedde3 !important;
     background: #ffffff !important;
   }
 
-  .pulse-auth-shell > :nth-last-child(2) button[class*="bg-white/5"]:hover {
+  .pulse-auth-card button[class*="bg-white/5"]:hover {
     border-color: #c9c7d0 !important;
     background: #f8f8fa !important;
   }
 
-  .pulse-auth-shell > :nth-last-child(2) .h-px.bg-neutral-900 {
+  .pulse-auth-card .h-px.bg-neutral-900 {
     background: #e5e4e9 !important;
-  }
-
-  .pulse-auth-brand-panel .text-white {
-    color: #ffffff !important;
   }
 
   .nav-item {

@@ -47,6 +47,13 @@ build:
     # rule locked to POST while every call site issued GET passed it — and that
     # was a P0 (findings.md F-015).
     - node qa/contract/adapter-coverage.qa.mjs
+    # Coverage answers "is this rule reached?" and the social-login rule was —
+    # with an empty body, because it read every key except the one the screens
+    # send. This drives the rule and asserts the credential arrives.
+    - node qa/contract/social-login-mapping.qa.mjs
+    # The five auth screens must state an invalid field the same way, and the
+    # message must wait for a submit rather than scold someone for typing.
+    - node qa/contract/auth-field-contract.qa.mjs
     # Both sides of the patent-status translation table. 487 production
     # patents were arriving with an unmapped status the screens could not
     # render or filter, and nothing failed because the lookup has a `?? s`

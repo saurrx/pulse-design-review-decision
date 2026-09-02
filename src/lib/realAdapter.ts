@@ -261,12 +261,34 @@ const RULES: Rule[] = [
   // -- auth -----------------------------------------------------------------
   { m: /^\/api\/v1\/auth\/(?:ihc\/)?login$/, method: "POST",
     to: (_m, b) => ({ url: "/v1/auth/login", method: "POST", body: b, wrap: asUser }) },
+  // The screens post {platform_type, code} — the OLD API's social-login shape,
+  // where `code` was polymorphic: a Google ACCESS token, or a Microsoft
+  // authorization code the server exchanged. This rule read `access_token` /
+  // `googleAccessToken` / `token` and never `code`, so it forwarded
+  // `{access_token: undefined}` and every Google sign-in got a 400 back
+  // ("A Google credential or access token is required"). It also ignored
+  // `platform_type` entirely, which sent Microsoft's authorization code to the
+  // GOOGLE verifier.
   { m: /^\/api\/v1\/auth\/social-login$/, method: "POST",
-    to: (_m, b) => ({
-      url: "/v1/auth/google", method: "POST",
-      body: { access_token: b?.access_token ?? b?.googleAccessToken ?? b?.token },
-      wrap: asUser,
-    }) },
+    to: (_m, b) => {
+      const platform = String(b?.platform_type ?? "google").toLowerCase();
+      // Microsoft is a server-side redirect flow on this API
+      // (GET /v1/auth/microsoft -> callback), not something a browser can POST.
+      // Fail by name rather than mis-routing it to the Google verifier.
+      if (platform !== "google") {
+        throw new Error(
+          `social-login: ${platform} is not a POST flow on this API — use GET /v1/auth/microsoft`,
+        );
+      }
+      return {
+        url: "/v1/auth/google", method: "POST",
+        body: {
+          access_token:
+            b?.access_token ?? b?.googleAccessToken ?? b?.token ?? b?.code,
+        },
+        wrap: asUser,
+      };
+    } },
   { m: /^\/api\/v1\/auth\/email-signup$/, method: "POST",
     to: (_m, b) => ({ url: "/v1/auth/signup", method: "POST",
       body: { email: b?.email, password: b?.password, name: b?.name }, wrap: asUser }) },
