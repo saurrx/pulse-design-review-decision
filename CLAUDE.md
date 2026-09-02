@@ -222,9 +222,21 @@ build — the design swap is a locked decision, see backend CLAUDE.md §6 for
 the full deviation table.
 
 ## 10. Route → page → component map
-Public: /login (Login.tsx; OCLogin.tsx is deleted. IHCLogin.tsx is NOT dead —
-ResetPassword.tsx imports its `iIHCLoginForm` type, so it stays) · /signup (domain-gated; NotOnboarded.tsx when domain unknown) ·
-/invite (accept + share-link path) · /forgot-password · /reset-password.
+Public: /login (Login.tsx; OCLogin.tsx is deleted. IHCLogin.tsx is NOT routed
+anywhere and stays only because ResetPassword.tsx imports its `iIHCLoginForm`
+type — a stale-code question, see atlas/stale.md) · /signup (domain-gated;
+NotOnboarded.tsx when domain unknown) · /invite (accept + share-link path) ·
+/forgot-password · /reset-password.
+All five share one shape: `.pulse-auth-shell` > `.pulse-auth-panel` >
+`.pulse-auth-card`, centred, with every field rendered by `pages/auth/AuthField`
+— which is what carries the reserved error slot, the red border and
+`aria-invalid`. Those class names are load-bearing: the light theme in
+`index.css` used to be selected POSITIONALLY (`> :nth-last-child(2) > div:last-child`),
+so it collapsed the moment the markup changed. Do not reintroduce a positional
+selector there. Errors are gated on `submitted`, never on Formik's defaults, and
+no auth submit button may be disabled on `!isValid` — with errors waiting for a
+submit that combination makes them unreachable. `qa/contract/auth-field-contract.qa.mjs`
+enforces all of it.
 Protected routes sit under ONE layout route (`<Route element={<DashboardLayout/>}>`
 in App.tsx) so Sidebar + Header mount once per session. Each page used to wrap
 ITSELF in `<DashboardLayout>`, so every navigation tore the chrome down and
@@ -333,10 +345,19 @@ dead; grepping for the bare identifier matched ordinary words ("chart",
 to parse every import specifier, resolve it against the alias and extension
 rules, and iterate to a fixpoint so cascades are caught — deleting
 BusinessScopeTab orphaned businessScopeQuestion, skeleton and aspect-ratio in
-turn. PatentReportModal, TechBackground, BannerAnimation and IHCLogin all
-survived that pass and are LIVE; the earlier audits had all four listed as
-dead. src/vite-env.d.ts is never imported by design (ambient declaration) and
+turn. src/vite-env.d.ts is never imported by design (ambient declaration) and
 must not be swept.
+
+**That method has a blind spot, and this paragraph used to be the proof.** It
+said "PatentReportModal, TechBackground, BannerAnimation and IHCLogin all
+survived that pass and are LIVE". Only TechBackground ever was, and it is now
+deleted too. Module-level reachability asks "is this file imported?" — a file
+can be imported and still be dead, because only a TYPE crossed the edge (erased
+at build) or because the component is imported and never rendered.
+BannerAnimation was imported by four auth screens and rendered by none;
+IHCLogin survives on a two-field type ResetPassword imports. Re-run the walk
+counting an edge only when the importing file references a VALUE export outside
+its import statement, and 8 files fall out rather than 1. See atlas/stale.md.
 
 ## 11. Per-role journeys (what the harness asserts, in UI terms)
 - **Inventor:** signup/login → dashboard → My disclosures → New idea →
@@ -358,8 +379,27 @@ must not be swept.
 - Mobile/tablet (<1024px): DesktopOnlyGate overlay, app mounted underneath.
 
 ## 12. Feature inventory (parity status vs plan §10)
-Shipped: email/Google/Microsoft auth, invites + share-link + QR, forgot/reset,
-role-shaped dashboards, multi-draft questionnaire with autosave + dictation,
+**Social sign-in, honestly (2026-09-02).** This line used to claim
+"email/Google/Microsoft auth" and "dictation", and neither was true.
+- **Google** — the browser half is fixed: the adapter forwarded
+  `{access_token: undefined}` because it read every key except `code`, which is
+  the one both screens send. It still needs `GOOGLE_CLIENT_ID` on the API
+  droplet, which is absent, so `POST /v1/auth/google` answers 501 until it is
+  set. Both halves are required.
+- **Microsoft** — not working. The screens run their own browser-side flow
+  against the unpinned `/common` tenant and POST the result to the Google
+  endpoint; the API's own tenant-pinned `GET /v1/auth/microsoft` has no call
+  site. `VITE_MS_CLIENT_ID` is referenced in two files and declared in no env
+  file, and the droplet has no `MICROSOFT_*` values, so it 501s too.
+- **SSO/Okta** — a regression, not a gap. It existed and worked in the old app
+  (`~/workspace/aakash-shifu/pulse-v2`: a full SAML module server-side, a
+  "Log in with SSO" button and `SamlCallback.tsx` client-side) and was dropped
+  in the port.
+- **Dictation** — `AudioInput.tsx` is reachable from no live screen, and its
+  server side (a Deepgram WebSocket relay) was never ported at all.
+
+Shipped: email auth, invites + share-link + QR, forgot/reset,
+role-shaped dashboards, multi-draft questionnaire with autosave,
 real agent scoring with in-flight indicators + report download, two-stage
 configurable review (committee optional per client), appeals, clone,
 supporting files (presigned Spaces uploads), patent portfolio table + detail +
