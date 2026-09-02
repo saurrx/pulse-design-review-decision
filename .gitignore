@@ -33,3 +33,6 @@ qa/.sessions/
 qa/.conformance-design/
 qa/.exception-hits/
 qa/.api-trace.jsonl
+
+# transient esbuild output from qa/contract/social-login-mapping.qa.mjs
+qa/.adapter-build/
