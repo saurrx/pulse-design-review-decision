@@ -1,7 +1,7 @@
 import API_CONFIG from "@/lib/apiConfig";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useLayoutEffect, useState, useRef } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { toast } from "@/lib/toast";
 import { track } from "@/lib/analytics";
 import Cookies from "js-cookie";
@@ -44,9 +44,6 @@ const Login = () => {
   const navigate = useNavigate();
   const [screenHeight, setScreenHeight] = useState(0);
   const [searchParams, setSearchParams] = useSearchParams();
-  const processedCodeRef = useRef<string | null>(null);
-
-  const code = searchParams.get("code");
 
   useLayoutEffect(() => {
     const updateHeight = () => {
@@ -99,37 +96,23 @@ const Login = () => {
     }
   }, [isSuccess, data]);
 
+  // The API's Microsoft callback redirects back here with ?error= when the
+  // state handshake fails or the token exchange does. It never says which —
+  // deliberately, so a reason cannot be screenshotted into a ticket — but the
+  // user still deserves to be told something happened. This screen used to
+  // ignore the parameter entirely and show a silent, ordinary login form.
   useEffect(() => {
-    if (code && code !== processedCodeRef.current) {
-      // Validate OAuth state parameter to prevent CSRF
-      const returnedState = searchParams.get("state");
-      const savedState = sessionStorage.getItem("ms_oauth_state");
-      sessionStorage.removeItem("ms_oauth_state");
-
-      if (!returnedState || returnedState !== savedState) {
-        toast.error("OAuth state mismatch. Please try logging in again.");
-        const newSearchParams = new URLSearchParams(searchParams);
-        newSearchParams.delete("code");
-        newSearchParams.delete("state");
-        setSearchParams(newSearchParams, { replace: true });
-        return;
-      }
-
-      processedCodeRef.current = code;
-      const payload: PlatformPayloadInterface = {
-        code: code,
-        platform_type: "microsoft",
-      };
-
-      // Remove code and state from URL to prevent re-processing
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.delete("code");
-      newSearchParams.delete("state");
-      setSearchParams(newSearchParams, { replace: true });
-
-      mutate(payload);
-    }
-  }, [code, mutate, searchParams, setSearchParams]);
+    const err = searchParams.get("error");
+    if (!err) return;
+    toast.error(
+      err === "oauth_state"
+        ? "That sign-in link expired. Please try again."
+        : "Microsoft sign-in could not be completed. Please try again.",
+    );
+    const next = new URLSearchParams(searchParams);
+    next.delete("error");
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const handleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -227,20 +210,22 @@ const Login = () => {
     },
   });
 
+  /**
+   * Hand off to the API's own Microsoft route. A full-page navigation, not an
+   * XHR — the server issues the redirect, holds the `state` in an HttpOnly
+   * cookie and exchanges the code with the client secret, which a browser
+   * cannot do and should not try to.
+   *
+   * This page used to run its own authorize flow against the **`/common`**
+   * tenant and POST the returned code to `social-login`, which sent it to the
+   * GOOGLE verifier. `/common` is also the unpinned posture the server refuses
+   * outright: it would accept an assertion from any Microsoft directory, not
+   * just ours. The path below goes through the app origin so the session
+   * cookie the callback sets is first-party.
+   */
   const microsoftLogin = () => {
     track("login_attempted", { method: "microsoft" });
-    const oauthState = crypto.randomUUID();
-    sessionStorage.setItem("ms_oauth_state", oauthState);
-    const params = new URLSearchParams({
-      client_id: import.meta.env.VITE_MS_CLIENT_ID,
-      response_type: "code",
-      redirect_uri: `${window.location.origin}/login`,
-      response_mode: "query",
-      scope: "openid profile email User.Read",
-      state: oauthState,
-    });
-
-    window.location.href = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${params}`;
+    window.location.href = "/v1/auth/microsoft";
   };
 
   return (
