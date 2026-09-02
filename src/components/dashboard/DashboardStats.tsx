@@ -868,8 +868,8 @@ const MyIdeas = ({
                   {scoredUnsent ? (
                     <>
                       <span className="shrink-0 whitespace-nowrap text-xs text-[#727272]">
-                        Scored {Math.round(idea.score as number)}/100 — not
-                        yet sent
+                        Scored {((idea.score as number) / 10).toFixed(1)}/10 —
+                        not yet sent
                       </span>
                       {onSendIdea && (
                         <button

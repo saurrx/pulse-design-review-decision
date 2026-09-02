@@ -188,13 +188,19 @@ const StatusTag = ({ status }: { status: string }) => {
   );
 };
 
-const ProvenanceTag = ({ ai = false }: { ai?: boolean }) => (
-  <ProductChip
-    kind="metadata"
-    tone="neutral"
-    icon={ai ? <Sparkles className="h-3.5 w-3.5" /> : undefined}
-  >
-    {ai ? "AI evaluated" : "Inventor submitted"}
+/**
+ * Marks a card whose contents a model wrote.
+ *
+ * There used to be a second variant reading "Inventor submitted", on the cards
+ * in the top right of the peek view. It was dropped: on a reviewer's screen,
+ * inside a disclosure the inventor filed, everything is from the inventor
+ * unless it says otherwise — so the chip spent a corner of the card restating
+ * the default. What a reviewer cannot tell by looking is which text a model
+ * produced, and that is the one this still marks.
+ */
+const ProvenanceTag = () => (
+  <ProductChip kind="metadata" tone="neutral" icon={<Sparkles className="h-3.5 w-3.5" />}>
+    AI evaluated
   </ProductChip>
 );
 
@@ -439,6 +445,19 @@ const ReviewQueueWorkspace = () => {
   )[0];
   const evaluationReport =
     reviewDraft?.CheckDraftSoreLog?.at(-1)?.score_meta_data;
+
+  // The two cards at the top of the peek view were blank for most ideas: they
+  // read `Idea.body` (free text, only some inventors fill it) and `Idea.about`
+  // (which the API has never returned for an idea at all). The disclosure
+  // itself is the questionnaire, so the backend now writes a brief of it —
+  // see pulse-backend src/ideas/disclosure-brief.ts. Inventor-written text
+  // still wins where it exists; nobody's own words get replaced by a summary.
+  const brief = reviewDraft as { brief_summary?: string | null; brief_problem?: string | null } | undefined;
+  const inventionSummary = selectedIdea?.summary || brief?.brief_summary || "";
+  const problemAndMechanism = (selectedIdea as { about?: string })?.about || brief?.brief_problem || "";
+  const briefIsGenerated =
+    (!selectedIdea?.summary && Boolean(brief?.brief_summary)) ||
+    (!(selectedIdea as { about?: string })?.about && Boolean(brief?.brief_problem));
 
   // A reviewer often opens a submission WHILE the agent is still scanning —
   // there is no report yet, but there is an evaluation id. Poll its status;
@@ -907,15 +926,23 @@ const ReviewQueueWorkspace = () => {
                           <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-muted)]">Invention summary</p>
                           <h3 className="mt-2 text-lg font-semibold">What the inventor says is new</h3>
                         </div>
-                        <ProvenanceTag />
+                        {/* Both paragraphs below are usually written by a model
+                            FROM the questionnaire, because the disclosure is a
+                            questionnaire and nothing was turning it into prose.
+                            Say so: a reviewer weighing "what the inventor says"
+                            is entitled to know when the sentence in front of
+                            them is a summary rather than the inventor's own
+                            words. Absent a brief, this falls back to the
+                            free-text fields and the chip disappears with it. */}
+                        {briefIsGenerated && <ProvenanceTag />}
                       </div>
                       <p className="mt-4 text-base leading-7 text-[var(--pulse-ink-secondary)]">
-                        {selectedIdea.summary || "No short summary was provided."}
+                        {inventionSummary || "No short summary was provided."}
                       </p>
                       <div className="my-5 h-px bg-[var(--pulse-line)]" />
                       <h4 className="text-sm font-semibold">Problem and proposed mechanism</h4>
                       <p className="mt-2 text-sm leading-6 text-[var(--pulse-ink-secondary)]">
-                        {selectedIdea.about || "No detailed description was provided."}
+                        {problemAndMechanism || "No detailed description was provided."}
                       </p>
                     </article>
 
@@ -926,7 +953,7 @@ const ReviewQueueWorkspace = () => {
                           <h3 className="mt-2 text-lg font-semibold">Closest prior art</h3>
                           <p className="mt-1 text-sm text-[var(--pulse-ink-muted)]">The most relevant references returned by the evaluation.</p>
                         </div>
-                        <ProvenanceTag ai />
+                        <ProvenanceTag />
                       </div>
                       {priorArtReferences.length ? (
                         <div className="mt-5 divide-y divide-[var(--pulse-line)] border-y border-[var(--pulse-line)]">
@@ -958,7 +985,7 @@ const ReviewQueueWorkspace = () => {
                               <span className="ml-1 text-base font-medium text-[var(--pulse-ink-muted)]">/10</span>
                             </p>
                           </div>
-                          <ProvenanceTag ai />
+                          <ProvenanceTag />
                         </div>
                         <p className="mt-3 text-sm text-[var(--pulse-ink-muted)]">
                           A review aid, not a filing recommendation. Inspect the evidence before deciding.
@@ -981,7 +1008,6 @@ const ReviewQueueWorkspace = () => {
                       <div>
                         <h3 className="text-lg font-semibold">Inventor submission</h3>
                       </div>
-                      <ProvenanceTag />
                     </div>
 
                     <div className="py-6">
@@ -1012,11 +1038,11 @@ const ReviewQueueWorkspace = () => {
                         <div className="space-y-5 border-b border-[var(--pulse-line)] py-5">
                           <section>
                             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-muted)]">What is new</p>
-                            <p className="mt-2 text-sm leading-6 text-[var(--pulse-ink-secondary)]">{selectedIdea.summary || "No short summary was provided."}</p>
+                            <p className="mt-2 text-sm leading-6 text-[var(--pulse-ink-secondary)]">{inventionSummary || "No short summary was provided."}</p>
                           </section>
                           <section>
                             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-muted)]">Problem and proposed mechanism</p>
-                            <p className="mt-2 text-sm leading-6 text-[var(--pulse-ink-secondary)]">{selectedIdea.about || "No detailed description was provided."}</p>
+                            <p className="mt-2 text-sm leading-6 text-[var(--pulse-ink-secondary)]">{problemAndMechanism || "No detailed description was provided."}</p>
                           </section>
                         </div>
                       )}
@@ -1050,7 +1076,7 @@ const ReviewQueueWorkspace = () => {
                       <section className="overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-white">
                         <div className="flex items-center justify-between gap-4 border-b border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-5 py-3">
                           <h3 className="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-secondary)]">Patent Analysis Report</h3>
-                          <ProvenanceTag ai />
+                          <ProvenanceTag />
                         </div>
                         <div className="p-6">
                           <PatentNoveltyReport

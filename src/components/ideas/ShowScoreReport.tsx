@@ -104,7 +104,6 @@ interface PatentNoveltyReportProps {
     scoringResult: ScoringResult;
   };
   embedded?: boolean;
-  displayScale?: 10 | 100;
   expandFirstReference?: boolean;
   /** The idea's human reference, e.g. DEMO07 — shown instead of an id. */
   reference?: string;
@@ -117,7 +116,6 @@ export default function PatentNoveltyReport({
   report,
   api_evaluation_id,
   embedded = false,
-  displayScale = 100,
   expandFirstReference = true,
   reference,
 }: PatentNoveltyReportProps) {
@@ -251,8 +249,16 @@ export default function PatentNoveltyReport({
       .replace(/^./, (str) => str.toUpperCase());
   };
 
-  const displayScore = (score: number) =>
-    displayScale === 10 ? (score / 10).toFixed(1) : Math.round(score);
+  /**
+   * Scores are stored 0-100 and shown out of 10, everywhere.
+   *
+   * This used to take a `displayScale` prop defaulting to 100, and only the
+   * inventor's own screen passed 10 — so the same idea read "72" to the person
+   * who wrote it and "7.2" to the legal counsel reviewing it, on screens they
+   * discuss with each other. The prop is gone rather than defaulted the other
+   * way: a scale that can differ by call site will differ again.
+   */
+  const displayScore = (score: number) => (score / 10).toFixed(1);
 
 const enrichedPriorArt = priorArt.map((art, index) => {
   const matchSummary =
@@ -376,7 +382,7 @@ const topPriorArt = sortedPriorArt.slice(0, 5);
                     theme === "dark" ? "text-gray-400" : "text-[#727272]"
                   }`}
                 >
-                  /{displayScale}
+                  /10
                 </span>
               </div>
               <div>
@@ -753,7 +759,7 @@ const topPriorArt = sortedPriorArt.slice(0, 5);
                                     } ml-1 font-normal text-sm`}
                                   >
                                     {" "}
-                                    /{displayScale}
+                                    /10
                                   </span>
                                 </span>
                               </div>

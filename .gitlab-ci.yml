@@ -54,6 +54,10 @@ build:
     # The five auth screens must state an invalid field the same way, and the
     # message must wait for a submit rather than scold someone for typing.
     - node qa/contract/auth-field-contract.qa.mjs
+    # Scores are stored 0-100 and shown out of 10. They used to be shown both
+    # ways at once — the same idea read 72 to the inventor and 7.2 to the
+    # counsel reviewing it.
+    - node qa/contract/score-scale.qa.mjs
     # Both sides of the patent-status translation table. 487 production
     # patents were arriving with an unmapped status the screens could not
     # render or filter, and nothing failed because the lookup has a `?? s`
