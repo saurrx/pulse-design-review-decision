@@ -98,6 +98,30 @@ the name means PHOTON side (historical). `npm run lint:roles`
 (tools/no-substring-roles.mjs) FAILS the build on role.includes() — substring
 checks silently broke during the rename once.
 
+## 4.6 Two rules the reviewer screens now enforce
+
+**Scores are stored 0-100 and shown out of 10. Everywhere.** `ShowScoreReport`
+used to take a `displayScale` prop defaulting to 100, and exactly one of its
+three call sites passed 10 — so the same idea read "72" to the inventor who
+wrote it and "7.2" to the legal counsel reviewing it, on screens the two of them
+discuss with each other, while the dashboard said "Scored 72/100" and the PDF's
+headline printed a bare "72.00" above per-reference scores already on /10. The
+prop is deleted rather than re-defaulted: a scale that CAN differ per call site
+will differ again. `qa/contract/score-scale.qa.mjs` fails on the prop returning
+or on any rendered `/100`.
+
+**The disclosure brief fills the two cards at the top of the reviewer screens.**
+"What the inventor says is new" and "Problem and proposed mechanism" read
+`Idea.body` (free text only some inventors fill) and `Idea.about` (which the API
+has never returned for an idea), so they were blank on most ideas. The
+disclosure is a QUESTIONNAIRE — it lives in the draft's answers — so
+pulse-backend writes a brief of it (`src/ideas/disclosure-brief.ts`) and these
+screens render `brief_summary` / `brief_problem`. Two rules when touching this:
+inventor-written text always wins where it exists — nobody's own words are
+replaced by a summary — and when the paragraph IS generated the card must say
+so, because a reviewer weighing "what the inventor says" is entitled to know
+when the sentence is a model's summary rather than the inventor's words.
+
 ## 5. Component map (the big ones are 2000+ lines — grep, don't read whole)
 - pages/Index.tsx — role-branched dashboard. **Every stage number comes from
   `/v1/ideas/pipeline`** (one call, `byClient` for the Photon filter); it used
