@@ -455,9 +455,7 @@ const ReviewQueueWorkspace = () => {
   const brief = reviewDraft as { brief_summary?: string | null; brief_problem?: string | null } | undefined;
   const inventionSummary = selectedIdea?.summary || brief?.brief_summary || "";
   const problemAndMechanism = (selectedIdea as { about?: string })?.about || brief?.brief_problem || "";
-  const briefIsGenerated =
-    (!selectedIdea?.summary && Boolean(brief?.brief_summary)) ||
-    (!(selectedIdea as { about?: string })?.about && Boolean(brief?.brief_problem));
+
 
   // A reviewer often opens a submission WHILE the agent is still scanning —
   // there is no report yet, but there is an evaluation id. Poll its status;
@@ -926,15 +924,6 @@ const ReviewQueueWorkspace = () => {
                           <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-muted)]">Invention summary</p>
                           <h3 className="mt-2 text-lg font-semibold">What the inventor says is new</h3>
                         </div>
-                        {/* Both paragraphs below are usually written by a model
-                            FROM the questionnaire, because the disclosure is a
-                            questionnaire and nothing was turning it into prose.
-                            Say so: a reviewer weighing "what the inventor says"
-                            is entitled to know when the sentence in front of
-                            them is a summary rather than the inventor's own
-                            words. Absent a brief, this falls back to the
-                            free-text fields and the chip disappears with it. */}
-                        {briefIsGenerated && <ProvenanceTag />}
                       </div>
                       <p className="mt-4 text-base leading-7 text-[var(--pulse-ink-secondary)]">
                         {inventionSummary || "No short summary was provided."}
