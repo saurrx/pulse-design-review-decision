@@ -42,9 +42,10 @@ if (remaining) { console.error("conflicts left for a human:\n" + remaining); pro
 const prodClaude = sanitise(sh(`git show ${target}:CLAUDE.md`));
 fs.writeFileSync("contract/production-CLAUDE.md", prodClaude);
 sh("git add contract/production-CLAUDE.md");
-const instructionDiff = spawnSync("git", ["diff", "--no-index", "--stat", "--", "/dev/null", "contract/production-CLAUDE.md"], { encoding: "utf8" }).stdout;
 const changedRule = previousCopy !== prodClaude;
-const ruleDiff = changedRule ? spawnSync("diff", ["-u", "-", "contract/production-CLAUDE.md"], { input: previousCopy, encoding: "utf8" }).stdout.split("\n").slice(0, 200).join("\n") : "";
+// A line-level change report, dependency-free: lines only in the new copy (+) and lines only in the old (-).
+const lineDiff = (a, b) => { const A = a.split("\n"), B = b.split("\n"); const inA = new Set(A), inB = new Set(B); return [...B.filter((l) => !inA.has(l) && l.trim()).map((l) => "+ " + l), ...A.filter((l) => !inB.has(l) && l.trim()).map((l) => "- " + l)].slice(0, 200).join("\n"); };
+const ruleDiff = changedRule ? lineDiff(previousCopy, prodClaude) : "";
 
 if (preambleOf(fs.readFileSync("CLAUDE.md", "utf8")) !== preamble || !preamble) { console.error("design CLAUDE.md preamble changed or missing; refusing"); process.exit(1); }
 
