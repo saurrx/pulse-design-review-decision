@@ -295,6 +295,14 @@ const RULES: Rule[] = [
   { m: /^\/api\/v1\/auth\/email-signup$/, method: "POST",
     to: (_m, b) => ({ url: "/v1/auth/signup", method: "POST",
       body: { email: b?.email, password: b?.password, name: b?.name }, wrap: asUser }) },
+  // Read the session the API already established, in the same shape a login
+  // returns. SAML lands the browser back on the app with the cookies already
+  // set by the ACS redirect — there is no login RESPONSE to read the user out
+  // of — so the callback page asks for it here. `asUser` rather than a bare
+  // passthrough because the sidebar and every client-scoped query depend on the
+  // photon sentinel it fills in.
+  { m: /^\/api\/v1\/auth\/session$/, method: "GET",
+    to: () => ({ url: "/v1/auth/me", method: "GET", wrap: (p: any) => asUser({ user: p }) }) },
   { m: /^\/api\/v1\/auth\/logout$/, method: "POST",
     to: () => ({ url: "/v1/auth/logout", method: "POST" }) },
   // "Sign out everywhere" on /profile. The route has existed on the API since

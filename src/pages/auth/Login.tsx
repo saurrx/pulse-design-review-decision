@@ -12,6 +12,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import "@/style.css";
 import { motion } from "framer-motion";
 import { AuthField } from "./AuthField";
+import { SsoButton, SsoEmailStep } from "./SsoPanel";
 import { PlatformPayloadInterface } from "./Signup";
 
 type loginDataType = {
@@ -102,15 +103,23 @@ const Login = () => {
   // user still deserves to be told something happened. This screen used to
   // ignore the parameter entirely and show a silent, ordinary login form.
   useEffect(() => {
-    const err = searchParams.get("error");
+    // Two spellings, because two things redirect here on failure: the API's
+    // Microsoft callback uses ?error=, and the SAML failure redirect — whose
+    // default lives in the backend's saml.config.ts — uses ?sso_error=1. A
+    // parameter this screen does not read is a user returned to a silent,
+    // ordinary login form with no idea what happened.
+    const err = searchParams.get("error") ?? (searchParams.get("sso_error") ? "sso" : null);
     if (!err) return;
     toast.error(
       err === "oauth_state"
         ? "That sign-in link expired. Please try again."
-        : "Microsoft sign-in could not be completed. Please try again.",
+        : err === "sso"
+          ? "SSO sign-in could not be completed. Please try again."
+          : "Microsoft sign-in could not be completed. Please try again.",
     );
     const next = new URLSearchParams(searchParams);
     next.delete("error");
+    next.delete("sso_error");
     setSearchParams(next, { replace: true });
   }, [searchParams, setSearchParams]);
 
@@ -163,6 +172,7 @@ const Login = () => {
   // scolded the user before they had asked for anything. Validation is off
   // until the first submit and live afterwards, so a message that has appeared
   // clears as soon as the value is fixed.
+  const [ssoStep, setSsoStep] = useState<"idle" | "email">("idle");
   const [submitted, setSubmitted] = useState(false);
 
   const {
@@ -256,6 +266,10 @@ const Login = () => {
             <p className="text-neutral-400 font-sans">Welcome back to Pulse</p>
           </div>
 
+          {ssoStep === "email" ? (
+            <SsoEmailStep onCancel={() => setSsoStep("idle")} />
+          ) : (
+            <>
           <div className="flex items-center gap-5">
             <motion.button
               initial={
@@ -337,6 +351,8 @@ const Login = () => {
             </motion.button>
           </div>
 
+          <SsoButton onStart={() => setSsoStep("email")} disabled={isLoading || isPending} />
+
           <div className="relative mb-6 flex items-center">
             <div className="flex-1 h-px bg-neutral-900" />
 
@@ -408,6 +424,8 @@ const Login = () => {
               {isLoadingLogin ? "Please wait..." : "Sign In"}
             </button>
           </form>
+            </>
+          )}
 
           <div className="mt-5 text-center">
             <p className="text-sm text-neutral-500 font-sans">

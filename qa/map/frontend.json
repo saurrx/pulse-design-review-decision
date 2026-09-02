@@ -5,7 +5,7 @@
    "route": "/login",
    "page": "Login",
    "entry": "src/pages/auth/Login.tsx",
-   "components": 14,
+   "components": 16,
    "calls": [
     {
      "method": "POST",
@@ -106,7 +106,7 @@
    "route": "/reset-password",
    "page": "ResetPassword",
    "entry": "src/pages/auth/ResetPassword.tsx",
-   "components": 16,
+   "components": 18,
    "calls": [
     {
      "method": "POST",
@@ -178,6 +178,23 @@
       "/v1/auth/password-reset/request"
      ],
      "from": "src/pages/auth/ForgotPassword.tsx"
+    }
+   ]
+  },
+  {
+   "route": "/auth/saml/callback",
+   "page": "SamlCallback",
+   "entry": "src/pages/auth/SamlCallback.tsx",
+   "components": 9,
+   "calls": [
+    {
+     "method": "GET",
+     "call": "/api/v1/auth/session",
+     "rule": "^\\/api\\/v1\\/auth\\/session$",
+     "v1": [
+      "/v1/auth/me"
+     ],
+     "from": "src/pages/auth/SamlCallback.tsx"
     }
    ]
   },
@@ -1494,6 +1511,6 @@
    ]
   }
  ],
- "adapterRules": 86,
+ "adapterRules": 87,
  "unusedAdapterRules": []
 }

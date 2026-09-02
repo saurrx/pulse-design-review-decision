@@ -149,6 +149,72 @@ for (const f of rd(AUTH).filter(x => x.endsWith('.tsx') && x !== 'AuthField.tsx'
   }
 }
 
+
+// ---------------------------------------------------------------------------
+// SSO. The hand-off must be a NAVIGATION to the API's own route, and the round
+// trip must land on a route that actually exists — a SAML callback the router
+// does not know about is a 404 holding a valid session nobody reads.
+{
+  const app = readFileSync(join(ROOT, 'src', 'App.tsx'), 'utf8');
+  const panel = readFileSync(join(AUTH, 'SsoPanel.tsx'), 'utf8');
+  const cb = readFileSync(join(AUTH, 'SamlCallback.tsx'), 'utf8');
+  const access = readFileSync(join(AUTH, 'ssoAccess.ts'), 'utf8');
+
+  check('sso: the hand-off is a full-page navigation to the API route', () => {
+    if (!/window\.location\.href\s*=\s*SSO_START_URL/.test(panel)) {
+      throw new Error('does not navigate; an XHR cannot follow the IdP redirect or receive the state cookie');
+    }
+    if (!/["']\/v1\/auth\/saml\/login["']/.test(access)) {
+      throw new Error('SSO_START_URL is not /v1/auth/saml/login');
+    }
+  });
+
+  check('sso: the same-origin path is preserved', () => {
+    // An absolute API URL here would set the session cookie on the API host,
+    // where the app cannot read it. Same constraint as the ACS URL.
+    if (/https?:\/\//.test(/SSO_START_URL\s*=\s*"([^"]*)"/.exec(access)?.[1] ?? '')) {
+      throw new Error('SSO_START_URL is absolute — the session cookie would land on the wrong origin');
+    }
+  });
+
+  check('sso: the callback route exists', () => {
+    if (!/path="\/auth\/saml\/callback"/.test(app)) {
+      throw new Error('no /auth/saml/callback route — the IdP round trip would 404');
+    }
+  });
+
+  check('sso: the callback writes the readable session cookie', () => {
+    if (!/Cookies\.set\("pl_user"/.test(cb)) {
+      throw new Error('does not write pl_user — the app would not know who signed in');
+    }
+    if (!/\/api\/v1\/auth\/session/.test(cb)) {
+      throw new Error('does not read the session back; SAML has no login response to read it from');
+    }
+  });
+
+  check('sso: the failure redirect lands on a param Login actually reads', () => {
+    const login = readFileSync(join(AUTH, 'Login.tsx'), 'utf8');
+    // Collect every ?param= the SSO code redirects to /login with, and require
+    // Login to read each one. The callback used ?sso_error=1 while Login read
+    // only ?error= — a failed sign-in returned to a silent form.
+    const params = new Set();
+    for (const src of [cb, access, panel]) {
+      for (const m of src.matchAll(/\/login\?([a-z_]+)=/g)) params.add(m[1]);
+    }
+    for (const p of params) {
+      if (!new RegExp(`searchParams\\.get\\("${p}"\\)`).test(login)) {
+        throw new Error(`redirects to /login?${p}= but Login never reads it`);
+      }
+    }
+  });
+
+  check('sso: the allowlist is not treated as authorisation', () => {
+    if (!/UX guardrail/i.test(access)) {
+      throw new Error('ssoAccess.ts must say plainly that it authorises nobody');
+    }
+  });
+}
+
 rmSync(OUT, { recursive: true, force: true });
 
 console.log();

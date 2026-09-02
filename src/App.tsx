@@ -52,6 +52,7 @@ const Login = lazy(() => import("./pages/auth/Login"));
 const AssistantPage = lazy(() => import("./pages/client/AssistantPage"));
 const ActionsPage = lazy(() => import("./pages/ActionsPage"));
 const Invite = lazy(() => import("./pages/auth/Invite"));
+const SamlCallback = lazy(() => import("./pages/auth/SamlCallback"));
 const Signup = lazy(() => import("./pages/auth/Signup"));
 
 /**
@@ -160,6 +161,8 @@ const App = () => {
                   <Route path="/i/:inviteCode" element={<Invite />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
+                  {/* Where the SAML round trip lands — see SamlCallback. */}
+                  <Route path="/auth/saml/callback" element={<SamlCallback />} />
                 </Route>
 
                 {/* ONE layout for every protected route. Each page used to
