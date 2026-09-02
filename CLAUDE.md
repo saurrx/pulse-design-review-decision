@@ -226,7 +226,9 @@ Public: /login (Login.tsx; OCLogin.tsx is deleted. IHCLogin.tsx is NOT routed
 anywhere and stays only because ResetPassword.tsx imports its `iIHCLoginForm`
 type — a stale-code question, see atlas/stale.md) · /signup (domain-gated;
 NotOnboarded.tsx when domain unknown) · /invite (accept + share-link path) ·
-/forgot-password · /reset-password.
+/forgot-password · /reset-password · /auth/saml/callback (where the SAML round
+trip lands — see SamlCallback.tsx; SAML has no login response to read the user
+out of, so it reads the session back and writes `pl_user` itself).
 All five share one shape: `.pulse-auth-shell` > `.pulse-auth-panel` >
 `.pulse-auth-card`, centred, with every field rendered by `pages/auth/AuthField`
 — which is what carries the reserved error slot, the red border and
@@ -381,7 +383,13 @@ its import statement, and 8 files fall out rather than 1. See atlas/stale.md.
 ## 12. Feature inventory (parity status vs plan §10)
 **Social sign-in, honestly (2026-09-02).** This line used to claim
 "email/Google/Microsoft auth" and "dictation", and neither was true.
-- **Google** — the browser half is fixed: the adapter forwarded
+**Update 2026-09-02 — all three now work.** Google and Microsoft went live that
+day and SSO/Okta with them; the notes below are kept because each explains a
+distinct defect worth not repeating. Verified on demo: Google 401 on a junk
+token (configured), Microsoft 302 to a pinned tenant GUID, SAML 302 to Okta with
+SP metadata advertising the app origin.
+
+- **Google** — the browser half was fixed: the adapter forwarded
   `{access_token: undefined}` because it read every key except `code`, which is
   the one both screens send. It still needs `GOOGLE_CLIENT_ID` on the API
   droplet, which is absent, so `POST /v1/auth/google` answers 501 until it is
@@ -391,10 +399,14 @@ its import statement, and 8 files fall out rather than 1. See atlas/stale.md.
   endpoint; the API's own tenant-pinned `GET /v1/auth/microsoft` has no call
   site. `VITE_MS_CLIENT_ID` is referenced in two files and declared in no env
   file, and the droplet has no `MICROSOFT_*` values, so it 501s too.
-- **SSO/Okta** — a regression, not a gap. It existed and worked in the old app
-  (`~/workspace/aakash-shifu/pulse-v2`: a full SAML module server-side, a
-  "Log in with SSO" button and `SamlCallback.tsx` client-side) and was dropped
-  in the port.
+- **SSO/Okta** — was a regression, not a gap: it existed and worked in the old
+  app and the port dropped it. Now restored. The button and the work-email step
+  live in `pages/auth/SsoPanel.tsx`; the allowlist in `ssoAccess.ts` is a UX
+  guardrail and authorises NOBODY (Okta decides who authenticates, the API's
+  domain gate decides who gets an account). The hand-off is a full-page
+  navigation to `/v1/auth/saml/login` — relative on purpose, because the app
+  proxies /v1 and that is what keeps the session cookie first-party. ONE IdP for
+  the whole product; per-client SSO is still not built.
 - **Dictation** — `AudioInput.tsx` is reachable from no live screen, and its
   server side (a Deepgram WebSocket relay) was never ported at all.
 
