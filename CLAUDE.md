@@ -153,7 +153,8 @@ checks silently broke during the rename once.
 - DesktopOnlyGate.tsx — overlay for phones and tablets (pure CSS visibility,
   app stays mounted: cannot cause state bugs). It gates on the DEVICE
   (`pointer: coarse` and `hover: none`) plus a 640px hard floor, NOT on width:
-  it was `lg:hidden`, and CSS pixels shrink with zoom, so a 1440px laptop at
+  the condition hangs off the `.pulse-desktop-gate` class in index.css, NOT a
+  Tailwind width utility: it was `lg:hidden`, and CSS pixels shrink with zoom, so a 1440px laptop at
   150% reported 960px and desktop users were told to find a desktop — an
   accessibility failure, since zoom is the first thing low vision reaches for
   (pulse-backend F-069). The condition lives in index.css and is shared with the
