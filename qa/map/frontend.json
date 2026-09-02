@@ -19,7 +19,7 @@
     {
      "method": "POST",
      "call": "/api/v1/auth/login",
-     "rule": "^\\/api\\/v1\\/auth\\/(?:ihc\\/)?login$",
+     "rule": "^\\/api\\/v1\\/auth\\/login$",
      "v1": [
       "/v1/auth/login"
      ],
@@ -106,7 +106,7 @@
    "route": "/reset-password",
    "page": "ResetPassword",
    "entry": "src/pages/auth/ResetPassword.tsx",
-   "components": 15,
+   "components": 16,
    "calls": [
     {
      "method": "POST",
@@ -119,12 +119,12 @@
     },
     {
      "method": "POST",
-     "call": "/api/v1/auth/ihc/login",
-     "rule": "^\\/api\\/v1\\/auth\\/(?:ihc\\/)?login$",
+     "call": "/api/v1/auth/email-signup",
+     "rule": "^\\/api\\/v1\\/auth\\/email-signup$",
      "v1": [
-      "/v1/auth/login"
+      "/v1/auth/signup"
      ],
-     "from": "src/pages/auth/ResetPassword.tsx"
+     "from": "src/pages/auth/Signup.tsx"
     },
     {
      "method": "POST",
@@ -138,11 +138,11 @@
     {
      "method": "POST",
      "call": "/api/v1/auth/login",
-     "rule": "^\\/api\\/v1\\/auth\\/(?:ihc\\/)?login$",
+     "rule": "^\\/api\\/v1\\/auth\\/login$",
      "v1": [
       "/v1/auth/login"
      ],
-     "from": "src/pages/auth/IHCLogin.tsx"
+     "from": "src/pages/auth/ResetPassword.tsx"
     },
     {
      "method": "POST",
@@ -152,6 +152,15 @@
       "/v1/auth/password-reset/complete"
      ],
      "from": "src/pages/auth/ResetPassword.tsx"
+    },
+    {
+     "method": "POST",
+     "call": "/api/v1/auth/social-login",
+     "rule": "^\\/api\\/v1\\/auth\\/social-login$",
+     "v1": [
+      "/v1/auth/google"
+     ],
+     "from": "src/pages/auth/Login.tsx"
     }
    ]
   },

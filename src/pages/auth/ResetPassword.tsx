@@ -8,7 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/lib/toast";
 import API_CONFIG from "@/lib/apiConfig";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { iIHCLoginForm } from "./IHCLogin";
+import { iLoginForm } from "./Login";
 import Cookies from "js-cookie";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion"
@@ -50,9 +50,9 @@ const ResetPassword: React.FC = () => {
 
   const { mutate: loginMutate, isPending: isLoadingLogin } = useMutation({
     mutationKey: ["ihc_login"],
-    mutationFn: async (data: iIHCLoginForm) => {
+    mutationFn: async (data: iLoginForm) => {
       try {
-        const response = await API_CONFIG.post("/api/v1/auth/ihc/login", data, {
+        const response = await API_CONFIG.post("/api/v1/auth/login", data, {
           headers: {
             "Content-Type": "application/json",
           },
