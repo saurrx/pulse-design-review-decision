@@ -2360,7 +2360,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                           <PatentNoveltyReport
                             reference={mainIdeaData?.reference_number}
                             embedded
-                            displayScale={10}
                             expandFirstReference={false}
                             title={mainIdeaData?.title}
                             api_evaluation_id={latestScoreReport?.id}

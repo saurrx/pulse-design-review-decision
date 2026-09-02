@@ -275,13 +275,16 @@ export function PatentReportDocument({ payload }: { payload: PatentReportPayload
         <Text style={styles.title}>Photon Pulse Evaluation Report</Text>
 
         <View style={styles.scoreBox}>
+          {/* Out of 10, like every screen and like the per-reference scores
+              further down this same document, which were already /10 while this
+              headline printed the raw 0-100 value with no scale at all. */}
           <Text style={styles.scoreValue}>
             {scoringResult?.noveltyScore != null
-              ? Number(scoringResult.noveltyScore).toFixed(2)
-              : "0"}
+              ? (Number(scoringResult.noveltyScore) / 10).toFixed(1)
+              : "0.0"}
           </Text>
           <View style={styles.scoreLine} />
-          <Text style={styles.scoreLabel}>Novelty Score</Text>
+          <Text style={styles.scoreLabel}>Novelty Score /10</Text>
         </View>
 
         <Text style={styles.sectionTitle}>Summary</Text>
