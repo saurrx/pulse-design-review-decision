@@ -1,0 +1,4 @@
+# Convenience only: the sync script is the control for instruction files.
+CLAUDE.md merge=ours
+AGENTS.md merge=ours
+.claude/** merge=ours

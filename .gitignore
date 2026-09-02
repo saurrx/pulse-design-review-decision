@@ -36,3 +36,8 @@ qa/.api-trace.jsonl
 
 # transient esbuild output from qa/contract/social-login-mapping.qa.mjs
 qa/.adapter-build/
+
+# design fork tooling output
+storybook-static/
+.vitest-attachments/
+__screenshots__/

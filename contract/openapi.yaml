@@ -1,0 +1,2132 @@
+# GENERATED — do not edit by hand.
+#   npx ts-node -P tsconfig.json qa/contract/generate-openapi.ts
+# CI regenerates this and fails the pipeline if it differs, so a controller
+# change without a spec change cannot merge.
+openapi: 3.1.0
+info:
+  title: "Pulse API"
+  version: "1.0.0"
+  description: >-
+    Generated from the NestJS route table and class-validator metadata.
+    Routes marked x-undocumented-body take an untyped body (`any` or an
+    inline object) and therefore have no schema to publish. That is a
+    backlog, not a modelling choice.
+servers:
+  - url: "https://demo-api.photonpulse.ai"
+components:
+  securitySchemes:
+    cookieAuth: { type: "apiKey", in: "cookie", name: "pulse_at" }
+    bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" }
+security:
+  - cookieAuth: []
+  - bearerAuth: []
+paths:
+  "/v1/actions":
+    get:
+      operationId: "ActionsController.list"
+      summary: "List (ActionsController)"
+      x-capabilities:
+        - "docket:read"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/actions/queue":
+    get:
+      operationId: "ActionsController.queue"
+      summary: "Queue (ActionsController)"
+      x-capabilities:
+        - "idea:file"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/actions/submit-all":
+    post:
+      operationId: "ActionsController.submitAll"
+      summary: "Submit all (ActionsController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/actions/templates":
+    get:
+      operationId: "ActionsController.templates"
+      summary: "Templates (ActionsController)"
+      x-capabilities:
+        - "docket:read"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/actions/{id}":
+    patch:
+      operationId: "ActionsController.decide"
+      summary: "Decide (ActionsController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "DecideActionDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                instruction:
+                  maxLength: 2000
+                  type: "string"
+                note:
+                  maxLength: 4000
+                  type: "string"
+                template_id:
+                  type: "string"
+                selected_countries:
+                  type: "array"
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/actions/{id}/request-status":
+    patch:
+      operationId: "ActionsController.setRequestStatus"
+      summary: "Set request status (ActionsController)"
+      x-capabilities:
+        - "idea:file"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "SetRequestStatusDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                status:
+                  enum:
+                    - "NEW"
+                    - "ACKNOWLEDGED"
+                    - "IN_PROGRESS"
+                    - "COMPLETED"
+                  type: "string"
+              required:
+                - "status"
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/actions/{id}/resolve":
+    post:
+      operationId: "ActionsController.resolve"
+      summary: "Resolve (ActionsController)"
+      x-capabilities:
+        - "idea:file"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "ResolveActionDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                status:
+                  enum:
+                    - "COMPLETED"
+                    - "DECLINED"
+                  type: "string"
+                note:
+                  maxLength: 4000
+                  type: "string"
+              required:
+                - "status"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/agent/webhook":
+    post:
+      operationId: "AgentWebhookController.receive"
+      summary: "Receive (AgentWebhookController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      responses:
+        "201": { description: "OK" }
+  "/v1/auth/change-password":
+    post:
+      operationId: "AuthController.changePassword"
+      summary: "Change password (AuthController)"
+      x-capabilities: []
+      x-public: false
+      x-body-dto: "ChangePasswordDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                current_password:
+                  maxLength: 200
+                  type: "string"
+                new_password:
+                  maxLength: 200
+                  minLength: 12
+                  type: "string"
+              required:
+                - "current_password"
+                - "new_password"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+  "/v1/auth/check-domain":
+    get:
+      operationId: "AuthController.checkDomain"
+      summary: "Check domain (AuthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      responses:
+        "200": { description: "OK" }
+  "/v1/auth/google":
+    post:
+      operationId: "AuthController.googleLogin"
+      summary: "Google login (AuthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      x-body-dto: "GoogleDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                credential:
+                  maxLength: 8000
+                  minLength: 20
+                  type: "string"
+                access_token:
+                  maxLength: 8000
+                  minLength: 20
+                  type: "string"
+      responses:
+        "201": { description: "OK" }
+  "/v1/auth/invite/accept":
+    post:
+      operationId: "AuthController.accept"
+      summary: "Accept (AuthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      x-body-dto: "AcceptInviteDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                token:
+                  minLength: 10
+                  type: "string"
+                name:
+                  maxLength: 120
+                  type: "string"
+                password:
+                  maxLength: 200
+                  minLength: 12
+                  type: "string"
+              required:
+                - "token"
+      responses:
+        "201": { description: "OK" }
+  "/v1/auth/invite/verify-share":
+    post:
+      operationId: "AuthController.verifyShare"
+      summary: "Verify share (AuthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      x-body-dto: "VerifyShareDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                code:
+                  maxLength: 40
+                  minLength: 4
+                  type: "string"
+                email:
+                  type: "string"
+                  format: "email"
+              required:
+                - "code"
+                - "email"
+      responses:
+        "201": { description: "OK" }
+  "/v1/auth/invite/{code}":
+    get:
+      operationId: "AuthController.peek"
+      summary: "Peek (AuthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      parameters:
+        - name: "code"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/auth/login":
+    post:
+      operationId: "AuthController.login"
+      summary: "Login (AuthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      x-body-dto: "LoginDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+                  format: "email"
+                password:
+                  maxLength: 200
+                  minLength: 1
+                  type: "string"
+              required:
+                - "email"
+                - "password"
+      responses:
+        "201": { description: "OK" }
+  "/v1/auth/logout":
+    post:
+      operationId: "AuthController.logout"
+      summary: "Logout (AuthController)"
+      x-capabilities: []
+      x-public: false
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+  "/v1/auth/logout-all":
+    post:
+      operationId: "AuthController.logoutAll"
+      summary: "Logout all (AuthController)"
+      x-capabilities: []
+      x-public: false
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+  "/v1/auth/me":
+    get:
+      operationId: "AuthController.me"
+      summary: "Me (AuthController)"
+      x-capabilities: []
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+  "/v1/auth/microsoft":
+    get:
+      operationId: "AuthController.msStart"
+      summary: "Ms start (AuthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      responses:
+        "200": { description: "OK" }
+  "/v1/auth/microsoft/callback":
+    get:
+      operationId: "AuthController.msCallback"
+      summary: "Ms callback (AuthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      responses:
+        "200": { description: "OK" }
+  "/v1/auth/password-reset/complete":
+    post:
+      operationId: "AuthController.resetComplete"
+      summary: "Reset complete (AuthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      x-body-dto: "ResetCompleteDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                token:
+                  minLength: 10
+                  type: "string"
+                password:
+                  maxLength: 200
+                  minLength: 12
+                  type: "string"
+              required:
+                - "password"
+                - "token"
+      responses:
+        "201": { description: "OK" }
+  "/v1/auth/password-reset/request":
+    post:
+      operationId: "AuthController.resetRequest"
+      summary: "Reset request (AuthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      x-body-dto: "ResetRequestDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+                  format: "email"
+              required:
+                - "email"
+      responses:
+        "201": { description: "OK" }
+  "/v1/auth/refresh":
+    post:
+      operationId: "AuthController.refresh"
+      summary: "Refresh (AuthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      responses:
+        "201": { description: "OK" }
+  "/v1/auth/saml/acs":
+    post:
+      operationId: "SamlController.acs"
+      summary: "Acs (SamlController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      x-body-dto: "SamlAcsDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                SAMLResponse:
+                  maxLength: 100000
+                  minLength: 20
+                  type: "string"
+                RelayState:
+                  maxLength: 2000
+                  type: "string"
+              required:
+                - "SAMLResponse"
+      responses:
+        "201": { description: "OK" }
+  "/v1/auth/saml/login":
+    get:
+      operationId: "SamlController.login"
+      summary: "Login (SamlController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      responses:
+        "200": { description: "OK" }
+  "/v1/auth/saml/metadata":
+    get:
+      operationId: "SamlController.metadata"
+      summary: "Metadata (SamlController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      responses:
+        "200": { description: "OK" }
+  "/v1/auth/signup":
+    post:
+      operationId: "AuthController.signup"
+      summary: "Signup (AuthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      x-body-dto: "SignupDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+                  format: "email"
+                password:
+                  maxLength: 200
+                  minLength: 12
+                  type: "string"
+                name:
+                  maxLength: 120
+                  type: "string"
+              required:
+                - "email"
+      responses:
+        "201": { description: "OK" }
+  "/v1/auth/view-as/exit":
+    post:
+      operationId: "AuthController.exitViewAs"
+      summary: "Exit view as (AuthController)"
+      x-capabilities: []
+      x-public: false
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+  "/v1/auth/view-as/{clientId}":
+    post:
+      operationId: "AuthController.viewAs"
+      summary: "View as (AuthController)"
+      x-capabilities: []
+      x-public: false
+      parameters:
+        - name: "clientId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/case-owners":
+    get:
+      operationId: "ClientsController.caseOwners"
+      summary: "Case owners (ClientsController)"
+      x-capabilities:
+        - "access:grant"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/case-owners/{userId}/assignments":
+    put:
+      operationId: "ClientsController.setAssignments"
+      summary: "Set assignments (ClientsController)"
+      x-capabilities:
+        - "access:grant"
+      x-public: false
+      parameters:
+        - name: "userId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "SetAssignmentsDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                client_ids:
+                  type: "array"
+                kind:
+                  type: "string"
+                reason:
+                  maxLength: 500
+                  type: "string"
+                expires_at:
+                  type: "string"
+              required:
+                - "client_ids"
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/clients":
+    get:
+      operationId: "ClientsController.list"
+      summary: "List (ClientsController)"
+      x-capabilities:
+        - "client:read:assigned"
+        - "client:read:any"
+        - "idea:read:client"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+    post:
+      operationId: "ClientsController.create"
+      summary: "Create (ClientsController)"
+      x-capabilities:
+        - "client:create"
+      x-public: false
+      x-body-dto: "CreateClientDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                name:
+                  maxLength: 200
+                  minLength: 2
+                  type: "string"
+                domain:
+                  maxLength: 200
+                  type: "string"
+                has_tech_committee:
+                  type: "boolean"
+                admin_emails:
+                  type: "array"
+              required:
+                - "name"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/clients/{clientId}":
+    get:
+      operationId: "ClientsController.get"
+      summary: "Get (ClientsController)"
+      x-capabilities:
+        - "client:read:assigned"
+        - "client:read:any"
+        - "idea:read:client"
+      x-public: false
+      parameters:
+        - name: "clientId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+    patch:
+      operationId: "ClientsController.update"
+      summary: "Update (ClientsController)"
+      x-capabilities:
+        - "client:configure"
+      x-public: false
+      parameters:
+        - name: "clientId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "UpdateClientDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                name:
+                  maxLength: 200
+                  minLength: 2
+                  type: "string"
+                domain:
+                  maxLength: 200
+                  type: "string"
+                has_tech_committee:
+                  type: "boolean"
+                is_active:
+                  type: "boolean"
+                about:
+                  maxLength: 5000
+                  type: "string"
+                business_scope:
+                  type: "string"
+                idea_reference_prefix:
+                  maxLength: 12
+                  type: "string"
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/clients/{clientId}/members":
+    get:
+      operationId: "ClientsController.members"
+      summary: "Members (ClientsController)"
+      x-capabilities:
+        - "user:read:client"
+      x-public: false
+      parameters:
+        - name: "clientId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/clients/{clientId}/request-access":
+    post:
+      operationId: "ClientsController.requestAccess"
+      summary: "Request access (ClientsController)"
+      x-capabilities:
+        - "client:read:assigned"
+      x-public: false
+      parameters:
+        - name: "clientId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/dashboard":
+    get:
+      operationId: "MiscController.dashboard"
+      summary: "Dashboard (MiscController)"
+      x-capabilities: []
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+  "/v1/drafts/{id}":
+    delete:
+      operationId: "DraftsController.remove"
+      summary: "Remove (DraftsController)"
+      x-capabilities:
+        - "idea:create"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+    get:
+      operationId: "DraftsController.get"
+      summary: "Get (DraftsController)"
+      x-capabilities:
+        - "idea:read:own"
+        - "idea:read:client"
+        - "idea:read:any"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+    patch:
+      operationId: "DraftsController.update"
+      summary: "Update (DraftsController)"
+      x-capabilities:
+        - "idea:create"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "UpdateDraftDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                answers:
+                  type: "string"
+                status:
+                  maxLength: 40
+                  type: "string"
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/drafts/{id}/autofill":
+    post:
+      operationId: "DraftsController.autofill"
+      summary: "Autofill (DraftsController)"
+      x-capabilities:
+        - "idea:create"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "AutofillDraftDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                text:
+                  maxLength: 60000
+                  minLength: 40
+                  type: "string"
+              required:
+                - "text"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/drafts/{id}/evaluate":
+    post:
+      operationId: "DraftsController.evaluate"
+      summary: "Evaluate (DraftsController)"
+      x-capabilities:
+        - "idea:create"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/drafts/{id}/evaluation":
+    get:
+      operationId: "DraftsController.evaluation"
+      summary: "Evaluation (DraftsController)"
+      x-capabilities:
+        - "idea:read:own"
+        - "idea:read:client"
+        - "idea:read:any"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/drafts/{id}/re-evaluate":
+    post:
+      operationId: "DraftsController.reEvaluate"
+      summary: "Re evaluate (DraftsController)"
+      x-capabilities:
+        - "idea:create"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/drafts/{id}/review":
+    post:
+      operationId: "DraftsController.review"
+      summary: "Review (DraftsController)"
+      x-capabilities:
+        - "idea:review:technical"
+        - "idea:review:legal"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "ReviewIdeaDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                decision:
+                  type: "string"
+                comment:
+                  maxLength: 4000
+                  type: "string"
+              required:
+                - "decision"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/drafts/{id}/signal":
+    get:
+      operationId: "DraftsController.signal"
+      summary: "Signal (DraftsController)"
+      x-capabilities:
+        - "idea:read:own"
+        - "idea:read:client"
+        - "idea:read:any"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/drafts/{id}/submit":
+    post:
+      operationId: "DraftsController.submit"
+      summary: "Submit (DraftsController)"
+      x-capabilities:
+        - "idea:submit"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "SubmitIdeaDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                comment:
+                  maxLength: 4000
+                  type: "string"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/drafts/{id}/suggest":
+    post:
+      operationId: "DraftsController.suggest"
+      summary: "Suggest (DraftsController)"
+      x-capabilities:
+        - "idea:create"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "SuggestFieldDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                question_id:
+                  maxLength: 80
+                  type: "string"
+                answer:
+                  maxLength: 20000
+                  type: "string"
+              required:
+                - "question_id"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/due-dates":
+    get:
+      operationId: "PatentsController.dueDates"
+      summary: "Due dates (PatentsController)"
+      x-capabilities:
+        - "asset:read"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/due-dates/{id}":
+    patch:
+      operationId: "PatentsController.setDueDateStatus"
+      summary: "Set due date status (PatentsController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "SetDueDateStatusDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                status:
+                  enum:
+                    - "COMPLETED"
+                    - "PENDING"
+                    - "OPEN"
+                  type: "string"
+              required:
+                - "status"
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/due-dates/{id}/remind":
+    post:
+      operationId: "PatentsController.remind"
+      summary: "Remind (PatentsController)"
+      x-capabilities:
+        - "asset:read"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/files/confirm-upload":
+    post:
+      operationId: "FilesController.confirm"
+      summary: "Confirm (FilesController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      x-body-dto: "ConfirmDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                id:
+                  type: "string"
+              required:
+                - "id"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/files/confirm-upload-batch":
+    post:
+      operationId: "FilesController.confirmBatch"
+      summary: "Confirm batch (FilesController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      x-body-dto: "ConfirmBatchDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                ids:
+                  type: "array"
+              required:
+                - "ids"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/files/presign-upload":
+    post:
+      operationId: "FilesController.presign"
+      summary: "Presign (FilesController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      x-body-dto: "PresignDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                filename:
+                  maxLength: 255
+                  type: "string"
+                content_type:
+                  maxLength: 200
+                  type: "string"
+                size:
+                  type: "number"
+                category:
+                  maxLength: 40
+                  type: "string"
+                client_id:
+                  type: "string"
+              required:
+                - "content_type"
+                - "filename"
+                - "size"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/files/{id}":
+    delete:
+      operationId: "FilesController.remove"
+      summary: "Remove (FilesController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/files/{id}/content":
+    put:
+      operationId: "FilesController.uploadContent"
+      summary: "Upload content (FilesController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/files/{id}/download":
+    get:
+      operationId: "FilesController.download"
+      summary: "Download (FilesController)"
+      x-capabilities:
+        - "asset:read"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/files/{id}/raw":
+    get:
+      operationId: "FilesController.raw"
+      summary: "Raw (FilesController)"
+      x-capabilities:
+        - "asset:read"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/health":
+    get:
+      operationId: "HealthController.health"
+      summary: "Health (HealthController)"
+      security: []
+      x-capabilities: []
+      x-public: true
+      responses:
+        "200": { description: "OK" }
+  "/v1/ideas":
+    get:
+      operationId: "IdeasController.list"
+      summary: "List (IdeasController)"
+      x-capabilities:
+        - "idea:read:own"
+        - "idea:read:client"
+        - "idea:read:any"
+      x-public: false
+      x-body-dto: "ListIdeasQuery"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                state:
+                  type: "string"
+                client_id:
+                  type: "string"
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+    post:
+      operationId: "IdeasController.create"
+      summary: "Create (IdeasController)"
+      x-capabilities:
+        - "idea:create"
+      x-public: false
+      x-body-dto: "CreateIdeaDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                title:
+                  maxLength: 300
+                  minLength: 3
+                  type: "string"
+                body:
+                  maxLength: 60000
+                  type: "string"
+              required:
+                - "title"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/ideas/colleagues":
+    get:
+      operationId: "IdeasController.colleagues"
+      summary: "Colleagues (IdeasController)"
+      x-capabilities:
+        - "user:read:colleagues"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/ideas/counts":
+    get:
+      operationId: "IdeasController.counts"
+      summary: "Counts (IdeasController)"
+      x-capabilities:
+        - "idea:read:own"
+        - "idea:read:client"
+        - "idea:read:any"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/ideas/inventor-credits/{creditId}":
+    delete:
+      operationId: "IdeasController.removeInventorCredit"
+      summary: "Remove inventor credit (IdeasController)"
+      x-capabilities:
+        - "idea:inventors:manage"
+      x-public: false
+      parameters:
+        - name: "creditId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/ideas/pipeline":
+    get:
+      operationId: "IdeasController.pipeline"
+      summary: "Pipeline (IdeasController)"
+      x-capabilities:
+        - "idea:read:client"
+        - "idea:read:any"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/ideas/{ideaId}/file":
+    post:
+      operationId: "PatentsController.fileIdea"
+      summary: "File idea (PatentsController)"
+      x-capabilities:
+        - "idea:file"
+      x-public: false
+      parameters:
+        - name: "ideaId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "FileIdeaDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                title:
+                  maxLength: 500
+                  type: "string"
+                application_number:
+                  maxLength: 120
+                  type: "string"
+                jurisdiction:
+                  maxLength: 10
+                  type: "string"
+                publication_country:
+                  maxLength: 10
+                  type: "string"
+                status:
+                  enum:
+                    - "APPLIED"
+                    - "EXAMINATION"
+                    - "GRANTED"
+                    - "EXPIRED"
+                    - "WITHDRAWN"
+                    - "REJECTED"
+                    - "ABANDONED"
+                    - "NONPAYMENT"
+                  type: "string"
+                filing_date:
+                  type: "string"
+                application_date:
+                  type: "string"
+                grant_date:
+                  type: "string"
+                tags:
+                  type: "array"
+                abstract:
+                  maxLength: 20000
+                  type: "string"
+                priority_details:
+                  maxLength: 4000
+                  type: "string"
+                current_assignee:
+                  maxLength: 500
+                  type: "string"
+                assignee_original:
+                  maxLength: 500
+                  type: "string"
+                prn:
+                  maxLength: 120
+                  type: "string"
+                inventors:
+                  type: "array"
+                ipc_all_versions:
+                  type: "array"
+                additional_notes:
+                  maxLength: 4000
+                  type: "string"
+                client_id:
+                  type: "string"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/ideas/{id}":
+    delete:
+      operationId: "IdeasController.remove"
+      summary: "Remove (IdeasController)"
+      x-capabilities:
+        - "idea:create"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+    get:
+      operationId: "IdeasController.get"
+      summary: "Get (IdeasController)"
+      x-capabilities:
+        - "idea:read:own"
+        - "idea:read:client"
+        - "idea:read:any"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+    patch:
+      operationId: "IdeasController.update"
+      summary: "Update (IdeasController)"
+      x-capabilities:
+        - "idea:create"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "UpdateIdeaDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                title:
+                  maxLength: 300
+                  minLength: 3
+                  type: "string"
+                body:
+                  maxLength: 60000
+                  type: "string"
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/ideas/{id}/clone":
+    post:
+      operationId: "IdeasController.clone"
+      summary: "Clone (IdeasController)"
+      x-capabilities:
+        - "idea:create"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/ideas/{id}/drafts":
+    get:
+      operationId: "IdeasController.listDrafts"
+      summary: "List drafts (IdeasController)"
+      x-capabilities:
+        - "idea:read:own"
+        - "idea:read:client"
+        - "idea:read:any"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+    post:
+      operationId: "IdeasController.createDraft"
+      summary: "Create draft (IdeasController)"
+      x-capabilities:
+        - "idea:create"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "CreateDraftDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                answers:
+                  type: "string"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/ideas/{id}/inventors/{inventorId}":
+    delete:
+      operationId: "IdeasController.removeInventor"
+      summary: "Remove inventor (IdeasController)"
+      x-capabilities:
+        - "idea:inventors:manage"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+        - name: "inventorId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+    post:
+      operationId: "IdeasController.addInventor"
+      summary: "Add inventor (IdeasController)"
+      x-capabilities:
+        - "idea:inventors:manage"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+        - name: "inventorId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/ideas/{id}/review":
+    post:
+      operationId: "IdeasController.review"
+      summary: "Review (IdeasController)"
+      x-capabilities:
+        - "idea:review:technical"
+        - "idea:review:legal"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "ReviewIdeaDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                decision:
+                  type: "string"
+                comment:
+                  maxLength: 4000
+                  type: "string"
+              required:
+                - "decision"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/ideas/{id}/submit":
+    post:
+      operationId: "IdeasController.submit"
+      summary: "Submit (IdeasController)"
+      x-capabilities:
+        - "idea:submit"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "SubmitIdeaDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                comment:
+                  maxLength: 4000
+                  type: "string"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/ideas/{id}/transitions":
+    get:
+      operationId: "IdeasController.transitions"
+      summary: "Transitions (IdeasController)"
+      x-capabilities:
+        - "idea:read:own"
+        - "idea:read:client"
+        - "idea:read:any"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/invites":
+    post:
+      operationId: "InvitesController.create"
+      summary: "Create (InvitesController)"
+      x-capabilities:
+        - "user:invite"
+      x-public: false
+      x-body-dto: "CreateInvitesDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                emails:
+                  maxLength: 50000
+                  minLength: 3
+                  type: "string"
+                role:
+                  type: "string"
+                client_id:
+                  type: "string"
+              required:
+                - "emails"
+                - "role"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/invites/share-link":
+    get:
+      operationId: "InvitesController.shareLink"
+      summary: "Share link (InvitesController)"
+      x-capabilities:
+        - "user:invite"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/invites/share-link/regenerate":
+    post:
+      operationId: "InvitesController.regenerateShareLink"
+      summary: "Regenerate share link (InvitesController)"
+      x-capabilities:
+        - "user:invite"
+      x-public: false
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/invites/{code}/qr":
+    get:
+      operationId: "InvitesController.qr"
+      summary: "Qr (InvitesController)"
+      x-capabilities:
+        - "user:invite"
+      x-public: false
+      parameters:
+        - name: "code"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/invites/{id}":
+    delete:
+      operationId: "InvitesController.revoke"
+      summary: "Revoke (InvitesController)"
+      x-capabilities:
+        - "user:invite"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/notifications":
+    get:
+      operationId: "MiscController.notifications"
+      summary: "Notifications (MiscController)"
+      x-capabilities: []
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+  "/v1/notifications/{id}/read":
+    post:
+      operationId: "MiscController.markRead"
+      summary: "Mark read (MiscController)"
+      x-capabilities: []
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/patents":
+    get:
+      operationId: "PatentsController.list"
+      summary: "List (PatentsController)"
+      x-capabilities:
+        - "asset:read"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+    post:
+      operationId: "PatentsController.create"
+      summary: "Create (PatentsController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      x-body-dto: "CreatePatentDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                title:
+                  maxLength: 500
+                  type: "string"
+                application_number:
+                  maxLength: 120
+                  type: "string"
+                jurisdiction:
+                  maxLength: 10
+                  type: "string"
+                publication_country:
+                  maxLength: 10
+                  type: "string"
+                status:
+                  enum:
+                    - "APPLIED"
+                    - "EXAMINATION"
+                    - "GRANTED"
+                    - "EXPIRED"
+                    - "WITHDRAWN"
+                    - "REJECTED"
+                    - "ABANDONED"
+                    - "NONPAYMENT"
+                  type: "string"
+                filing_date:
+                  type: "string"
+                application_date:
+                  type: "string"
+                grant_date:
+                  type: "string"
+                tags:
+                  type: "array"
+                abstract:
+                  maxLength: 20000
+                  type: "string"
+                priority_details:
+                  maxLength: 4000
+                  type: "string"
+                current_assignee:
+                  maxLength: 500
+                  type: "string"
+                assignee_original:
+                  maxLength: 500
+                  type: "string"
+                prn:
+                  maxLength: 120
+                  type: "string"
+                inventors:
+                  type: "array"
+                ipc_all_versions:
+                  type: "array"
+                additional_notes:
+                  maxLength: 4000
+                  type: "string"
+                client_id:
+                  type: "string"
+              required:
+                - "title"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/patents/export":
+    get:
+      operationId: "PatentsController.export"
+      summary: "Export (PatentsController)"
+      x-capabilities:
+        - "asset:read"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/patents/import":
+    post:
+      operationId: "PatentsController.import"
+      summary: "Import (PatentsController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      x-body-dto: "ImportPatentsDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                client_id:
+                  type: "string"
+                file_id:
+                  type: "string"
+                rows:
+                  type: "array"
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/patents/import-history":
+    get:
+      operationId: "PatentsController.importHistory"
+      summary: "Import history (PatentsController)"
+      x-capabilities:
+        - "asset:read"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/patents/stats":
+    get:
+      operationId: "PatentsController.stats"
+      summary: "Stats (PatentsController)"
+      x-capabilities:
+        - "asset:read"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/patents/tags":
+    get:
+      operationId: "PatentsController.tags"
+      summary: "Tags (PatentsController)"
+      x-capabilities:
+        - "asset:read"
+      x-public: false
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+  "/v1/patents/{id}":
+    delete:
+      operationId: "PatentsController.remove"
+      summary: "Remove (PatentsController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+    get:
+      operationId: "PatentsController.get"
+      summary: "Get (PatentsController)"
+      x-capabilities:
+        - "asset:read"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+    patch:
+      operationId: "PatentsController.update"
+      summary: "Update (PatentsController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "UpdatePatentDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                title:
+                  maxLength: 500
+                  type: "string"
+                application_number:
+                  maxLength: 120
+                  type: "string"
+                jurisdiction:
+                  maxLength: 10
+                  type: "string"
+                publication_country:
+                  maxLength: 10
+                  type: "string"
+                status:
+                  enum:
+                    - "APPLIED"
+                    - "EXAMINATION"
+                    - "GRANTED"
+                    - "EXPIRED"
+                    - "WITHDRAWN"
+                    - "REJECTED"
+                    - "ABANDONED"
+                    - "NONPAYMENT"
+                  type: "string"
+                filing_date:
+                  type: "string"
+                application_date:
+                  type: "string"
+                grant_date:
+                  type: "string"
+                tags:
+                  type: "array"
+                abstract:
+                  maxLength: 20000
+                  type: "string"
+                priority_details:
+                  maxLength: 4000
+                  type: "string"
+                current_assignee:
+                  maxLength: 500
+                  type: "string"
+                assignee_original:
+                  maxLength: 500
+                  type: "string"
+                prn:
+                  maxLength: 120
+                  type: "string"
+                inventors:
+                  type: "array"
+                ipc_all_versions:
+                  type: "array"
+                additional_notes:
+                  maxLength: 4000
+                  type: "string"
+                client_id:
+                  type: "string"
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/patents/{id}/link-idea/{ideaId}":
+    post:
+      operationId: "PatentsController.link"
+      summary: "Link (PatentsController)"
+      x-capabilities:
+        - "idea:file"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+        - name: "ideaId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/patents/{id}/restore":
+    post:
+      operationId: "PatentsController.restore"
+      summary: "Restore (PatentsController)"
+      x-capabilities:
+        - "asset:write"
+      x-public: false
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "201": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+  "/v1/users/{userId}":
+    delete:
+      operationId: "ClientsController.suspend"
+      summary: "Suspend (ClientsController)"
+      x-capabilities:
+        - "user:manage"
+      x-public: false
+      parameters:
+        - name: "userId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "403": { description: "Missing a required capability" }
+        "404": { description: "Not found, or not visible to this caller" }
+    patch:
+      operationId: "ClientsController.updateUser"
+      summary: "Update user (ClientsController)"
+      x-capabilities: []
+      x-public: false
+      parameters:
+        - name: "userId"
+          in: path
+          required: true
+          schema: { type: "string" }
+      x-body-dto: "UpdateUserDto"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                name:
+                  maxLength: 120
+                  type: "string"
+                role:
+                  enum:
+                    - "INVENTOR"
+                    - "TECH_COMMITTEE"
+                    - "LEGAL_COUNSEL"
+                  type: "string"
+                status:
+                  enum:
+                    - "ACTIVE"
+                    - "SUSPENDED"
+                  type: "string"
+                phone:
+                  maxLength: 40
+                  type: "string"
+                country_code:
+                  maxLength: 8
+                  type: "string"
+                country_name:
+                  maxLength: 80
+                  type: "string"
+                address:
+                  maxLength: 400
+                  type: "string"
+                notification_prefs:
+                  type: "string"
+      responses:
+        "200": { description: "OK" }
+        "401": { description: "No or invalid session" }
+        "404": { description: "Not found, or not visible to this caller" }

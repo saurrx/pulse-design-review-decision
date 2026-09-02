@@ -1,0 +1,4422 @@
+{
+ "_generated": "qa/map/generate.ts — do not edit by hand; CI fails if stale",
+ "routes": [
+  {
+   "method": "PATCH",
+   "path": "/v1/actions/:id/request-status",
+   "controller": "ActionsController",
+   "handler": "setRequestStatus",
+   "service": "ActionsService",
+   "caps": [
+    "idea:file"
+   ],
+   "models": {
+    "PatentDueDate": [
+     "count",
+     "findMany",
+     "update"
+    ],
+    "ActionTemplate": [
+     "findMany",
+     "findUnique"
+    ],
+    "ActionRequest": [
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ActionRequestVersion": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/actions/:id/resolve",
+   "controller": "ActionsController",
+   "handler": "resolve",
+   "service": "ActionsService",
+   "caps": [
+    "idea:file"
+   ],
+   "models": {
+    "PatentDueDate": [
+     "count",
+     "findMany",
+     "update"
+    ],
+    "ActionTemplate": [
+     "findMany",
+     "findUnique"
+    ],
+    "ActionRequest": [
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ActionRequestVersion": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "PATCH",
+   "path": "/v1/actions/:id",
+   "controller": "ActionsController",
+   "handler": "decide",
+   "service": "ActionsService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "PatentDueDate": [
+     "count",
+     "findMany",
+     "update"
+    ],
+    "ActionTemplate": [
+     "findMany",
+     "findUnique"
+    ],
+    "ActionRequest": [
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ActionRequestVersion": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/actions/queue",
+   "controller": "ActionsController",
+   "handler": "queue",
+   "service": "ActionsService",
+   "caps": [
+    "idea:file"
+   ],
+   "models": {
+    "PatentDueDate": [
+     "count",
+     "findMany",
+     "update"
+    ],
+    "ActionTemplate": [
+     "findMany",
+     "findUnique"
+    ],
+    "ActionRequest": [
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ActionRequestVersion": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/actions/submit-all",
+   "controller": "ActionsController",
+   "handler": "submitAll",
+   "service": "ActionsService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "PatentDueDate": [
+     "count",
+     "findMany",
+     "update"
+    ],
+    "ActionTemplate": [
+     "findMany",
+     "findUnique"
+    ],
+    "ActionRequest": [
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ActionRequestVersion": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/actions/templates",
+   "controller": "ActionsController",
+   "handler": "templates",
+   "service": "ActionsService",
+   "caps": [
+    "docket:read"
+   ],
+   "models": {
+    "PatentDueDate": [
+     "count",
+     "findMany",
+     "update"
+    ],
+    "ActionTemplate": [
+     "findMany",
+     "findUnique"
+    ],
+    "ActionRequest": [
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ActionRequestVersion": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/actions",
+   "controller": "ActionsController",
+   "handler": "list",
+   "service": "ActionsService",
+   "caps": [
+    "docket:read"
+   ],
+   "models": {
+    "PatentDueDate": [
+     "count",
+     "findMany",
+     "update"
+    ],
+    "ActionTemplate": [
+     "findMany",
+     "findUnique"
+    ],
+    "ActionRequest": [
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ActionRequestVersion": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/agent/webhook",
+   "controller": "AgentWebhookController",
+   "handler": "receive",
+   "service": "IdeasService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/change-password",
+   "controller": "AuthController",
+   "handler": "changePassword",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/auth/check-domain",
+   "controller": "AuthController",
+   "handler": "checkDomain",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/google",
+   "controller": "AuthController",
+   "handler": "googleLogin",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/auth/invite/:code",
+   "controller": "AuthController",
+   "handler": "peek",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/invite/accept",
+   "controller": "AuthController",
+   "handler": "accept",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/invite/verify-share",
+   "controller": "AuthController",
+   "handler": "verifyShare",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/login",
+   "controller": "AuthController",
+   "handler": "login",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/logout-all",
+   "controller": "AuthController",
+   "handler": "logoutAll",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/logout",
+   "controller": "AuthController",
+   "handler": "logout",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/auth/me",
+   "controller": "AuthController",
+   "handler": "me",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/auth/microsoft/callback",
+   "controller": "AuthController",
+   "handler": "msCallback",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/auth/microsoft",
+   "controller": "AuthController",
+   "handler": "msStart",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/password-reset/complete",
+   "controller": "AuthController",
+   "handler": "resetComplete",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/password-reset/request",
+   "controller": "AuthController",
+   "handler": "resetRequest",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/refresh",
+   "controller": "AuthController",
+   "handler": "refresh",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/saml/acs",
+   "controller": "SamlController",
+   "handler": "acs",
+   "service": "SamlService",
+   "caps": [],
+   "models": {}
+  },
+  {
+   "method": "GET",
+   "path": "/v1/auth/saml/login",
+   "controller": "SamlController",
+   "handler": "login",
+   "service": "SamlService",
+   "caps": [],
+   "models": {}
+  },
+  {
+   "method": "GET",
+   "path": "/v1/auth/saml/metadata",
+   "controller": "SamlController",
+   "handler": "metadata",
+   "service": "SamlService",
+   "caps": [],
+   "models": {}
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/signup",
+   "controller": "AuthController",
+   "handler": "signup",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/view-as/:clientId",
+   "controller": "AuthController",
+   "handler": "viewAs",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/auth/view-as/exit",
+   "controller": "AuthController",
+   "handler": "exitViewAs",
+   "service": "AuthService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "findFirst",
+     "findUnique"
+    ],
+    "User": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "AuthIdentity": [
+     "create",
+     "findUnique"
+    ],
+    "Session": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "findFirst",
+     "findMany"
+    ],
+    "Invite": [
+     "findUnique",
+     "update"
+    ],
+    "PasswordResetToken": [
+     "create",
+     "findUnique",
+     "update"
+    ],
+    "RejectedSignup": [
+     "delete",
+     "upsert"
+    ]
+   }
+  },
+  {
+   "method": "PUT",
+   "path": "/v1/case-owners/:userId/assignments",
+   "controller": "ClientsController",
+   "handler": "setAssignments",
+   "service": "ClientsService",
+   "caps": [
+    "access:grant"
+   ],
+   "models": {
+    "Client": [
+     "count",
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "User": [
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "create",
+     "findMany",
+     "update"
+    ],
+    "Idea": [
+     "findFirst"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/case-owners",
+   "controller": "ClientsController",
+   "handler": "caseOwners",
+   "service": "ClientsService",
+   "caps": [
+    "access:grant"
+   ],
+   "models": {
+    "Client": [
+     "count",
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "User": [
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "create",
+     "findMany",
+     "update"
+    ],
+    "Idea": [
+     "findFirst"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/clients/:clientId/members",
+   "controller": "ClientsController",
+   "handler": "members",
+   "service": "ClientsService",
+   "caps": [
+    "user:read:client"
+   ],
+   "models": {
+    "Client": [
+     "count",
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "User": [
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "create",
+     "findMany",
+     "update"
+    ],
+    "Idea": [
+     "findFirst"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/clients/:clientId/request-access",
+   "controller": "ClientsController",
+   "handler": "requestAccess",
+   "service": "ClientsService",
+   "caps": [
+    "client:read:assigned"
+   ],
+   "models": {
+    "Client": [
+     "count",
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "User": [
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "create",
+     "findMany",
+     "update"
+    ],
+    "Idea": [
+     "findFirst"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/clients/:clientId",
+   "controller": "ClientsController",
+   "handler": "get",
+   "service": "ClientsService",
+   "caps": [
+    "client:read:assigned",
+    "client:read:any",
+    "idea:read:client"
+   ],
+   "models": {
+    "Client": [
+     "count",
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "User": [
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "create",
+     "findMany",
+     "update"
+    ],
+    "Idea": [
+     "findFirst"
+    ]
+   }
+  },
+  {
+   "method": "PATCH",
+   "path": "/v1/clients/:clientId",
+   "controller": "ClientsController",
+   "handler": "update",
+   "service": "ClientsService",
+   "caps": [
+    "client:configure"
+   ],
+   "models": {
+    "Client": [
+     "count",
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "User": [
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "create",
+     "findMany",
+     "update"
+    ],
+    "Idea": [
+     "findFirst"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/clients",
+   "controller": "ClientsController",
+   "handler": "list",
+   "service": "ClientsService",
+   "caps": [
+    "client:read:assigned",
+    "client:read:any",
+    "idea:read:client"
+   ],
+   "models": {
+    "Client": [
+     "count",
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "User": [
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "create",
+     "findMany",
+     "update"
+    ],
+    "Idea": [
+     "findFirst"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/clients",
+   "controller": "ClientsController",
+   "handler": "create",
+   "service": "ClientsService",
+   "caps": [
+    "client:create"
+   ],
+   "models": {
+    "Client": [
+     "count",
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "User": [
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "create",
+     "findMany",
+     "update"
+    ],
+    "Idea": [
+     "findFirst"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/dashboard",
+   "controller": "MiscController",
+   "handler": "dashboard",
+   "service": "PrismaService",
+   "caps": [],
+   "models": {}
+  },
+  {
+   "method": "POST",
+   "path": "/v1/drafts/:id/autofill",
+   "controller": "DraftsController",
+   "handler": "autofill",
+   "service": "IdeasService",
+   "caps": [
+    "idea:create"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/drafts/:id/evaluate",
+   "controller": "DraftsController",
+   "handler": "evaluate",
+   "service": "IdeasService",
+   "caps": [
+    "idea:create"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/drafts/:id/evaluation",
+   "controller": "DraftsController",
+   "handler": "evaluation",
+   "service": "IdeasService",
+   "caps": [
+    "idea:read:own",
+    "idea:read:client",
+    "idea:read:any"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/drafts/:id/re-evaluate",
+   "controller": "DraftsController",
+   "handler": "reEvaluate",
+   "service": "IdeasService",
+   "caps": [
+    "idea:create"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/drafts/:id/review",
+   "controller": "DraftsController",
+   "handler": "review",
+   "service": "IdeasService",
+   "caps": [
+    "idea:review:technical",
+    "idea:review:legal"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/drafts/:id/signal",
+   "controller": "DraftsController",
+   "handler": "signal",
+   "service": "IdeasService",
+   "caps": [
+    "idea:read:own",
+    "idea:read:client",
+    "idea:read:any"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/drafts/:id/submit",
+   "controller": "DraftsController",
+   "handler": "submit",
+   "service": "IdeasService",
+   "caps": [
+    "idea:submit"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/drafts/:id/suggest",
+   "controller": "DraftsController",
+   "handler": "suggest",
+   "service": "IdeasService",
+   "caps": [
+    "idea:create"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "DELETE",
+   "path": "/v1/drafts/:id",
+   "controller": "DraftsController",
+   "handler": "remove",
+   "service": "IdeasService",
+   "caps": [
+    "idea:create"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/drafts/:id",
+   "controller": "DraftsController",
+   "handler": "get",
+   "service": "IdeasService",
+   "caps": [
+    "idea:read:own",
+    "idea:read:client",
+    "idea:read:any"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "PATCH",
+   "path": "/v1/drafts/:id",
+   "controller": "DraftsController",
+   "handler": "update",
+   "service": "IdeasService",
+   "caps": [
+    "idea:create"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/due-dates/:id/remind",
+   "controller": "PatentsController",
+   "handler": "remind",
+   "service": "PatentsService",
+   "caps": [
+    "asset:read"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "PATCH",
+   "path": "/v1/due-dates/:id",
+   "controller": "PatentsController",
+   "handler": "setDueDateStatus",
+   "service": "PatentsService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/due-dates",
+   "controller": "PatentsController",
+   "handler": "dueDates",
+   "service": "PatentsService",
+   "caps": [
+    "asset:read"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "PUT",
+   "path": "/v1/files/:id/content",
+   "controller": "FilesController",
+   "handler": "uploadContent",
+   "service": "FilesService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "StoredFile": [
+     "create",
+     "delete",
+     "findMany",
+     "findUnique",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/files/:id/download",
+   "controller": "FilesController",
+   "handler": "download",
+   "service": "FilesService",
+   "caps": [
+    "asset:read"
+   ],
+   "models": {
+    "StoredFile": [
+     "create",
+     "delete",
+     "findMany",
+     "findUnique",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/files/:id/raw",
+   "controller": "FilesController",
+   "handler": "raw",
+   "service": "FilesService",
+   "caps": [
+    "asset:read"
+   ],
+   "models": {
+    "StoredFile": [
+     "create",
+     "delete",
+     "findMany",
+     "findUnique",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "DELETE",
+   "path": "/v1/files/:id",
+   "controller": "FilesController",
+   "handler": "remove",
+   "service": "FilesService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "StoredFile": [
+     "create",
+     "delete",
+     "findMany",
+     "findUnique",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/files/confirm-upload-batch",
+   "controller": "FilesController",
+   "handler": "confirmBatch",
+   "service": "FilesService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "StoredFile": [
+     "create",
+     "delete",
+     "findMany",
+     "findUnique",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/files/confirm-upload",
+   "controller": "FilesController",
+   "handler": "confirm",
+   "service": "FilesService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "StoredFile": [
+     "create",
+     "delete",
+     "findMany",
+     "findUnique",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/files/presign-upload",
+   "controller": "FilesController",
+   "handler": "presign",
+   "service": "FilesService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "StoredFile": [
+     "create",
+     "delete",
+     "findMany",
+     "findUnique",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/health",
+   "controller": "HealthController",
+   "handler": "health",
+   "service": "PrismaService",
+   "caps": [],
+   "models": {}
+  },
+  {
+   "method": "POST",
+   "path": "/v1/ideas/:id/clone",
+   "controller": "IdeasController",
+   "handler": "clone",
+   "service": "IdeasService",
+   "caps": [
+    "idea:create"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/ideas/:id/drafts",
+   "controller": "IdeasController",
+   "handler": "listDrafts",
+   "service": "IdeasService",
+   "caps": [
+    "idea:read:own",
+    "idea:read:client",
+    "idea:read:any"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/ideas/:id/drafts",
+   "controller": "IdeasController",
+   "handler": "createDraft",
+   "service": "IdeasService",
+   "caps": [
+    "idea:create"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "DELETE",
+   "path": "/v1/ideas/:id/inventors/:inventorId",
+   "controller": "IdeasController",
+   "handler": "removeInventor",
+   "service": "IdeasService",
+   "caps": [
+    "idea:inventors:manage"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/ideas/:id/inventors/:inventorId",
+   "controller": "IdeasController",
+   "handler": "addInventor",
+   "service": "IdeasService",
+   "caps": [
+    "idea:inventors:manage"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/ideas/:id/review",
+   "controller": "IdeasController",
+   "handler": "review",
+   "service": "IdeasService",
+   "caps": [
+    "idea:review:technical",
+    "idea:review:legal"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/ideas/:id/submit",
+   "controller": "IdeasController",
+   "handler": "submit",
+   "service": "IdeasService",
+   "caps": [
+    "idea:submit"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/ideas/:id/transitions",
+   "controller": "IdeasController",
+   "handler": "transitions",
+   "service": "IdeasService",
+   "caps": [
+    "idea:read:own",
+    "idea:read:client",
+    "idea:read:any"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "DELETE",
+   "path": "/v1/ideas/:id",
+   "controller": "IdeasController",
+   "handler": "remove",
+   "service": "IdeasService",
+   "caps": [
+    "idea:create"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/ideas/:ideaId/file",
+   "controller": "PatentsController",
+   "handler": "fileIdea",
+   "service": "PatentsService",
+   "caps": [
+    "idea:file"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/ideas/:id",
+   "controller": "IdeasController",
+   "handler": "get",
+   "service": "IdeasService",
+   "caps": [
+    "idea:read:own",
+    "idea:read:client",
+    "idea:read:any"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "PATCH",
+   "path": "/v1/ideas/:id",
+   "controller": "IdeasController",
+   "handler": "update",
+   "service": "IdeasService",
+   "caps": [
+    "idea:create"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/ideas/colleagues",
+   "controller": "IdeasController",
+   "handler": "colleagues",
+   "service": "IdeasService",
+   "caps": [
+    "user:read:colleagues"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/ideas/counts",
+   "controller": "IdeasController",
+   "handler": "counts",
+   "service": "IdeasService",
+   "caps": [
+    "idea:read:own",
+    "idea:read:client",
+    "idea:read:any"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "DELETE",
+   "path": "/v1/ideas/inventor-credits/:creditId",
+   "controller": "IdeasController",
+   "handler": "removeInventorCredit",
+   "service": "IdeasService",
+   "caps": [
+    "idea:inventors:manage"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/ideas/pipeline",
+   "controller": "IdeasController",
+   "handler": "pipeline",
+   "service": "IdeasService",
+   "caps": [
+    "idea:read:client",
+    "idea:read:any"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/ideas",
+   "controller": "IdeasController",
+   "handler": "list",
+   "service": "IdeasService",
+   "caps": [
+    "idea:read:own",
+    "idea:read:client",
+    "idea:read:any"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/ideas",
+   "controller": "IdeasController",
+   "handler": "create",
+   "service": "IdeasService",
+   "caps": [
+    "idea:create"
+   ],
+   "models": {
+    "Client": [
+     "findMany",
+     "findUnique"
+    ],
+    "User": [
+     "findMany",
+     "findUnique"
+    ],
+    "Idea": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaInventor": [
+     "delete",
+     "findFirst",
+     "findMany",
+     "upsert"
+    ],
+    "IdeaTransition": [
+     "count",
+     "create",
+     "findMany"
+    ],
+    "IdeaDraft": [
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "Notification": [
+     "create"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/invites/:code/qr",
+   "controller": "InvitesController",
+   "handler": "qr",
+   "service": "InvitesService",
+   "caps": [
+    "user:invite"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "Invite": [
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "DELETE",
+   "path": "/v1/invites/:id",
+   "controller": "InvitesController",
+   "handler": "revoke",
+   "service": "InvitesService",
+   "caps": [
+    "user:invite"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "Invite": [
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/invites/share-link/regenerate",
+   "controller": "InvitesController",
+   "handler": "regenerateShareLink",
+   "service": "InvitesService",
+   "caps": [
+    "user:invite"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "Invite": [
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/invites/share-link",
+   "controller": "InvitesController",
+   "handler": "shareLink",
+   "service": "InvitesService",
+   "caps": [
+    "user:invite"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "Invite": [
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/invites",
+   "controller": "InvitesController",
+   "handler": "create",
+   "service": "InvitesService",
+   "caps": [
+    "user:invite"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "Invite": [
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/notifications/:id/read",
+   "controller": "MiscController",
+   "handler": "markRead",
+   "service": "PrismaService",
+   "caps": [],
+   "models": {}
+  },
+  {
+   "method": "GET",
+   "path": "/v1/notifications",
+   "controller": "MiscController",
+   "handler": "notifications",
+   "service": "PrismaService",
+   "caps": [],
+   "models": {}
+  },
+  {
+   "method": "POST",
+   "path": "/v1/patents/:id/link-idea/:ideaId",
+   "controller": "PatentsController",
+   "handler": "link",
+   "service": "PatentsService",
+   "caps": [
+    "idea:file"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/patents/:id/restore",
+   "controller": "PatentsController",
+   "handler": "restore",
+   "service": "PatentsService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "DELETE",
+   "path": "/v1/patents/:id",
+   "controller": "PatentsController",
+   "handler": "remove",
+   "service": "PatentsService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/patents/:id",
+   "controller": "PatentsController",
+   "handler": "get",
+   "service": "PatentsService",
+   "caps": [
+    "asset:read"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "PATCH",
+   "path": "/v1/patents/:id",
+   "controller": "PatentsController",
+   "handler": "update",
+   "service": "PatentsService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/patents/export",
+   "controller": "PatentsController",
+   "handler": "export",
+   "service": "PatentsService",
+   "caps": [
+    "asset:read"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/patents/import-history",
+   "controller": "PatentsController",
+   "handler": "importHistory",
+   "service": "PatentsService",
+   "caps": [
+    "asset:read"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/patents/import",
+   "controller": "PatentsController",
+   "handler": "import",
+   "service": "PatentsService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/patents/stats",
+   "controller": "PatentsController",
+   "handler": "stats",
+   "service": "PatentsService",
+   "caps": [
+    "asset:read"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/patents/tags",
+   "controller": "PatentsController",
+   "handler": "tags",
+   "service": "PatentsService",
+   "caps": [
+    "asset:read"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "GET",
+   "path": "/v1/patents",
+   "controller": "PatentsController",
+   "handler": "list",
+   "service": "PatentsService",
+   "caps": [
+    "asset:read"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "POST",
+   "path": "/v1/patents",
+   "controller": "PatentsController",
+   "handler": "create",
+   "service": "PatentsService",
+   "caps": [
+    "asset:write"
+   ],
+   "models": {
+    "User": [
+     "findMany"
+    ],
+    "ClientAccess": [
+     "findFirst"
+    ],
+    "Idea": [
+     "findUnique",
+     "update"
+    ],
+    "IdeaTransition": [
+     "create"
+    ],
+    "Patent": [
+     "count",
+     "create",
+     "delete",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "groupBy",
+     "update"
+    ],
+    "IdeaPatentLink": [
+     "create",
+     "findUnique"
+    ],
+    "PatentDueDate": [
+     "count",
+     "create",
+     "findFirst",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "PatentImport": [
+     "create",
+     "findFirst",
+     "findMany",
+     "update"
+    ]
+   }
+  },
+  {
+   "method": "DELETE",
+   "path": "/v1/users/:userId",
+   "controller": "ClientsController",
+   "handler": "suspend",
+   "service": "ClientsService",
+   "caps": [
+    "user:manage"
+   ],
+   "models": {
+    "Client": [
+     "count",
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "User": [
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "create",
+     "findMany",
+     "update"
+    ],
+    "Idea": [
+     "findFirst"
+    ]
+   }
+  },
+  {
+   "method": "PATCH",
+   "path": "/v1/users/:userId",
+   "controller": "ClientsController",
+   "handler": "updateUser",
+   "service": "ClientsService",
+   "caps": [],
+   "models": {
+    "Client": [
+     "count",
+     "create",
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "User": [
+     "findMany",
+     "findUnique",
+     "update"
+    ],
+    "ClientAccess": [
+     "create",
+     "findMany",
+     "update"
+    ],
+    "Idea": [
+     "findFirst"
+    ]
+   }
+  }
+ ],
+ "grants": {
+  "INVENTOR": [
+   "idea:create",
+   "idea:read:own",
+   "idea:submit",
+   "user:read:colleagues",
+   "idea:inventors:manage",
+   "asset:read"
+  ],
+  "TECH_COMMITTEE": [
+   "idea:read:own",
+   "idea:read:client",
+   "idea:review:technical",
+   "user:read:client",
+   "user:read:colleagues",
+   "asset:read",
+   "docket:read"
+  ],
+  "LEGAL_COUNSEL": [
+   "idea:read:own",
+   "idea:read:client",
+   "idea:review:legal",
+   "idea:send_to_photon",
+   "client:configure",
+   "user:invite",
+   "user:manage",
+   "user:read:client",
+   "user:read:colleagues",
+   "idea:inventors:manage",
+   "audit:read",
+   "asset:read",
+   "asset:write",
+   "docket:read"
+  ],
+  "CASE_OWNER": [
+   "idea:read:client",
+   "idea:file",
+   "client:configure",
+   "user:invite",
+   "user:read:client",
+   "user:read:colleagues",
+   "client:read:assigned",
+   "asset:read",
+   "asset:write",
+   "docket:read"
+  ],
+  "PHOTON_ADMIN": [
+   "idea:read:any",
+   "idea:file",
+   "client:configure",
+   "user:invite",
+   "user:manage",
+   "user:read:client",
+   "user:read:colleagues",
+   "client:read:any",
+   "client:create",
+   "access:grant",
+   "access:grant:any",
+   "audit:read",
+   "asset:read",
+   "asset:write",
+   "docket:read"
+  ],
+  "PHOTON_SUPERADMIN": [
+   "idea:create",
+   "idea:read:own",
+   "idea:read:client",
+   "idea:read:any",
+   "idea:submit",
+   "idea:review:technical",
+   "idea:review:legal",
+   "idea:send_to_photon",
+   "idea:file",
+   "client:configure",
+   "user:invite",
+   "user:manage",
+   "user:read:client",
+   "user:read:colleagues",
+   "idea:inventors:manage",
+   "client:read:assigned",
+   "client:read:any",
+   "client:create",
+   "access:grant",
+   "access:grant:any",
+   "audit:read",
+   "asset:read",
+   "asset:write",
+   "docket:read"
+  ]
+ },
+ "models": [
+  {
+   "name": "Client",
+   "table": "client",
+   "usedBy": [
+    "src/auth/auth.service.ts",
+    "src/clients/clients.service.ts",
+    "src/ideas/ideas.service.ts",
+    "src/ideas/reference-backfill.service.ts"
+   ]
+  },
+  {
+   "name": "User",
+   "table": "app_user",
+   "usedBy": [
+    "src/auth/auth.service.ts",
+    "src/clients/clients.service.ts",
+    "src/common/notify.service.ts",
+    "src/ideas/ideas.service.ts",
+    "src/invites/invites.service.ts",
+    "src/patents/patents.service.ts"
+   ]
+  },
+  {
+   "name": "AuthIdentity",
+   "table": "auth_identity",
+   "usedBy": [
+    "src/auth/auth.service.ts"
+   ]
+  },
+  {
+   "name": "Session",
+   "table": "session",
+   "usedBy": [
+    "src/auth/auth.service.ts"
+   ]
+  },
+  {
+   "name": "ClientAccess",
+   "table": "client_access",
+   "usedBy": [
+    "src/auth/auth.service.ts",
+    "src/auth/guards/client-isolation.guard.ts",
+    "src/clients/clients.service.ts",
+    "src/patents/patents.service.ts"
+   ]
+  },
+  {
+   "name": "Invite",
+   "table": "invite",
+   "usedBy": [
+    "src/auth/auth.service.ts",
+    "src/invites/invites.service.ts"
+   ]
+  },
+  {
+   "name": "PasswordResetToken",
+   "table": "password_reset_token",
+   "usedBy": [
+    "src/auth/auth.service.ts"
+   ]
+  },
+  {
+   "name": "RejectedSignup",
+   "table": "rejected_signup",
+   "usedBy": [
+    "src/auth/auth.service.ts"
+   ]
+  },
+  {
+   "name": "AuditLog",
+   "table": "audit_log",
+   "usedBy": [
+    "src/common/audit.service.ts"
+   ]
+  },
+  {
+   "name": "ProductEvent",
+   "table": "product_event",
+   "usedBy": [
+    "src/common/analytics.service.ts"
+   ]
+  },
+  {
+   "name": "Idea",
+   "table": "idea",
+   "usedBy": [
+    "src/clients/clients.service.ts",
+    "src/ideas/ideas.service.ts",
+    "src/ideas/reference-backfill.service.ts",
+    "src/patents/patents.service.ts"
+   ]
+  },
+  {
+   "name": "IdeaInventor",
+   "table": "idea_inventor",
+   "usedBy": [
+    "src/ideas/ideas.service.ts"
+   ]
+  },
+  {
+   "name": "IdeaTransition",
+   "table": "idea_transition",
+   "usedBy": [
+    "src/ideas/ideas.service.ts",
+    "src/patents/patents.service.ts"
+   ]
+  },
+  {
+   "name": "Patent",
+   "table": "patent",
+   "usedBy": [
+    "src/patents/patents.service.ts"
+   ]
+  },
+  {
+   "name": "IdeaPatentLink",
+   "table": "idea_patent_link",
+   "usedBy": [
+    "src/patents/patents.service.ts"
+   ]
+  },
+  {
+   "name": "PatentDueDate",
+   "table": "patent_due_date",
+   "usedBy": [
+    "src/actions/actions.service.ts",
+    "src/patents/patents.service.ts"
+   ]
+  },
+  {
+   "name": "PatentImport",
+   "table": "patent_import",
+   "usedBy": [
+    "src/patents/patents.service.ts"
+   ]
+  },
+  {
+   "name": "ActionTemplate",
+   "table": "action_template",
+   "usedBy": [
+    "src/actions/actions.service.ts"
+   ]
+  },
+  {
+   "name": "ActionRequest",
+   "table": "action_request",
+   "usedBy": [
+    "src/actions/actions.service.ts"
+   ]
+  },
+  {
+   "name": "ActionRequestVersion",
+   "table": "action_request_version",
+   "usedBy": [
+    "src/actions/actions.service.ts"
+   ]
+  },
+  {
+   "name": "IdeaDraft",
+   "table": "idea_draft",
+   "usedBy": [
+    "src/ideas/ideas.service.ts"
+   ]
+  },
+  {
+   "name": "Notification",
+   "table": "notification",
+   "usedBy": [
+    "src/common/notify.service.ts",
+    "src/ideas/ideas.service.ts"
+   ]
+  },
+  {
+   "name": "StoredFile",
+   "table": "stored_file",
+   "usedBy": [
+    "src/files/files.service.ts"
+   ]
+  }
+ ],
+ "enums": {
+  "UserRole": [
+   "INVENTOR",
+   "TECH_COMMITTEE",
+   "LEGAL_COUNSEL",
+   "CASE_OWNER",
+   "PHOTON_ADMIN",
+   "PHOTON_SUPERADMIN"
+  ],
+  "AccessKind": [
+   "ASSIGNMENT",
+   "TEMPORARY",
+   "STEP_IN"
+  ],
+  "UserStatus": [
+   "INVITED",
+   "ACTIVE",
+   "SUSPENDED"
+  ],
+  "AuthProvider": [
+   "PASSWORD",
+   "GOOGLE",
+   "MICROSOFT",
+   "SAML"
+  ],
+  "InviteStatus": [
+   "PENDING",
+   "ACCEPTED",
+   "REVOKED",
+   "EXPIRED"
+  ],
+  "AuditAction": [
+   "SIGNUP_SUCCEEDED",
+   "SIGNUP_REJECTED_DOMAIN",
+   "LOGIN_SUCCEEDED",
+   "LOGIN_FAILED",
+   "LOGOUT",
+   "PASSWORD_RESET_REQUESTED",
+   "PASSWORD_RESET_COMPLETED",
+   "INVITE_CREATED",
+   "INVITE_ACCEPTED",
+   "INVITE_REVOKED",
+   "USER_ROLE_CHANGED",
+   "USER_SUSPENDED",
+   "USER_REACTIVATED",
+   "CLIENT_ACCESS_GRANTED",
+   "CLIENT_ACCESS_REVOKED",
+   "CLIENT_ACCESS_EXPIRED",
+   "PHOTON_ADMIN_ACCESS",
+   "CLIENT_CREATED",
+   "CLIENT_UPDATED",
+   "PATENTS_IMPORTED",
+   "PATENT_DELETED",
+   "PATENT_RESTORED"
+  ],
+  "IdeaState": [
+   "DRAFT",
+   "TECH_REVIEW",
+   "LEGAL_REVIEW",
+   "CHANGES_REQUESTED",
+   "REJECTED",
+   "SENT_TO_PHOTON",
+   "FILED"
+  ],
+  "InventorRole": [
+   "PRIMARY",
+   "CO"
+  ],
+  "ReviewStage": [
+   "TECHNICAL",
+   "LEGAL"
+  ],
+  "ReviewDecision": [
+   "APPROVED",
+   "CHANGES_REQUESTED",
+   "REJECTED"
+  ],
+  "PatentStatus": [
+   "APPLIED",
+   "EXAMINATION",
+   "GRANTED",
+   "EXPIRED",
+   "WITHDRAWN",
+   "REJECTED",
+   "ABANDONED",
+   "NONPAYMENT"
+  ],
+  "DueDateStatus": [
+   "PENDING",
+   "COMPLETED",
+   "MISSED"
+  ],
+  "ActionStatus": [
+   "NO_ACTION",
+   "NEW",
+   "ACKNOWLEDGED",
+   "IN_PROGRESS",
+   "COMPLETED",
+   "DECLINED"
+  ],
+  "ActionSubmissionState": [
+   "DRAFT",
+   "SUBMITTED",
+   "UPDATED"
+  ],
+  "ClientType": [
+   "EXISTING",
+   "POTENTIAL"
+  ],
+  "ClientPlan": [
+   "FREE",
+   "ENTERPRISE",
+   "PRODUCT_OWNER"
+  ],
+  "ImportStatus": [
+   "RUNNING",
+   "PARTIAL",
+   "COMPLETED",
+   "FAILED"
+  ],
+  "FileStatus": [
+   "PENDING",
+   "STORED"
+  ]
+ }
+}

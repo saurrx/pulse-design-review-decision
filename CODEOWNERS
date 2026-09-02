@@ -1,0 +1,11 @@
+# Owner approval for the paths that can change what a design record means.
+/src/styles/            @saurabh189
+/design/tokens/         @saurabh189
+/qa/conformance/baseline-mock/  @saurabh189
+/qa/visual/baselines/   @saurabh189
+/design/a11y-baseline/  @saurabh189
+/changes/               @saurabh189
+/mock/runtime/          @saurabh189
+/contract/              @saurabh189
+/CLAUDE.md              @saurabh189
+/AGENTS.md              @saurabh189
