@@ -259,7 +259,10 @@ const ideaListWrap = (query: string) => (p: any) => {
 
 const RULES: Rule[] = [
   // -- auth -----------------------------------------------------------------
-  { m: /^\/api\/v1\/auth\/(?:ihc\/)?login$/, method: "POST",
+  // The `ihc/` spelling went with IHCLogin.tsx. There has never been a separate
+  // in-house-counsel login on the API — both spellings always resolved here —
+  // and ResetPassword was the last caller of the alternative.
+  { m: /^\/api\/v1\/auth\/login$/, method: "POST",
     to: (_m, b) => ({ url: "/v1/auth/login", method: "POST", body: b, wrap: asUser }) },
   // The screens post {platform_type, code} — the OLD API's social-login shape,
   // where `code` was polymorphic: a Google ACCESS token, or a Microsoft

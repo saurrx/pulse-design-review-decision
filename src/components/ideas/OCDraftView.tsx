@@ -2,7 +2,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Sparkles } from "lucide-react";
-import AudioInput from "../AudioInput";
 
 interface OCDraftViewProps {
   ideaDraft: any;
@@ -67,36 +66,6 @@ const OCDraftView: React.FC<OCDraftViewProps> = ({ ideaDraft, theme = "light" })
                           : "border-gray-200 text-zinc-900"
                           } border transition-all w-full resize-y`}
                       />
-                      {/* <div className="absolute opacity-50 hover:opacity-100 bottom-4 right-4 flex items-center gap-5">
-                        <AudioInput
-                          onTranscript={(transcript) => {
-                            // Append transcribed text to existing content
-                            const currentText =
-                              question.answer.trim();
-                            const newText = currentText
-                              ? `${currentText} ${transcript}`
-                              : transcript;
-                            handleAnswerChange(
-                              section.id,
-                              question.id,
-                              newText
-                            );
-                          }}
-                          languageCode="en-IN"
-                          disabled={[
-                            "SEND_TO_OC",
-                            "UNDER_REVIEW",
-                          ]?.includes(mainIdeaData?.idea?.status)}
-                        />
-                        <Sparkles
-                          size={16}
-                          className={
-                            theme === "dark"
-                              ? "text-gray-300"
-                              : "text-gray-500"
-                          }
-                        />
-                      </div> */}
                     </div>
                   </div>
                 ))}
