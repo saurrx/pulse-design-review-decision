@@ -41,3 +41,4 @@ qa/.adapter-build/
 storybook-static/
 .vitest-attachments/
 __screenshots__/
+.vercel
