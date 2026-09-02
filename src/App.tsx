@@ -134,7 +134,7 @@ const App = () => {
       <GoogleOAuthProvider
         clientId={
           (import.meta.env.VITE_GOOGLE_CLIENT_ID as string) ||
-          "376798389820-em6eve9874gue4qkvq9dnod98tvjnc15.apps.googleusercontent.com"
+          "689119300325-7ppo8m68f1qaeaocn8g286i5va2bpran.apps.googleusercontent.com"
         }
       >
         <QueryClientProvider client={queryClient}>

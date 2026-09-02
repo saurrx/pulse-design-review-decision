@@ -24,7 +24,7 @@
  * still sends the wrong thing.
  */
 import { build } from 'esbuild';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { pathToFileURL } from 'node:url';
@@ -109,6 +109,44 @@ for (const key of ['access_token', 'googleAccessToken', 'token']) {
     if (hitGoogle) throw new Error('a microsoft authorization code was POSTed to /v1/auth/google');
     if (!threw) throw new Error('expected a named failure, got a silent pass');
   });
+}
+
+
+// ---------------------------------------------------------------------------
+// The screens' half: HOW they start a social sign-in, asserted statically.
+//
+// Microsoft on this API is a server-side redirect flow — GET /v1/auth/microsoft
+// sets the state cookie, redirects, and exchanges the code with the client
+// secret. The screens used to run their OWN authorize flow in the browser
+// against the **/common** tenant and POST the result to social-login. Two
+// problems, both of which the adapter half above cannot see: /common accepts an
+// assertion from ANY Microsoft directory (the exact posture microsoft.service.ts
+// refuses server-side), and a browser cannot hold a client secret, so the
+// exchange could never have completed anyway.
+import { readdirSync as rd } from 'node:fs';
+const AUTH = join(ROOT, 'src', 'pages', 'auth');
+for (const f of rd(AUTH).filter(x => x.endsWith('.tsx') && x !== 'AuthField.tsx')) {
+  const src = readFileSync(join(AUTH, f), 'utf8');
+  check(`${f}: no browser-side Microsoft authorize flow`, () => {
+    if (/login\.microsoftonline\.com/.test(src)) {
+      throw new Error('runs its own authorize flow instead of GET /v1/auth/microsoft');
+    }
+    if (/VITE_MS_CLIENT_ID/.test(src)) {
+      throw new Error('reads VITE_MS_CLIENT_ID — the browser has no business holding the client id for this flow');
+    }
+  });
+  if (/microsoftLogin/.test(src)) {
+    check(`${f}: the Microsoft button hands off to the API`, () => {
+      if (!/["'`]\/v1\/auth\/microsoft["'`]/.test(src)) {
+        throw new Error('does not navigate to /v1/auth/microsoft');
+      }
+    });
+    check(`${f}: the callback's ?error= is surfaced`, () => {
+      if (!/searchParams\.get\("error"\)/.test(src)) {
+        throw new Error('ignores ?error= — a failed sign-in returns to a silent login form');
+      }
+    });
+  }
 }
 
 rmSync(OUT, { recursive: true, force: true });

@@ -56,7 +56,6 @@ const Signup = () => {
   const navigate = useNavigate();
   const [screenHeight, setScreenHeight] = useState(0);
   const [searchParams, setSearchParams] = useSearchParams();
-  const processedCodeRef = useRef<string | null>(null);
 
   const url = new URL(window.location.href);
   const code = url.searchParams.get("code");
@@ -115,38 +114,20 @@ const Signup = () => {
     }
   }, [isSuccess, data]);
 
+  // The API's Microsoft callback reports failure as ?error= and never says
+  // which failure, deliberately. Say something rather than nothing.
   useEffect(() => {
-    if (code && code !== processedCodeRef.current) {
-      // Validate OAuth state parameter to prevent CSRF
-      const returnedState = searchParams.get("state");
-      const savedState = sessionStorage.getItem("ms_oauth_state");
-      sessionStorage.removeItem("ms_oauth_state");
-
-      if (!returnedState || returnedState !== savedState) {
-        toast.error("OAuth state mismatch. Please try signing up again.");
-        const newSearchParams = new URLSearchParams(searchParams);
-        newSearchParams.delete("code");
-        newSearchParams.delete("state");
-        setSearchParams(newSearchParams, { replace: true });
-        return;
-      }
-
-      processedCodeRef.current = code;
-
-      const payload: PlatformPayloadInterface = {
-        code: code,
-        platform_type: "microsoft",
-      };
-
-      // Remove code and state from URL to prevent re-processing
-      const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.delete("code");
-      newSearchParams.delete("state");
-      setSearchParams(newSearchParams, { replace: true });
-
-      mutate(payload);
-    }
-  }, [code, mutate, searchParams, setSearchParams]);
+    const err = searchParams.get("error");
+    if (!err) return;
+    toast.error(
+      err === "oauth_state"
+        ? "That sign-in link expired. Please try again."
+        : "Microsoft sign-in could not be completed. Please try again.",
+    );
+    const next = new URLSearchParams(searchParams);
+    next.delete("error");
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
 
 
   const handleLogin = useGoogleLogin({
@@ -174,26 +155,10 @@ const Signup = () => {
     },
   });
 
+  /** Same server-side flow as Login — see the note there. */
   const microsoftLogin = () => {
     track("signup_submitted");
-    const clientId = import.meta.env.VITE_MS_CLIENT_ID;
-    if (!clientId) {
-      toast.error("Microsoft login is not configured. Set VITE_MS_CLIENT_ID in .env");
-      return;
-    }
-    const oauthState = crypto.randomUUID();
-    sessionStorage.setItem("ms_oauth_state", oauthState);
-    const redirectUri = `${window.location.origin}/login`;
-    const params = new URLSearchParams({
-      client_id: clientId,
-      response_type: "code",
-      redirect_uri: redirectUri,
-      response_mode: "query",
-      scope: "openid profile email User.Read",
-      state: oauthState,
-    });
-
-    window.location.href = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${params}`;
+    window.location.href = "/v1/auth/microsoft";
   };
 
   const fetchUserInfo = async (tokenResponse) => {
