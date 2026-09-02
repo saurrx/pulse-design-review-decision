@@ -61,7 +61,7 @@ import FileIdeaModal from "./FileIdeaModal";
 import RequestUpdate from "./RequestUpdate";
 import PatentNoveltyReport from "./ShowScoreReport";
 import ViewRequestUpdate from "./ViewRequestUpdate";
-import { Section } from "./DraftCreationContent";
+import { Section } from "./draftSections";
 import {
   Dialog,
   DialogContent,
@@ -72,7 +72,6 @@ import {
 } from "@/components/ui/dialog";
 import { FileUp, PlusCircle, ArrowRight, LoaderCircle } from "lucide-react";
 import EmptyDraftsView from "./EmptyDraftsView";
-import IHCAdminDraftView from "./IHCAdminDraftView";
 import PatentPaperView from "./PatentPaperView";
 import StatusChip from "@/components/ui/StatusChip";
 import StatusTimeline from "./StatusTimeline";

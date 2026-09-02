@@ -292,7 +292,7 @@
    "route": "/clients",
    "page": "ClientsPage",
    "entry": "src/pages/client/ClientsPage.tsx",
-   "components": 34,
+   "components": 33,
    "calls": [
     {
      "method": "GET",
@@ -638,7 +638,7 @@
    "route": "/ideas/:id",
    "page": "IdeaDetailsPage",
    "entry": "src/pages/IdeaDetailsPage.tsx",
-   "components": 64,
+   "components": 54,
    "calls": [
     {
      "method": "POST",
@@ -693,31 +693,6 @@
       "/v1/ideas/{id}/review"
      ],
      "from": "src/components/ideas/RequestUpdate.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/idea/add/inventor/${ideaId}/${inventorId}",
-     "rule": "^\\/api\\/v1\\/idea\\/add\\/inventor\\/([^/]+)\\/([^/]+)$",
-     "v1": [
-      "/v1/ideas/{id}/inventors/{id}"
-     ],
-     "from": "src/components/ideas/CoInventorsField.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/idea/analyze-document",
-     "rule": null,
-     "v1": [],
-     "from": "src/components/ideas/DraftCreationContent.tsx"
-    },
-    {
-     "method": "GET",
-     "call": "/api/v1/idea/check-score/${draftId}",
-     "rule": "^\\/api\\/v1\\/idea\\/check-score\\/([^/]+)$",
-     "v1": [
-      "/v1/drafts/{id}/evaluate"
-     ],
-     "from": "src/components/ideas/DraftCreationContent.tsx"
     },
     {
      "method": "GET",
@@ -775,15 +750,6 @@
     },
     {
      "method": "GET",
-     "call": "/api/v1/idea/fetch-score/${draftId}",
-     "rule": "^\\/api\\/v1\\/idea\\/fetch-score\\/([^/]+)$",
-     "v1": [
-      "/v1/drafts/{id}/evaluation"
-     ],
-     "from": "src/components/ideas/DraftCreationContent.tsx"
-    },
-    {
-     "method": "GET",
      "call": "/api/v1/idea/fetch-score/${localStorage.getItem(\"analysisDraftID\")}",
      "rule": "^\\/api\\/v1\\/idea\\/fetch-score\\/([^/]+)$",
      "v1": [
@@ -817,13 +783,6 @@
       "/v1/ideas/{id}"
      ],
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/idea/generate-summary/${draftId}",
-     "rule": null,
-     "v1": [],
-     "from": "src/components/ideas/DraftCreationContent.tsx"
     },
     {
      "method": "POST",
@@ -871,15 +830,6 @@
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
-     "method": "DELETE",
-     "call": "/api/v1/idea/remove/inventor/${ideaInventorId}",
-     "rule": "^\\/api\\/v1\\/idea\\/remove\\/inventor\\/([^/]+)$",
-     "v1": [
-      "/v1/ideas/inventor-credits/{id}"
-     ],
-     "from": "src/components/ideas/CoInventorsField.tsx"
-    },
-    {
      "method": "POST",
      "call": "/api/v1/idea/send-to-ihc/${payload.draft_id}/${payload.ihc_id}",
      "rule": "^\\/api\\/v1\\/idea\\/send-to-ihc\\/([^/]+)\\/",
@@ -898,15 +848,6 @@
      "from": "src/components/ideas/IdeaDetailsContent.tsx"
     },
     {
-     "method": "GET",
-     "call": "/api/v1/idea/single-draft/${draftId}",
-     "rule": "^\\/api\\/v1\\/idea\\/single-draft\\/([^/]+)$",
-     "v1": [
-      "/v1/drafts/{id}"
-     ],
-     "from": "src/components/ideas/DraftCreationContent.tsx"
-    },
-    {
      "method": "PUT",
      "call": "/api/v1/idea/update-idea/${ideaId}",
      "rule": "^\\/api\\/v1\\/idea\\/update-idea\\/([^/]+)$",
@@ -921,15 +862,6 @@
      "rule": null,
      "v1": [],
      "from": "src/components/ideas/RequestUpdate.tsx"
-    },
-    {
-     "method": "POST",
-     "call": "/api/v1/idea/update/draft/${draftId}",
-     "rule": "^\\/api\\/v1\\/idea\\/update\\/draft\\/([^/]+)$",
-     "v1": [
-      "/v1/drafts/{id}"
-     ],
-     "from": "src/components/ideas/DraftCreationContent.tsx"
     },
     {
      "method": "POST",
@@ -1085,7 +1017,7 @@
    "route": "/patents",
    "page": "PatentsPage",
    "entry": "src/pages/PatentsPage.tsx",
-   "components": 42,
+   "components": 41,
    "calls": [
     {
      "method": "GET",
@@ -1183,7 +1115,7 @@
    "route": "/patents/:patentId",
    "page": "PatentsPage",
    "entry": "src/pages/PatentsPage.tsx",
-   "components": 42,
+   "components": 41,
    "calls": [
     {
      "method": "GET",

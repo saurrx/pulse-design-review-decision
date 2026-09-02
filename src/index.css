@@ -208,18 +208,6 @@
     @apply bg-white/70 backdrop-blur-lg border border-white/20;
   }
   
-  /* Resizable handle styling */
-  [data-panel-group-direction="horizontal"] > [data-panel-handle] {
-    width: 1px;
-    @apply bg-gray-200 transition-all;
-  }
-  
-  [data-panel-group-direction="horizontal"] > [data-panel-handle]:hover, 
-  [data-panel-group-direction="horizontal"] > [data-panel-handle][data-panel-handle-active="true"] {
-    width: 2px;
-    @apply bg-primary/30;
-  }
-  
   /* Textarea focus styling */
   .textarea-focus-ring {
     @apply focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200;
