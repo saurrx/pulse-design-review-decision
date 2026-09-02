@@ -54,6 +54,11 @@ export default defineConfig((env) => {
     plugins: [swapEntry()],
     resolve: { alias: DESIGN_ALIASES },
     server: { port: 3700, strictPort: true },
+    // Discover every dependency at startup: a late optimisation reloads the page, which kills a story-test run.
+    optimizeDeps: {
+      entries: ["index.html", "src/**/*.{ts,tsx}", "design/stories/**/*.tsx", "design/harness/**/*.tsx", "mock/**/*.{ts,tsx}"],
+      include: ["react", "react-dom", "react-dom/client", "react-router-dom", "@tanstack/react-query", "axios", "js-cookie", "recharts", "react-simple-maps", "d3-geo", "framer-motion", "date-fns", "moment", "lodash", "formik", "yup", "zod", "react-hook-form", "@hookform/resolvers/zod", "react-select", "cmdk", "sonner", "lucide-react", "qrcode.react", "react-day-picker", "react-phone-input-2", "react-phone-number-input", "libphonenumber-js", "input-otp", "vaul", "embla-carousel-react", "react-image", "react-loader-spinner", "react-to-print", "next-themes", "posthog-js", "@posthog/react", "class-variance-authority", "clsx", "tailwind-merge"],
+    },
     preview: { port: 3700, strictPort: true },
   }) as UserConfig;
   if (merged.server) delete (merged.server as { proxy?: unknown }).proxy;

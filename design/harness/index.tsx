@@ -22,14 +22,19 @@ import { clearProductionStorage, clearSessionCookie, writeSessionCookie } from "
  * router and only the story's own route under the real layout, plus a
  * catch-all that renders a navigation marker. There is no second route table.
  */
+import type { Db } from "../../mock/runtime/types";
+
 export type PulseParams = {
   scenario?: string;
   persona?: string;       // email, or a role name resolved inside the scenario's personas
-  route?: string;         // the location to open, e.g. "/ideas" or "/login"
+  /** The location to open, e.g. "/ideas", or a function of the seeded store so a story can pick a record by state. */
+  route?: string | ((db: Db) => string);
   path?: string;          // the route pattern if it has params, e.g. "/ideas/:id"
   layout?: "dashboard" | "public";
   retry?: boolean | number;
   clock?: string;
+  /** Per-story adjustments to the seeded store, applied before the cookie is written. */
+  prepare?: (db: Db) => void;
 };
 
 export const VIEWPORTS = {
@@ -59,6 +64,7 @@ export const pulseLoader: Loader = async ({ parameters }) => {
   clearSessionCookie();
   resetDb(scenario, { persist: false, fresh: true });
   const db = getDb();
+  p.prepare?.(db);
   const persona = p.persona ?? (p.layout === "public" ? null : scenario.defaultPersona);
   if (persona) {
     const byRole = (list: typeof db.users) => list.find((u) => u.role === persona);
@@ -67,7 +73,8 @@ export const pulseLoader: Loader = async ({ parameters }) => {
     writeSessionCookie(user, db);
   }
   stubDialogs();
-  return { scenario: scenario.name, persona };
+  const route = typeof p.route === "function" ? p.route(db) : p.route ?? "/";
+  return { scenario: scenario.name, persona, route };
 };
 
 const NavMarker = () => {
@@ -87,8 +94,8 @@ const ReadyMarker = () => {
 
 export const withPulse: Decorator = (Story, ctx) => {
   const p = (ctx.parameters.pulse ?? {}) as PulseParams;
-  const route = p.route ?? "/";
-  const pattern = p.path ?? route.split("?")[0];
+  const route = (ctx.loaded as { route?: string }).route ?? (typeof p.route === "string" ? p.route : "/");
+  const pattern = p.path ?? (typeof p.route === "string" ? route.split("?")[0] : route.split("?")[0]);
   const retry = p.retry ?? false;
   const client = React.useMemo(() => new QueryClient({
     defaultOptions: { queries: { refetchOnWindowFocus: false, refetchOnMount: false, refetchOnReconnect: false, staleTime: 5 * 60 * 1000, retry } },
