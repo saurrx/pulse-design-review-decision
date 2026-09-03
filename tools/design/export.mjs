@@ -15,6 +15,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { execSync, spawnSync } from "node:child_process";
 import { classify, PATCH_CLASSES } from "./paths.mjs";
+import { fingerprintChanges } from "./fingerprint.mjs";
 
 const sh = (cmd, opts = {}) => execSync(cmd, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], ...opts }).trim();
 const id = process.argv[2];
@@ -42,6 +43,12 @@ if (byClass.unclassified?.length) report.refused.push(`unclassified paths, add t
 if (byClass.buildImpact?.length) report.flags.push("build-impact approval required");
 if (byClass.behaviourImpact?.length) report.flags.push("behaviour-impact approval required");
 const patchFiles = changed.filter((f) => PATCH_CLASSES.has(classify(f)));
+// The behavioural fingerprint: a difference escalates to behaviour-impact approval, it never fails by itself.
+const behaviour = fingerprintChanges(mergeBase, head, patchFiles);
+if (Object.keys(behaviour).length) { report.flags.push("behaviour-impact approval required (fingerprint changed)"); report.behaviour = behaviour; }
+fs.writeFileSync(path.join(dir, "behaviour.md"), Object.keys(behaviour).length
+  ? "# Behavioural fingerprint differences\n\nThese escalate the record to behaviour-impact approval.\n\n" + Object.entries(behaviour).map(([f, d]) => `## ${f}\n` + Object.entries(d).map(([k, v]) => `- ${k}: added ${JSON.stringify(v.added)} removed ${JSON.stringify(v.removed)}`).join("\n")).join("\n\n") + "\n"
+  : "# Behavioural fingerprint differences\n\nNone. The change is visual as far as the fingerprint can see.\n");
 if (!patchFiles.length) report.refused.push("no portable change on this branch");
 
 // Story coverage: every changed portable component must be imported, directly or transitively, by a referenced story.

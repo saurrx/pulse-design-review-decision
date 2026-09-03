@@ -1,9 +1,11 @@
 import { getDb } from "../runtime/db";
-import { readSessionUser } from "../runtime/session";
+import { getFramePersona, readSessionUser } from "../runtime/session";
 import type { Db, Idea, User } from "../runtime/types";
 
 /** The caller, from the session cookie, resolved against the store. */
 export function currentUser(): User | null {
+  const pinned = getFramePersona();
+  if (pinned) return getDb().users.find((u) => u.email === pinned) ?? null;
   const s = readSessionUser();
   if (!s) return null;
   const db = getDb();

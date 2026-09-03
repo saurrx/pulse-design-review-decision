@@ -12,7 +12,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { SCENARIOS, DEFAULT_SCENARIO } from "../../mock/scenarios";
 import { resetDb, getDb } from "../../mock/runtime/db";
 import { clock, installFakeDate } from "../../mock/runtime/clock";
-import { clearProductionStorage, clearSessionCookie, writeSessionCookie } from "../../mock/runtime/session";
+import { clearProductionStorage, clearSessionCookie, setFramePersona, writeSessionCookie } from "../../mock/runtime/session";
 
 /**
  * The story harness. A story names a scenario, a persona (by role or email)
@@ -56,12 +56,15 @@ function restoreDialogs() {
 
 export const pulseLoader: Loader = async ({ parameters }) => {
   const p = (parameters.pulse ?? {}) as PulseParams;
+  // Fonts first: a component that measures text before the face arrives lays out a subpixel differently.
+  try { await Promise.all([400, 500, 600, 700].map((w) => document.fonts.load(`${w} 15px "Instrument Sans"`))); } catch { /* fallback faces are fine */ }
   const scenario = SCENARIOS[p.scenario ?? DEFAULT_SCENARIO] ?? SCENARIOS[DEFAULT_SCENARIO];
   clock.set(p.clock ?? scenario.clock);
   installFakeDate();
   document.body.removeAttribute("data-story-ready");
   clearProductionStorage();
   clearSessionCookie();
+  setFramePersona(null);
   resetDb(scenario, { persist: false, fresh: true });
   const db = getDb();
   p.prepare?.(db);
@@ -71,6 +74,7 @@ export const pulseLoader: Loader = async ({ parameters }) => {
     const user = db.users.find((u) => u.email === persona) ?? byRole(db.users.filter((u) => scenario.personas.includes(u.email))) ?? byRole(db.users);
     if (!user) throw new Error(`[harness] no persona "${persona}" in scenario ${scenario.name}`);
     writeSessionCookie(user, db);
+    setFramePersona(user.email);
   }
   stubDialogs();
   const route = typeof p.route === "function" ? p.route(db) : p.route ?? "/";
@@ -100,7 +104,7 @@ export const withPulse: Decorator = (Story, ctx) => {
   const client = React.useMemo(() => new QueryClient({
     defaultOptions: { queries: { refetchOnWindowFocus: false, refetchOnMount: false, refetchOnReconnect: false, staleTime: 5 * 60 * 1000, retry } },
   }), [ctx.id, retry]);
-  const story = <><Story /><ReadyMarker /></>;
+  const story = <Story />;
   return (
     <ThemeProvider>
       <GoogleOAuthProvider clientId="inert">
@@ -109,6 +113,8 @@ export const withPulse: Decorator = (Story, ctx) => {
             <TooltipProvider>
               <Toaster />
               <Sonner />
+              {/* Outside the routes so the marker survives a redirect to the catch-all. */}
+              <ReadyMarker />
               <MemoryRouter initialEntries={[route]}>
                 <React.Suspense fallback={<div data-testid="story-suspense" />}>
                   <Routes>

@@ -1,13 +1,22 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "_design": "The design fork's Vercel config: no API rewrite (the worker answers /v1 in-page), a content policy limited to the frame's own origin, production's other headers kept. Deployments use tools/design/deploy.mjs, which writes its own config into the output directories; this file is the reference and what the static security gates read.",
   "rewrites": [
     {
-      "source": "/v1/:path*",
-      "destination": "https://demo-api.photonpulse.ai/v1/:path*"
+      "source": "/((?!assets/|mockServiceWorker\\.js$).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/v1/auth/microsoft",
+      "destination": "/?persona=admin@photonlegal.test",
+      "permanent": false
     },
     {
-      "source": "/((?!v1/).*)",
-      "destination": "/index.html"
+      "source": "/v1/auth/saml/login",
+      "destination": "/auth/saml/callback?persona=counsel@acme.test",
+      "permanent": false
     }
   ],
   "headers": [
@@ -16,7 +25,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com https://event.photonpulse.ai https://us.i.posthog.com https://us-assets.i.posthog.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://demo-api.photonpulse.ai https://www.googleapis.com https://accounts.google.com https://event.photonpulse.ai https://us.i.posthog.com https://us-assets.i.posthog.com; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
         },
         {
           "key": "X-Content-Type-Options",

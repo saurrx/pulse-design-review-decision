@@ -12,7 +12,8 @@ import path from "node:path";
 const results = [];
 const run = (name, cmd, args, opts = {}) => {
   const started = Date.now();
-  const r = spawnSync(cmd, args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, CI: "1" }, ...opts });
+  const { informational, ...spawnOpts } = opts;
+  const r = spawnSync(cmd, args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], ...spawnOpts, env: { ...process.env, CI: "1", ...(opts.env ?? {}) } });
   const ok = r.status === 0;
   const tail = (r.stdout + r.stderr).trim().split("\n").filter(Boolean).slice(-2).join(" | ").slice(0, 160);
   results.push({ name, ok, informational: !!opts.informational, secs: ((Date.now() - started) / 1000).toFixed(0), tail });
@@ -22,6 +23,11 @@ const run = (name, cmd, args, opts = {}) => {
 
 run("typecheck", "npm", ["run", "typecheck"]);
 run("lint:roles", "npm", ["run", "lint:roles"]);
+run("routes: every handler is real, every reachable route served", "node", ["tools/design/routes.mjs"]);
+run("credentials and inert hosts", "node", ["tools/design/credentials.mjs"]);
+run("manifest and graph parity", "node", ["tools/design/manifest.mjs"]);
+run("fingerprint self-test (bites)", "node", ["tools/design/fingerprint.mjs", "--self-test"]);
+run("fidelity: adapter boundary, OpenAPI bodies, state machine", "npm", ["run", "test:fidelity"]);
 run("build:design", "npm", ["run", "build:design"]);
 run("storybook:build", "npm", ["run", "storybook:build"]);
 run("test:stories (interaction, serial)", "npm", ["run", "test:stories"]);
@@ -34,6 +40,12 @@ const preview = spawnSync("sh", ["-c", "npx vite preview --config vite.design.co
 const pid = Number(preview.stdout.trim());
 spawnSync("sleep", ["3"]);
 run("smoke (full app on mock)", "node", ["tools/design/smoke.mjs"]);
+run("crawl (every persona, every page and detail route)", "node", ["tools/design/crawl.mjs"]);
+const qaEnv = { ...process.env, QA_MOCK: "1", QA_BASE: "http://localhost:3700" };
+run("qa invariant: desktop gate", "node", ["qa/invariant/desktop-gate.qa.mjs"], { env: qaEnv });
+run("qa invariant: layout rules, 6 roles x 2 viewports", "node", ["qa/invariant/layout.qa.mjs", "--base", "http://localhost:3700"], { env: qaEnv });
+run("qa invariant: no visible uuid", "node", ["qa/invariant/no-visible-uuid.qa.mjs", "--base", "http://localhost:3700"], { env: qaEnv });
+run("qa conformance: structure against baseline-mock", "node", ["qa/conformance/structure.qa.mjs", "--base", "http://localhost:3700"], { env: qaEnv });
 if (pid) process.kill(pid);
 
 // Lockfile: a clean install reproduces the tree; one copy of react, react-dom and vite.

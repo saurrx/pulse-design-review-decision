@@ -16,7 +16,8 @@
     "preview:design": "vite preview --config vite.design.config.ts",
     "storybook": "storybook dev -p 6006 --no-open",
     "storybook:build": "storybook build",
-    "test:stories": "vitest --project=storybook --run"
+    "test:stories": "vitest --project=storybook --run",
+    "test:fidelity": "vitest --project=fidelity --run"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

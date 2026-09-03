@@ -30,6 +30,17 @@ export function presentUser(u: User, db: Db) {
 
 export const COOKIE = "pl_user";
 
+/**
+ * A frame-local persona. Storybook frames share one origin, so the cookie is
+ * shared between concurrently rendered stories; the story harness pins the
+ * persona per frame here and the handlers prefer it over the cookie. The full
+ * app never sets it, so there the cookie decides, as in production. Node-side
+ * tests use it to act as a persona without a document.
+ */
+let framePersona: string | null = null;
+export const setFramePersona = (email: string | null) => { framePersona = email; };
+export const getFramePersona = () => framePersona;
+
 export function readSessionUser(): { id: string; email: string; role: string; client_id?: string | null } | null {
   const raw = Cookies.get(COOKIE);
   if (!raw) return null;

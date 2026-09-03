@@ -12,8 +12,11 @@ import { spawnSync } from "node:child_process";
 
 const sh = (cmd, args, cwd) => { const r = spawnSync(cmd, args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }); if (r.status !== 0) throw new Error(`${cmd} ${args.join(" ")} failed:\n${r.stderr || r.stdout}`); return (r.stdout || "").trim(); };
 const scope = process.env.VERCEL_SCOPE ? ["--scope", process.env.VERCEL_SCOPE] : [];
+// The app's deploy config is the root vercel.json (design-owned); Storybook gets only the worker header.
+const rootConfig = JSON.parse(fs.readFileSync("vercel.json", "utf8"));
+const appConfig = { rewrites: rootConfig.rewrites, redirects: rootConfig.redirects, headers: [...(rootConfig.headers ?? []), { source: "/mockServiceWorker.js", headers: [{ key: "Cache-Control", value: "no-store" }, { key: "Service-Worker-Allowed", value: "/" }] }] };
 const targets = [
-  { project: "pulse-design", dir: "dist", build: ["npm", ["run", "build:design"]], config: { redirects: [{ source: "/v1/auth/microsoft", destination: "/?persona=admin@photonlegal.test", permanent: false }, { source: "/v1/auth/saml/login", destination: "/auth/saml/callback?persona=counsel@acme.test", permanent: false }], rewrites: [{ source: "/((?!assets/|mockServiceWorker\\.js$).*)", destination: "/index.html" }], headers: [{ source: "/(.*)", headers: [{ key: "X-Content-Type-Options", value: "nosniff" }, { key: "X-Frame-Options", value: "DENY" }, { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" }] }, { source: "/mockServiceWorker.js", headers: [{ key: "Cache-Control", value: "no-store" }, { key: "Service-Worker-Allowed", value: "/" }] }] } },
+  { project: "pulse-design", dir: "dist", build: ["npm", ["run", "build:design"]], config: appConfig },
   { project: "pulse-design-storybook", dir: "storybook-static", build: ["npm", ["run", "storybook:build"]], config: { headers: [{ source: "/mockServiceWorker.js", headers: [{ key: "Cache-Control", value: "no-store" }] }] } },
 ];
 const STABLE = { "pulse-design": "https://pulse-design-s-5ecc81c4.vercel.app", "pulse-design-storybook": "https://pulse-design-storybook.vercel.app" };

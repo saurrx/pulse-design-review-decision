@@ -26,9 +26,12 @@ await blockEgress(context);
 const page = await context.newPage();
 const seen = new Set(); const fresh = []; let redesignBlocking = 0;
 
+let broken = 0;
 for (const s of storiesFrom(dir)) {
-  await page.goto(`http://localhost:${port}/iframe.html?id=${s.id}&viewMode=story`);
-  await page.waitForSelector('body[data-story-ready="1"]', { timeout: 20_000 });
+  try {
+    await page.goto(`http://localhost:${port}/iframe.html?id=${s.id}&viewMode=story`);
+    await page.waitForSelector('body[data-story-ready="1"]', { timeout: 20_000 });
+  } catch (e) { broken++; console.log(`FAIL  ${s.id}: did not become ready (${String(e.message || e).slice(0, 80)})`); continue; }
   await page.addScriptTag({ content: axeSource });
   const result = await page.evaluate(async () => {
     const res = await window.axe.run(document.getElementById("storybook-root") ?? document.body, { resultTypes: ["violations"] });
@@ -48,6 +51,6 @@ const fixed = [...known].filter((fp) => !seen.has(fp));
 if (args.has("--update")) { fs.writeFileSync(baselineFile, JSON.stringify({ recorded: new Date().toISOString(), fingerprints: [...seen].sort() }, null, 2) + "\n"); console.log(`a11y: baseline written with ${seen.size} inherited fingerprint(s)`); process.exit(0); }
 for (const fp of fresh) console.log(`NEW   ${fp}`);
 for (const fp of fixed) console.log(`fixed ${fp} (remove it from the baseline)`);
-const failures = fresh.length + redesignBlocking;
+const failures = fresh.length + redesignBlocking + broken;
 console.log(failures ? `a11y: ${fresh.length} new fingerprint(s), ${redesignBlocking} blocking in redesigned content` : `a11y: no new violations (${known.size} inherited on the ratchet)`);
 process.exit(failures ? 1 : 0);
