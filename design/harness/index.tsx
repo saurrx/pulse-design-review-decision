@@ -69,7 +69,7 @@ function restoreDialogs() {
 export const pulseLoader: Loader = async ({ parameters }) => {
   const p = (parameters.pulse ?? {}) as PulseParams;
   // Fonts first: a component that measures text before the face arrives lays out a subpixel differently.
-  try { await Promise.all([400, 500, 600, 700].map((w) => document.fonts.load(`${w} 15px "Instrument Sans"`))); } catch { /* fallback faces are fine */ }
+  try { await Promise.all([...[400, 500, 600, 700].map((w) => document.fonts.load(`${w} 15px "Schibsted Grotesk"`)), ...[400, 500, 600].map((w) => document.fonts.load(`${w} 28px "Newsreader"`)), ...[400, 600].map((w) => document.fonts.load(`${w} 13px "IBM Plex Mono"`))]); } catch { /* fallback faces are fine */ }
   const scenario = SCENARIOS[p.scenario ?? DEFAULT_SCENARIO] ?? SCENARIOS[DEFAULT_SCENARIO];
   clock.set(p.clock ?? scenario.clock);
   installFakeDate();

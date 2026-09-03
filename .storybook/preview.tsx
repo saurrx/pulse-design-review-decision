@@ -2,7 +2,6 @@ import type { Preview } from "@storybook/react-vite";
 import { setupWorker } from "msw/browser";
 import { mswLoader } from "msw-storybook-addon/csf3";
 import "../src/index.css";
-import "../design/fonts/fonts.css";
 import { handlers } from "../mock/handlers";
 import { pulseLoader, withPulse, VIEWPORTS } from "../design/harness";
 

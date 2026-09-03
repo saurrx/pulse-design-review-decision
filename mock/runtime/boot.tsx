@@ -12,7 +12,6 @@ import { readSelection, writeSessionCookie, readSessionUser } from "./session";
 import { mountChip } from "./chip";
 import { stats } from "./registry";
 // The vendored typeface. Bundled here so the build emits the font files as assets; the design Vite config strips the Google Fonts links from index.html.
-import "../../design/fonts/fonts.css";
 
 async function main() {
   const sel = readSelection(DEFAULT_SCENARIO);
