@@ -277,7 +277,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
       onSuccess: (idea) => {
         queryClient.setQueryData(["ideaDetails", ideaId], idea);
         queryClient.invalidateQueries({ queryKey: ["fetch_ideas"] });
-        toast.success("Status updated");
       },
       onError: (error: any) => {
         toast.error(
@@ -307,7 +306,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           );
 
           if (response?.status === 200) {
-            toast.success("Inventor removed successfully", { position: "top-center" });
             return response?.data?.data;
           }
         } catch (error) {
@@ -429,7 +427,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         );
 
         if (response?.status === 201) {
-          toast.success("Draft added successfully", { position: "top-center" });
           navigate(
             `/ideas/${ideaId}/draft?draftId=${response?.data?.data?.id}`,
           );
@@ -483,7 +480,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           );
 
           if (response?.status === 200) {
-            toast.success("Idea rejected successfully", { position: "top-center" });
             return response?.data?.data;
           }
         } catch (error) {
@@ -535,7 +531,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         }
       },
       onSuccess: () => {
-        toast.success("Draft cloned successfully", { position: "top-center" });
         queryClient.invalidateQueries({
           queryKey: ["idea_draft", ideaId],
         });
@@ -577,7 +572,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         );
 
         if (response?.status === 200) {
-          toast.success("Draft sent for review", { position: "top-center" });
         }
       } catch (error) {
         console.error("Error sending to IHC:", error);
@@ -609,7 +603,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           },
         );
         if (response?.status === 200) {
-          toast.success("Draft sent to Photon Legal successfully", { position: "top-center" });
           setInstructions("");
         }
       } catch (error) {
@@ -855,9 +848,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                       `api/v1/idea/add/inventor/${ideaId}/${inventorId}`,
                     );
                     if (addResponse?.status === 200) {
-                      toast.success(
-                        `Inventor ${inventor.email} added successfully`, { position: "top-center" }
-                      );
                     }
                   } catch (addError: any) {
                     console.error("Error adding inventor to idea:", addError);
@@ -898,7 +888,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
       setExtraInventors([]);
       setDeletedInventorIds([]);
       setOriginalInventorIds([]);
-      toast.success("Changes saved successfully", { position: "top-center" });
     } catch (error) {
       console.error("Error saving changes:", error, { position: "top-center" });
       toast.error("Failed to save changes", { position: "top-center" });
@@ -1051,7 +1040,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
 
           if (response.status === 200) {
             const data = response?.data?.data;
-            toast.success("Evaluation underway", { position: "top-center" });
             setIsDisableScoreTransition(false);
             setEnableScorePolling(true);
           }
@@ -1081,7 +1069,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
     onSuccess: () => {
       setOpenEvaluatePopup(false);
       setPatentInput("");
-      toast.success("Re-evaluation started successfully.", { position: "top-center" });
     },
     onError: (err: any) => {
       toast.error(
@@ -1316,7 +1303,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           );
 
           if (response.status === 201) {
-            toast.success("Draft updated successfully", { position: "top-center" });
             // Update local state with new data
             if (ideaDraft?.[0]) {
               const updatedDraft = {
@@ -1445,7 +1431,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           );
 
           if (response?.status === 201) {
-            toast.success("Files uploaded successfully", { position: "top-center" });
           }
           return response?.data;
         } catch (error) {
@@ -1471,7 +1456,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         );
 
         if (response.status === 200) {
-          toast.success("File deleted successfully", { position: "top-center" });
           queryClient.invalidateQueries({
             queryKey: ["ideaDetails", ideaId],
           });
@@ -2327,7 +2311,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                   <main className="w-full lg:w-[60%]">
                     <PatentPaperView
                       title={mainIdeaData?.title}
-                      irn={mainIdeaData?.id?.toUpperCase()}
+                      irn={mainIdeaData?.reference_number}
                       submissionDate={
                         mainIdeaData?.submission_date
                           ? moment(mainIdeaData.submission_date).format(
@@ -2451,7 +2435,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
               ) : (
                 <PatentPaperView
                   title={mainIdeaData?.title}
-                  irn={mainIdeaData?.id?.toUpperCase()}
+                  irn={mainIdeaData?.reference_number}
                   inventors={(mainIdeaData?.IdeaInventor || [])
                     .map((x: any) => x?.inventor?.name)
                     .filter(Boolean)}

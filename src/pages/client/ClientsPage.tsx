@@ -175,7 +175,6 @@ const ClientsPage: React.FC = () => {
         const response = await API_CONFIG.post("/api/v1/clients", data);
 
         if (response?.status === 201) {
-          toast.success("Client added successfully");
           // call get all clients query to refresh the list
           setIsOnboardModalOpen(initialValuesClientOnboardModal);
           formik.resetForm();
@@ -218,7 +217,6 @@ const ClientsPage: React.FC = () => {
         );
 
         if (response?.status === 200 || response?.status === 204) {
-          toast.success("Client deleted successfully");
           setClientToDelete(null);
         }
         return response?.data;

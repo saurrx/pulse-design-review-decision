@@ -109,7 +109,6 @@ const Signup = () => {
         Cookies.set("pl_user", JSON.stringify(user), { secure: true, sameSite: "lax", path: "/" });
       }
 
-      toast.success("User registered/login successfully");
       navigate("/", { replace: true });
     }
   }, [isSuccess, data]);
@@ -226,7 +225,6 @@ const Signup = () => {
           // navigate("/", { replace: true });
           //   }
 
-          toast.success(response?.data?.message);
         }
       } catch (error) {
         toast.error(error?.response?.data?.message || "Error logging in");

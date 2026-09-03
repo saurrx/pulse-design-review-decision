@@ -62,7 +62,6 @@ const ForgotPassword = () => {
         );
 
         if (response?.data) {
-          toast.success("Password reset link sent to your email");
           setStatus("SENT");
         }
       } catch (error: any) {

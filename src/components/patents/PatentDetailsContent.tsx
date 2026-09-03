@@ -570,7 +570,6 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
           `/api/v1/patent/delete-doc/${id}`,
         );
         if (response?.status === 200) {
-          toast.success("Document removed successfully");
           setLocalDocuments((prev) => prev.filter((doc) => doc.id !== id));
           setNewUploadedFiles((prev) => prev.filter((doc) => doc.id !== id));
           queryClient.invalidateQueries({
@@ -746,7 +745,6 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
         );
 
         if (response?.status === 200) {
-          toast.success("Patent updated successfully");
           handleEditToggle();
           queryClient.invalidateQueries({
             queryKey: ["patentDetails", patentId],

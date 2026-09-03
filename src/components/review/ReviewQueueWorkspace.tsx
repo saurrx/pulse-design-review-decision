@@ -573,7 +573,6 @@ const ReviewQueueWorkspace = () => {
         decision: "APPROVED",
         stage: isCommittee ? "technical" : "legal",
       });
-      toast.success("Approved and sent to Photon Legal");
       setSelectedId(nextQueueId);
       await refreshWorkspace();
     },
@@ -602,7 +601,6 @@ const ReviewQueueWorkspace = () => {
         stage: isCommittee ? "technical" : "legal",
       });
       track("request_update_submitted", { idea_id: selectedIdea?.id });
-      toast.success("Update requested from the inventor");
       setDecisionDialog(null);
       setDecisionNote("");
       setSelectedId(nextQueueId);
@@ -630,7 +628,6 @@ const ReviewQueueWorkspace = () => {
         idea_id: selectedIdea?.id,
         reason_len: decisionNote.trim().length,
       });
-      toast.success("Disclosure declined");
       setDecisionDialog(null);
       setDecisionNote("");
       setSelectedId(nextQueueId);
@@ -1087,7 +1084,10 @@ const ReviewQueueWorkspace = () => {
                       <div className="rounded-xl border border-[var(--pulse-line)] bg-white p-6">
                         <h3 className="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-secondary)]">Patent Analysis in progress</h3>
                         <div className="mt-4">
-                          <EvaluationProgress evaluationId={liveEvaluationId} />
+                          <EvaluationProgress
+                            evaluationId={liveEvaluationId}
+                            reference={selectedIdea?.reference_number}
+                          />
                         </div>
                         <p className="mt-3 text-xs text-[var(--pulse-ink-muted)]">The report appears here the moment the scan completes — no refresh needed.</p>
                       </div>

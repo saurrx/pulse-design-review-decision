@@ -32,7 +32,6 @@ const SamlCallback = () => {
         // asUser has already resolved the photon sentinel client_id.
         Cookies.set("pl_user", JSON.stringify(user), { secure: true, sameSite: "lax", path: "/" });
         track("login_succeeded", { method: "saml" });
-        toast.success("Signed in with SSO");
         navigate("/", { replace: true });
       } catch {
         toast.error("SSO sign-in could not be completed. Please try again.");

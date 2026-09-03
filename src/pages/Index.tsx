@@ -429,7 +429,6 @@ const Index = () => {
                         `/api/v1/idea/send-latest-draft-to-ihc/${id}`,
                         {},
                       );
-                      toast.success("Sent for review");
                       refetchIdeas();
                     } catch {
                       toast.error("Failed to send");

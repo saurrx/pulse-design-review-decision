@@ -683,7 +683,6 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
         kind: "submit",
         appeal_count: 0,
       });
-      toast.success("Sent for review");
       navigate(`/ideas/${ideaId}`);
     },
     onError: () => toast.error("Failed to send"),
@@ -762,7 +761,13 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
       >
         <div className="mx-auto w-full max-w-[1200px]">
           <div className={`text-sm ${muted}`}>
-            Ideas <span className="mx-1.5">/</span> {idea?.id?.toUpperCase() || ""}
+            Ideas <span className="mx-1.5">/</span>{" "}
+            {/* The workspace reference (DEMO07), never the row id. A uuid
+                cannot be read down a phone or matched to a paper file, and
+                this is the first identity a new idea shows its author.
+                `reference_number` is on the idea from the moment it is
+                created — ideas.service writes it in the same insert. */}
+            {idea?.reference_number || idea?.title || ""}
           </div>
           <h1 className={`mt-4 truncate text-2xl font-semibold tracking-[-0.025em] ${ink}`}>
             {idea?.title || "Working submission"}
@@ -771,35 +776,131 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
             <span className="inline-flex h-7 items-center gap-1.5 rounded-md border border-[var(--pulse-line)] bg-white px-2.5 font-medium text-[#484E59]">
               <span className="h-[7px] w-[7px] bg-[#727272]" /> In draft
             </span>
-            <span>Working submission</span>
             {savedAt && <span>· {savedLabel(savedAt)}</span>}
           </div>
         </div>
       </div>
 
-      {idea && <StatusTimeline idea={idea} showStatusLine={false} />}
+      {idea && <StatusTimeline idea={idea} showStatusLine={false} showTimings={false} />}
 
       {/* ---- Body ---- */}
       <div className="min-h-0 flex-1 overflow-y-auto pb-8">
         <div className="mx-auto w-full max-w-[1160px] px-6 py-8">
-          <section className="overflow-hidden rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] [box-shadow:var(--pulse-shadow-card)]">
-            <div className="flex items-start gap-4 border-l-4 border-l-[#F9B418] px-6 py-5">
-              <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#FDF3DC] text-[#7E5A00]">
-                <FileText className="h-4 w-4" />
-              </span>
+          {/* "Start from what you already have" — full width, in the row
+              the "Keep building" banner used to occupy. It was capped at
+              64% inside <main>, which is narrow for a card whose whole job
+              is to be taken up before the questionnaire is touched. */}
+        {slimBanner ? (
+          <div
+            className={`mb-5 flex items-center justify-between gap-3 rounded-xl border px-4 py-2.5 ${card}`}
+          >
+            <span className={`text-[13px] ${muted}`}>
+              <Sparkles className="mr-1.5 inline h-3.5 w-3.5 text-[#F9B418]" />
+              {autofillRan
+                ? "Pre-filled from your material — review each section. Novelty is yours to write."
+                : "Have a write-up? Pre-fill the rest of this draft."}
+            </span>
+            <div className="flex shrink-0 gap-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className={`text-[13px] font-medium underline-offset-2 hover:underline ${ink}`}
+                disabled={isAutofilling}
+              >
+                Upload
+              </button>
+              <button
+                type="button"
+                onClick={() => setPasteOpen((v) => !v)}
+                className={`text-[13px] font-medium underline-offset-2 hover:underline ${ink}`}
+                disabled={isAutofilling}
+              >
+                Paste text
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="mb-5 rounded-xl border border-[#F9B418]/60 bg-[#F9B418]/5 p-5">
+            <div className="flex items-start gap-3">
+              <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-[#F9B418]" />
               <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[#7E5A00]">
-                  Keep building
+                <div className={`text-base font-semibold ${ink}`}>
+                  Start from what you already have
+                </div>
+                <p className={`mt-0.5 text-[13px] ${muted}`}>
+                  Upload a document or paste text and we'll pre-fill the
+                  sections below. Review and edit before submission.
                 </p>
-                <h2 className={`mt-1 text-lg font-semibold tracking-[-0.015em] ${ink}`}>
-                  Complete your working submission
-                </h2>
-                <p className={`mt-1 text-sm ${muted}`}>
-                  Your answers save automatically. Send for review when the required sections are complete.
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isAutofilling}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#F9B418] px-3.5 py-2 text-[13px] font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:opacity-50"
+                  >
+                    <Upload className="h-4 w-4" />
+                    {isAutofilling ? "Analyzing..." : "Upload document"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPasteOpen((v) => !v)}
+                    disabled={isAutofilling}
+                    className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-[13px] font-medium transition-colors ${
+                      dark
+                        ? "border-white/15 text-neutral-300 hover:border-white/30"
+                        : "border-[#C8C8C8] text-[#444444] hover:bg-[#F5F5F5]"
+                    }`}
+                  >
+                    Paste text
+                  </button>
+                </div>
+                <p className={`mt-2 text-xs ${muted}`}>
+                  Read here in your browser: PDF, DOCX, TXT. For slides or
+                  an old .doc, paste the text.
                 </p>
               </div>
             </div>
-          </section>
+          </div>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,.docx,.txt,.md"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) runAutofill({ file: f });
+            e.target.value = "";
+          }}
+        />
+        {pasteOpen && (
+          <div className={`mb-5 rounded-xl border p-4 ${card}`}>
+            <textarea
+              rows={5}
+              value={pasteText}
+              onChange={(e) => setPasteText(e.target.value)}
+              placeholder="Paste anything — an email, meeting notes, a rough description. We'll structure it for you."
+              className={`ph-no-capture ${fieldCls}`}
+            />
+            <div className="mt-2 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setPasteOpen(false)}
+                className={`px-3 py-1.5 text-[13px] font-medium ${muted} hover:${ink}`}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!pasteText.trim() || isAutofilling}
+                onClick={() => runAutofill({ text: pasteText.trim() })}
+                className="rounded-xl bg-[#F9B418] px-3.5 py-1.5 text-[13px] font-semibold text-[#0C0C0C] hover:bg-[#DA9700] disabled:opacity-50"
+              >
+                {isAutofilling ? "Analyzing..." : "Pre-fill from text"}
+              </button>
+            </div>
+          </div>
+        )}
 
           <div className="mt-6 flex flex-col items-start gap-6 lg:flex-row">
         {/* Left rail: progress + outline */}
@@ -861,118 +962,6 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
 
         {/* Main column */}
         <main className="w-full min-w-0 lg:w-[64%]">
-          {/* Autofill banner */}
-          {slimBanner ? (
-            <div
-              className={`mb-5 flex items-center justify-between gap-3 rounded-xl border px-4 py-2.5 ${card}`}
-            >
-              <span className={`text-[13px] ${muted}`}>
-                <Sparkles className="mr-1.5 inline h-3.5 w-3.5 text-[#F9B418]" />
-                {autofillRan
-                  ? "Pre-filled from your material — review each section. Novelty is yours to write."
-                  : "Have a write-up? Pre-fill the rest of this draft."}
-              </span>
-              <div className="flex shrink-0 gap-2">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`text-[13px] font-medium underline-offset-2 hover:underline ${ink}`}
-                  disabled={isAutofilling}
-                >
-                  Upload
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPasteOpen((v) => !v)}
-                  className={`text-[13px] font-medium underline-offset-2 hover:underline ${ink}`}
-                  disabled={isAutofilling}
-                >
-                  Paste text
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="mb-5 rounded-xl border border-[#F9B418]/60 bg-[#F9B418]/5 p-5">
-              <div className="flex items-start gap-3">
-                <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-[#F9B418]" />
-                <div className="min-w-0 flex-1">
-                  <div className={`text-base font-semibold ${ink}`}>
-                    Start from what you already have
-                  </div>
-                  <p className={`mt-0.5 text-[13px] ${muted}`}>
-                    Upload a document or paste text and we'll pre-fill the
-                    sections below. Review and edit before submission.
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isAutofilling}
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-[#F9B418] px-3.5 py-2 text-[13px] font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:opacity-50"
-                    >
-                      <Upload className="h-4 w-4" />
-                      {isAutofilling ? "Analyzing..." : "Upload document"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPasteOpen((v) => !v)}
-                      disabled={isAutofilling}
-                      className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-[13px] font-medium transition-colors ${
-                        dark
-                          ? "border-white/15 text-neutral-300 hover:border-white/30"
-                          : "border-[#C8C8C8] text-[#444444] hover:bg-[#F5F5F5]"
-                      }`}
-                    >
-                      Paste text
-                    </button>
-                  </div>
-                  <p className={`mt-2 text-xs ${muted}`}>
-                    Read here in your browser: PDF, DOCX, TXT. For slides or
-                    an old .doc, paste the text.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,.docx,.txt,.md"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) runAutofill({ file: f });
-              e.target.value = "";
-            }}
-          />
-          {pasteOpen && (
-            <div className={`mb-5 rounded-xl border p-4 ${card}`}>
-              <textarea
-                rows={5}
-                value={pasteText}
-                onChange={(e) => setPasteText(e.target.value)}
-                placeholder="Paste anything — an email, meeting notes, a rough description. We'll structure it for you."
-                className={`ph-no-capture ${fieldCls}`}
-              />
-              <div className="mt-2 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPasteOpen(false)}
-                  className={`px-3 py-1.5 text-[13px] font-medium ${muted} hover:${ink}`}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  disabled={!pasteText.trim() || isAutofilling}
-                  onClick={() => runAutofill({ text: pasteText.trim() })}
-                  className="rounded-xl bg-[#F9B418] px-3.5 py-1.5 text-[13px] font-semibold text-[#0C0C0C] hover:bg-[#DA9700] disabled:opacity-50"
-                >
-                  {isAutofilling ? "Analyzing..." : "Pre-fill from text"}
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Sections */}
           <div className="space-y-3">
@@ -1331,7 +1320,11 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
               </>
             ) : scoringActive ? (
               <div className="mt-2">
-                <EvaluationProgress compact evaluationId={runningEvaluationId} />
+                <EvaluationProgress
+                    compact
+                    evaluationId={runningEvaluationId}
+                    reference={idea?.reference_number}
+                  />
               </div>
             ) : (
               <>

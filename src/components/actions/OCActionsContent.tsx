@@ -228,7 +228,6 @@ const OCActionsContent: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["oc_action_queue"] });
-      toast.success("Status updated");
     },
     onError: (error: any) => {
       toast.error(

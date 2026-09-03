@@ -373,7 +373,6 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     }
     setAppliedFilters(newFilters);
 
-    toast.success(`Filter applied: ${getFilterLabel(value)}`);
   };
 
   const handleStatusFilterChange = (value: StatusFilter) => {
@@ -389,7 +388,6 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     }
     setAppliedFilters(newFilters);
 
-    toast.success(`Status filter applied: ${value}`);
   };
 
   const handleCountryFilterChange = (value: CountryFilter) => {
@@ -405,14 +403,12 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     }
     setAppliedFilters(newFilters);
 
-    toast.success(`Country filter applied: ${value}`);
   };
 
   const handleSortChange = (value: SortOption) => {
     track("list_sorted", { list: "due_dates" });
     setSortOption(value);
     setCurrentPage(1); // Reset to first page when sort changes
-    toast.success(`Sort applied: ${getSortLabel(value)}`);
   };
 
   const removeFilter = (filter: string) => {
@@ -428,7 +424,6 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
       setCountryFilter("all");
     }
 
-    toast.success(`Filter removed: ${filter}`);
   };
 
   const clearAllFilters = () => {
@@ -438,7 +433,6 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     setCountryFilter("all");
     setSearchQuery("");
     setCurrentPage(1); // Reset to first page when filters are cleared
-    toast.success("All filters cleared");
   };
 
   const getFilterLabel = (filter: FilterOption): string => {

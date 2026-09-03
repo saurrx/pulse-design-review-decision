@@ -126,7 +126,6 @@ const AddPatentModal: React.FC<AddPatentModalProps> = ({
       return response.data;
     },
     onSuccess: (resp) => {
-      toast.success("Patent added");
       onAdded?.(resp?.data);
       onOpenChange(false);
     },

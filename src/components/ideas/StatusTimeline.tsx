@@ -122,12 +122,24 @@ const StatusTimeline = ({
   /** Admin review action attached to the current node (unused in inventor view). */
   currentNodeAction,
   showStatusLine = true,
+  showTimings = true,
 }: {
   idea: any;
   onAction?: () => void;
   actionLabel?: string;
   currentNodeAction?: React.ReactNode;
   showStatusLine?: boolean;
+  /**
+   * The "usually 5 to 10 days" hint on the next stop, and the "in draft 3d"
+   * elapsed label on the current one.
+   *
+   * Off on the draft workspace: an inventor still writing their disclosure is
+   * being told how long a review they have not requested yet will take, and how
+   * many days they have spent not finishing — neither is information they can
+   * act on, and one of them reads as a reproach. On the idea DETAIL page, where
+   * the thing has been submitted and the wait is real, both stay.
+   */
+  showTimings?: boolean;
 }) => {
   const ideaStatus = (idea?.status || "").toUpperCase();
   const { currentIndex, variant, elapsedLabel, statusLine, dates } =
@@ -221,7 +233,7 @@ const StatusTimeline = ({
                     {fmt(dates[i]!)}
                   </div>
                 )}
-                {current && elapsedLabel && (
+                {showTimings && current && elapsedLabel && (
                   <div className="mt-0.5 text-xs text-[#727272]">
                     {elapsedLabel}
                   </div>
@@ -235,7 +247,7 @@ const StatusTimeline = ({
                   </button>
                 )}
                 {current && currentNodeAction}
-                {hint && (
+                {showTimings && hint && (
                   <div className="mt-0.5 text-xs italic text-[#A0A0A0]">
                     {hint}
                   </div>

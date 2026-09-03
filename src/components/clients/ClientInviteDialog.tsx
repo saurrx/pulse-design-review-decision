@@ -80,7 +80,6 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
       API_CONFIG.post(`/api/v1/clients/${clientId}/invite-link`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
-      toast.success("A new secure invite link was generated");
     },
   });
 
@@ -89,7 +88,6 @@ const ClientInviteDialog: React.FC<ClientInviteDialogProps> = ({
       API_CONFIG.delete(`/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
-      toast.success("Invite link deactivated");
     },
   });
 
