@@ -78,11 +78,44 @@ const heading = () => page.locator('h1').last();
 const readinessPct = () => page.locator('span.font-mono:visible').filter({ hasText: /^\d+%$/ }).last();
 
 try {
+  /**
+   * The dashboard's own submit affordance, for an inventor who HAS ideas.
+   *
+   * This step exists because that button was removed by mistake and shipped.
+   * The instruction was one bullet under a heading that read "The Screen where
+   * Inventor has NOT submitted any ideas"; it was applied unconditionally, so
+   * an inventor with ideas lost the only way to start another from that card —
+   * the large "Submit your first idea" call to action renders in the EMPTY
+   * state and not for them. Nothing failed, because nothing asserted it.
+   *
+   * The demo inventor always has ideas, so this asserts the state that exists
+   * here. The empty state is not reachable on demo without deleting their whole
+   * corpus, and a journey that did that would be worse than the gap it closes.
+   */
+  await j.step('the dashboard offers an inventor with ideas a way to start one', async () => {
+    await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(2500);
+    const card = page.locator('div').filter({ hasText: /^My ideas/ }).last();
+    const recent = await page.getByText(/^My ideas$/).count();
+    assert(recent > 0, 'the inventor dashboard has no "My ideas" card at all');
+    const submit = page.getByRole('button', { name: /Submit Idea/i });
+    assert(await submit.count() > 0,
+      'the inventor dashboard offers no "Submit Idea" button — it was removed once ' +
+      'by applying an empty-state instruction to every state');
+    return `${await submit.count()} submit affordance(s) on the dashboard`;
+  });
+
   await j.step('create idea from the ideas page', async () => {
     await page.goto(`${BASE}/ideas`, { waitUntil: 'networkidle' });
     await page.getByRole('button', { name: /Submit an Idea|Submit your first idea/i }).first().click();
     await page.fill('#idea-title', TITLE);
-    await page.getByRole('button', { name: /^Start draft$/ }).click();
+    // "Save Idea" since 2026-09-03. The modal's button was a three-way ternary
+    // — "Start draft" / "Start with context" / "Starting…" — collapsed to
+    // "Save Idea" / "Saving…" when the submit-modal copy was rewritten. This
+    // line still said "Start draft" and timed out, and nothing caught it,
+    // because browser-tiers is manual/scheduled: a copy change and the journey
+    // that names that copy live in the same MR and only one of them is checked.
+    await page.getByRole('button', { name: /^Save Idea$/ }).click();
     const url = await assertUrl(page, /\/ideas\/[0-9a-f-]{36}\/draft\?draftId=[0-9a-f-]{36}/,
       'creating an idea must open its draft workspace');
     ideaId = /\/ideas\/([0-9a-f-]{36})\//.exec(url)[1];
@@ -107,6 +140,49 @@ try {
     return 'h1 = title, chip = In draft';
   });
 
+  /**
+   * The pre-fill card holds the full-width row the "Keep building" banner used
+   * to occupy — asserted on an UNTOUCHED draft here, and again after the
+   * questionnaire is answered, because those are two different code paths and
+   * only the second one regressed.
+   */
+  await j.step('an untouched draft shows the full-width pre-fill card', async () => {
+    const rich = page.getByText('Start from what you already have', { exact: true });
+    assert(await rich.count() > 0,
+      'the "Start from what you already have" card is missing on a new draft');
+    // Full width means WIDER than <main>, which is capped at 64%. Measuring is
+    // the point: the card was moved out of <main> correctly once and a class
+    // change could put it back without any text changing.
+    const cardBox = await rich.locator('xpath=ancestor::div[contains(@class,"rounded-xl")][1]').boundingBox();
+    // The QUESTIONNAIRE column specifically — `main[class*="64%"]` — not the
+    // layout's outer <main>, which is the full content width and against which
+    // any card looks full width. Measured the outer one first and it "passed"
+    // at 1104px vs 1152px, which proves nothing at all.
+    const col = page.locator('main[class*="64%"]').first();
+    assert(await col.count() > 0,
+      'no lg:w-[64%] column on the draft page — this assertion has lost its reference point');
+    const colBox = await col.boundingBox();
+    assert(cardBox && colBox && cardBox.width > colBox.width * 1.2,
+      `the pre-fill card is ${Math.round(cardBox?.width)}px against a ` +
+      `${Math.round(colBox?.width)}px questionnaire column — it is back inside that ` +
+      'column instead of the full-width row the "Keep building" banner vacated');
+    // And the things that row replaced must be gone.
+    for (const gone of ['Keep building', 'usually 5 to 10 days', 'in draft 0d']) {
+      assert(!(await page.getByText(gone, { exact: false }).count()),
+        `"${gone}" is still on the draft page`);
+    }
+    // "Working submission" was asked to be removed FROM THE CHIP, and that is
+    // what is asserted — scoped to the chip row beside the heading. The string
+    // also survives as the DashboardLayout page-header title and as the <h1>
+    // fallback for an untitled idea, neither of which was in scope; a
+    // whole-page search for it fails on those and would have been a test
+    // asserting more than was asked.
+    const chips = await page.locator('h1 + div').first().innerText();
+    assert(!/Working submission/i.test(chips),
+      `the chip row still carries "Working submission": "${chips.replace(/\s+/g, ' ')}"`);
+    return `card ${Math.round(cardBox.width)}px > column ${Math.round(colBox.width)}px`;
+  });
+
   await j.step('answering the questionnaire drives readiness to 100%', async () => {
     for (const [id, value] of Object.entries(ANSWERS)) {
       if (!(await page.locator('#' + id).count())) {
@@ -121,6 +197,24 @@ try {
       'with every required field answered the rail must say Ready for evaluation');
     await assertVisibleText(readinessPct(), /^100%$/, 'the readiness figure must reach 100%');
     return 'Ready for evaluation · 100%';
+  });
+
+  /**
+   * THE regression, asserted directly.
+   *
+   * The card was hoisted into the full-width row correctly, but the collapse
+   * condition was `autofillRan || anyContent` — so the moment a draft had a
+   * single character in it the card became a one-line bar, and on every real
+   * draft nothing prominent stood where the banner had been. The move was in
+   * the diff; the outcome was not. It now collapses only once pre-fill has
+   * actually RUN, which this journey never does.
+   */
+  await j.step('a draft WITH content still shows the card, not a one-line bar', async () => {
+    assert(await page.getByText('Start from what you already have', { exact: true }).count() > 0,
+      'the pre-fill card collapsed once the draft had content — the full-width row is empty again');
+    assert(!(await page.getByText('Have a write-up? Pre-fill the rest of this draft.', { exact: true }).count()),
+      'the draft shows the collapsed one-line pre-fill bar even though pre-fill never ran');
+    return 'still the full card after answering every section';
   });
 
   await j.step('autosave persisted the answers on the SERVER', async () => {
