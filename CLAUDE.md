@@ -257,6 +257,7 @@ it, in order of what the evidence justified rather than what looked tidy:
 | `components/auth/AuthLoadingOverlay.tsx` | 4 byte-identical copies | Login, Signup, Invite, ResetPassword |
 | `components/auth/BrandIcons.tsx` | 2 copies each of the Google (24-line) and Microsoft (11-line) marks | Login, Signup |
 | `lib/actionsView.ts` | 4 byte-identical helpers in the two actions screens | `daysColor`, `filterLabel`, `toggleColumn` |
+| `components/patents/LinkedIdeaBadge.tsx` | inline JSX in a 2,600-line file | extracted to make it TESTABLE, not to de-duplicate |
 
 Net: **806 lines deleted, 74 added.**
 
@@ -268,6 +269,16 @@ their computed visibility per route, and found 3 in the DOM and **0 visible** on
 /patents, /ideas, /due-dates and /clients, against 3 of 3 on the 404 page.
 Reading the CSS would have found only one of the two mechanisms. Registered as
 atlas `stale.md` F21.
+
+**One extraction is not about duplication at all.** `LinkedIdeaBadge` had a
+single call site. It came out because it could not be verified any other way:
+most of the demo portfolio was imported and carries no idea link — a scan of 500
+patents on demo returns zero — so the badge renders on no screen anyone can
+open. Inline in a 2,600-line file it was unreviewable and untestable; as a
+component it has stories that assert it is round, that it sits ON the
+application-number line rather than under it, that its accessible name carries
+the idea's title, and that `stopPropagation` keeps the row's own click from
+firing too. "I cannot see this in the running app" is a reason to extract.
 
 **What was deliberately NOT extracted, and why.** The scan's second- and
 fourth-biggest groups are the country-code list in `ProfileTab.tsx` and the

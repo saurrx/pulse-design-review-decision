@@ -78,6 +78,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useTheme } from "@/hooks/useTheme";
 import PatentTagsCell from "./PatentTagsCell";
+import LinkedIdeaBadge from "@/components/patents/LinkedIdeaBadge";
 import {
   PATENT_LEGAL_STATUS_META,
   PATENT_LEGAL_STATUS_VALUES,
@@ -2488,36 +2489,11 @@ const PatentsContent = (props: PatentsContentProps) => {
                                     the idea, because a bare icon tells a reader
                                     a link exists without telling them to what. */}
                                 {client?.IdeaPatentLink?.[0]?.idea?.id && (
-                                  <TooltipProvider delayDuration={200}>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <button
-                                          type="button"
-                                          aria-label={`Open the linked idea: ${
-                                            client.IdeaPatentLink[0].idea.title ||
-                                            "Untitled disclosure"
-                                          }`}
-                                          onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate(
-                                              `/ideas/${client.IdeaPatentLink[0].idea.id}`,
-                                            );
-                                          }}
-                                          className="inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border border-blue-200 bg-blue-50 text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900"
-                                        >
-                                          <LinkIcon className="h-2.5 w-2.5" />
-                                        </button>
-                                      </TooltipTrigger>
-                                      <TooltipContent side="top" className="max-w-xs">
-                                        <p className="text-xs font-medium">
-                                          {client.IdeaPatentLink[0].idea.title || "Untitled disclosure"}
-                                        </p>
-                                        <p className="mt-0.5 text-xs opacity-80">
-                                          Filed from a disclosure on Pulse. Open the idea.
-                                        </p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
+                                  <LinkedIdeaBadge
+                                    ideaId={client.IdeaPatentLink[0].idea.id}
+                                    ideaTitle={client.IdeaPatentLink[0].idea.title}
+                                    onOpen={(id) => navigate(`/ideas/${id}`)}
+                                  />
                                 )}
                               </span>
                             </div>
