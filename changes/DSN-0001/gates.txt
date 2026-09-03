@@ -1,0 +1,27 @@
+ok   typecheck (4s) 
+ok   lint:roles (0s) 
+ok   routes: every handler is real, every reachable route served (0s) 
+ok   credentials and inert hosts (0s) 
+ok   manifest and graph parity (1s) 
+ok   fingerprint self-test (bites) (0s) 
+ok   tokens: generated outputs match src/styles/tokens.json (0s) 
+ok   fidelity: adapter boundary, OpenAPI bodies, state machine (2s) 
+ok   v0 semantic gate (four personas, one stage, coverage, exclusions, optional evaluation, badges, declared contracts) (2s) 
+ok   v0 coverage matrix rendered and current (0s) 
+ok   build:design (7s) 
+ok   storybook:build (14s) 
+ok   test:stories (interaction, serial) (31s) 
+ok   shots (stable across two clean renders, no egress, matches baselines) (429s) 
+ok   a11y ratchet (no new fingerprints, zero in redesigned content) (57s) 
+info isolation probe (parallel stories safe?) (7s) isolation: data isolated (frame-local persona holds); chrome identity CONTAMINATED through the shared cookie | isolation: keep story tests serial | full output: node_modules/.cache/gates/isolation-probe-parallel-stories-safe-.log
+ok   smoke (full app on mock) (7s) 
+ok   crawl (every persona, every page and detail route) (95s) 
+ok   qa invariant: desktop gate (0s) 
+ok   qa invariant: layout rules, 6 roles x 2 viewports (132s) 
+ok   qa invariant: no visible uuid (192s) 
+ok   qa conformance: structure against baseline-mock (160s) 
+ok   lockfile reproduces with npm ci (6s) 
+ok   single runtime copies react=1 react-dom=1 vite=1
+ok   path classes
+
+gates: 25/25 passed

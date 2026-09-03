@@ -1,0 +1,11 @@
+{
+  "deployed": "2026-09-03",
+  "sourceCommit": "c1dbec22382935e968984e33175ee90e64d13a9f",
+  "kind": "preview deployments of the branch; the two production URLs still serve main",
+  "previews": [
+    { "project": "pulse-design", "url": "https://pulse-design-1pnwr07wn-s-5ecc81c4.vercel.app", "public": true },
+    { "project": "pulse-design-storybook", "url": "https://pulse-design-storybook-gy9dnz47o-s-5ecc81c4.vercel.app", "public": true }
+  ],
+  "verification": "both answer HTTP 200 without authentication; the Storybook index lists 116 stories, eight of them Foundations; the app HTML equals the local build except for the preview-feedback script Vercel injects into preview deployments (vercel.live), which production deployments do not carry; tools/design/smoke.mjs passes against the app preview with no outside host contacted",
+  "startHere": "https://pulse-design-storybook-gy9dnz47o-s-5ecc81c4.vercel.app/?path=/story/foundations-tokens--color"
+}

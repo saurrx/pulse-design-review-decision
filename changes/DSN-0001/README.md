@@ -102,8 +102,12 @@ Overdue, Declined); slate carries no judgment (Draft, Closed, Saved draft).
 ## Review surfaces
 Before: the Storybook deployment of the design main at `db73cd8`
 (https://pulse-design-storybook.vercel.app, Legacy reference on production's
-foundations). After: this branch's preview deployment, recorded in
-`previews.json`.
+foundations). After: this branch's preview deployments, recorded in
+`previews.json`: Storybook at
+https://pulse-design-storybook-gy9dnz47o-s-5ecc81c4.vercel.app (start at
+Foundations/Tokens) and the full app on mock data at
+https://pulse-design-1pnwr07wn-s-5ecc81c4.vercel.app. The production URLs
+still serve main; nothing is merged.
 - `foundations-tokens--color`, `foundations-tokens--typography`,
   `foundations-tokens--spacing`, `foundations-tokens--radius-and-borders`,
   `foundations-tokens--status-semantics`, `foundations-tokens--buttons-and-inputs`,
