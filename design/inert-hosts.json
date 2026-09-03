@@ -48,6 +48,7 @@
     "code.claude.com": "docs/architecture/pulse-design-fork-v5.html research citations; documentation only",
     "designtokens.org": "docs/architecture/pulse-design-fork-v5.html research citations; documentation only",
     "martinfowler.com": "docs/architecture/pulse-design-fork-v5.html research citations; documentation only",
-    "cdn.tailwindcss.com": "design/v4/PL-TKN-004.html, the approved token specification kept as a byte-exact reference; never served or executed by the product"
+    "cdn.tailwindcss.com": "design/v4/PL-TKN-004.html, the approved token specification kept as a byte-exact reference; never served or executed by the product",
+    "scripts.sil.org": "the SIL Open Font License texts under public/fonts name their home page; documentation only, never fetched"
   }
 }
