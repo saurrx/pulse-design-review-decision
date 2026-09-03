@@ -66,12 +66,18 @@ try {
         .map(el => /\/clients\/([0-9a-f-]{36})/.exec(el.getAttribute('href') || el.dataset.href || '')?.[1])
         .filter(Boolean));
     if (!roster.length) {
-      // The cards may not carry an href. Fall back to the API the page renders
-      // from — same session, same fence, and it still measures the server.
+      // The cards carry no href — they are divs with an onClick — so fall back
+      // to the API the page renders from. `/v1`, NOT `/api/v1`: the `/api`
+      // prefix is the legacy dialect that realAdapter rewrites in the browser,
+      // so a raw fetch to it lands on the SPA's index.html and parses as
+      // "Unexpected token '<'". Same session and same fence either way, so this
+      // still measures the server rather than the DOM.
       roster = await page.evaluate(async () => {
-        const r = await fetch('/api/v1/clients?limit=0', { credentials: 'include' });
+        const r = await fetch('/v1/clients?limit=0', { credentials: 'include' });
+        if (!r.ok) return [];
         const j = await r.json();
-        return (j?.data?.clients ?? j?.data ?? j?.clients ?? []).map(c => c.id).filter(Boolean);
+        const rows = Array.isArray(j) ? j : (j?.clients ?? j?.data?.clients ?? j?.data ?? []);
+        return (Array.isArray(rows) ? rows : []).map(c => c.id).filter(Boolean);
       });
     }
     assert(roster.length > 0, '/clients rendered no clients at all for a case owner');
