@@ -42,6 +42,7 @@ import {
 import Loader from "../Loader";
 import RequestStatusBadge from "./RequestStatusBadge";
 import moment from "moment";
+import { daysColor, filterLabel, toggleColumn } from "@/lib/actionsView";
 
 type FilterOption = "all" | "upcoming" | "dueToday" | "overdue";
 type SortOption = "newest" | "oldest" | "eventAZ" | "eventZA";
@@ -131,25 +132,11 @@ const OCActionsContent: React.FC = () => {
     { id: "requestStatus", label: "Request Status", visible: true, sticky: false },
   ]);
 
-  const toggleColumnVisibility = (columnId: string) => {
-    setColumns(
-      columns.map((col) =>
-        col.id === columnId ? { ...col, visible: !col.visible } : col,
-      ),
-    );
-  };
+  const toggleColumnVisibility = (columnId: string) =>
+    setColumns(toggleColumn(columns, columnId));
 
   const visibleColumns = columns.filter((col) => col.visible);
 
-  const getFilterLabel = (filter: FilterOption): string => {
-    switch (filter) {
-      case "all": return "All Actions";
-      case "upcoming": return "Upcoming";
-      case "dueToday": return "Due Today";
-      case "overdue": return "Overdue";
-      default: return "All Actions";
-    }
-  };
 
   // Same `list` name as the IHC table on purpose: /actions is one screen with
   // two role-specific bodies, and splitting the label would make the breakdown
@@ -247,13 +234,6 @@ const OCActionsContent: React.FC = () => {
     [updateStatus],
   );
 
-  const getDaysColor = (days: number | null) => {
-    if (days === null) return "";
-    if (days <= 0) return "text-red-600 font-semibold";
-    if (days <= 7) return "text-red-500";
-    if (days <= 30) return "text-amber-600";
-    return "text-green-600";
-  };
 
   if (isLoading) {
     return (
@@ -311,7 +291,7 @@ const OCActionsContent: React.FC = () => {
               }`}
             >
               <Filter className="w-4 h-4" />
-              <span>{getFilterLabel(filterOption)}</span>
+              <span>{filterLabel(filterOption)}</span>
               <ChevronDown className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -701,7 +681,7 @@ const OCActionsContent: React.FC = () => {
                               className={`p-3 text-xs ${
                                 isCompleted
                                   ? "text-zinc-500"
-                                  : getDaysColor(action.days_to_deadline)
+                                  : daysColor(action.days_to_deadline)
                               }`}
                             >
                               {isCompleted

@@ -5,13 +5,13 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "@/lib/toast";
 import { track } from "@/lib/analytics";
 import Cookies from "js-cookie";
-import { Loader2 } from "lucide-react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import "@/style.css";
 import { motion } from "framer-motion";
 import { AuthField } from "./AuthField";
+import AuthLoadingOverlay from "@/components/auth/AuthLoadingOverlay";
 
 type loginDataType = {
   email: string
@@ -93,14 +93,7 @@ const Invite = () => {
 
   return (
     <div className="pulse-auth-shell relative flex h-screen items-center justify-center overflow-hidden">
-      {isLoading && (
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-photon-primary" />
-            <p className="text-gray-600 font-medium">Signing in...</p>
-          </div>
-        </div>
-      )}
+      <AuthLoadingOverlay show={isLoading} />
 
       <div className="pulse-auth-panel w-full flex items-center justify-center p-6 relative z-10">
         <div className="pulse-auth-card">

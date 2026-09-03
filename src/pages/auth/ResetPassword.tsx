@@ -7,11 +7,12 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/lib/toast";
 import API_CONFIG from "@/lib/apiConfig";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { iLoginForm } from "./Login";
 import Cookies from "js-cookie";
 import { useMemo, useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion"
+import AuthLoadingOverlay from "@/components/auth/AuthLoadingOverlay";
 // password and confirm_password fields. both should be same case sentsitive
 const validationSchema = Yup.object().shape({
   password: Yup.string()
@@ -205,14 +206,7 @@ const ResetPassword: React.FC = () => {
 
   return (
     <div className="pulse-auth-shell relative flex h-screen items-center justify-center overflow-hidden">
-      {isLoadingLogin && (
-        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-photon-primary" />
-            <p className="text-gray-600 font-medium">Signing in...</p>
-          </div>
-        </div>
-      )}
+      <AuthLoadingOverlay show={isLoadingLogin} />
 
       <div className="pulse-auth-panel w-full flex items-center justify-center p-6 relative z-10">
         {/* Diagonal yellow line */}

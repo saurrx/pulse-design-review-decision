@@ -156,7 +156,23 @@ browser-tiers:
   script:
     - |
       failed=""
-      # Invariants first: it logs in as all five roles and populates the cache
+      # Storybook FIRST, and deliberately before anything that logs in.
+      #
+      # These are the only browser tests here that do not touch the deployed
+      # demo: `vitest --project=storybook` renders each story in this repo's own
+      # Chromium, runs its play function, and fails on an axe violation because
+      # .storybook/preview.tsx sets `a11y: { test: "error" }`. So it costs no
+      # demo login, cannot be flaked by a Vercel deploy race, and if a shared
+      # component is broken there is no point spending five logins to find out
+      # from a screen.
+      #
+      # It lives in THIS job rather than a per-MR one because it needs a browser
+      # image, and a second Playwright job on every push does not fit a
+      # 400-minute month. The marginal cost here is seconds: the image and
+      # `npm ci` are already paid for.
+      echo "=== storybook component tests"
+      npm run test-storybook || failed="$failed storybook"
+      # Invariants next: it logs in as all five roles and populates the cache
       # the journeys then reuse.
       echo "=== layout invariants"
       node qa/invariant/layout.qa.mjs || failed="$failed invariants"

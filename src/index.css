@@ -202,21 +202,6 @@
     }
   
   }
-
-  /* Glass effect classes */
-  .glass {
-    @apply bg-white/70 backdrop-blur-lg border border-white/20;
-  }
-  
-  /* Textarea focus styling */
-  .textarea-focus-ring {
-    @apply focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200;
-  }
-  
-  /* Animated status badges */
-  .pulse-badge {
-    @apply animate-pulse;
-  }
 }
 
 @layer components {
@@ -233,22 +218,6 @@
 
   .pulse-product-page .animate-blob {
     display: none !important;
-  }
-
-  .pulse-page-header {
-    @apply flex min-h-[108px] items-center justify-between gap-6 border-b px-6 py-5;
-    background: color-mix(in srgb, var(--pulse-surface) 94%, transparent);
-    border-color: var(--pulse-line);
-  }
-
-  .pulse-page-title {
-    @apply truncate text-2xl font-semibold tracking-[-0.03em];
-    color: var(--pulse-ink);
-  }
-
-  .pulse-page-description {
-    @apply mt-1 text-sm;
-    color: var(--pulse-ink-secondary);
   }
 
   .pulse-toolbar {
@@ -363,12 +332,6 @@
     box-shadow: var(--pulse-shadow-card);
   }
 
-  .pulse-segmented-control {
-    @apply inline-flex rounded-xl border p-1;
-    background: var(--pulse-surface-subtle);
-    border-color: var(--pulse-line);
-  }
-
   .pulse-pagination-bar {
     @apply border-t px-4 py-3;
     border-color: var(--pulse-line);
@@ -457,58 +420,8 @@
     background: #e5e4e9 !important;
   }
 
-  .nav-item {
-    @apply flex items-center gap-3 px-3 py-2 rounded-md text-photon-gray-600 hover:text-photon-primary hover:bg-photon-gray-100 transition-all;
-  }
-
-  .nav-item.active {
-    @apply bg-photon-primary/10 text-photon-primary font-medium;
-  }
-
   .metric-card {
     @apply bg-white rounded-xl p-5 border border-photon-gray-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col;
-  }
-
-  .map-tooltip {
-    @apply absolute z-10 bg-white rounded-lg shadow-lg p-3 border border-photon-gray-200 text-sm max-w-[250px] pointer-events-none;
-  }
-  
-  /* New components for the draft page */
-  .section-button {
-    @apply w-full text-left px-3 py-2 rounded-md flex items-center justify-between transition-all;
-  }
-  
-  .section-button.active {
-    @apply bg-primary/10 text-primary font-medium border-l-2 border-primary;
-  }
-  
-  .question-card {
-    @apply bg-gray-50 p-4 rounded-lg border border-gray-100 transition-all duration-200 hover:border-gray-200;
-  }
-  
-  /* Table styling to match sidebar */
-  .sidebar-styled-table {
-    @apply bg-sidebar-background border border-sidebar-border rounded-md overflow-hidden;
-  }
-  
-  .sidebar-styled-table thead {
-    @apply bg-sidebar-background border-b border-sidebar-border;
-  }
-  
-  .sidebar-styled-table thead th {
-    @apply text-sidebar-foreground font-medium text-sm py-3 px-4;
-  }
-  
-  .sidebar-styled-table tbody tr {
-    @apply border-b border-sidebar-border hover:bg-sidebar-accent transition-colors;
-  }
-  
-  .sidebar-styled-table tbody tr:last-child {
-    @apply border-b-0;
-  }
-  
-  .sidebar-styled-table tbody td {
-    @apply py-3 px-4 text-sidebar-foreground;
   }
 
   /* Card elevated light style from Figma */
@@ -519,42 +432,6 @@
   /* Card elevated dark style */
   .card-elevated-dark {
     @apply bg-[linear-gradient(135deg,#1e1e1eb3_0%,#1a1a1a99_100%)] rounded-xl border border-zinc-800 shadow-sm hover:shadow-md hover:bg-[#1a1a1a99] transition-all duration-300;
-  }
-
-  /* Icon glow effects */
-  .icon-glow-blue {
-    @apply bg-blue-50;
-  }
-  .icon-glow-blue svg {
-    color: rgb(59, 130, 246);
-  }
-
-  .icon-glow-green {
-    @apply bg-green-50;
-  }
-  .icon-glow-green svg {
-    color: rgb(16, 185, 129);
-  }
-
-  .icon-glow-yellow {
-    @apply bg-yellow-50;
-  }
-  .icon-glow-yellow svg {
-    color: rgb(249, 180, 24);
-  }
-
-  .icon-glow-red {
-    @apply bg-red-50;
-  }
-  .icon-glow-red svg {
-    color: rgb(239, 68, 68);
-  }
-
-  .icon-glow-purple {
-    @apply bg-purple-50;
-  }
-  .icon-glow-purple svg {
-    color: rgb(139, 92, 246);
   }
 
   /* Label muted style */
@@ -585,40 +462,6 @@
 
   .scrollbar-modern-light::-webkit-scrollbar-thumb:hover {
     background-color: rgba(156, 163, 175, 0.5);
-  }
-
-  /* Sidebar modern dark style */
-  .sidebar-modern-dark {
-    @apply bg-[linear-gradient(135deg,#121212f0_0%,#0c0c0ce6_100%)] border-r border-zinc-800;
-  }
-
-  /* Sidebar modern light style */
-  .sidebar-modern-light {
-    @apply bg-white border-r border-zinc-200;
-  }
-
-  /* Scrollbar modern dark style */
-  .scrollbar-modern-dark {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(113, 113, 122, 0.3) transparent;
-  }
-
-  .scrollbar-modern-dark::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  .scrollbar-modern-dark::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .scrollbar-modern-dark::-webkit-scrollbar-thumb {
-    background-color: rgba(113, 113, 122, 0.3);
-    border-radius: 3px;
-  }
-
-  .scrollbar-modern-dark::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(113, 113, 122, 0.5);
   }
 
   /* Dark mode base styles */
