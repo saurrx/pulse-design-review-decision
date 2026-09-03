@@ -1,14 +1,15 @@
 {
-  "deployed": "2026-09-03T04:05:00Z",
-  "protection": "Vercel Authentication disabled on both projects via the project API; production and preview URLs are public",
+  "deployed": "2026-09-03T06:48:21.977Z",
   "previews": [
     {
       "project": "pulse-design",
+      "url": "https://pulse-design-hg1khzkga-s-5ecc81c4.vercel.app",
       "stable": "https://pulse-design-s-5ecc81c4.vercel.app",
       "public": true
     },
     {
       "project": "pulse-design-storybook",
+      "url": "https://pulse-design-storybook-2qn8zpys6-s-5ecc81c4.vercel.app",
       "stable": "https://pulse-design-storybook.vercel.app",
       "public": true
     }
