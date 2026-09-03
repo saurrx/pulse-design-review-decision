@@ -1,0 +1,11 @@
+{
+  "deployed": "2026-09-03",
+  "sourceCommit": "dbafed5551c8e90bc67f231fa27cb642e4eb4274",
+  "builtBy": "the gate run recorded in gates-2026-09-03.txt (build:design, storybook:build), deployed prebuilt with tools/design/deploy.mjs --prod --no-build",
+  "verification": "deployed storybook index.json, iframe.html, the app's index.html and its main bundle are byte-identical (SHA-256) to the local build of the source commit; the deployed index lists 108 stories, all under Legacy reference; tools/design/smoke.mjs passes against the deployed app with no external host contacted",
+  "protection": "Vercel Authentication off on both projects; no project created or renamed",
+  "previews": [
+    { "project": "pulse-design", "stable": "https://pulse-design-s-5ecc81c4.vercel.app", "public": true },
+    { "project": "pulse-design-storybook", "stable": "https://pulse-design-storybook.vercel.app", "public": true }
+  ]
+}
