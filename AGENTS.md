@@ -19,6 +19,16 @@ other agent.
 - `product-context/` is the V0 product and design truth. Read-only in design
   branches; a product change needs a recorded context update (its VALIDATION.md).
 - `docs/architecture/` is the pinned architecture and the reconciliation record.
+- `design/v0/` is the V0 foundation: the coverage matrix (`coverage.json`, rendered
+  as `COVERAGE.md`), one entry per brief in product-context/surfaces with personas,
+  goals, routes, required scenarios, states, backend impact and intended story ids.
+- `mock/scenarios/v0/` holds the ten V0 scenarios (names start with `v0/`): V0
+  tenants, four personas, no committee, one review stage. The legacy scenarios
+  (`committee/queue`, `counsel/queue`, ...) serve the Legacy reference tier only.
+- `mock/proposed-fields.json` and `mock/proposed-routes.json` declare the future
+  backend contracts the V0 mock models (BF-1 on-behalf submission with separate
+  attribution, BF-3 the activation email outbox). They answer only when a scenario
+  sets `flags.v0`; the legacy tier keeps refusing what the backend refuses.
 - `changes/DSN-*/` holds one folder per design record.
 - `contract/` holds pinned copies of the backend contract and sanitised production
   instructions. Protected; refreshed only by the sync script.
@@ -77,10 +87,20 @@ docs/architecture/CONTEXT-RECONCILIATION.md and the design record is
 - Expect a behavioural-fingerprint escalation when a restyle touches a query, a
   payload, a navigation target or a role condition, and say in the record why.
 - Render and inspect the real result at 1280×720, 1366×768, 1440×900, 1920×1080
-  and 200% zoom, then run product-context/DESIGN-SCORECARD.md before calling
-  work ready.
+  and 200% zoom (the harness viewports `pulse1280`, `pulse1366`, `pulse1440`,
+  `pulse1920`, `pulseZoom200`; a story tags `viewport:1366x768` or
+  `viewport:640x360@2` for its screenshot), then run
+  product-context/DESIGN-SCORECARD.md before calling work ready.
+- A V0 story is titled `Surfaces/<brief title>` with the id the coverage matrix
+  intends, selects a `v0/` scenario, and exists only when its DSN record creates
+  the production-shaped component. Never present a Legacy reference story as V0.
 - Before a PR: `npm run typecheck`, `npm run lint:roles`, `npm run build:design`,
-  `npm run storybook:build`, `npm run test:stories`, `node tools/design/gates.mjs`.
+  `npm run storybook:build`, `npm run test:stories`, `npm run test:v0`,
+  `node tools/design/gates.mjs`. The V0 semantic gate fails on a fifth persona,
+  a committee or superadmin persona, a technical review stage, a brief missing
+  from the matrix, an Inventor reaching Actions or due dates, an excluded
+  feature, an evaluation that gates submission, or a badge outside Workspace
+  Admin review.
 - Write the record: intent, what moved, what stayed, story ids, screenshots per
   persona, backend impact (`none`, `unwired` or `conceptual`), the scorecard.
 
@@ -107,5 +127,7 @@ docs/architecture/CONTEXT-RECONCILIATION.md and the design record is
 - Full app on mock data: `npm run dev:design` (port 3700). Persona and scenario
   from the chip at the bottom-left, or `?scenario=<name>&role=<ROLE>`.
 - Storybook: `npm run storybook` (port 6006). Story tests: `npm run test:stories`.
+  V0 semantic gate: `npm run test:v0`. Coverage matrix: `node tools/design/v0-coverage.mjs --write`
+  after editing `design/v0/coverage.json`. V0 scenarios: `?scenario=v0/workspace-admin/queue`.
 - Sync from production: `node tools/design/sync.mjs`. Export a record:
   `node tools/design/export.mjs DSN-0007`.

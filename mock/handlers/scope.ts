@@ -23,6 +23,7 @@ export function visibleIdeas(db: Db, u: User | null): Idea[] {
 
 export function hydrateIdea(db: Db, i: Idea, now: number) {
   const author = db.users.find((x) => x.id === i.author_id);
+  const submitter = i.submitted_by_id ? db.users.find((x) => x.id === i.submitted_by_id) : null;
   const client = db.clients.find((c) => c.id === i.client_id);
   const draft = db.drafts.filter((d) => d.idea_id === i.id).sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
   const inventors = db.inventors.filter((x) => x.idea_id === i.id).map((x) => {
@@ -34,6 +35,7 @@ export function hydrateIdea(db: Db, i: Idea, now: number) {
     ...i,
     reference_number: i.reference,
     author: author ? { id: author.id, name: author.name, email: author.email } : null,
+    submitted_by: submitter ? { id: submitter.id, name: submitter.name, email: submitter.email } : null,
     client: client ? { id: client.id, name: client.name } : null,
     inventors,
     patent_link: null,

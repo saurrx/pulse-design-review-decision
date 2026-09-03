@@ -1,0 +1,39 @@
+{
+  "_doc": "Future backend contracts the V0 mock models so an approved experience can be designed before the backend has it. Each entry names the backend finding in docs/architecture/CONTEXT-RECONCILIATION.md. The mock honours these only when a scenario sets flags.v0; the Legacy reference tier keeps refusing what the backend refuses. A design record that depends on one of these is `conceptual` until the contract lands and the field moves into contract/.",
+  "fields": [
+    {
+      "entity": "Idea",
+      "field": "submitted_by_id",
+      "type": "string | null",
+      "finding": "BF-1",
+      "reason": "Separate Inventor and Submitted by attribution when a Workspace Admin submits on behalf of an inventor (product-context/WORKFLOWS.md section 5). Null when the primary inventor submitted."
+    },
+    {
+      "entity": "Idea",
+      "field": "inventor_id",
+      "type": "string (request body of POST /v1/ideas)",
+      "finding": "BF-1",
+      "reason": "A Workspace Admin selects the real primary inventor when starting an idea on their behalf. Requires idea:create and idea:submit for LEGAL_COUNSEL, which GRANTS does not carry today."
+    }
+  ],
+  "collections": [
+    {
+      "name": "emails",
+      "route": "GET /v1/emails/outbox",
+      "finding": "BF-3",
+      "reason": "The activation and reminder sequences of product-context/WORKFLOWS.md section 9 are V0 requirements; the backend has no mailer. The outbox lets the design show what a person received and why. Nothing is sent."
+    }
+  ],
+  "policies": [
+    {
+      "name": "inventor-no-docket",
+      "routes": [
+        "GET /v1/due-dates",
+        "GET /v1/actions",
+        "GET /v1/actions/templates"
+      ],
+      "finding": "BF-4",
+      "reason": "Inventors never see due dates or Actions (product-context/PERSONAS.md, SCREENS.md). The backend serves both to any authenticated role scoped to its client, and production's dashboard shows upcoming due dates to inventors. V0 hides them in the interface; the backend should refuse them so the interface is not the only barrier."
+    }
+  ]
+}

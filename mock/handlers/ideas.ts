@@ -62,7 +62,8 @@ function submit(idea: Idea, actor: User, comment: string | undefined) {
   const client = db.clients.find((c) => c.id === idea.client_id)!;
   const from = idea.state;
   if (!["DRAFT", "CHANGES_REQUESTED", "REJECTED"].includes(from)) return { status: 409, body: { message: `An idea in state ${from} cannot be submitted.` } };
-  if (actor.role !== "INVENTOR") return { status: 403, body: { message: "Only an inventor can submit a disclosure." } };
+  const onBehalf = !!db.flags.v0 && actor.role === "LEGAL_COUNSEL" && idea.submitted_by_id === actor.id;
+  if (actor.role !== "INVENTOR" && !onBehalf) return { status: 403, body: { message: "Only an inventor can submit a disclosure." } };
   if (from === "REJECTED" && !comment?.trim()) return { status: 400, body: { message: "An appeal needs a comment explaining what changed." } };
   const draft = db.drafts.filter((d) => d.idea_id === idea.id).sort((a, b) => b.updated_at.localeCompare(a.updated_at))[0];
   const answers = (draft?.answers ?? {}) as Record<string, unknown>;
@@ -116,16 +117,20 @@ export const ideaHandlers = [
     return visibleIdeas(db, u).filter((i) => (!states.length || states.includes(i.state)) && (!cid || i.client_id === cid)).map((i) => hydrateIdea(db, i, clock.now()));
   }),
   route("post", "/v1/ideas", async ({ body }) => {
-    const b = (await body()) as { title?: string; body?: string };
+    const b = (await body()) as { title?: string; body?: string; inventor_id?: string };
     const db = getDb(); const u = currentUser();
     if (!u) return { status: 401, body: { message: "Not signed in." } };
-    if (u.role !== "INVENTOR" || !u.client_id) return { status: 403, body: { message: "Only an inventor at a client can author a disclosure." } };
+    // BF-1 (V0 scenarios only): a Workspace Admin starts an idea on behalf of a real inventor in the same workspace; the inventor stays the author, the admin is recorded as the submitter.
+    const onBehalf = !!db.flags.v0 && u.role === "LEGAL_COUNSEL" && !!b.inventor_id;
+    const author = onBehalf ? db.users.find((x) => x.id === b.inventor_id && x.role === "INVENTOR" && x.client_id === u.client_id) : u;
+    if (onBehalf && !author) return { status: 400, body: { message: "Choose an inventor from your workspace." } };
+    if (!author || author.role !== "INVENTOR" || !author.client_id) return { status: 403, body: { message: "Only an inventor at a client can author a disclosure." } };
     if (!b.title?.trim()) return { status: 400, body: { message: "A title is required." } };
-    const { reference, seq } = nextReference(u.client_id);
+    const { reference, seq } = nextReference(author.client_id);
     const rng = rngNow(u.id + b.title);
-    const idea: Idea = { id: uuid(rng), client_id: u.client_id, author_id: u.id, title: b.title.trim(), body: b.body?.trim() || null, reference, reference_seq: seq, state: "DRAFT", revision: 1, submitted_at: null, created_at: clock.iso(), updated_at: clock.iso() };
+    const idea: Idea = { id: uuid(rng), client_id: author.client_id, author_id: author.id, submitted_by_id: onBehalf ? u.id : null, title: b.title.trim(), body: b.body?.trim() || null, reference, reference_seq: seq, state: "DRAFT", revision: 1, submitted_at: null, created_at: clock.iso(), updated_at: clock.iso() };
     db.ideas.push(idea);
-    db.inventors.push({ id: uuid(rng), idea_id: idea.id, inventor_id: u.id, role: "PRIMARY", added_at: clock.iso() });
+    db.inventors.push({ id: uuid(rng), idea_id: idea.id, inventor_id: author.id, role: "PRIMARY", added_at: clock.iso() });
     db.transitions.push({ id: uuid(rng), idea_id: idea.id, from_state: null, to_state: "DRAFT", stage: null, decision: null, actor_id: u.id, revision: 1, comment: null, is_appeal: false, created_at: clock.iso() });
     touched();
     return { status: 201, body: hydrateIdea(db, idea, clock.now()) };

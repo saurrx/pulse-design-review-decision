@@ -134,6 +134,7 @@ export const patentHandlers = [
 
   // Due dates: the docket.
   route("get", "/v1/due-dates", ({ url }) => {
+    if (getDb().flags.v0 && currentUser()?.role === "INVENTOR") return { status: 403, body: { message: "Due dates are not part of an inventor's workspace." } }; // BF-4, V0 scenarios only
     const { scope } = scoped(url);
     let rows = allDueDates(scope);
     const from = q(url, "from"); const to = q(url, "to");

@@ -28,8 +28,11 @@ const close = await serveStatic(dir, port);
 const browser = await chromium.launch();
 let failures = 0; const blockedAll = new Set();
 
-async function render(id) {
-  const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: "en-GB", timezoneId: "UTC", reducedMotion: "reduce", deviceScaleFactor: 1 });
+async function render(id, tags = []) {
+  // A story tagged viewport:WxH or viewport:WxH@scale is shot at that size (200% zoom is 640x360@2); the default is the 1440 review width.
+  const tag = (tags ?? []).map((t) => /^viewport:(\d+)x(\d+)(?:@(\d))?$/.exec(t)).find(Boolean);
+  const viewport = tag ? { width: Number(tag[1]), height: Number(tag[2]) } : { width: 1440, height: 900 };
+  const context = await browser.newContext({ viewport, locale: "en-GB", timezoneId: "UTC", reducedMotion: "reduce", deviceScaleFactor: tag?.[3] ? Number(tag[3]) : 1 });
   const blocked = await blockEgress(context);
   const page = await context.newPage();
   const errors = [];
@@ -55,9 +58,9 @@ for (const s of storiesFrom(dir)) {
   if (only && !only.test(s.id)) continue;
   const file = path.join(out, `${s.id}.png`);
   try {
-    const a = await render(s.id);
+    const a = await render(s.id, s.tags);
     if (args.has("--twice")) {
-      const b = await render(s.id);
+      const b = await render(s.id, s.tags);
       const st = same(a.png, b.png);
       if (!st.ok) { failures++; console.log(`UNSTABLE ${s.id}: two clean renders differ by ${st.count} pixels in ${JSON.stringify(st.box)}`); if (debugDir) { fs.writeFileSync(path.join(debugDir, `${s.id}.a.png`), a.png); fs.writeFileSync(path.join(debugDir, `${s.id}.b.png`), b.png); } continue; }
       if (st.count) console.log(`   note ${s.id}: ${st.count} anti-aliasing pixel(s) between renders, within tolerance`);

@@ -6,7 +6,7 @@ export type Client = { id: string; name: string; domain: string; has_tech_commit
 export type User = { id: string; email: string; name: string; role: RoleName; status: "INVITED" | "ACTIVE" | "SUSPENDED"; client_id: string | null; assigned_client_ids: string[]; phone: string | null; country_code: string | null; country_name: string | null; address: string | null; notification_prefs: { reviewDecisions: boolean; informationRequests: boolean; filingUpdates: boolean }; last_login_at: string | null; created_at: string; updated_at: string };
 export type ClientAccess = { id: string; user_id: string; client_id: string; kind: "ASSIGNMENT" | "TEMPORARY" | "STEP_IN"; is_primary: boolean; reason: string | null; expires_at: string | null; granted_at: string; revoked_at: string | null };
 export type Inventor = { id: string; idea_id: string; inventor_id: string; role: "PRIMARY" | "CO"; added_at: string };
-export type Idea = { id: string; client_id: string; author_id: string; title: string; body: string | null; reference: string; reference_seq: number; state: IdeaState; revision: number; submitted_at: string | null; created_at: string; updated_at: string };
+export type Idea = { id: string; client_id: string; author_id: string; /** Proposed (BF-1): the account that submitted on behalf of the primary inventor; null when the inventor did. */ submitted_by_id?: string | null; title: string; body: string | null; reference: string; reference_seq: number; state: IdeaState; revision: number; submitted_at: string | null; created_at: string; updated_at: string };
 export type Transition = { id: string; idea_id: string; from_state: IdeaState | null; to_state: IdeaState; stage: ReviewStage | null; decision: ReviewDecision | null; actor_id: string; revision: number; comment: string | null; is_appeal: boolean; created_at: string };
 export type Draft = { id: string; idea_id: string; answers: Record<string, unknown>; status: "DRAFT" | "SUBMITTED"; api_evaluation_id: string | null; score: number | null; report: unknown | null; brief_summary: string | null; brief_problem: string | null; created_at: string; updated_at: string };
 export type EvalState = "QUEUED" | "RUNNING" | "SUCCEEDED" | "PARTIAL" | "FAILED" | "TIMED_OUT";
@@ -24,6 +24,8 @@ export type PatentImport = { id: string; client_id: string; file_id: string; sta
 export type PortfolioSpec = { count: number; seed: string; dueDatesPerPatent: number; assignee: string };
 
 export type Flags = {
+  /** A V0 scenario: four personas, one review stage; the mock models the proposed contracts in mock/proposed-fields.json. */
+  v0?: boolean;
   /** Every mutation answers 400 with a message, for failure-state design. */
   mutationsFail?: boolean;
   /** The login endpoint refuses every account; /me and refresh answer 401. */
@@ -34,7 +36,15 @@ export type Flags = {
   latencyMs?: number;
 };
 
+/** The activation and reminder emails of product-context/WORKFLOWS.md section 9 (proposed, BF-3). */
+export type EmailKind =
+  | "admin-invite" | "admin-login-reminder-24h" | "admin-seven-day-digest" | "admin-no-inventors" | "admin-inventors-no-idea" | "admin-new-idea-review" | "admin-weekly-pending-digest"
+  | "inventor-invite" | "inventor-login-reminder-24h" | "inventor-teammate-submission" | "inventor-browsed-no-start" | "inventor-clicked-no-draft" | "inventor-half-draft" | "inventor-evaluated-not-submitted" | "inventor-submitted-confirmation";
+export type EmailRecord = { id: string; kind: EmailKind; to_user_id: string; to_email: string; subject: string; primary_action: { label: string; path: string }; reason: string; sent_at: string };
+
 export type Db = {
+  /** V0 only: the outbox a scenario's state implies. Absent in the Legacy reference tier. */
+  emails?: EmailRecord[];
   scenario: string;
   seedVersion: number;
   flags: Flags;

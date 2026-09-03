@@ -90,9 +90,16 @@ must change; the record ships as a proposal).
 - Base: production's counsel navigation already labels `/due-dates` as
   "Actions"; whether patent detail shows dates to inventors is decided per
   component.
-- Resolution: patent detail and Actions hide date data by persona; the
-  `/due-dates` path stays as a technical route for Workspace Admin.
-- Impact: `none`, fingerprint escalation on the role condition.
+- Resolution: patent detail, dashboards and Actions hide date data by persona;
+  the `/due-dates` path stays as a technical route for Workspace Admin. The
+  backend serves scoped due dates and Actions to every authenticated role
+  (section 8 of its instruction copy lists no capability on those reads) and
+  production's dashboard shows upcoming due dates to inventors; the V0 mock
+  refuses inventors under `flags.v0` as the declared policy BF-4, the legacy
+  tier keeps serving them.
+- Impact: `none` for the interface, fingerprint escalation on the role
+  condition; backend finding BF-4: refuse due-date and Action reads to
+  INVENTOR so the interface is not the only barrier.
 
 ## R-09 Client plans and pricing
 - Product: no purchasing, checkout, billing or price selection.

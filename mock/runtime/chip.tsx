@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { SCENARIOS } from "../scenarios";
+import { SCENARIOS, V0_SCENARIOS } from "../scenarios";
+import { personaLabel } from "../scenarios/v0/personas";
 import { getDb, clearSnapshot } from "./db";
 import { clock } from "./clock";
 import { stats } from "./registry";
@@ -19,7 +20,8 @@ const badge = (bg: string): React.CSSProperties => ({ display: "inline-block", p
 
 function Chip({ scenario }: { scenario: string }) {
   const [, tick] = React.useReducer((n: number) => n + 1, 0);
-  const [open, setOpen] = React.useState(true);
+  // Collapsed by default: production's QA tiers snapshot the accessibility tree, and an open chip would put every scenario and persona name into their baselines.
+  const [open, setOpen] = React.useState(false);
   React.useEffect(() => { const t = setInterval(tick, 1000); return () => clearInterval(t); }, []);
   const db = getDb();
   const def = SCENARIOS[scenario];
@@ -52,13 +54,14 @@ function Chip({ scenario }: { scenario: string }) {
       </div>
       <label style={label}>Scenario
         <select style={select} value={scenario} onChange={(e) => switchScenario(e.target.value)}>
-          {Object.values(SCENARIOS).map((s) => <option key={s.name} value={s.name}>{s.name}</option>)}
+          <optgroup label="V0">{Object.values(V0_SCENARIOS).map((s) => <option key={s.name} value={s.name}>{s.name}</option>)}</optgroup>
+          <optgroup label="Legacy reference">{Object.values(SCENARIOS).filter((s) => !V0_SCENARIOS[s.name]).map((s) => <option key={s.name} value={s.name}>{s.name}</option>)}</optgroup>
         </select>
       </label>
       <label style={label}>Persona
         <select style={select} value={persona?.email ?? ""} onChange={(e) => switchPersona(e.target.value)}>
           <option value="">signed out</option>
-          {db.users.filter((u) => (def?.personas ?? []).includes(u.email) || u.role.startsWith("PHOTON") || u.role === "CASE_OWNER").map((u) => <option key={u.email} value={u.email}>{u.role.toLowerCase().replace("_", " ")} · {u.name}</option>)}
+          {db.users.filter((u) => (def?.personas ?? []).includes(u.email) || u.role.startsWith("PHOTON") || u.role === "CASE_OWNER").map((u) => <option key={u.email} value={u.email}>{db.flags.v0 ? personaLabel(u.role) : u.role.toLowerCase().replace("_", " ")} · {u.name}</option>)}
         </select>
       </label>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>

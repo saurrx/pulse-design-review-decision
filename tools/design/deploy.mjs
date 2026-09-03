@@ -39,4 +39,5 @@ for (const t of targets) {
   out.push({ project: t.project, url, stable, public: prod });
   console.log(`${t.project}: ${stable ?? url}${prod ? " (production, public: Vercel Authentication is off for both projects)" : " (preview deployment URL)"}`);
 }
-fs.writeFileSync("changes/SPIKE/previews.json", JSON.stringify({ deployed: new Date().toISOString(), previews: out }, null, 2) + "\n");
+// The last deployment, as a record beside the design records; a record folder (changes/<NAME>/previews.json) documents what was verified for its commit.
+fs.writeFileSync("changes/deployments.json", JSON.stringify({ deployed: new Date().toISOString(), commit: sh("git", ["rev-parse", "HEAD"]).trim(), previews: out }, null, 2) + "\n");

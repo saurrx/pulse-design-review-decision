@@ -14,6 +14,7 @@ const step = async (name, fn) => { try { await fn(); console.log("ok  ", name); 
 await step("login page renders on mock", async () => {
   await page.goto(base + "/login?scenario=committee/queue", { waitUntil: "networkidle" });
   await page.waitForSelector("#design-tools", { state: "attached", timeout: 15000 });
+  await page.getByRole("button", { name: "Open design tools" }).click();
   await page.getByRole("region", { name: "Design tools" }).waitFor();
   await page.getByRole("heading", { name: "Sign in" }).waitFor();
   await page.screenshot({ path: `${shots}/01-login.png` });

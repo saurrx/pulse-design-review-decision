@@ -1,6 +1,7 @@
 import type { ScenarioDef } from "../runtime/types";
 import { ACME, GLOBEX, HELIX, USERS } from "./personas";
 import { buildIdeas, emptyData, portfolio, rngFor, seedOperations, type IdeaSpec } from "./build";
+import { V0_SCENARIOS, DEFAULT_V0_SCENARIO } from "./v0";
 
 /**
  * Named scenarios. A story or the chip selects one; the store is rebuilt from
@@ -100,5 +101,9 @@ const qaFull = firm("qa/full", "Everything populated for the QA tiers", "All thr
 
 function firmBuild(name: string) { return firm(name, "", "", USERS.counsel.email, [], SMALL).build(); }
 
-export const SCENARIOS: Record<string, ScenarioDef> = Object.fromEntries([inventorFirstRun, inventorPortfolio, committeeQueue, counselQueue, caseOwner, photonAdmin, superadmin, large, failure, slow, authFailures, qaFull].map((s) => [s.name, s]));
+/** Legacy reference scenarios: production's six roles as they are today. Technical regression only; never V0. */
+export const LEGACY_SCENARIOS: Record<string, ScenarioDef> = Object.fromEntries([inventorFirstRun, inventorPortfolio, committeeQueue, counselQueue, caseOwner, photonAdmin, superadmin, large, failure, slow, authFailures, qaFull].map((s) => [s.name, s]));
+/** V0 first, then the Legacy reference tier. */
+export const SCENARIOS: Record<string, ScenarioDef> = { ...V0_SCENARIOS, ...LEGACY_SCENARIOS };
+export { V0_SCENARIOS, DEFAULT_V0_SCENARIO };
 export const DEFAULT_SCENARIO = committeeQueue.name;

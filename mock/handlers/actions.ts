@@ -28,7 +28,7 @@ const clientRow = (dd: ReturnType<typeof allDueDates>[number]) => {
 };
 
 export const actionHandlers = [
-  route("get", "/v1/actions/templates", ({ url }) => templatesFor(q(url, "event_type") ?? "")),
+  route("get", "/v1/actions/templates", ({ url }) => (getDb().flags.v0 && currentUser()?.role === "INVENTOR" ? { status: 403, body: { message: "Actions are not part of an inventor's workspace." } } : templatesFor(q(url, "event_type") ?? ""))),
   route("get", "/v1/actions/queue", ({ url }) => {
     const db = getDb(); const u = currentUser();
     if (!u || !["CASE_OWNER", "PHOTON_ADMIN", "PHOTON_SUPERADMIN"].includes(u.role)) return { status: 403, body: { message: "Photon Legal only." } };
@@ -50,6 +50,7 @@ export const actionHandlers = [
   }),
   route("get", "/v1/actions", ({ url }) => {
     const u = currentUser();
+    if (getDb().flags.v0 && u?.role === "INVENTOR") return { status: 403, body: { message: "Actions are not part of an inventor's workspace." } }; // BF-4, V0 scenarios only
     const scope = scopeFor(u);
     const cid = q(url, "client_id");
     const ids = cid ? (scope === null || scope.includes(cid) ? [cid] : []) : scope;

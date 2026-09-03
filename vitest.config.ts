@@ -25,6 +25,10 @@ export default async () => {
         },
         {
           extends: true,
+          test: { name: "v0", environment: "node", include: ["qa/v0/**/*.test.ts"], setupFiles: ["qa/fidelity/setup.ts"] },
+        },
+        {
+          extends: true,
           plugins: [storybookTest({ configDir: path.join(dirname, ".storybook") })],
           test: {
             name: "storybook",

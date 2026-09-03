@@ -17,6 +17,8 @@ export type IdeaSpec = {
   comment?: string;
   reviewer?: User;
   completion?: number;       // for drafts: 0..100
+  /** V0: the Workspace Admin who submitted on behalf of the author (proposed field submitted_by_id). */
+  submittedBy?: User;
 };
 
 export type Data = Omit<Db, "scenario" | "seedVersion">;
@@ -39,7 +41,7 @@ export function buildIdeas(rng: Rng, client: Client, specs: IdeaSpec[], data: Da
     const created = clock.daysAgo(spec.ageDays + 2);
     const submitted = spec.state === "DRAFT" ? null : clock.daysAgo(spec.ageDays);
     const idea: Idea = {
-      id: ideaId, client_id: client.id, author_id: spec.author.id, title: inv.title,
+      id: ideaId, client_id: client.id, author_id: spec.author.id, submitted_by_id: spec.submittedBy?.id ?? null, title: inv.title,
       body: i % 3 === 0 ? `A short inventor-written summary of ${inv.title.toLowerCase()}.` : null,
       reference: `${client.idea_reference_prefix}-${String(seq).padStart(4, "0")}`, reference_seq: seq,
       state: spec.state, revision: 1, submitted_at: submitted, created_at: created, updated_at: clock.daysAgo(Math.max(0, spec.ageDays - 1)),
@@ -84,7 +86,7 @@ export function buildIdeas(rng: Rng, client: Client, specs: IdeaSpec[], data: Da
     const chain: Array<[IdeaState | null, IdeaState, Transition["stage"], Transition["decision"], User, string | null]> = [];
     const firstStage: IdeaState = client.has_tech_committee ? "TECH_REVIEW" : "LEGAL_REVIEW";
     const reviewer = spec.reviewer ?? spec.author;
-    if (spec.state !== "DRAFT") chain.push([null, firstStage, null, null, spec.author, null]);
+    if (spec.state !== "DRAFT") chain.push([null, firstStage, null, null, spec.submittedBy ?? spec.author, null]);
     if (spec.state === "LEGAL_REVIEW" && client.has_tech_committee) chain.push(["TECH_REVIEW", "LEGAL_REVIEW", "TECHNICAL", "APPROVED", reviewer, null]);
     if (spec.state === "CHANGES_REQUESTED") chain.push([firstStage, "CHANGES_REQUESTED", client.has_tech_committee ? "TECHNICAL" : "LEGAL", "CHANGES_REQUESTED", reviewer, spec.comment ?? "Please add test data for the novelty claim."]);
     if (spec.state === "REJECTED") chain.push([firstStage, "REJECTED", client.has_tech_committee ? "TECHNICAL" : "LEGAL", "REJECTED", reviewer, spec.comment ?? "Overlaps a filed application."]);

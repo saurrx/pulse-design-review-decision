@@ -37,11 +37,23 @@ export type PulseParams = {
   prepare?: (db: Db) => void;
 };
 
+/**
+ * Review widths. product-context/INTERFACE-QUALITY.md names 1280×720, 1366×768,
+ * 1440×900, 1920×1080 and 200% browser zoom; 1024 stays as production's desktop
+ * floor for the Legacy reference tier. Zoom is emulated as the CSS viewport a
+ * 1280×720 window has at 200%: 640×360 at device scale 2. A story selects one
+ * with `globals: { viewport: { value: "pulse1366" } }` and, for screenshots,
+ * the tag `viewport:1366x768` (or `viewport:640x360@2`), which shots.mjs reads.
+ */
 export const VIEWPORTS = {
-  pulse1024: { name: "Desktop floor 1024", styles: { width: "1024px", height: "768px" }, type: "desktop" as const },
-  pulse1280: { name: "Laptop 1280", styles: { width: "1280px", height: "720px" }, type: "desktop" as const },
-  pulse1440: { name: "Review 1440", styles: { width: "1440px", height: "900px" }, type: "desktop" as const },
+  pulse1024: { name: "Desktop floor 1024×768 (legacy)", styles: { width: "1024px", height: "768px" }, type: "desktop" as const },
+  pulse1280: { name: "Laptop 1280×720", styles: { width: "1280px", height: "720px" }, type: "desktop" as const },
+  pulse1366: { name: "Laptop 1366×768", styles: { width: "1366px", height: "768px" }, type: "desktop" as const },
+  pulse1440: { name: "Review 1440×900", styles: { width: "1440px", height: "900px" }, type: "desktop" as const },
+  pulse1920: { name: "Desktop 1920×1080", styles: { width: "1920px", height: "1080px" }, type: "desktop" as const },
+  pulseZoom200: { name: "1280×720 at 200% zoom", styles: { width: "640px", height: "360px" }, type: "desktop" as const },
 };
+export const V0_REVIEW_VIEWPORTS = ["pulse1280", "pulse1366", "pulse1440", "pulse1920", "pulseZoom200"] as const;
 
 const stubs: { prompt?: typeof window.prompt; confirm?: typeof window.confirm } = {};
 function stubDialogs() {
