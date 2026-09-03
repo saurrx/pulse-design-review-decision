@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "@/lib/toast";
 
-const meta = { title: "Primitives/Overlays", component: Dialog, parameters: { pulse: { layout: "public", route: "/" }, layout: "padded" } } satisfies Meta<typeof Dialog>;
+const meta = { title: "Legacy reference/Primitives/Overlays", component: Dialog, parameters: { pulse: { layout: "public", route: "/" }, layout: "padded" } } satisfies Meta<typeof Dialog>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 const Pad = ({ children }: { children: React.ReactNode }) => <div style={{ padding: 24, display: "flex", gap: 12, flexWrap: "wrap" }}>{children}</div>;

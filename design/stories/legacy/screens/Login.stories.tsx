@@ -4,7 +4,7 @@ import Login from "@/pages/auth/Login";
 
 /** The auth shell. Public layout, no persona. Google is an inert control here; the password form talks to the mock. */
 const meta = {
-  title: "Screens/Login",
+  title: "Legacy reference/Screens/Login",
   component: Login,
   parameters: { pulse: { scenario: "committee/queue", layout: "public", route: "/login" } },
 } satisfies Meta<typeof Login>;

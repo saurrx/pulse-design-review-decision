@@ -7,7 +7,7 @@ import ResetPassword from "@/pages/auth/ResetPassword";
 import SamlCallback from "@/pages/auth/SamlCallback";
 
 /** The public auth screens beyond login: signup, invitations, password reset, the SAML landing. Public layout, no persona unless the story says so. */
-const meta = { title: "Screens/Authentication", component: Signup, parameters: { pulse: { layout: "public", route: "/signup" } } } satisfies Meta<typeof Signup>;
+const meta = { title: "Legacy reference/Screens/Authentication", component: Signup, parameters: { pulse: { layout: "public", route: "/signup" } } } satisfies Meta<typeof Signup>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 

@@ -14,7 +14,7 @@ const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 await blockEgress(context);
 const open = async (id) => { const p = await context.newPage(); await p.goto(`http://localhost:${port}/iframe.html?id=${id}&viewMode=story`); await p.waitForSelector('body[data-story-ready="1"]', { timeout: 20_000 }); return p; };
-const [committee, counsel] = await Promise.all([open("screens-review-queue--committee"), open("screens-review-queue--counsel")]);
+const [committee, counsel] = await Promise.all([open("legacy-reference-screens-review-queue--committee"), open("legacy-reference-screens-review-queue--counsel")]);
 
 // Force refetches in both frames after the other frame has written its cookie: click the "All" queue filter, then wait past a poll interval.
 for (const p of [committee, counsel]) { await p.getByRole("button", { name: /^All/ }).click().catch(() => {}); }

@@ -3,7 +3,7 @@ import { expect, within } from "storybook/test";
 import Index from "@/pages/Index";
 
 /** The role-branched dashboard at /. Every role has one; each reads the persona from the session cookie. */
-const meta = { title: "Screens/Dashboard", component: Index, parameters: { pulse: { route: "/" } } } satisfies Meta<typeof Index>;
+const meta = { title: "Legacy reference/Screens/Dashboard", component: Index, parameters: { pulse: { route: "/" } } } satisfies Meta<typeof Index>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 

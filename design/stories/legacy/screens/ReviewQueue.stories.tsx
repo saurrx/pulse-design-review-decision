@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, userEvent, within, waitFor } from "storybook/test";
 import IdeasPage from "@/pages/IdeasPage";
-import { route } from "../../../mock/runtime/registry";
+import { route } from "../../../../mock/runtime/registry";
 
 /**
  * The reviewers' queue at /ideas, through the real page so the role branch and
  * the dashboard chrome are exercised. Each story names a scenario and a persona.
  */
 const meta = {
-  title: "Screens/Review queue",
+  title: "Legacy reference/Screens/Review queue",
   component: IdeasPage,
   parameters: { pulse: { scenario: "committee/queue", persona: "TECH_COMMITTEE", route: "/ideas" } },
 } satisfies Meta<typeof IdeasPage>;

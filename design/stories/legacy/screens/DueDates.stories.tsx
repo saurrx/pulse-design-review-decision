@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import DueDatesPage from "@/pages/DueDatesPage";
 
 /** /due-dates: the docket list and calendar. Client roles carry the Action column; Photon roles work the other axis. */
-const meta = { title: "Screens/Due dates", component: DueDatesPage, parameters: { pulse: { route: "/due-dates" } } } satisfies Meta<typeof DueDatesPage>;
+const meta = { title: "Legacy reference/Screens/Due dates", component: DueDatesPage, parameters: { pulse: { route: "/due-dates" } } } satisfies Meta<typeof DueDatesPage>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 

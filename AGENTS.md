@@ -8,7 +8,14 @@ other agent.
 - `src/` is production's tree. It changes only through design records (DSN branches).
 - `mock/` is a Mock Service Worker layer under the adapter: handlers speak the
   backend's own `/v1` vocabulary from `contract/backend.json` and `contract/enums.ts`.
-- `design/` holds the harness, stories, fonts and baselines.
+- `design/` holds the harness, stories, fonts and baselines. V0 stories live under
+  `design/stories/surfaces/` titled `Surfaces/<brief name>`, one file per brief in
+  product-context/surfaces, covering the states the brief lists.
+- `design/stories/legacy/` is the Legacy reference tier: production's screens as
+  they are today, six backend roles, titled `Legacy reference/...`. It is kept as
+  technical regression coverage for the harness (screenshot, a11y and story-test
+  baselines) until the V0 catalogue covers the same technical states, then
+  removed. It is never product authority and never a source for V0 copy.
 - `product-context/` is the V0 product and design truth. Read-only in design
   branches; a product change needs a recorded context update (its VALIDATION.md).
 - `docs/architecture/` is the pinned architecture and the reconciliation record.

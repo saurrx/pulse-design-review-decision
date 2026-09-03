@@ -14,8 +14,8 @@ What changes for the user, in two or three sentences. Why now.
 ## Review surfaces
 Before: the Storybook deployment of the design main at the recorded base.
 After: this branch's deployment.
-- `screens-review-queue--committee`
-- `screens-review-queue--counsel`
+- `legacy-reference-screens-review-queue--committee`
+- `legacy-reference-screens-review-queue--counsel`
 
 ## Scenarios and handlers
 - Scenarios added or changed, and why.

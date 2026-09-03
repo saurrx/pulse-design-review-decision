@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
 import PatentsPage from "@/pages/PatentsPage";
-import { allPatents } from "../../../mock/runtime/store";
+import { allPatents } from "../../../../mock/runtime/store";
 
 /** /patents: the portfolio table with URL-synced filters, and /patents/:id. Rows come from the generated portfolio. */
-const meta = { title: "Screens/Patents", component: PatentsPage, parameters: { pulse: { route: "/patents" } } } satisfies Meta<typeof PatentsPage>;
+const meta = { title: "Legacy reference/Screens/Patents", component: PatentsPage, parameters: { pulse: { route: "/patents" } } } satisfies Meta<typeof PatentsPage>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 const seenAny = (text: RegExp) => async ({ canvasElement }: { canvasElement: HTMLElement }) => { const all = await within(canvasElement).findAllByText(text, {}, { timeout: 15_000 }); await expect(all[0]).toBeVisible(); };

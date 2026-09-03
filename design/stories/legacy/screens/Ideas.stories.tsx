@@ -3,7 +3,7 @@ import { expect, within } from "storybook/test";
 import IdeasPage from "@/pages/IdeasPage";
 
 /** /ideas branches by role: inventors see their draft cards, reviewers the queue (see Review queue), Photon roles the repository table. */
-const meta = { title: "Screens/Ideas", component: IdeasPage, parameters: { pulse: { route: "/ideas" } } } satisfies Meta<typeof IdeasPage>;
+const meta = { title: "Legacy reference/Screens/Ideas", component: IdeasPage, parameters: { pulse: { route: "/ideas" } } } satisfies Meta<typeof IdeasPage>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 const seen = (text: RegExp) => async ({ canvasElement }: { canvasElement: HTMLElement }) => { const all = await within(canvasElement).findAllByText(text, {}, { timeout: 10_000 }); await expect(all[0]).toBeVisible(); };

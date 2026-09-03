@@ -14,7 +14,7 @@ const Swatch = ({ name, value }: { name: string; value: string }) => <div style=
 const Grid = ({ children }: { children: React.ReactNode }) => <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 16, padding: 24 }}>{children}</div>;
 const H = ({ children }: { children: React.ReactNode }) => <h2 style={{ font: "600 14px/1.3 sans-serif", padding: "16px 24px 0", color: "var(--pulse-ink)" }}>{children}</h2>;
 
-const meta = { title: "Foundations/Tokens", parameters: { pulse: { layout: "public", route: "/" }, layout: "fullscreen" } } satisfies Meta;
+const meta = { title: "Legacy reference/Foundations/Tokens", parameters: { pulse: { layout: "public", route: "/" }, layout: "fullscreen" } } satisfies Meta;
 export default meta;
 
 export const Colors: StoryObj = { render: () => { const cs = getComputedStyle(document.documentElement); return <div><H>Pulse tokens (src/index.css)</H><Grid>{PULSE_VARS.map((v) => <Swatch key={v} name={v} value={cs.getPropertyValue(v).trim() || "unset"} />)}</Grid><H>shadcn tokens, HSL triplets</H><Grid>{SHADCN_VARS.map((v) => <Swatch key={v} name={v} value={`hsl(${cs.getPropertyValue(v).trim()})`} />)}</Grid></div>; } };

@@ -9,7 +9,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Button } from "@/components/ui/button";
 import { PRODUCT_CARD_CLASS, PRODUCT_CARD_DESCRIPTION_CLASS, PRODUCT_CARD_TITLE_CLASS, PRODUCT_SEGMENTED_CONTROL_CLASS, PRODUCT_SEGMENTED_ITEM_CLASS } from "@/components/ui/product-surfaces";
 
-const meta = { title: "Primitives/Surfaces", component: Card, parameters: { pulse: { layout: "public", route: "/" }, layout: "padded" } } satisfies Meta<typeof Card>;
+const meta = { title: "Legacy reference/Primitives/Surfaces", component: Card, parameters: { pulse: { layout: "public", route: "/" }, layout: "padded" } } satisfies Meta<typeof Card>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 const Pad = ({ children }: { children: React.ReactNode }) => <div style={{ padding: 24, display: "grid", gap: 20, maxWidth: 720 }}>{children}</div>;

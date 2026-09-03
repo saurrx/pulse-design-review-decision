@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
 import IdeaDetailsPage from "@/pages/IdeaDetailsPage";
-import type { Db } from "../../../mock/runtime/types";
+import type { Db } from "../../../../mock/runtime/types";
 
 /** /ideas/:id by workflow state and by viewer. The route picks the record from the seeded store by state. */
 const byState = (state: Db["ideas"][number]["state"], nth = 0) => (db: Db) => `/ideas/${db.ideas.filter((i) => i.state === state)[nth]?.id}`;
-const meta = { title: "Screens/Idea details", component: IdeaDetailsPage, parameters: { pulse: { path: "/ideas/:id" } } } satisfies Meta<typeof IdeaDetailsPage>;
+const meta = { title: "Legacy reference/Screens/Idea details", component: IdeaDetailsPage, parameters: { pulse: { path: "/ideas/:id" } } } satisfies Meta<typeof IdeaDetailsPage>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 const seen = (text: RegExp) => async ({ canvasElement }: { canvasElement: HTMLElement }) => { await expect(await within(canvasElement).findByText(text, {}, { timeout: 10_000 })).toBeVisible(); };

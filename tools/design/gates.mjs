@@ -10,12 +10,23 @@ import os from "node:os";
 import path from "node:path";
 
 const results = [];
+// --only <substring> (repeatable) runs the matching gates and skips the rest; the inline checks at the end always run.
+const only = process.argv.slice(2).flatMap((a, i, all) => (a === "--only" && all[i + 1] ? [all[i + 1].toLowerCase()] : []));
 const run = (name, cmd, args, opts = {}) => {
+  if (only.length && !only.some((o) => name.toLowerCase().includes(o))) { console.log(`skip ${name}`); return true; }
   const started = Date.now();
   const { informational, ...spawnOpts } = opts;
   const r = spawnSync(cmd, args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], ...spawnOpts, env: { ...process.env, CI: "1", ...(opts.env ?? {}) } });
   const ok = r.status === 0;
-  const tail = (r.stdout + r.stderr).trim().split("\n").filter(Boolean).slice(-2).join(" | ").slice(0, 160);
+  let tail = (r.stdout + r.stderr).trim().split("\n").filter(Boolean).slice(-2).join(" | ").slice(0, 160);
+  if (!ok) {
+    // The two-line tail hides a crash; keep the whole output where a human can read it.
+    const logDir = path.join("node_modules", ".cache", "gates");
+    fs.mkdirSync(logDir, { recursive: true });
+    const logFile = path.join(logDir, name.replace(/[^a-z0-9]+/gi, "-").toLowerCase().slice(0, 60) + ".log");
+    fs.writeFileSync(logFile, `$ ${cmd} ${args.join(" ")}\nexit ${r.status} signal ${r.signal}\n\n${r.stdout}\n${r.stderr}`);
+    tail += ` | full output: ${logFile}`;
+  }
   results.push({ name, ok, informational: !!opts.informational, secs: ((Date.now() - started) / 1000).toFixed(0), tail });
   console.log(`${ok ? "ok  " : opts.informational ? "info" : "FAIL"} ${name} (${results.at(-1).secs}s) ${ok ? "" : tail}`);
   return ok;

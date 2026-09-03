@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Button } from "@/components/ui/button";
 import { Mail, Plus, Trash2 } from "lucide-react";
 
-const meta = { title: "Primitives/Button", component: Button, parameters: { pulse: { layout: "public", route: "/" }, layout: "padded" } } satisfies Meta<typeof Button>;
+const meta = { title: "Legacy reference/Primitives/Button", component: Button, parameters: { pulse: { layout: "public", route: "/" }, layout: "padded" } } satisfies Meta<typeof Button>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 const Row = ({ children }: { children: React.ReactNode }) => <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", padding: 24 }}>{children}</div>;

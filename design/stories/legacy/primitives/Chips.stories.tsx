@@ -3,7 +3,7 @@ import { ProductChip } from "@/components/ui/product-chip";
 import StatusChip from "@/components/ui/StatusChip";
 import { Sparkles } from "lucide-react";
 
-const meta = { title: "Primitives/Chips", component: ProductChip, parameters: { pulse: { layout: "public", route: "/" }, layout: "padded" } } satisfies Meta<typeof ProductChip>;
+const meta = { title: "Legacy reference/Primitives/Chips", component: ProductChip, parameters: { pulse: { layout: "public", route: "/" }, layout: "padded" } } satisfies Meta<typeof ProductChip>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 const Row = ({ children }: { children: React.ReactNode }) => <div style={{ display: "flex", gap: 10, flexWrap: "wrap", padding: 24, alignItems: "center" }}>{children}</div>;

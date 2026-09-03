@@ -4,7 +4,7 @@ import ClientsPage from "@/pages/client/ClientsPage";
 import ClientDetailPage from "@/pages/client/ClientDetailPage";
 
 /** /clients and /clients/:id: Photon side only; case owners see their assignments; the founder tier is bounced from detail today. */
-const meta = { title: "Screens/Clients", component: ClientsPage, parameters: { pulse: { route: "/clients" } } } satisfies Meta<typeof ClientsPage>;
+const meta = { title: "Legacy reference/Screens/Clients", component: ClientsPage, parameters: { pulse: { route: "/clients" } } } satisfies Meta<typeof ClientsPage>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 

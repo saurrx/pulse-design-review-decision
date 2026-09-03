@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import ActionsPage from "@/pages/ActionsPage";
 
 /** /actions: the client's instruction selection, and Photon's operations queue. */
-const meta = { title: "Screens/Actions", component: ActionsPage, parameters: { pulse: { route: "/actions" } } } satisfies Meta<typeof ActionsPage>;
+const meta = { title: "Legacy reference/Screens/Actions", component: ActionsPage, parameters: { pulse: { route: "/actions" } } } satisfies Meta<typeof ActionsPage>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 

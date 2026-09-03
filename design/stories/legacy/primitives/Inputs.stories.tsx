@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 
-const meta = { title: "Primitives/Form controls", component: Input, parameters: { pulse: { layout: "public", route: "/" }, layout: "padded" } } satisfies Meta<typeof Input>;
+const meta = { title: "Legacy reference/Primitives/Form controls", component: Input, parameters: { pulse: { layout: "public", route: "/" }, layout: "padded" } } satisfies Meta<typeof Input>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 const Col = ({ children }: { children: React.ReactNode }) => <div style={{ display: "grid", gap: 16, maxWidth: 440, padding: 24 }}>{children}</div>;

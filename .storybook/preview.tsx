@@ -28,7 +28,7 @@ const preview: Preview = {
     msw: [],
     a11y: { test: "error" },
     viewport: { options: VIEWPORTS },
-    options: { storySort: { order: ["Foundations", "Primitives", "Patterns", "Screens", "States"] } },
+    options: { storySort: { order: ["Surfaces", "Foundations", "Primitives", "Patterns", "States", "Legacy reference"] } },
   },
   initialGlobals: { viewport: { value: "pulse1440", isRotated: false } },
   loaders: [pulseLoader, mswLoader(startWorker)],

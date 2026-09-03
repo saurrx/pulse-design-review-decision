@@ -3,7 +3,7 @@ import WorkspacePage from "@/pages/WorkspacePage";
 import ProfilePage from "@/pages/ProfilePage";
 
 /** /workspace (people, case owners, organisation) and /profile. */
-const meta = { title: "Screens/Workspace and profile", component: WorkspacePage, parameters: { pulse: { route: "/workspace" } } } satisfies Meta<typeof WorkspacePage>;
+const meta = { title: "Legacy reference/Screens/Workspace and profile", component: WorkspacePage, parameters: { pulse: { route: "/workspace" } } } satisfies Meta<typeof WorkspacePage>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 

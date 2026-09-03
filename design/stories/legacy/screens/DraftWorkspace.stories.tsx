@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, within } from "storybook/test";
 import IdeaDraftPage from "@/pages/IdeaDraftPage";
-import type { Db } from "../../../mock/runtime/types";
+import type { Db } from "../../../../mock/runtime/types";
 
 /** /ideas/:id/draft: the inventor's questionnaire, and the read views a reviewer gets on the same route. */
 const byState = (state: Db["ideas"][number]["state"], nth = 0) => (db: Db) => `/ideas/${db.ideas.filter((i) => i.state === state)[nth]?.id}/draft`;
-const meta = { title: "Screens/Draft workspace", component: IdeaDraftPage, parameters: { pulse: { path: "/ideas/:id/draft" } } } satisfies Meta<typeof IdeaDraftPage>;
+const meta = { title: "Legacy reference/Screens/Draft workspace", component: IdeaDraftPage, parameters: { pulse: { path: "/ideas/:id/draft" } } } satisfies Meta<typeof IdeaDraftPage>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 const seen = (text: RegExp) => async ({ canvasElement }: { canvasElement: HTMLElement }) => { await expect(await within(canvasElement).findByText(text, {}, { timeout: 10_000 })).toBeVisible(); };

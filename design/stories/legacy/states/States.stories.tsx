@@ -8,7 +8,7 @@ import ClientsPage from "@/pages/client/ClientsPage";
  * permission denied. Authentication failures live in the full app only (the
  * app's 401 handling navigates the frame away, which a story cannot survive).
  */
-const meta = { title: "States/Network and permissions", component: IdeasPage } satisfies Meta<typeof IdeasPage>;
+const meta = { title: "Legacy reference/States/Network and permissions", component: IdeasPage } satisfies Meta<typeof IdeasPage>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 
