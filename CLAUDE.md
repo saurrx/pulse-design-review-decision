@@ -98,6 +98,30 @@ the name means PHOTON side (historical). `npm run lint:roles`
 (tools/no-substring-roles.mjs) FAILS the build on role.includes() — substring
 checks silently broke during the rename once.
 
+### 4.5a A case owner opens every client; the assignment decides what they can do
+
+Changed 2026-09-03 (pulse-backend F-079). `ClientDetailPage`'s `canViewClient`
+used to require the client be in `user.assigned_client_ids` and otherwise
+rendered `<BlockedRedirect to="/clients" />`. It is now true for any CASE_OWNER.
+
+The page was ALREADY built for this and only the door was shut:
+`isUnassignedCaseOwner` swaps "View as client" for "Request access", and
+`OverviewTab.readOnlyForCaseOwner` renders the record read-only. "Edit client"
+was PHOTON_ADMIN-only and is now also shown to an ASSIGNED case owner, which is
+what `client:configure` in their grants has always meant.
+
+The backend agrees in two places, and both matter: `ClientIsolationGuard` passes
+an unassigned GET (auditing it) and still 403s any other method, and RLS answers
+the read through `app_can_read_client`. Bouncing the page in the browser would
+have refused a request the server is willing to serve.
+
+**`/patents` needed no change and that is worth knowing.** `PatentsContent`
+gates on `!!user?.client_id`, and a photon role carries the `photon-legal`
+sentinel there rather than null — so the query runs, `isUuid` drops the sentinel
+in the adapter, no `client_id` reaches the API, and the row scope decides. After
+the widening that is every client's portfolio, with no frontend edit at all. Do
+not "fix" the sentinel into a null check.
+
 ## 4.6 Two rules the reviewer screens now enforce
 
 **Scores are stored 0-100 and shown out of 10. Everywhere.** `ShowScoreReport`
