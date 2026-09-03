@@ -1434,82 +1434,6 @@ const PatentsContent = (props: PatentsContentProps) => {
 
   return (
     <div className="relative flex min-h-0 w-full min-w-0 flex-1 flex-col">
-      {/* Animated Gradient Background */}
-      <div className="hidden">
-        {theme === "dark" ? (
-          <>
-            {/* Yellow Gradient Blob */}
-            <div
-              className="absolute w-[600px] h-[600px] rounded-full opacity-20 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(245, 166, 35, 0.4) 0%, rgba(245, 166, 35, 0) 70%)",
-                top: "-10%",
-                right: "10%",
-                animationDelay: "0s",
-              }}
-            />
-            {/* Cyan Gradient Blob */}
-            <div
-              className="absolute w-[500px] h-[500px] rounded-full opacity-20 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(6, 182, 212, 0) 70%)",
-                bottom: "10%",
-                left: "5%",
-                animationDelay: "2s",
-              }}
-            />
-            {/* Purple Gradient Blob */}
-            <div
-              className="absolute w-[550px] h-[550px] rounded-full opacity-15 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0) 70%)",
-                top: "40%",
-                left: "30%",
-                animationDelay: "4s",
-              }}
-            />
-          </>
-        ) : (
-          <>
-            {/* Yellow Gradient Blob - Light */}
-            <div
-              className="absolute w-[600px] h-[600px] rounded-full opacity-30 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0) 70%)",
-                top: "-10%",
-                right: "10%",
-                animationDelay: "0s",
-              }}
-            />
-            {/* Cyan Gradient Blob - Light */}
-            <div
-              className="absolute w-[500px] h-[500px] rounded-full opacity-25 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0) 70%)",
-                bottom: "10%",
-                left: "5%",
-                animationDelay: "2s",
-              }}
-            />
-            {/* Pink Gradient Blob - Light */}
-            <div
-              className="absolute w-[550px] h-[550px] rounded-full opacity-20 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(236, 72, 153, 0) 70%)",
-                top: "40%",
-                left: "30%",
-                animationDelay: "4s",
-              }}
-            />
-          </>
-        )}
-      </div>
       <div className="flex min-h-0 w-full flex-1 flex-col bg-transparent">
         <div className="pulse-toolbar !mx-0 !mb-5 !mt-0 items-center">
           <div className="pulse-toolbar-tight flex w-full flex-wrap items-center gap-2">
@@ -2547,51 +2471,55 @@ const PatentsContent = (props: PatentsContentProps) => {
                                   theme === "dark"
                                     ? "text-neutral-300"
                                     : "text-[#0C0C0C]"
-                                } text-[13px] tabular-nums whitespace-nowrap flex items-center gap-2`}
+                                } text-[13px] tabular-nums whitespace-nowrap flex items-center gap-1.5`}
                               >
-                                                {client.application_number}
+                                {client.application_number}
+                                {/* This filing came from a disclosure on the
+                                    platform — a small population and worth
+                                    saying, since most of the portfolio was
+                                    imported.
+
+                                    A circular ICON beside the number, not a
+                                    "Linked idea" chip on its own row. The chip
+                                    cost a second line in a sticky column that is
+                                    already narrow, and it repeated a word the
+                                    tooltip says better; the mark belongs ON the
+                                    number it qualifies. The tooltip still names
+                                    the idea, because a bare icon tells a reader
+                                    a link exists without telling them to what. */}
+                                {client?.IdeaPatentLink?.[0]?.idea?.id && (
+                                  <TooltipProvider delayDuration={200}>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <button
+                                          type="button"
+                                          aria-label={`Open the linked idea: ${
+                                            client.IdeaPatentLink[0].idea.title ||
+                                            "Untitled disclosure"
+                                          }`}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(
+                                              `/ideas/${client.IdeaPatentLink[0].idea.id}`,
+                                            );
+                                          }}
+                                          className="inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border border-blue-200 bg-blue-50 text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-900"
+                                        >
+                                          <LinkIcon className="h-2.5 w-2.5" />
+                                        </button>
+                                      </TooltipTrigger>
+                                      <TooltipContent side="top" className="max-w-xs">
+                                        <p className="text-xs font-medium">
+                                          {client.IdeaPatentLink[0].idea.title || "Untitled disclosure"}
+                                        </p>
+                                        <p className="mt-0.5 text-xs opacity-80">
+                                          Filed from a disclosure on Pulse. Open the idea.
+                                        </p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                )}
                               </span>
-                              {/* This filing came from a disclosure on the
-                                  platform — a small population and worth
-                                  saying, since most of the portfolio was
-                                  imported. The tooltip names the idea, because
-                                  "Linked to idea" alone tells a reader that a
-                                  link exists without telling them to what. */}
-                              {client?.IdeaPatentLink?.[0]?.idea?.id && (
-                                <TooltipProvider delayDuration={200}>
-                                  <Tooltip>
-                                    {/* No truncation: the sticky column is
-                                        narrow, and a chip that renders as
-                                        "Linked …" is worse than the plain text
-                                        it replaced. whitespace-nowrap keeps the
-                                        label whole and lets the cell give it
-                                        the width. */}
-                                    <TooltipTrigger asChild>
-                                      <button
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          navigate(
-                                            `/ideas/${client.IdeaPatentLink[0].idea.id}`,
-                                          );
-                                        }}
-                                        className="mt-1 inline-flex w-fit items-center gap-1 whitespace-nowrap rounded-md border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-left text-xs text-blue-700 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-300"
-                                      >
-                                        <LinkIcon className="h-3 w-3 shrink-0" />
-                                        <span>Linked idea</span>
-                                      </button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" className="max-w-xs">
-                                      <p className="text-xs font-medium">
-                                        {client.IdeaPatentLink[0].idea.title || "Untitled disclosure"}
-                                      </p>
-                                      <p className="mt-0.5 text-xs opacity-80">
-                                        Filed from a disclosure on Pulse. Open the idea.
-                                      </p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              )}
                             </div>
                           </td>
 

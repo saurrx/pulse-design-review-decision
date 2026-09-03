@@ -37,6 +37,9 @@
     "src/components/auth/**": [
       "auth"
     ],
+    "src/components/common/**": [
+      "*"
+    ],
     "src/pages/Index.tsx": [
       "dashboard"
     ],
@@ -164,6 +167,12 @@
       "*"
     ],
     "vite.config.ts": [
+      "*"
+    ],
+    "vitest.config.ts": [
+      "*"
+    ],
+    ".storybook/**": [
       "*"
     ],
     "vercel.json": [

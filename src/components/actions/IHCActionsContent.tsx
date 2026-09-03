@@ -39,6 +39,7 @@ import RequestStatusBadge from "./RequestStatusBadge";
 import CountrySelector from "./CountrySelector";
 import SubmitActionsDialog from "./SubmitActionsDialog";
 import moment from "moment";
+import { daysColor, filterLabel, toggleColumn } from "@/lib/actionsView";
 
 type FilterOption = "all" | "upcoming" | "dueToday" | "overdue";
 type SortOption = "newest" | "oldest" | "eventAZ" | "eventZA";
@@ -100,25 +101,11 @@ const IHCActionsContent: React.FC = () => {
     { id: "lastUpdated", label: "Last Updated", visible: true, sticky: false },
   ]);
 
-  const toggleColumnVisibility = (columnId: string) => {
-    setColumns(
-      columns.map((col) =>
-        col.id === columnId ? { ...col, visible: !col.visible } : col,
-      ),
-    );
-  };
+  const toggleColumnVisibility = (columnId: string) =>
+    setColumns(toggleColumn(columns, columnId));
 
   const visibleColumns = columns.filter((col) => col.visible);
 
-  const getFilterLabel = (filter: FilterOption): string => {
-    switch (filter) {
-      case "all": return "All Actions";
-      case "upcoming": return "Upcoming";
-      case "dueToday": return "Due Today";
-      case "overdue": return "Overdue";
-      default: return "All Actions";
-    }
-  };
 
   // `list` is the table's name and the value is a preset ENUM — the free-text
   // search box deliberately does NOT emit, because the query is what a user
@@ -324,13 +311,6 @@ const IHCActionsContent: React.FC = () => {
     });
   }, [pendingSubmitAction, clientId, submitAllActions]);
 
-  const getDaysColor = (days: number | null) => {
-    if (days === null) return "";
-    if (days <= 0) return "text-red-600 font-semibold";
-    if (days <= 7) return "text-red-500";
-    if (days <= 30) return "text-amber-600";
-    return "text-green-600";
-  };
 
   if (isLoading) {
     return (
@@ -388,7 +368,7 @@ const IHCActionsContent: React.FC = () => {
               }`}
             >
               <Filter className="w-4 h-4" />
-              <span>{getFilterLabel(filterOption)}</span>
+              <span>{filterLabel(filterOption)}</span>
               <ChevronDown className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -702,7 +682,7 @@ const IHCActionsContent: React.FC = () => {
                                 className={`p-3 text-xs ${
                                   isCompleted
                                     ? "text-zinc-500"
-                                    : getDaysColor(event.days_to_deadline)
+                                    : daysColor(event.days_to_deadline)
                                 }`}
                               >
                                 {isCompleted
