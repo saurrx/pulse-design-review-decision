@@ -44,12 +44,16 @@ const ClientDetailPage: React.FC = () => {
     onError: () => toast.error("Couldn't send the request. Try again."),
   });
   const isCaseOwner = user?.role === "CASE_OWNER";
-  const assignedClientIds: string[] = Array.isArray(user?.assigned_client_ids)
-    ? user.assigned_client_ids
-    : [];
-  const canViewClient =
-    user?.role === "PHOTON_ADMIN" ||
-    (isCaseOwner && !!clientId && assignedClientIds.includes(clientId));
+  // A case owner OPENS any client; the assignment decides what they can do
+  // there, not whether they can look (2026-09-03, F-079). The backend agrees in
+  // two places — ClientIsolationGuard passes an unassigned GET and audits it,
+  // and RLS answers it through app_can_read_client — so bouncing the page here
+  // would refuse a request the server is willing to serve.
+  //
+  // Everything downstream was already built for this: `isUnassignedCaseOwner`
+  // swaps "View as client" for "Request access", and OverviewTab renders the
+  // record read-only. The only thing missing was letting them arrive.
+  const canViewClient = user?.role === "PHOTON_ADMIN" || isCaseOwner;
   const [isEditMode, setIsEditMode] = useState(false);
   // Only once the role check below has passed — a record the caller is bounced
   // off was never opened, it was refused, and redirect_blocked says that.
@@ -243,7 +247,8 @@ const ClientDetailPage: React.FC = () => {
                   <span className="hidden lg:inline">View as client</span>
                 </Button>
                 )}
-                {user?.role === "PHOTON_ADMIN" && (
+                {(user?.role === "PHOTON_ADMIN"
+                  || (isCaseOwner && !isUnassignedCaseOwner)) && (
                 <Button
                   variant="outline"
                   size="sm"

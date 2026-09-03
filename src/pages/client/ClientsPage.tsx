@@ -138,10 +138,12 @@ const ClientsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUserCookie();
   const isCaseOwner = user?.role === "CASE_OWNER";
-  // `scope` is the enum that makes this readable: a case owner sees only their
-  // assigned clients, an OC admin the whole book, and the two are not the same
-  // screen even though they share a route.
-  useTrackOnce("client_book_viewed", { scope: isCaseOwner ? "assigned" : "all" },
+  // Both roles now see the whole book (F-079) — a case owner reads every client
+  // and is fenced on what they can DO, not on what they can list. `scope` stays
+  // in the event because the two are still different screens: a case owner has
+  // "Request access" where an admin has "View as client". It reports the ROLE's
+  // reach, and after the widening that reach is the same list for both.
+  useTrackOnce("client_book_viewed", { scope: "all" },
     !!user && isOutsideCounselRole(user.role));
   const [isOnboardModalOpen, setIsOnboardModalOpen] =
     useState<iClientOnboardModal>(initialValuesClientOnboardModal);
