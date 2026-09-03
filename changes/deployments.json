@@ -1,0 +1,18 @@
+{
+  "deployed": "2026-09-03T09:42:02.694Z",
+  "commit": "afa214cf7e059a5564b098d5e7a15584f3cff083",
+  "previews": [
+    {
+      "project": "pulse-design",
+      "url": "https://pulse-design-5qhwi1ay6-s-5ecc81c4.vercel.app",
+      "stable": "https://pulse-design-s-5ecc81c4.vercel.app",
+      "public": true
+    },
+    {
+      "project": "pulse-design-storybook",
+      "url": "https://pulse-design-storybook-lb8agulxm-s-5ecc81c4.vercel.app",
+      "stable": "https://pulse-design-storybook.vercel.app",
+      "public": true
+    }
+  ]
+}
