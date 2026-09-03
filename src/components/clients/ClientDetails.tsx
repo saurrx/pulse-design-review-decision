@@ -169,7 +169,6 @@ const ClientDetails = forwardRef<ClientDetailsRef, ClientDetailsProps>(
             personalInfoUpdate(updateData, {
               onSuccess: () => {
                 refetchClientData();
-                toast.success("Changes saved successfully");
                 resolve();
               },
               onError: (error: any) => {

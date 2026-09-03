@@ -130,7 +130,6 @@ const FileIdeaModal: React.FC<FileIdeaModalProps> = ({
       return response.data;
     },
     onSuccess: (resp) => {
-      toast.success("Idea filed");
       onFiled(resp?.data);
       onOpenChange(false);
     },

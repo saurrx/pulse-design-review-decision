@@ -63,7 +63,6 @@ const ResetPassword: React.FC = () => {
 
           if (user) {
             Cookies.set("pl_user", JSON.stringify(user), { secure: true, sameSite: "lax", path: "/" });
-            toast.success("User logged in successfully");
             window.location.href = "/";
           }
         }
@@ -108,7 +107,6 @@ const ResetPassword: React.FC = () => {
             { headers: { "Content-Type": "application/json" } }
           );
           if (response?.status === 200) {
-            toast.success("Password set successfully. Please login!");
             setCurrentPageStatus("SUCCESS_SET");
             setTimeout(() => navigate("/login"), 2000);
           }
@@ -132,7 +130,6 @@ const ResetPassword: React.FC = () => {
           );
 
           if (response?.status === 200) {
-            toast.success("Password reset successfully! Please login.");
             setCurrentPageStatus("SUCCESS_RESET");
             // Redirect to login page after a short delay
             setTimeout(() => {
@@ -157,7 +154,6 @@ const ResetPassword: React.FC = () => {
           );
 
           if (response?.status === 200) {
-            toast.success("Password set successfully, Please login!");
             setCurrentPageStatus("SUCCESS_SET");
             setTimeout(() => {
               navigate("/login");

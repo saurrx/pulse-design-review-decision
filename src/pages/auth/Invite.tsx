@@ -83,7 +83,6 @@ const Invite = () => {
 
         if (response?.data?.data) {
           setIsSent(true);
-          toast.success("Invitation sent to your email");
         }
       } catch (error) {
         console.error("Error sending invitation:", error);

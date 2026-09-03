@@ -29,7 +29,6 @@ export function useFileUpload() {
         } else {
           throw new Error("No file provided");
         }
-        toast.success("File uploaded successfully");
         return { message: "File uploaded successfully", data: records };
       } catch (error: any) {
         console.error("upload file Error", error);

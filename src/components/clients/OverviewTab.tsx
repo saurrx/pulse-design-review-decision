@@ -107,7 +107,6 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
       return response.data;
     },
     onSuccess: (data: any) => {
-      toast.success("Portfolio uploaded successfully");
       const patentData = data?.data;
       if (patentData) {
         setDuplicatePatents(patentData.duplicate_patents || []);
@@ -148,7 +147,6 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
     mutationFn: async () => API_CONFIG.post(`/api/v1/clients/${clientId}/invite-link`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
-      toast.success("A new secure invite link was generated");
     },
   });
 
@@ -158,7 +156,6 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
       API_CONFIG.delete(`/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
-      toast.success("Invite link deactivated");
     },
   });
 
@@ -173,7 +170,6 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
       queryClient.invalidateQueries({ queryKey: ["ideas"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard_ideas"] });
-      toast.success("Idea reference format updated");
     },
     onError: (error: any) =>
       toast.error(

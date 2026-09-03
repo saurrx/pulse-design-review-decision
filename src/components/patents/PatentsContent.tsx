@@ -25,6 +25,7 @@ import {
   Loader2,
   CalendarDays,
   Tags as TagsIcon,
+  Link2 as LinkIcon,
 } from "lucide-react";
 import {
   Select,
@@ -705,7 +706,6 @@ const PatentsContent = (props: PatentsContentProps) => {
         return response?.data;
       },
       onSuccess: () => {
-        toast.success("Status updated");
         setEditingPatentId(null);
         queryClient.invalidateQueries({ queryKey: ["patents"] });
       },
@@ -853,7 +853,6 @@ const PatentsContent = (props: PatentsContentProps) => {
       }
       return next;
     });
-    toast.success(`Column visibility updated`);
   };
 
   const getStatusBadgeStyle = (status: string) => {
@@ -893,7 +892,6 @@ const PatentsContent = (props: PatentsContentProps) => {
     setSortConfig(newSortConfig);
     setSortOption(value);
     setCurrentPage(1); // Reset to first page when sort changes
-    toast.success(`Sort applied: ${getSortLabel(value)}`);
   };
 
   // Clicking a column header sorts by that DB field. First click on a new
@@ -2553,20 +2551,40 @@ const PatentsContent = (props: PatentsContentProps) => {
                               >
                                                 {client.application_number}
                               </span>
+                              {/* This filing came from a disclosure on the
+                                  platform — a small population and worth
+                                  saying, since most of the portfolio was
+                                  imported. The tooltip names the idea, because
+                                  "Linked to idea" alone tells a reader that a
+                                  link exists without telling them to what. */}
                               {client?.IdeaPatentLink?.[0]?.idea?.id && (
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(
-                                      `/ideas/${client.IdeaPatentLink[0].idea.id}`,
-                                    );
-                                  }}
-                                  className="ml-6 text-left text-xs text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300 truncate"
-                                  title={client.IdeaPatentLink[0].idea.title}
-                                >
-                                  ↳ Linked to idea
-                                </button>
+                                <TooltipProvider delayDuration={200}>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          navigate(
+                                            `/ideas/${client.IdeaPatentLink[0].idea.id}`,
+                                          );
+                                        }}
+                                        className="ml-6 inline-flex max-w-full items-center gap-1 truncate rounded-md border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-left text-xs text-blue-700 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-300"
+                                      >
+                                        <LinkIcon className="h-3 w-3 shrink-0" />
+                                        <span className="truncate">Linked to idea</span>
+                                      </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top" className="max-w-xs">
+                                      <p className="text-xs font-medium">
+                                        {client.IdeaPatentLink[0].idea.title || "Untitled disclosure"}
+                                      </p>
+                                      <p className="mt-0.5 text-xs opacity-80">
+                                        Filed from a disclosure on Pulse. Open the idea.
+                                      </p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
                               )}
                             </div>
                           </td>

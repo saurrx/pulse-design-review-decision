@@ -51,7 +51,10 @@ const SURFACES = [
   { role: 'CASE_OWNER', paths: ['/', '/clients', '/ideas', '/patents', '/due-dates', '/actions', '/profile'], drill: ['/ideas', '/clients'] },
   { role: 'LEGAL_COUNSEL', paths: ['/', '/ideas', '/patents', '/due-dates', '/workspace', '/profile'], drill: ['/ideas', '/patents'] },
   { role: 'TECH_COMMITTEE', paths: ['/', '/ideas', '/patents', '/due-dates', '/profile'], drill: ['/ideas'] },
-  { role: 'INVENTOR', paths: ['/', '/ideas', '/patents', '/profile'], drill: ['/ideas'] },
+  // The inventor drills /patents too, now that they can see the company's
+  // portfolio (F-077). Before that the list was empty for them and the drill
+  // was skipped silently — so their patents surface was never checked at all.
+  { role: 'INVENTOR', paths: ['/', '/ideas', '/patents', '/profile'], drill: ['/ideas', '/patents'] },
 ];
 
 /** Runs in the page: every visible text node carrying a uuid, with its owner. */

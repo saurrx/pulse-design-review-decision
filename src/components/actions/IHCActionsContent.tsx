@@ -233,7 +233,6 @@ const IHCActionsContent: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ["ihc_actions"] });
       setPendingSubmitAction(null);
       setShowSubmitDialog(false);
-      toast.success(data?.message || "Action submitted successfully");
     },
     onError: (error: any) => {
       toast.error(

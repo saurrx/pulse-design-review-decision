@@ -214,7 +214,6 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
       await API_CONFIG.post("/api/v1/auth/logout");
     } finally {
       clearAuthSession();
-      toast.success("Signed out");
       navigate("/login", { replace: true });
     }
   };

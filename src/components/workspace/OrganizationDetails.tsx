@@ -97,7 +97,6 @@ const OrganizationDetails: React.FC<OrganizationDetailsProps> = ({
     personalInfoUpdate({
       [field]: value,
     });
-    toast.success("Changes saved successfully");
   };
 
   const handleSaveAbout = useCallback(() => {

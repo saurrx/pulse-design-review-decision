@@ -173,7 +173,6 @@ export default function PatentNoveltyReport({
       track("re_evaluation_started", { evaluation_id: api_evaluation_id });
       setReEvalOpen(false);
       setPatentInput("");
-      toast.success("Re-evaluation started successfully.");
     },
     onError: (err: any) => {
       toast.error(

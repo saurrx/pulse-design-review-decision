@@ -58,6 +58,10 @@ build:
     # ways at once — the same idea read 72 to the inventor and 7.2 to the
     # counsel reviewing it.
     - node qa/contract/score-scale.qa.mjs
+    # Static half of the desktop gate. It has existed since the gate was written
+    # and CI has never invoked it — the build job runs a hand-written list, so
+    # adding a gate to the repo did not add it to CI (findings F-078).
+    - node qa/invariant/desktop-gate.qa.mjs
     # Both sides of the patent-status translation table. 487 production
     # patents were arriving with an unmapped status the screens could not
     # render or filter, and nothing failed because the lookup has a `?? s`
@@ -156,6 +160,12 @@ browser-tiers:
       # the journeys then reuse.
       echo "=== layout invariants"
       node qa/invariant/layout.qa.mjs || failed="$failed invariants"
+      # Same story as desktop-gate: registered, tagged, listed by `qa/cli.mjs
+      # list`, and run by nobody. It is the gate for "no screen shows a uuid",
+      # which is exactly what shipped on the draft workspace and the evaluation
+      # strip (F-078).
+      echo "=== no visible uuid"
+      node qa/invariant/no-visible-uuid.qa.mjs || failed="$failed no-visible-uuid"
       echo "=== structural conformance"
       node qa/conformance/structure.qa.mjs || failed="$failed conformance"
       for f in qa/journey/*.qa.mjs; do

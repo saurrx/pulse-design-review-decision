@@ -682,7 +682,12 @@ const RULES: Rule[] = [
       // The screen sends a CSV of legal statuses; the API takes one PatentStatus.
       const status = (q.get("filter_status") ?? "").split(",").filter(Boolean)[0];
       if (status) out.set("status", LEGAL_TO_PSTATUS[status] ?? status);
-      if (q.get("tag")) out.set("tag", q.get("tag")!);
+      // The tags multi-select sends `filter_tags` as a CSV. This rule copied
+      // only a singular `tag`, which the screen has never sent — so ticking
+      // three boxes filtered by none of them, silently, and the count badge
+      // said three. Forwarded as `tags`; the API matches ANY of them.
+      const tags = q.get("filter_tags") ?? q.get("tag");
+      if (tags) out.set("tags", tags);
       const qs = out.toString();
       return { url: `/v1/patents${qs ? `?${qs}` : ""}`, method: "GET", wrap: patentList };
     } },
@@ -925,8 +930,19 @@ const RULES: Rule[] = [
       wrap: (c: any) => ({ data: { idea_reference_prefix: c?.idea_reference_prefix } }) }) },
 
   // -- patents extras -------------------------------------------------------
-  { m: /^\/api\/v1\/patent\/export\/client\/([^/?]+)(\?.*)?$/,
-    to: m => ({ url: `/v1/patents/export${isUuid(m[1]) ? `?client_id=${m[1]}` : ""}`, method: "GET", wrap: p => ({ data: p }) }) },
+  // The export carries the SAME tag filter as the table. Without it, exporting
+  // a filtered view hands someone a spreadsheet of rows they did not ask for and
+  // cannot tell apart from the ones they did.
+  { m: /^\/api\/v1\/patent\/export\/client\/([^/?]+)(?:\?(.*))?$/,
+    to: m => {
+      const q = new URLSearchParams(m[2] ?? "");
+      const out = new URLSearchParams();
+      if (isUuid(m[1])) out.set("client_id", m[1]);
+      const tags = q.get("filter_tags") ?? q.get("tag");
+      if (tags) out.set("tags", tags);
+      const qs = out.toString();
+      return { url: `/v1/patents/export${qs ? `?${qs}` : ""}`, method: "GET", wrap: p => ({ data: p }) };
+    } },
   { m: /^\/api\/v1\/patent\/events\/([^/]+)\/remind$/, method: "POST",
     to: m => ({ url: `/v1/due-dates/${m[1]}/remind`, method: "POST", wrap: p => ({ data: p }) }) },
   // A "patent event" in the design is a docket due date here. The design says

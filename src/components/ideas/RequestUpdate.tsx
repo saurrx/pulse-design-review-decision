@@ -870,7 +870,6 @@ export default function RequestUpdateModal({
             payload
           );
           if (response?.status === 200) {
-            toast.success("Update request sent successfully");
             return response?.data?.data;
           }
         } catch (error) {
@@ -906,7 +905,6 @@ export default function RequestUpdateModal({
             payload
           );
           if (response?.status === 200) {
-            toast.success("Update request modified successfully");
             return response?.data?.data;
           }
         } catch (error) {

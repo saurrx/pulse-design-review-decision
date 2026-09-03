@@ -97,7 +97,6 @@ const OnboardClientModal: React.FC<OnboardClientModalProps> = ({
       try {
         const { s3Upload } = await import("@/lib/api-service/s3Upload");
         const fileRecord = await s3Upload(input.file, "image");
-        toast.success("File uploaded successfully");
         return { message: "File uploaded successfully", data: [fileRecord] };
       } catch (error: any) {
         console.error("upload file Error", error);
@@ -131,7 +130,6 @@ const OnboardClientModal: React.FC<OnboardClientModalProps> = ({
 
         if (response.status === 200) {
           setValues((prev) => ({ ...prev, logo: "" }));
-          toast.success("File delete sucessfully");
         }
       } catch (error) {
         console.error("file upload error", error);

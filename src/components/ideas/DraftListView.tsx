@@ -115,7 +115,6 @@ const DraftListView: React.FC<DraftListViewProps> = ({
             `/api/v1/idea/draft/${draftId}`,
           );
           if (response?.status === 200) {
-            toast.success("Draft deleted successfully");
             return response?.data;
           }
         } catch (error) {

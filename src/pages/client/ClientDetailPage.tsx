@@ -106,7 +106,6 @@ const ClientDetailPage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["case-owners"] });
       setIsOwnerDialogOpen(false);
-      toast.success("Case Owner updated");
     },
   });
 
@@ -137,7 +136,6 @@ const ClientDetailPage: React.FC = () => {
             Cookies.remove("pl_user", { path: "/" });
             Cookies.set("pl_user", JSON.stringify(userData), { secure: true, sameSite: "lax", path: "/" });
 
-            toast.success("Entered client mode successfully");
 
             // Entering a view-as session: re-identify as the viewed user with the
             // view flag, and record the transition. Ids/enums only, never name/email.

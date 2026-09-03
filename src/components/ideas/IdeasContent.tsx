@@ -410,7 +410,6 @@ const IdeasContent: React.FC = () => {
       try {
         const response = await API_CONFIG.post(`/api/v1/idea/clone/${ideaId}`);
         if (response.status === 200) {
-          toast.success("Idea cloned successfully");
           return response.data;
         }
       } catch (error) {
@@ -435,7 +434,6 @@ const IdeasContent: React.FC = () => {
           );
 
           if (response?.status === 200) {
-            toast.success("Idea removed successfully");
             return response?.data?.data;
           }
         } catch (error) {
@@ -508,7 +506,6 @@ const IdeasContent: React.FC = () => {
 
   const handleSortChange = (value: SortOption) => {
     setSortOption(value);
-    toast.success(`Sort applied: ${getSortLabel(value)}`);
   };
 
   const handleViewIdea = (ideaId: string) => {
@@ -1031,10 +1028,11 @@ const IdeasContent: React.FC = () => {
                           <h3
                             className={`mt-3 text-xl font-semibold ${theme === "dark" ? "text-zinc-200" : "text-zinc-900"}`}
                           >
-                            You haven't submitted an idea yet
+                            Every patent starts as a rough idea.
                           </h3>
                           <p className="max-w-md text-center text-sm text-gray-600 dark:text-neutral-400">
-                            A title and short description is enough to start.
+                            Upload notes, slides, or just type a title. Either one is
+                            enough to start.
                           </p>
                           <button
                             type="button"

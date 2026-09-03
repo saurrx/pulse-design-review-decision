@@ -70,8 +70,16 @@ function buildTimeline(evaluationId: string): string[] {
 
 export function EvaluationProgress({
   evaluationId,
+  reference,
   compact = false,
 }: {
+  /**
+   * The idea's workspace reference (DEMO07), for the person watching.
+   * `evaluationId` stays below because buildTimeline seeds its jitter from
+   * it — but a uuid is not an identity a reader can use, and this strip
+   * was showing one to an inventor who had just pressed Evaluate.
+   */
+  reference?: string | null;
   evaluationId?: string | null;
   compact?: boolean;
 }) {
@@ -109,7 +117,7 @@ export function EvaluationProgress({
             {timeline[step]}
           </p>
           <p className="mt-1 font-mono text-[11px] text-[var(--pulse-ink-muted,#7B8291)]">
-            Evaluation{evaluationId ? ` ${evaluationId}` : " starting"} · prior-art scan in progress
+            Evaluating {reference || "your idea"} · prior-art scan in progress
           </p>
         </div>
       </div>
