@@ -140,6 +140,20 @@ None. Tokens need no data.
 `dsn-0001.patch`, `classes.json`, `drift.txt`, `fingerprint.txt`, and
 `previews.json`.
 
+## Corrections after the first visual review
+- **Blank colour swatches (blocking, found by the founder).** The Color story
+  composed each swatch as `{ background: token, ...hairline }`, and the
+  `hairline` surface style carried `background: pl-bg`, so every swatch was
+  painted white after its colour. Fixed by separating outline-only styles
+  (`edgeHairline`, `edgeStrong`: outline, offset, radius, no background) from
+  surface styles (`hairline`, `strong`: the edge plus the white ground); a
+  swatch takes the edge and its own colour. No token, type or layout value
+  changed. The Color story now carries a play function that reads every
+  swatch's computed background and compares it with the hex it displays, and
+  names pl-brand #F9B418, pl-navy #040410, pl-green #1E7B4D, pl-red #B3362F and
+  pl-bg #FFFFFF explicitly; 31 of 31 swatches match. Only the five Color
+  screenshots were re-recorded; no other baseline changed.
+
 ## Known compromises
 The Legacy reference stories now show production's components on the new
 foundations, which is the honest state of a token change: the components were

@@ -16,8 +16,12 @@ import { colors, fontFamily, outline, padding, radius, roles, shadow, size, sour
 const stack = (fam: readonly string[]) => fam.map((f) => (f.includes(" ") ? `"${f}"` : f)).join(", ");
 const ui = stack(fontFamily.sans), display = stack(fontFamily.display), mono = stack(fontFamily.mono);
 const font = (k: keyof typeof type): React.CSSProperties => { const t = type[k]; const fam = t.font === "display" ? display : t.font === "mono" ? mono : ui; return { font: `${t.weight} ${t.size}px/${t.line}px ${fam}`, letterSpacing: `${t.tracking}px`, textTransform: ("transform" in t ? t.transform : "none") as "uppercase" | "none" }; };
-const hairline: React.CSSProperties = { outline: outline.hairline.value, outlineOffset: outline.hairline.offset, borderRadius: radius, background: colors.pl.bg };
-const strong: React.CSSProperties = { outline: outline.strong.value, outlineOffset: outline.strong.offset, borderRadius: radius, background: colors.pl.bg };
+/** Outline-only styles: they never set a background, so a coloured element can take one without being overwritten. */
+const edgeHairline: React.CSSProperties = { outline: outline.hairline.value, outlineOffset: outline.hairline.offset, borderRadius: radius };
+const edgeStrong: React.CSSProperties = { outline: outline.strong.value, outlineOffset: outline.strong.offset, borderRadius: radius };
+/** Surface styles: the edge plus the white ground, for cards, tables, tags and controls that sit on pl-bg. */
+const hairline: React.CSSProperties = { ...edgeHairline, background: colors.pl.bg };
+const strong: React.CSSProperties = { ...edgeStrong, background: colors.pl.bg };
 const focus: React.CSSProperties = { outline: outline.focus.value, outlineOffset: outline.focus.offset };
 const C = colors.pl;
 
@@ -75,7 +79,22 @@ const groups: Array<[string, string, Array<keyof typeof C>]> = [
   ["Chart series", "not on the specification; production's data palette", ["data-cyan", "data-ai"]],
 ];
 
+/** Every swatch must render its own token colour; the five named ones are the specification's anchors. */
+async function swatchesMatchTokens({ canvasElement }: { canvasElement: HTMLElement }) {
+  const rgb = (hex: string) => { const n = parseInt(hex.slice(1), 16); return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`; };
+  const swatches = [...canvasElement.querySelectorAll<HTMLElement>("[data-token]")];
+  await expect(swatches.length).toBe(Object.keys(C).length);
+  for (const el of swatches) await expect(getComputedStyle(el).backgroundColor, el.dataset.token).toBe(rgb(el.dataset.hex!));
+  for (const [token, hex] of [["pl-brand", "#F9B418"], ["pl-navy", "#040410"], ["pl-green", "#1E7B4D"], ["pl-red", "#B3362F"], ["pl-bg", "#FFFFFF"]] as const) {
+    const el = canvasElement.querySelector<HTMLElement>(`[data-token="${token}"]`);
+    await expect(el, token).toBeTruthy();
+    await expect(getComputedStyle(el!).backgroundColor, token).toBe(rgb(hex));
+    await expect(el!.dataset.hex, token).toBe(hex);
+  }
+}
+
 export const Color: StoryObj = {
+  play: swatchesMatchTokens,
   render: () => (
     <Page title="Colour">
       {groups.map(([name, note, keys]) => (
@@ -83,7 +102,7 @@ export const Color: StoryObj = {
           <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(168px, 1fr))", gap: space[6] }}>
             {keys.map((k) => (
               <li key={k} style={{ display: "grid", gap: space["2.5"] }}>
-                <div aria-hidden="true" style={{ height: 84, background: C[k], ...hairline }} />
+                <div aria-hidden="true" data-token={`pl-${k}`} data-hex={C[k]} style={{ ...edgeHairline, height: 84, background: C[k] }} />
                 <div style={{ display: "flex", justifyContent: "space-between", gap: space[2] }}><span style={{ ...font("mono"), fontWeight: 500, fontSize: 12 }}>pl-{k}</span><span style={{ ...font("table-cell-mono"), color: C["text-3"] }}>{C[k]}</span></div>
                 <div style={{ ...font("help"), color: C["text-2"] }}>{roles[k]}</div>
               </li>
