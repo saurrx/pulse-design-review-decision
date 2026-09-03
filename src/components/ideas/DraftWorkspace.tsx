@@ -326,8 +326,15 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
     if (!first) track("draft_readiness_changed", { idea_id: ideaId, pct: readinessBand });
   }, [readinessBand, ideaId]);
 
-  const anyContent = answered > 0;
-  const slimBanner = autofillRan || anyContent;
+  // Collapse to the one-line bar only once pre-fill has actually RUN — not the
+  // moment any text exists.
+  //
+  // This card replaced the "Keep building" banner in that full-width slot, so
+  // collapsing on `anyContent` meant a draft with a single character showed a
+  // thin line where a prominent card used to be, and the thing it was meant to
+  // replace it with was never seen. After autofill the slim bar is right: the
+  // offer has been taken and repeating it is noise.
+  const slimBanner = autofillRan;
 
   /* --------------------------------- saving --------------------------------- */
 

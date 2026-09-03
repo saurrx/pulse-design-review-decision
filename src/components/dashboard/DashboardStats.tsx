@@ -792,6 +792,12 @@ const MyIdeas = ({
     <div className={`${CARD_CLASS} flex h-full min-h-[280px] flex-col`}>
       <div className="flex items-center justify-between gap-3">
         <StatLabel>My ideas</StatLabel>
+        {/* Removed only from the EMPTY state, which is what "remove the submit
+            idea from the top right box" was about — that screen already carries
+            a large "Submit your first idea" call to action below, and two
+            buttons for one action is the clutter. An inventor who HAS ideas has
+            no other way to start one from this card, so it stays for them. */}
+        {recent.length > 0 && <SubmitIdeaButton onClick={onSubmit} />}
       </div>
 
       {recent.length === 0 ? (
