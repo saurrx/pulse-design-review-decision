@@ -1,18 +1,18 @@
 {
-  "deployed": "2026-09-03T10:54:16.177Z",
-  "commit": "c1dbec22382935e968984e33175ee90e64d13a9f",
+  "deployed": "2026-09-03T12:23:40.771Z",
+  "commit": "becbe23e56aa9fc1c93a47f2ec506b96f99df2a2",
   "previews": [
     {
       "project": "pulse-design",
-      "url": "https://pulse-design-1pnwr07wn-s-5ecc81c4.vercel.app",
-      "stable": null,
-      "public": false
+      "url": "https://pulse-design-n0rbgeqmr-s-5ecc81c4.vercel.app",
+      "stable": "https://pulse-design-s-5ecc81c4.vercel.app",
+      "public": true
     },
     {
       "project": "pulse-design-storybook",
-      "url": "https://pulse-design-storybook-gy9dnz47o-s-5ecc81c4.vercel.app",
-      "stable": null,
-      "public": false
+      "url": "https://pulse-design-storybook-52iupyx05-s-5ecc81c4.vercel.app",
+      "stable": "https://pulse-design-storybook.vercel.app",
+      "public": true
     }
   ]
 }

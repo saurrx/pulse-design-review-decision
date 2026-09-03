@@ -3,9 +3,27 @@
   "sourceCommit": "c1dbec22382935e968984e33175ee90e64d13a9f",
   "kind": "preview deployments of the branch; the two production URLs still serve main",
   "previews": [
-    { "project": "pulse-design", "url": "https://pulse-design-1pnwr07wn-s-5ecc81c4.vercel.app", "public": true },
-    { "project": "pulse-design-storybook", "url": "https://pulse-design-storybook-gy9dnz47o-s-5ecc81c4.vercel.app", "public": true }
+    {
+      "project": "pulse-design",
+      "url": "https://pulse-design-1pnwr07wn-s-5ecc81c4.vercel.app",
+      "public": true
+    },
+    {
+      "project": "pulse-design-storybook",
+      "url": "https://pulse-design-storybook-gy9dnz47o-s-5ecc81c4.vercel.app",
+      "public": true
+    }
   ],
   "verification": "both answer HTTP 200 without authentication; the Storybook index lists 116 stories, eight of them Foundations; the app HTML equals the local build except for the preview-feedback script Vercel injects into preview deployments (vercel.live), which production deployments do not carry; tools/design/smoke.mjs passes against the app preview with no outside host contacted",
-  "startHere": "https://pulse-design-storybook-gy9dnz47o-s-5ecc81c4.vercel.app/?path=/story/foundations-tokens--color"
+  "startHere": "https://pulse-design-storybook-gy9dnz47o-s-5ecc81c4.vercel.app/?path=/story/foundations-tokens--color",
+  "production": {
+    "deployed": "2026-09-03",
+    "sourceCommit": "becbe23e56aa9fc1c93a47f2ec506b96f99df2a2",
+    "note": "after the founder's approval and the fast-forward of main, both production URLs were redeployed from the outputs the recorded gate run built (25 of 25)",
+    "urls": {
+      "app": "https://pulse-design-s-5ecc81c4.vercel.app",
+      "storybook": "https://pulse-design-storybook.vercel.app"
+    },
+    "verification": "storybook index.json and iframe.html, the app's index.html and its main bundle are byte-identical (SHA-256) to the local build; the deployed index lists 116 stories, eight Foundations and 108 Legacy reference; no Google Fonts host in the deployed HTML; tools/design/smoke.mjs passes with no outside host contacted"
+  }
 }
