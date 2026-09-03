@@ -1,6 +1,6 @@
 # DSN-0001: Tokens and foundations
 
-**Status:** in review, awaiting the founder's visual approval of the rendered foundations
+**Status:** approved by the founder on 3 September 2026 after the corrected Color story; merged into main
 **Production base:** `6d10ae9` (upstream/main at the fork point) · **Design head:** see `classes.json` after export
 **Backend impact:** none
 **Approvals raised by the export:** build-impact (`index.html`, `tailwind.config.ts`, `tools/tokens.mjs`)
