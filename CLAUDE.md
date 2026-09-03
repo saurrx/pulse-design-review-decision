@@ -122,6 +122,33 @@ replaced by a summary — and when the paragraph IS generated the card must say
 so, because a reviewer weighing "what the inventor says" is entitled to know
 when the sentence is a model's summary rather than the inventor's words.
 
+## 4.7 Four rules these screens now enforce
+
+**A toast is for an outcome the reader cannot see.** After a login the outcome
+is the home page; after a delete the row is gone; after a sort the table is
+sorted. 78 success toasts confirming things already on screen were removed on
+2026-09-03. The 20 that remain are clipboard copies, things that leave the
+system with no local trace (invites, reminders, a nudge), downloads, and the
+autofill toast — which reports what the assistant REFUSED to write, and a
+refusal appears nowhere on screen. **Every error toast stays**: a failure has no
+visible outcome, and `lib/toast.ts` counts them for analytics.
+
+**A record is named by its reference, never its row id.** `reference_number`
+(DEMO59) is on an idea from the moment it is created — `ideas.service` writes it
+in the same insert — so there is never a reason to render `idea.id`. A uuid
+cannot be read down a phone, quoted in an email or matched to a paper file.
+`qa/invariant/no-visible-uuid.qa.mjs` is the gate, and it now actually runs.
+
+**The inventor's patents page shows the company's whole portfolio** — 468 rows
+on demo, not 1. The scope rule lives in pulse-backend `common/scope.ts`; note
+that patents and DUE DATES narrow differently on purpose (F-077). Nothing in
+this repo gates it.
+
+**Back from the draft goes to the list for an inventor.** The idea page bounces
+an inventor whose idea is IN_DRAFT straight back to the draft with
+`replace: true`, so "Back to idea" was a dead button and the `replace` poisoned
+the browser's own Back. Do not point it back at `/ideas/:id` for that role.
+
 ## 5. Component map (the big ones are 2000+ lines — grep, don't read whole)
 - pages/Index.tsx — role-branched dashboard. **Every stage number comes from
   `/v1/ideas/pipeline`** (one call, `byClient` for the Photon filter); it used

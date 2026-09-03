@@ -2560,6 +2560,12 @@ const PatentsContent = (props: PatentsContentProps) => {
                               {client?.IdeaPatentLink?.[0]?.idea?.id && (
                                 <TooltipProvider delayDuration={200}>
                                   <Tooltip>
+                                    {/* No truncation: the sticky column is
+                                        narrow, and a chip that renders as
+                                        "Linked …" is worse than the plain text
+                                        it replaced. whitespace-nowrap keeps the
+                                        label whole and lets the cell give it
+                                        the width. */}
                                     <TooltipTrigger asChild>
                                       <button
                                         type="button"
@@ -2569,10 +2575,10 @@ const PatentsContent = (props: PatentsContentProps) => {
                                             `/ideas/${client.IdeaPatentLink[0].idea.id}`,
                                           );
                                         }}
-                                        className="ml-6 inline-flex max-w-full items-center gap-1 truncate rounded-md border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-left text-xs text-blue-700 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-300"
+                                        className="mt-1 inline-flex w-fit items-center gap-1 whitespace-nowrap rounded-md border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-left text-xs text-blue-700 hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-300"
                                       >
                                         <LinkIcon className="h-3 w-3 shrink-0" />
-                                        <span className="truncate">Linked to idea</span>
+                                        <span>Linked idea</span>
                                       </button>
                                     </TooltipTrigger>
                                     <TooltipContent side="top" className="max-w-xs">
