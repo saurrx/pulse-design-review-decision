@@ -1,13 +1,13 @@
 # Scaffold, 3 September 2026
 
 Repository: gitlab.com/saurabh189/pulse-design, a private fork of photonlegal/pulse-frontend at 6d10ae9.
-Branch: tooling/scaffold, fast-forwarded into main. Run `node tools/design/gates.mjs` to reproduce the checklist.
+Branch: tooling/scaffold. Run `node tools/design/gates.mjs` to reproduce the checklist; the run recorded for this commit is `gates-2026-09-03.txt` (22 of 22 passed).
 
 ## What the scaffold added on top of the spike
 - The full mock surface: 81 handlers over the backend's own /v1 vocabulary, every reachable production route served for every backend role, twelve scenarios, a mock clock, deterministic data, frame-local personas.
 - The QA tiers in mock mode: layout invariants, the uuid invariant, structure conformance against a mock baseline, adapter-boundary fidelity tests.
 - The gate runner with 22 gates, the GitLab pipeline, the export dry run in disposable production worktrees, the sync script as the control for instruction files.
-- A catalogue of production's screens as they are today: 108 stories, screenshot baselines, an a11y ratchet baseline of 821 inherited fingerprints.
+- A catalogue of production's screens as they are today: 108 stories, screenshot baselines, an a11y ratchet baseline of 821 inherited fingerprints. These 108 stories describe Legacy Pulse, the six-role production application as it stands. They are not V0 and none of them is an approved V0 story.
 
 ## Product authority, installed the same day
 `product-context/` (Pulse V0 design context 1.0.0) became the product authority after the catalogue was built. The catalogue therefore documents production, not V0:
