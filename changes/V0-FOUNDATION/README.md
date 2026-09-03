@@ -23,7 +23,7 @@ reproduce the checklist; the run recorded for this branch is `gates-2026-09-03.t
   scenarios, the five common states and the brief's own, backend impact and
   200 intended story ids. No V0 story exists; the ids are intentions.
 - **V0 semantic gate** `qa/v0/semantic.test.ts` (`npm run test:v0`, in the gate
-  runner): twenty checks for the four personas, no committee or superadmin,
+  runner): 21 checks for the four personas, no committee or superadmin,
   no technical stage, matrix completeness, Inventor refused on Actions and due
   dates in the mock and in the matrix, excluded features, optional evaluation,
   badges, and declared contracts.
