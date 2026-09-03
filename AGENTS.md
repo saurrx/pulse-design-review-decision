@@ -72,9 +72,13 @@ docs/architecture/CONTEXT-RECONCILIATION.md and the design record is
   material surface, propose three directions and wait for human direction.
 - Start from the existing component and its props. Restyle in place; rewrite only
   with a design record that says so.
-- Put colour, type, spacing, radius and shadow decisions in the token source once
-  DSN-0001 lands. No new literal visual values in product files. PL-TKN-004 and
-  Photon Legal's core colours are the baseline; a core colour change needs approval.
+- Colour, type, spacing, radius, borders and shadows come from the token source
+  `src/styles/tokens.json` (PL-TKN-004, the approved specification kept byte-exact
+  at `design/v4/PL-TKN-004.html`). Edit the source, run `node tools/tokens.mjs`,
+  commit the generated `src/styles/tokens.css` and `tokens.tailwind.ts`; the
+  gate `node tools/tokens.mjs --check` fails on stale outputs. No new literal
+  visual values in product files. A value that is not the specification's needs
+  the founder's approval and a `_note` in the source.
 - Use the primitives under `src/components/ui` first. A new primitive is its own record.
 - Keep production's routes and redirects working for every backend role. What
   each persona is offered follows product-context/SCREENS.md; a page V0 removes

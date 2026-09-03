@@ -38,6 +38,7 @@ run("routes: every handler is real, every reachable route served", "node", ["too
 run("credentials and inert hosts", "node", ["tools/design/credentials.mjs"]);
 run("manifest and graph parity", "node", ["tools/design/manifest.mjs"]);
 run("fingerprint self-test (bites)", "node", ["tools/design/fingerprint.mjs", "--self-test"]);
+run("tokens: generated outputs match src/styles/tokens.json", "node", ["tools/tokens.mjs", "--check"]);
 run("fidelity: adapter boundary, OpenAPI bodies, state machine", "npm", ["run", "test:fidelity"]);
 run("v0 semantic gate (four personas, one stage, coverage, exclusions, optional evaluation, badges, declared contracts)", "npm", ["run", "test:v0"]);
 run("v0 coverage matrix rendered and current", "node", ["tools/design/v0-coverage.mjs"]);

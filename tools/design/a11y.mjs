@@ -34,7 +34,11 @@ for (const s of storiesFrom(dir)) {
   } catch (e) { broken++; console.log(`FAIL  ${s.id}: did not become ready (${String(e.message || e).slice(0, 80)})`); continue; }
   await page.addScriptTag({ content: axeSource });
   const result = await page.evaluate(async () => {
-    const res = await window.axe.run(document.getElementById("storybook-root") ?? document.body, { resultTypes: ["violations"] });
+    // The story-level addon may still be running its own axe pass; axe allows one run at a time, so wait it out.
+    let res; for (let attempt = 0; ; attempt++) {
+      try { res = await window.axe.run(document.getElementById("storybook-root") ?? document.body, { resultTypes: ["violations"] }); break; }
+      catch (e) { if (attempt < 20 && /already running/.test(String(e?.message || e))) { await new Promise((r) => setTimeout(r, 250)); continue; } throw e; }
+    }
     const norm = (el) => { const e = document.querySelector(el); if (!e) return "?"; const text = (e.getAttribute("aria-label") || e.textContent || "").trim().replace(/\s+/g, " ").slice(0, 40); return `${e.tagName.toLowerCase()}[${e.getAttribute("role") || ""}]:${text}`; };
     const main = document.querySelector("main");
     return res.violations.flatMap((v) => v.nodes.map((n) => ({ rule: v.id, impact: v.impact, context: norm(n.target[0]), inContent: main ? !!document.querySelector(n.target[0])?.closest("main") : true })));
