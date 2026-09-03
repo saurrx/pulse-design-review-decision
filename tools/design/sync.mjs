@@ -17,8 +17,9 @@ import { execSync, spawnSync } from "node:child_process";
 
 const sh = (cmd) => execSync(cmd, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
 const OWNED = ["CLAUDE.md", "AGENTS.md", ".claude/rules/design.md", ".claude/rules/protected.md", ".claude/rules/product-context.md", "CODEOWNERS", ".gitattributes", ".gitignore", "vercel.json"];
-const upstream = process.argv[2] ?? "upstream/main";
-const dryRun = process.argv.includes("--dry-run");
+const args = process.argv.slice(2);
+const upstream = args.find((a) => !a.startsWith("--")) ?? "upstream/main";
+const dryRun = args.includes("--dry-run");
 
 const preambleOf = (text) => { const m = text.match(/<!-- preamble:start[^>]*-->([\s\S]*?)<!-- preamble:end -->/); return m ? m[1].trim() : null; };
 const sanitise = (text) => text.split("\n").map((l) => (/password|passwd|PulseDemo|@acme\.test|@globex\.test|owner\/cover\/admin\/founder|demo accounts?:?/i.test(l) ? "[line removed by the design-repo sync: operational credential or account reference]" : l)).join("\n");
