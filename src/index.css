@@ -1,95 +1,12 @@
 
+/* Tokens: src/styles/tokens.json is the source (PL-TKN-004); tools/tokens.mjs writes tokens.css. fonts.css self-hosts the sheet's faces. */
+@import "./styles/fonts.css";
+@import "./styles/tokens.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  /* Pulse Design Tokens — v4 Photon Brand (DOC PL-TKN-004) */
-  :root {
-    --pulse-canvas: #f7f7f5;
-    --pulse-surface: #ffffff;
-    --pulse-surface-subtle: #fafafa;
-    --pulse-ink: #252642;
-    --pulse-ink-secondary: #555867;
-    --pulse-ink-muted: #7b7e8c;
-    --pulse-line: #e6e7eb;
-    --pulse-line-strong: #ccd0d9;
-    --pulse-shadow-card: 0 8px 24px rgba(17, 16, 60, 0.06);
-    --pulse-shadow-elevated: 0 18px 44px rgba(17, 16, 60, 0.12);
-
-    /* Photon brand: yellow is the signature, navy carries authority. */
-    --pulse-brand: #f9b418;
-    --pulse-brand-hover: #e2a113;
-    --pulse-brand-soft: #fff6dc;
-    --pl-amber: #f9b418;
-    --pl-slate: #64748b;
-    --pulse-navy: #11103c;
-    --pulse-navy-soft: #eeeeF5;
-    --pulse-focus: #4351c0;
-
-    /* Functional colors are reserved for meaning, never decoration alone. */
-    --pulse-data-primary: #11103c;
-    --pulse-data-accent: #f9b418;
-    --pulse-data-success: #2f8d70;
-    --pulse-data-cyan: #25a9b8;
-    --pulse-data-risk: #c96558;
-    --pulse-data-ai: #7057c7;
-    --pulse-danger: #a5443c;
-    --pulse-danger-soft: #fff1ef;
-    --pulse-success: #2f8d70;
-    --pulse-success-soft: #edf8f3;
-    --pulse-info: #7057c7;
-    --pulse-info-soft: #f2effb;
-
-    /* pl-bg / pl-ink */
-    --background: 0 0% 100%;
-    --foreground: 238 28% 20%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 238 28% 20%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 238 28% 20%;
-
-    /* pl-brand #F9B418 — ink text on brand */
-    --primary: 42 95% 54%;
-    --primary-foreground: 238 28% 20%;
-
-    /* pl-bg-muted #F5F5F5 */
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 238 28% 20%;
-
-    /* pl-bg-muted / pl-text-3 #727272 */
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-
-    /* pl-brand-tint #FDF3DC / pl-amber-text #7E5A00 */
-    --accent: 42 89% 93%;
-    --accent-foreground: 43 100% 25%;
-
-    /* pl-red #B3362F */
-    --destructive: 3 58% 44%;
-    --destructive-foreground: 0 0% 100%;
-
-    /* pl-border #E8E8E8 */
-    --border: 0 0% 91%;
-    --input: 0 0% 91%;
-    /* pl-blue #4351C0 — focus rings */
-    --ring: 233 49% 51%;
-
-    /* Shared product radius; dense status markers stay square for scanability. */
-    --radius: 0.75rem;
-
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 238 28% 20%;
-    --sidebar-primary: 42 95% 54%;
-    --sidebar-primary-foreground: 238 28% 20%;
-    --sidebar-accent: 42 89% 93%;
-    --sidebar-accent-foreground: 43 100% 25%;
-    --sidebar-border: 0 0% 91%;
-    --sidebar-ring: 233 49% 51%;
-  }
-}
 
 @layer base {
   * {
@@ -305,7 +222,7 @@
   }
 
   .pulse-data-table {
-    font-family: "Instrument Sans", sans-serif;
+    font-family: var(--pl-font-ui);
     font-size: 14px;
     line-height: 20px;
     font-variant-numeric: tabular-nums;
@@ -321,7 +238,7 @@
     padding: 0 16px !important;
     border-color: var(--pulse-line) !important;
     color: var(--pulse-ink-muted) !important;
-    font-family: "Instrument Sans", sans-serif !important;
+    font-family: var(--pl-font-ui) !important;
     font-size: 13px !important;
     font-weight: 600 !important;
     letter-spacing: 0.02em !important;
