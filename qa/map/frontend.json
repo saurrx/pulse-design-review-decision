@@ -1043,7 +1043,7 @@
    "route": "/patents",
    "page": "PatentsPage",
    "entry": "src/pages/PatentsPage.tsx",
-   "components": 41,
+   "components": 42,
    "calls": [
     {
      "method": "GET",
@@ -1141,7 +1141,7 @@
    "route": "/patents/:patentId",
    "page": "PatentsPage",
    "entry": "src/pages/PatentsPage.tsx",
-   "components": 41,
+   "components": 42,
    "calls": [
     {
      "method": "GET",
