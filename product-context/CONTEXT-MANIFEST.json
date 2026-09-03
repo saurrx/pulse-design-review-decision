@@ -1,0 +1,50 @@
+{
+  "name": "Pulse V0 Design Context",
+  "version": "1.0.0",
+  "authoritativeAsOf": "2026-09-03",
+  "deliverableType": "design-context-only",
+  "target": "first production release of the Pulse rebuild",
+  "commercialModel": "free product included with Photon Legal patent services",
+  "personas": [
+    "INVENTOR",
+    "WORKSPACE_ADMIN",
+    "CASE_OWNER",
+    "PHOTON_ADMIN"
+  ],
+  "primaryFunnel": [
+    "inventor_activated",
+    "submission_started",
+    "draft_completed",
+    "idea_submitted",
+    "review_completed",
+    "sent_to_photon",
+    "converted_to_patent_matter",
+    "filed"
+  ],
+  "requiredCoreFiles": [
+    "AGENTS.md",
+    "PRODUCT.md",
+    "BUSINESS.md",
+    "PERSONAS.md",
+    "WORKFLOWS.md",
+    "SCREENS.md",
+    "PRODUCT-VOCABULARY.md",
+    "DESIGN-PHILOSOPHY.md",
+    "INTERFACE-QUALITY.md",
+    "COPY-VOICE.md",
+    "MOTION.md",
+    "ACCESSIBILITY.md",
+    "METRICS.md",
+    "AI-WORKFLOW.md",
+    "DESIGN-SCORECARD.md",
+    "FOUNDER-FEEDBACK.md"
+  ],
+  "prohibitedFixtureData": [
+    "real customer names",
+    "real emails",
+    "real invention disclosures",
+    "real patent records",
+    "credentials",
+    "raw call transcripts"
+  ]
+}

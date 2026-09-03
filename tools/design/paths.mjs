@@ -16,7 +16,7 @@ export const CLASSES = {
   buildImpact: ["index.html", "vite.config.ts", "tailwind.config.ts", "postcss.config.js", "tools/tokens.mjs"],
   behaviourImpact: ["src/lib/roles.ts", "src/utils/patentLegalStatus.ts", "src/contexts/**", "src/hooks/**"],
   reviewSupport: ["design/stories/**", "mock/scenarios/**", "mock/handlers/**", "changes/**", "qa/conformance/baseline-mock/**", "qa/visual/baselines/**", "design/a11y-baseline.json"],
-  protected: ["mock/runtime/**", "mock/proposed-routes.json", ".storybook/**", "design/harness/**", "design/fonts/**", "tools/design/**", "qa/**", "contract/**", "vite.design.config.ts", "vitest.config.ts", "CLAUDE.md", "AGENTS.md", ".claude/**", "CODEOWNERS", "vercel.json", "package.json", "package-lock.json", ".gitattributes", ".gitignore", ".nvmrc", "public/mockServiceWorker.js"],
+  protected: ["mock/runtime/**", "mock/proposed-routes.json", "product-context/**", "docs/**", ".storybook/**", "design/harness/**", "design/fonts/**", "tools/design/**", "qa/**", "contract/**", "vite.design.config.ts", "vitest.config.ts", "CLAUDE.md", "AGENTS.md", ".claude/**", "CODEOWNERS", "vercel.json", "package.json", "package-lock.json", ".gitattributes", ".gitignore", ".nvmrc", "public/mockServiceWorker.js"],
   offLimits: ["src/lib/realAdapter.ts", "src/lib/apiConfig.ts", "src/lib/auth.ts", "src/lib/analytics/**", "src/lib/api-service/**", "src/lib/ProtectedRoutes.tsx", "src/lib/PublicRoutes.tsx", "src/App.tsx", "src/main.tsx"],
 };
 

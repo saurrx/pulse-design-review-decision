@@ -1,9 +1,10 @@
 # Pulse design fork
 
 A private fork of `photonlegal/pulse-frontend` on mock data. Production stays
-untouched; this repository exists so the v4 redesign can be built for all six
-roles and handed back as portable patches. The plan, decisions and review log
-live in the published proposal "Pulse Design Fork"; the rules in AGENTS.md.
+untouched; this repository exists so Pulse V0, a full UI and UX redesign for
+four personas, can be built on production's stack and handed back as portable
+patches. Product truth lives in `product-context/` (read its AGENTS.md first),
+the architecture in `docs/architecture/`, the rules in AGENTS.md.
 
 ## Run
 | What | Command | Where |

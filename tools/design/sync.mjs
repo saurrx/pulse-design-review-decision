@@ -16,7 +16,7 @@ import path from "node:path";
 import { execSync, spawnSync } from "node:child_process";
 
 const sh = (cmd) => execSync(cmd, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
-const OWNED = ["CLAUDE.md", "AGENTS.md", ".claude/rules/design.md", ".claude/rules/protected.md", "CODEOWNERS", ".gitattributes", ".gitignore", "vercel.json"];
+const OWNED = ["CLAUDE.md", "AGENTS.md", ".claude/rules/design.md", ".claude/rules/protected.md", ".claude/rules/product-context.md", "CODEOWNERS", ".gitattributes", ".gitignore", "vercel.json"];
 const upstream = process.argv[2] ?? "upstream/main";
 const dryRun = process.argv.includes("--dry-run");
 

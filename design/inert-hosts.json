@@ -30,6 +30,23 @@
     "lucide.dev": "icon library docs",
     "localhost": "local",
     "openapi.vercel.sh": "the $schema reference in vercel.json",
-    "vitejs.dev": "a docs link in vite.config.ts"
+    "vitejs.dev": "a docs link in vite.config.ts",
+    "linear.app": "product-context/references/READING.md reading list; documentation only",
+    "youtube.com": "product-context/references/READING.md reading list; documentation only",
+    "apple.com": "product-context/references/READING.md reading list; documentation only",
+    "lennysnewsletter.com": "product-context/references/READING.md reading list; documentation only",
+    "figma.com": "product-context/references/READING.md reading list; documentation only",
+    "research.google": "product-context/references/READING.md reading list; documentation only",
+    "gov.uk": "product-context/references/READING.md reading list; documentation only",
+    "nngroup.com": "product-context/references/READING.md reading list; documentation only",
+    "design.google": "product-context/references/READING.md reading list; documentation only",
+    "mobbin.com": "product-context/references/READING.md reading list; documentation only",
+    "saasframe.io": "product-context/references/READING.md reading list; documentation only",
+    "saasui.design": "product-context/references/READING.md reading list; documentation only",
+    "engineering.zalando.com": "docs/architecture/pulse-design-fork-v5.html research citations; documentation only",
+    "agents.md": "docs/architecture/pulse-design-fork-v5.html research citations; documentation only",
+    "code.claude.com": "docs/architecture/pulse-design-fork-v5.html research citations; documentation only",
+    "designtokens.org": "docs/architecture/pulse-design-fork-v5.html research citations; documentation only",
+    "martinfowler.com": "docs/architecture/pulse-design-fork-v5.html research citations; documentation only"
   }
 }

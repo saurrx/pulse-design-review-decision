@@ -1,0 +1,813 @@
+<title>Pulse Design Fork</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400..700&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#ffffff; --bg-2:#fafafa; --bg-3:#f5f5f5;
+    --ink:#0c0c0c; --ink-2:#444444; --ink-3:#727272;
+    --line:#e8e8e8; --line-2:#c8c8c8;
+    --brand:#f9b418; --brand-deep:#da9700; --brand-tint:#fdf3dc;
+    --navy:#11103c; --navy-ink:#ffffff; --navy-ink-2:#c9c8e3;
+    --green:#1e7b4d; --green-tint:#e9f1ec; --green-text:#155c3b;
+    --blue:#4351c0; --blue-tint:#eceef8; --blue-text:#333f99;
+    --red:#b3362f; --red-tint:#f7edeb; --red-text:#8e2b25;
+    --amber-tint:#faf1da; --amber-text:#7e5a00;
+    --slate:#5e6470; --slate-tint:#eff0f2; --slate-text:#484e59;
+    --code-bg:#f5f5f5;
+    --font-body:"Schibsted Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --font-display:"Newsreader",Georgia,"Times New Roman",serif;
+    --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0c0c12; --bg-2:#13131b; --bg-3:#1a1a24;
+      --ink:#ececea; --ink-2:#bcbcb8; --ink-3:#8e8e8c;
+      --line:#26262f; --line-2:#3a3a46;
+      --brand:#f9b418; --brand-deep:#ffc846; --brand-tint:#2b2410;
+      --navy:#15143f; --navy-ink:#ffffff; --navy-ink-2:#b8b7d8;
+      --green:#5cc28f; --green-tint:#10261b; --green-text:#8fd7b1;
+      --blue:#8b95e6; --blue-tint:#171a33; --blue-text:#aab2f0;
+      --red:#e0776f; --red-tint:#2e1614; --red-text:#f0a39d;
+      --amber-tint:#2b2410; --amber-text:#f2c96a;
+      --slate:#9aa0ac; --slate-tint:#1d1f26; --slate-text:#b7bcc6;
+      --code-bg:#13131b;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0c0c12; --bg-2:#13131b; --bg-3:#1a1a24;
+    --ink:#ececea; --ink-2:#bcbcb8; --ink-3:#8e8e8c;
+    --line:#26262f; --line-2:#3a3a46;
+    --brand:#f9b418; --brand-deep:#ffc846; --brand-tint:#2b2410;
+    --navy:#15143f; --navy-ink:#ffffff; --navy-ink-2:#b8b7d8;
+    --green:#5cc28f; --green-tint:#10261b; --green-text:#8fd7b1;
+    --blue:#8b95e6; --blue-tint:#171a33; --blue-text:#aab2f0;
+    --red:#e0776f; --red-tint:#2e1614; --red-text:#f0a39d;
+    --amber-tint:#2b2410; --amber-text:#f2c96a;
+    --slate:#9aa0ac; --slate-tint:#1d1f26; --slate-text:#b7bcc6;
+    --code-bg:#13131b;
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue-text);text-decoration:none;border-bottom:1px solid var(--line-2)}
+  a:hover{border-bottom-color:var(--blue)}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  h1,h2,h3{margin:0;text-wrap:balance}
+  p{margin:0}
+  code{font-family:var(--font-mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:2px;border:1px solid var(--line)}
+  pre{font-family:var(--font-mono);font-size:12.5px;line-height:1.5;background:var(--code-bg);border:1px solid var(--line);border-radius:2px;padding:14px 16px;overflow-x:auto;margin:0;color:var(--ink)}
+  pre code{background:none;border:0;padding:0;font-size:inherit}
+  ul,ol{margin:0;padding-left:22px}
+  li{margin:0 0 6px 0}
+  li:last-child{margin-bottom:0}
+  strong{font-weight:600}
+
+  .mast{background:var(--navy);color:var(--navy-ink);padding:44px 32px 36px}
+  .mast-inner{max-width:1040px;margin:0 auto;display:grid;gap:18px}
+  .kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);display:inline-flex;align-items:center;gap:8px}
+  .kicker::before{content:"";width:7px;height:7px;background:var(--brand);display:inline-block}
+  .mast .kicker{color:var(--navy-ink-2)}
+  .mast h1{font-family:var(--font-display);font-weight:500;font-size:44px;line-height:1.08;letter-spacing:-.01em;font-variation-settings:"opsz" 48}
+  .mast .lede{max-width:66ch;font-size:16px;color:var(--navy-ink-2);line-height:1.5}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 18px;font-family:var(--font-mono);font-size:12px;color:var(--navy-ink-2)}
+  .meta b{color:var(--navy-ink);font-weight:500}
+
+  .page{max-width:1040px;margin:0 auto;padding:12px 32px 96px}
+  section{padding:40px 0 8px;border-top:1px solid var(--line)}
+  section:first-of-type{border-top:0}
+  .sec-head{display:grid;gap:8px;padding-bottom:12px;border-bottom:1px solid var(--ink);margin-bottom:22px}
+  h2{font-family:var(--font-display);font-weight:500;font-size:30px;line-height:1.15;letter-spacing:-.005em;font-variation-settings:"opsz" 32}
+  h3{font-size:16px;font-weight:600;margin:26px 0 10px}
+  h3:first-child{margin-top:0}
+  .prose{max-width:72ch;display:grid;gap:12px}
+  .prose p{color:var(--ink);}
+  .muted{color:var(--ink-2)}
+  .small{font-size:13.5px;color:var(--ink-3)}
+
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;border:1px solid var(--line);border-radius:2px;margin:18px 0 22px;overflow:hidden}
+  .tile{padding:16px 18px;border-right:1px solid var(--line);display:grid;gap:6px;align-content:start;background:var(--bg)}
+  .tile:last-child{border-right:0}
+  .tile .label{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+  .tile .value{font-family:var(--font-display);font-size:34px;line-height:1;font-weight:500;font-variation-settings:"opsz" 36;font-variant-numeric:tabular-nums}
+  .tile .note{font-size:13px;color:var(--ink-2);line-height:1.4}
+  @media (max-width:720px){.tile{border-right:0;border-bottom:1px solid var(--line)}.tile:last-child{border-bottom:0}}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:2px;margin:14px 0 6px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
+  th{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:500;text-align:left;padding:10px 12px;border-bottom:1px solid var(--ink);background:var(--bg-2);white-space:nowrap}
+  td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink)}
+  tr:last-child td{border-bottom:0}
+  td.mono,th.mono{font-family:var(--font-mono);font-size:12.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  td.num{font-family:var(--font-mono);font-size:12.5px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+  td .sub{display:block;color:var(--ink-3);font-size:12.5px;margin-top:2px}
+
+  .tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--line-2);border-radius:2px;background:var(--bg);color:var(--ink-2);white-space:nowrap;line-height:1.4}
+  .tag::before{content:"";width:7px;height:7px;display:inline-block;background:var(--slate)}
+  .tag.keep::before{background:var(--green)} .tag.keep{color:var(--green-text)}
+  .tag.change::before{background:var(--brand)} .tag.change{color:var(--amber-text)}
+  .tag.drop::before{background:var(--red)} .tag.drop{color:var(--red-text)}
+  .tag.new::before{background:var(--blue)} .tag.new{color:var(--blue-text)}
+
+  .callout{border-left:3px solid var(--brand);background:var(--brand-tint);padding:14px 18px;border-radius:0 2px 2px 0;margin:18px 0;display:grid;gap:8px;max-width:78ch}
+  .callout.risk{border-left-color:var(--red);background:var(--red-tint)}
+  .callout.note{border-left-color:var(--blue);background:var(--blue-tint)}
+  .callout .kicker{color:var(--ink-2)}
+  .callout p,.callout li{color:var(--ink)}
+
+  .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px 32px;margin:14px 0}
+  .cols h3{margin-top:0}
+  .cols ul{display:grid;gap:6px}
+
+  .steps{display:grid;gap:0;border:1px solid var(--line);border-radius:2px;margin:14px 0}
+  .step{display:grid;grid-template-columns:64px 1fr 150px;gap:16px;padding:14px 16px;border-bottom:1px solid var(--line);align-items:start}
+  .step:last-child{border-bottom:0}
+  .step .n{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);padding-top:3px}
+  .step .t{font-weight:600}
+  .step .d{color:var(--ink-2);font-size:13.5px;margin-top:4px;line-height:1.5}
+  .step .who{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-3);text-align:right;padding-top:3px;line-height:1.5}
+  @media (max-width:640px){.step{grid-template-columns:48px 1fr}.step .who{grid-column:2;text-align:left}}
+
+  .diagram{margin:16px 0 4px;overflow-x:auto}
+  .diagram svg{width:100%;max-width:980px;height:auto;display:block}
+  .diagram .box{fill:var(--bg);stroke:var(--ink);stroke-width:1}
+  .diagram .box.navy{fill:var(--navy);stroke:var(--navy)}
+  .diagram .box.tint{fill:var(--brand-tint);stroke:var(--brand-deep)}
+  .diagram text{font-family:var(--font-body);font-size:13px;fill:var(--ink)}
+  .diagram text.mono{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;fill:var(--ink-3)}
+  .diagram text.onnavy{fill:var(--navy-ink)}
+  .diagram text.onnavy2{fill:var(--navy-ink-2)}
+  .diagram .arrow{stroke:var(--ink);stroke-width:1.2;fill:none;marker-end:url(#ah)}
+  .diagram .arrow.brand{stroke:var(--brand-deep)}
+  .diagram #ah path{fill:var(--ink)}
+
+  .decisions{display:grid;gap:0;border:1px solid var(--line);border-radius:2px;margin:14px 0}
+  .decision{display:grid;grid-template-columns:40px 1fr;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+  .decision:last-child{border-bottom:0}
+  .decision .n{font-family:var(--font-mono);font-size:12px;color:var(--ink-3);padding-top:2px}
+  .decision .q{font-weight:600}
+  .decision .r{color:var(--ink-2);font-size:13.5px;margin-top:3px}
+  .sources{columns:2;column-gap:32px;font-size:13px;color:var(--ink-2)}
+  .sources li{break-inside:avoid;margin-bottom:8px}
+  @media (max-width:720px){.sources{columns:1}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="mast">
+  <div class="mast-inner">
+    <span class="kicker">Pulse / Design operations / Proposal</span>
+    <h1>Pulse Design Fork</h1>
+    <p class="lede">One design repository, forked from today's production frontend, running on mock data, where the Pulse v4 redesign is built for all six roles and handed back as patches the developer can apply in an afternoon. Nothing in this document has been built yet.</p>
+    <div class="meta">
+      <span>Date <b>3 Sep 2026</b></span>
+      <span>Frontend baseline <b>pulse-frontend df5f2ff</b></span>
+      <span>Backend baseline <b>pulse-backend 00272d1</b></span>
+      <span>Atlas <b>ec1411b</b></span>
+      <span>Redesign target <b>PL-TKN-004 (Pulse v4)</b></span>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+
+<section>
+  <div class="sec-head"><span class="kicker">Summary</span><h2>The short version</h2></div>
+  <div class="prose">
+    <p>The last design port, PR #2 on 28 August, was expensive because the design repo had drifted from production in three ways at once: an older fork point, the old API dialect and role names, and four endpoints the backend did not have. Every constraint you have set since is a reaction to that. The fix is to make the design repo a fork of production itself and to keep it that way.</p>
+    <ul>
+      <li><strong>Fork production at its head</strong>, file for file, into a private design repo. The permanent mock and review infrastructure stays outside <code>src/</code>; portable token sources, generated styles and product UI changes stay inside the production-shaped tree. Sync from production daily while it moves this fast.</li>
+      <li><strong>Mock at the network</strong>, under the adapter, with Mock Service Worker. The app's own login, cookie, adapter and React Query code runs unchanged. A mock route is only allowed if it exists in the backend's pinned route map, which is how "no backend changes" becomes a CI failure instead of a review comment.</li>
+      <li><strong>Reuse the developer's own instruments.</strong> Production already has a structural conformance baseline per role and page, layout invariants, a role lint and a route map. They run against the mock app on every design PR, with no login throttle in the way.</li>
+      <li><strong>Storybook from the first commit</strong>, sharing the mock scenarios and the provider tree with the full app. Every role, state and screen gets a stable story URL, and every design record names the stories it changed and carries their visual, interaction and accessibility results. Verified feasible on the frozen stack: Storybook 10.6 and Vitest 3.2 both accept Vite 5; Vitest 4 does not.</li>
+      <li><strong>Hand off a patch and a note.</strong> Each design change is a numbered record with an exported patch built from portable product paths only, screenshots per role, and a machine-generated list of what moved structurally. Stories, scenarios and the record itself travel beside the patch, never inside it. The developer applies it three-way and re-records the baseline.</li>
+      <li><strong>Own the instruction files.</strong> Production's CLAUDE.md forbids visual change and names live infrastructure, so the design repo carries its own root file with an explicit precedence statement and keeps production's under <code>contract/</code>, synced and reported but never loaded.</li>
+      <li><strong>Spike two screens first.</strong> The review queue and the login screen, in the full app and in Storybook, with the export applied to production, before the full route surface and story catalogue are built.</li>
+      <li><strong>Make production themeable first.</strong> Four in five colour decisions in production are literals inside 2,000-line screens, and 750 dead dark-theme branches sit in 43 files. A full redesign cannot be delivered as tokens plus primitives until that is fixed. That pass is frontend-only, behaviour-preserving, verifiable, and belongs in production.</li>
+      <li><strong>Deliver the redesign in layers</strong>: tokens, primitives, chrome, then one screen at a time, each its own record and its own port. One long-lived redesign branch against a codebase moving 20 to 50 commits a day would never merge.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Evidence</span><h2>What the audits found</h2></div>
+  <div class="prose">
+    <p>Six read-only audits ran over the four repositories, the old design repo and the Pulse v4 material. These are the findings that shape the design. Every number is reproducible from the commands recorded in the audit outputs.</p>
+  </div>
+  <div class="tiles">
+    <div class="tile"><span class="label">Production velocity</span><span class="value">180</span><span class="note">commits in six days, 35 to 57 a day at peak, 6 to 18 a day this week. The visual layer changed on four of those days.</span></div>
+    <div class="tile"><span class="label">Colour decisions as literals</span><span class="value">~80%</span><span class="note">980 hex values, 2,641 raw palette classes and 142 inline styles in product components, against 826 token uses.</span></div>
+    <div class="tile"><span class="label">Dead theme branches</span><span class="value">750</span><span class="note">"theme === dark" ternaries in 43 files plus 236 dark: variants. The theme is hard-wired to light, so none of it renders.</span></div>
+    <div class="tile"><span class="label">Reachable API surface</span><span class="value">78</span><span class="note">method and path pairs under /v1 that the frontend can reach through 87 adapter rules. The backend lists 99.</span></div>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Area</th><th>Finding</th><th>Consequence for the design repo</th></tr></thead>
+      <tbody>
+        <tr><td>Session</td><td>The app treats a user as logged in when the readable <code>pl_user</code> cookie exists. Role and client scope are read from that cookie. No session call on boot.</td><td>A mock session is one cookie plus a mock login endpoint. No fake auth server, no HttpOnly tricks.</td></tr>
+        <tr><td>Adapter</td><td>87 rules translate the old dialect to <code>/v1</code>. Unmapped calls fail with a synthetic 501 and never reach the network.</td><td>Mock under the adapter so it keeps translating, and the existing adapter-coverage gate keeps passing.</td></tr>
+        <tr><td>Backend contract</td><td>The backend commits a route map with 99 routes, 18 enums and per-role grants, and an OpenAPI 3.1 file with 36 request schemas. Both are drift-gated in its CI.</td><td>Pin both at a commit. Generate the mock's route registry and enums from them. Fail CI on any handler outside the map.</td></tr>
+        <tr><td>QA tiers</td><td>Conformance snapshots ARIA roles, names, headings, table columns and a 25-property style projection for 31 role-and-page surfaces. Its diff function is pure. Layout invariants assert rules with no baseline. Journeys assert server state.</td><td>Conformance, invariants and the static gates run against the mock on every PR. Journeys do not transfer as written.</td></tr>
+        <tr><td>Styling</td><td>Tokens exist, in two dialects, and three status-colour vocabularies disagree. Six primitives carry <code>#F9B418</code> literally. One context file holds 1,000 lines of UI.</td><td>The redesign needs a themeability pass in production before screens can be restyled through tokens.</td></tr>
+        <tr><td>Pulse v4</td><td>Approved token sheet PL-TKN-004: Schibsted Grotesk, Newsreader, IBM Plex Mono, 2px radius, hairline outlines, no shadows, 232px navy sidebar. Thirteen pages, rendered for one persona only, the firm admin. No inventor, counsel, committee, case-owner or superadmin screens, no auth beyond login, no states, no dark mode.</td><td>The visual system is nearly complete. The screen coverage is the designer's work, and this repo is where it happens.</td></tr>
+        <tr><td>Old design repo</td><td>PR #3 is byte-identical to PR #2 and both are merged. The 83 modified files locally are Vite cache and screenshots. Nothing is pending.</td><td>Retire it. Salvage the fixture data and the persona chip pattern only.</td></tr>
+        <tr><td>Token drift</td><td>Production's Tailwind carries a <code>pl-*</code> palette used once, with green and red values that differ from the v4 sheet. Its CSS claims v4 while shipping Instrument Sans and card shadows.</td><td>The first design record reconciles the token truth. One source file, generated outputs.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Review</span><h2>Verdict on the earlier plan</h2></div>
+  <div class="prose">
+    <p>The earlier proposal was right about the boundary and wrong about the shape. It designed a new workspace from scratch when the winning move is to keep production's shape exactly and add one layer beside it.</p>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Proposal</th><th>Verdict</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Mock at the network boundary with MSW, behind the adapter</td><td><span class="tag keep">Keep</span></td><td>Only way to run the adapter, React Query and the cookie logic untouched.</td></tr>
+        <tr><td>Named scenarios per role, deterministic data, no real disclosures</td><td><span class="tag keep">Keep</span></td><td>Personas should mirror the backend seed so designer and developer talk about the same accounts.</td></tr>
+        <tr><td>Pinned production baseline, AI rules file, fail-closed analytics</td><td><span class="tag keep">Keep</span></td><td>Analytics is already gated by env and hostname. Leave the variables unset and nothing leaves.</td></tr>
+        <tr><td>Turborepo with apps and seven packages</td><td><span class="tag drop">Drop</span></td><td>Changes root layout, configs and paths. Every port would need translation again. The repo stays a single Vite app.</td></tr>
+        <tr><td>Contract snapshot built from OpenAPI, Playwright visual and accessibility gates</td><td><span class="tag change">Change</span></td><td>The backend already ships the contract files. Production already ships the structural and layout tiers. Reuse them, and run visual and accessibility checks through the story catalogue rather than a separate harness.</td></tr>
+        <tr><td>Storybook from the first commit</td><td><span class="tag keep">Keep</span></td><td>Six roles and many hard-to-reach states inside 2,000-line screens. Storybook is the primary design-review surface, shares the mock scenarios and providers with the full app, and gives the developer stable URLs. The full app still owns route-level and multi-screen review. Versions verified against Vite 5 below.</td></tr>
+        <tr><td>JSON change manifests as the handoff</td><td><span class="tag change">Change</span></td><td>A short note plus an exported patch, screenshots and the generated structural diff. Nobody fills in JSON by hand.</td></tr>
+        <tr><td>Design repo owns exploration, production owns behaviour</td><td><span class="tag keep">Keep</span></td><td>Also: production owns the fork point. The design repo syncs from it, never the reverse.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Model</span><h2>How the two repositories relate</h2></div>
+  <div class="diagram">
+    <svg viewBox="0 0 980 330" role="img" aria-label="Production on GitLab is forked into the design repo on GitHub. Production syncs into the design repo daily. Design records branch from the design repo, export a patch and note, and the developer applies them to production, gates them and re-records the baseline.">
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z"/></marker></defs>
+      <rect class="box navy" x="20" y="60" width="270" height="120" rx="2"/>
+      <text class="mono onnavy2" x="36" y="84">GITLAB / PHOTONLEGAL</text>
+      <text class="onnavy" x="36" y="110" style="font-size:16px;font-weight:600">pulse-frontend</text>
+      <text class="onnavy2" x="36" y="132">Production. Owns behaviour, API,</text>
+      <text class="onnavy2" x="36" y="150">auth, security and the fork point.</text>
+      <text class="onnavy2" x="36" y="168">20 to 50 commits a day.</text>
+
+      <rect class="box" x="360" y="60" width="270" height="120" rx="2"/>
+      <text class="mono" x="376" y="84">GITHUB / SAURRX (PRIVATE)</text>
+      <text x="376" y="110" style="font-size:16px;font-weight:600">pulse-design</text>
+      <text x="376" y="132">A fork of production plus one</text>
+      <text x="376" y="150">tooling layer: mock/, design/,</text>
+      <text x="376" y="168">changes/, contract/, rules, scripts.</text>
+
+      <rect class="box tint" x="700" y="60" width="260" height="120" rx="2"/>
+      <text class="mono" x="716" y="84">BRANCH DSN-00NN</text>
+      <text x="716" y="110" style="font-size:16px;font-weight:600">One design record</text>
+      <text x="716" y="132">Tokens, primitives, chrome or one</text>
+      <text x="716" y="150">screen. Lives under a week. Changes</text>
+      <text x="716" y="168">product and review files only.</text>
+
+      <path class="arrow" d="M290,100 L360,100"/>
+      <text class="mono" x="296" y="92">FORK ONCE AT df5f2ff</text>
+      <path class="arrow" d="M290,150 L360,150"/>
+      <text class="mono" x="298" y="170">SYNC DAILY</text>
+      <path class="arrow" d="M630,120 L700,120"/>
+      <text class="mono" x="640" y="112">BRANCH</text>
+
+      <rect class="box" x="360" y="230" width="600" height="80" rx="2"/>
+      <text class="mono" x="376" y="254">EXPORT, ON THE DESIGN SIDE</text>
+      <text x="376" y="278">changes/DSN-00NN: note, one three-way patch without tooling paths,</text>
+      <text x="376" y="296">screenshots per role, generated structural diff, drift check against upstream.</text>
+      <path class="arrow brand" d="M830,180 L830,230"/>
+
+      <path class="arrow" d="M360,270 L155,270 L155,180"/>
+      <text class="mono" x="168" y="236">APPLY, GATE,</text>
+      <text class="mono" x="168" y="252">RE-RECORD BASELINE,</text>
+      <text class="mono" x="168" y="268">CLOSE DSN</text>
+    </svg>
+  </div>
+  <div class="prose">
+    <p>The fork shares history with production from the fork commit onward, so a three-way apply resolves against real ancestry rather than guessing. The permanent mock and review infrastructure stays outside <code>src/</code>, while portable token sources, generated styles and product UI changes stay inside the production-shaped tree; a design branch may change portable product files and review-support files, but never protected infrastructure, and only the portable files enter the patch. Production's own plan forbids an in-browser demo mode from ever shipping, and this layout honours that by construction: the mock cannot be ported by accident because it is never in the patch.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Repository</span><h2>The design repository, concretely</h2></div>
+  <div class="prose">
+    <p>"Single repo" here means one repository holding everything the designer and their AI agent need: the frontend fork, the mock layer, the v4 source material, the pinned backend contract and the change records. It is not a workspace of packages. Its <code>src/</code> tree is production's <code>src/</code> tree, changed only through design records.</p>
+  </div>
+<pre><code>pulse-design/
+├── src/                      # production's tree, untouched by tooling; src/styles/ arrives with DSN-0001, not the scaffold
+├── public/                   # production's assets + mockServiceWorker.js (protected, never in a patch)
+├── qa/                       # production's corpus + a mock-session seam; conformance/baseline-mock/ is design-owned
+├── tools/                    # production's tools (lint:roles) + tools/design/*.mjs (sync, export, shots, gates)
+├── .storybook/               # main.ts, preview.tsx, manager.ts; stories resolved from design/stories
+├── mock/
+│   ├── runtime/              # worker boot, registry, route guard, db engine, clock, chip, shims (protected)
+│   ├── handlers/             # one module per resource, keyed on method + canonical path (review support)
+│   └── scenarios/            # personas and data shapes; large sets generated per page   (review support)
+├── design/
+│   ├── stories/              # foundations, primitives, patterns, screens, states        (review support)
+│   ├── harness/              # StoryApp provider tree, loaders, viewport presets, clock   (protected)
+│   ├── fonts/                # vendored faces for deterministic screenshots
+│   └── v4/                   # the approved pages and screens, as reference only
+├── contract/                 # pinned: backend.json, openapi/spec.yaml, enums.ts, production-CLAUDE.md, production-backend-CLAUDE.md
+├── changes/                  # DSN-0001/ ... one folder per design record                (review support)
+├── CLAUDE.md                 # design-owned: precedence statement + @AGENTS.md; production's file is under contract/
+├── AGENTS.md, .claude/rules/ # the design rules, shared by Codex and Claude
+├── vite.design.config.ts     # design-owned: merges production's vite.config.ts, swaps the entry to mock/runtime/boot.tsx,
+│                             # aliases @react-oauth/google to an inert shim; used by the app and by Storybook (protected)
+├── index.html, vite.config.ts# production's, untouched
+└── vercel.json, .nvmrc       # two preview projects, app and Storybook; no API rewrite, no env vars</code></pre>
+  <div class="cols">
+    <div>
+      <h3>Copied verbatim</h3>
+      <ul>
+        <li>Everything under <code>src/</code>, including the adapter, roles, auth and the analytics catalogue. The root CLAUDE.md is the one production file the design repo replaces.</li>
+        <li><code>package.json</code>, the lockfile, Vite, Tailwind, TypeScript and ESLint configs.</li>
+        <li>The whole <code>qa/</code> corpus, the conformance baseline directory, the role lint.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Added beside it</h3>
+      <ul>
+        <li><code>mock/</code>, <code>contract/</code>, <code>design/</code>, <code>changes/</code>, <code>tools/design/</code>, <code>.storybook/</code>, <code>qa/conformance/baseline-mock/</code>, <code>qa/visual/</code>, and <code>vite.design.config.ts</code>, which merges production's Vite config, swaps the entry module and adds the shim aliases so no production config file is edited.</li>
+        <li>A design-owned root <code>CLAUDE.md</code> that states precedence and imports <code>AGENTS.md</code>, plus <code>.claude/rules/*.md</code> scoped to UI paths. Production's CLAUDE.md is kept under <code>contract/</code>, refreshed on every sync with its changes reported, and never loaded as instructions.</li>
+        <li>Pinned dev dependencies only: <code>msw</code> and its data helper, <code>storybook</code> with the React and Vite framework, the docs, accessibility and Vitest addons, <code>vitest</code> 3 with its browser runner, <code>playwright</code> at the exact version of the CI browser image, and the MSW addon. Nothing else without a design record saying why. The design repo keeps its own augmented lockfile; the sync reconciles it against production's instead of regenerating it.</li>
+        <li>A <code>.nvmrc</code> pinning Node 22, matching production's CI image. Production should carry the same file.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Neutralised without edits</h3>
+      <ul>
+        <li>Analytics: the PostHog variables stay unset, so every track call is a no-op and no host is contacted.</li>
+        <li>Google sign-in: the design Vite config aliases the Google OAuth package to an inert shim with the same exports, for the app and Storybook alike. No identity script loads, the user-info call never happens, and the mock answers the login endpoint.</li>
+        <li>Microsoft and SAML: the mock answers the redirect endpoints with a landing on the mock session.</li>
+        <li>Uploads: presign and content endpoints are mocked in memory. Nothing leaves the tab.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Mock layer</span><h2>How the mock behaves</h2></div>
+  <div class="prose">
+    <p>A service worker intercepts every request the app makes to <code>/v1</code>. The handlers speak the backend's own vocabulary, Prisma state names and all, because the adapter above them expects exactly that. The old design repo's mock spoke the old dialect, which is why its data columns leaked into the PR #2 port. This one cannot.</p>
+  </div>
+  <h3>Route registry and the "no new endpoints" rule</h3>
+  <div class="prose">
+    <p>The registry is generated from the pinned backend route map using the same path canonicaliser Atlas uses, so <code>:clientId</code> and <code>{id}</code> collapse the same way. Each handler registers under a key like <code>PATCH /v1/due-dates/{id}</code>. A CI gate fails if any key is not in the map. The reverse report lists the 78 routes the frontend reaches, so the mock's coverage is also checked, and route order is exact-match to avoid the 22 shadowing pairs the real router has.</p>
+    <p>Two kinds of gap exist and the record must name which. A route that exists in the backend map but that the frontend never wired, of which there are 27 today, needs no backend work but is still an API-surface and product-behaviour change; the record marks it <code>unwired</code> and it needs the developer's approval before port. A route the backend does not have is declared in <code>mock/proposed-routes.json</code> with a reason; the chip shows a red "needs backend" badge whenever it is hit, the record is marked conceptual, and it cannot be marked ready for port. That is the whole enforcement of "no backend changes".</p>
+  </div>
+  <h3>Fidelity beyond route existence</h3>
+  <div class="prose">
+    <p>A handler can target a real route and still return fields or transitions the backend never produces. So the mock is tested across the real boundary: each handler's response is fed through the adapter, bundled the way production's own social-login contract test bundles it, and the result is asserted against the minimum screen-facing shape for that resource. Request bodies are validated against the pinned OpenAPI schemas, and the review and submit handlers are checked against the backend's declared state machine using the plans its demo-inventor seed uses. Covered from day one: session user, clients, ideas, drafts, patents, due dates, actions, the evaluation report, invites and share links, upload and import results.</p>
+    <p>Every record also reports its handler changes: handlers added or changed, routes already wired, routes present but previously unwired, routes absent from the backend, response fields added or changed, and state transitions affected. A handler-only change cannot close a record, and it can never be the thing that makes a broken screen story pass.</p>
+  </div>
+  <h3>Personas and scenarios</h3>
+  <div class="prose">
+    <p>Personas mirror the backend seed so a conversation about "the Acme counsel" means the same thing on both sides. The seed has two workspaces, Acme with a tech committee and Globex without, and eight users across all six roles. Every persona gets a realistic portfolio, not the four-patent seed, because the developer's own testing law says an empty table hides broken code.</p>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Scenario</th><th>Persona</th><th>What it exercises</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">inventor/first-run</td><td>New inventor at Acme</td><td>Empty state, first draft, autosave, evaluation from queued to complete over 20 seconds.</td></tr>
+        <tr><td class="mono">inventor/portfolio</td><td>Inventor with ideas in every state</td><td>Changes requested, rejected with appeal, sent to Photon, filed. Mirrors the backend's demo-inventor seed plans.</td></tr>
+        <tr><td class="mono">committee/queue</td><td>Tech committee at Acme</td><td>Review queue with day-age spread, one-screen decision, evaluation running and partial.</td></tr>
+        <tr><td class="mono">counsel/queue</td><td>Legal counsel at Globex (no committee)</td><td>Ideas arriving straight at legal review, workspace people management, invites and share link.</td></tr>
+        <tr><td class="mono">case-owner/assigned</td><td>Case owner with two of three clients</td><td>Scoped client list, view-as and exit, portfolio upload, actions queue.</td></tr>
+        <tr><td class="mono">photon-admin/firm</td><td>Photon admin</td><td>All clients, onboarding, case-owner access drawer, operations queue, due dates across clients.</td></tr>
+        <tr><td class="mono">superadmin/firm</td><td>Founder tier</td><td>Everything the admin sees. Also surfaces the two places production currently short-changes this role.</td></tr>
+        <tr><td class="mono">shape/large</td><td>Any</td><td>Realistic totals, about 14,000 patents and 13,000 deadlines, with each requested page and every aggregate generated on demand from a seeded generator. Nothing of that size is materialised or persisted. Long titles, many countries, many events on one day.</td></tr>
+        <tr><td class="mono">shape/failure</td><td>Any</td><td>4xx responses on mutations, a timed-out and a failed evaluation, an import with duplicates and errors.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="prose">
+    <p>The scenario is chosen by query string or the chip and remembered in the browser. Mutations write to an in-memory store. In the full app that store snapshots to local storage with a seed version, the same pattern the old mock used, so a click-through survives reloads and a reset is one button. In Storybook and in CI persistence is off and the store is rebuilt for every story. Time comes from a mock clock, identifiers are stable, and the random sources are seeded, so the structural baseline and the no-visible-UUID gate stay green from run to run.</p>
+  </div>
+  <h3>Things the audit says the mock must get right</h3>
+  <ul>
+    <li>Answer the login endpoint with the full user shape the adapter wraps, including a real client id for client roles and null for Photon roles, and assigned client ids for case owners.</li>
+    <li>Never answer 401. The refresh interceptor would bounce the app to the login screen.</li>
+    <li>Return 201 where screens assert it: creating an idea, a draft, a client, and the draft patch on the idea details path.</li>
+    <li>Evaluation states are fixed snapshots: queued, running, succeeded, partial, failed, timed out. A story pins one. Only the full app progresses, and it does so on the mock clock, which the chip advances, never on request count, because mounts, focus and strict-mode double effects make request counts unpredictable. The three five-second polls stop when the clock reaches a terminal state with a score.</li>
+    <li>Queries retry every thrown request error three times by default, whatever the status, unless the individual query overrides it; mutations do not retry. Error-state stories therefore use a harness query client with retries off to reach the final state at once, and one parity story keeps production's retry behaviour and checks the loading-to-error delay. The full app keeps production behaviour.</li>
+    <li>Serve <code>files/{id}/raw</code> with an image for any client that has a logo, and accept the raw upload body.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Storybook</span><h2>Storybook as the design-review surface</h2></div>
+  <div class="prose">
+    <p>Storybook is installed in the initial scaffold, not later. It complements the full mock application: Storybook holds isolated states and components, the full app holds complete role journeys, and production QA holds real behaviour, authorization and persistence. Adding it after tokens, primitives and screens have been designed would mean retrofitting the state catalogue at the most expensive moment.</p>
+  </div>
+
+  <h3>Versions, verified against the frozen stack</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Package</th><th>Pin</th><th>Why this one</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">storybook, @storybook/react-vite</td><td class="mono">10.6.x</td><td>The React and Vite framework accepts Vite 5 through 8 and React 16 through 19. It reuses the project's Vite config, including the <code>@</code> alias and the SWC React plugin.</td></tr>
+        <tr><td class="mono">@storybook/addon-vitest, vitest, @vitest/browser</td><td class="mono">10.6.x, 3.2.x, 3.2.x</td><td>The addon accepts Vitest 3 or 4, but Vitest 4 requires Vite 6 or newer. Vitest 3.2 is the last line that runs on Vite 5. Move to Vitest 4 only when production moves to Vite 6.</td></tr>
+        <tr><td class="mono">@storybook/addon-a11y, @storybook/addon-docs</td><td class="mono">10.6.x</td><td>Same major as the core.</td></tr>
+        <tr><td class="mono">msw, msw-storybook-addon</td><td class="mono">2.15.x, 3.0.x</td><td>The addon requires MSW 2 and Storybook 9 or newer. One worker script under <code>public/</code>, shared by the app and Storybook.</td></tr>
+        <tr><td class="mono">@storybook/test-runner</td><td class="mono">not installed</td><td>Superseded by the Vitest addon. A documented fallback only, added if the spike shows a real blocker with the browser runner.</td></tr>
+        <tr><td class="mono">playwright, @playwright/test</td><td class="mono">the CI image's exact version</td><td>The Vitest browser runner declares Playwright as a peer. Pinned to the browser image so every screenshot comes from one browser build. The proposed set resolved cleanly in an isolated trial with Storybook 10.6, Vite 5.4.21 and Vitest 3.2.7.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout note">
+    <span class="kicker">Installer discipline</span>
+    <p>The Storybook installer offers to upgrade neighbours. Run it with the pins above and refuse every upgrade of React, Vite, Tailwind, TypeScript, Playwright or Radix. A gate compares the design manifest with production's plus the tooling set and fails on anything else.</p>
+  </div>
+
+  <h3>The harness</h3>
+  <div class="prose">
+    <p>Most Pulse components do not render from a bare import. They expect the router, the query client, the theme and analysis contexts, the toasters and, for every protected screen, the dashboard chrome: page headers are portalled into slots that only the layout renders. So a screen story mounts a memory router with only its own route nested under the real layout, plus a catch-all route that renders a navigation marker so a play test can assert where the screen tried to go without mounting the destination. There is no second route table to keep in sync; the full app runs production's own <code>App.tsx</code>.</p>
+    <p>A story selects a scenario rather than building its own data. Its parameters name the scenario, the role and the route. A loader then rebuilds the store, seeds the scenario, clears every known production storage key, writes the session cookie, installs any per-story handler overrides, pins the mock clock, stubs prompt and confirm, marks the frame ready once fonts and the portal slots have settled, and opens the route. Stubs are restored when the story unmounts. A fresh query client is created per story.</p>
+    <p>Storybook frames share one origin, so the session cookie and both storages are shared between stories. Role-aware stories therefore run serially, persistence is off, screenshot runs use a fresh browser context per story, and parallel execution is enabled only after an isolation test proves two personas cannot contaminate each other: open an inventor story and a counsel story concurrently and assert that each still renders its own navigation and affordances after a refetch.</p>
+  </div>
+<pre><code>export const TechnicalReviewQueue = {
+  parameters: { pulse: { scenario: "committee/queue", role: "TECH_COMMITTEE", route: "/ideas" } },
+};</code></pre>
+  <ul>
+    <li>Auth screens need the Google provider or their sign-in hook throws. The shim provides it, inert, with the same exports; nothing loads from Google and the login endpoint is mocked.</li>
+    <li>Two flows call the browser's own prompt and confirm dialogs. The harness stubs them so interaction tests do not block, and restores them after each story.</li>
+    <li>The sidebar collapses itself under 1440px. Stories declare viewport presets at 1024, 1280 and 1440 by 900, and screenshots are taken at 1440 unless the story says otherwise.</li>
+    <li>The Microsoft and SSO buttons navigate the frame away. Stories show them; interaction tests never click them.</li>
+    <li>The desktop gate keys on pointer and hover media features, not width. Stories that show it use device emulation in the screenshot runner, not a viewport preset.</li>
+    <li>Tailwind only scans <code>src/</code>. Stories compose production components and use no classes of their own; where a harness element needs one, the Storybook Vite config extends the content globs without touching production's config file.</li>
+  </ul>
+
+  <h3>Catalogue</h3>
+  <div class="cols">
+    <div>
+      <h3>Day one</h3>
+      <ul>
+        <li><strong>Foundations.</strong> Colours, type, spacing, status vocabulary, icons. During the spike and the scaffold these read production's stylesheet and Tailwind config as they are; DSN-0001 introduces the token source, the generator, the generated styles, the font files and the updated foundation stories together, so the scaffold carries no unapproved product change.</li>
+        <li><strong>Primitives.</strong> The 29 files under <code>components/ui</code>, every variant and state.</li>
+        <li><strong>Screens.</strong> Page stories for every route, for every role that can reach it, default state, using the existing page and workspace components as they are. No production refactor is needed to get here.</li>
+        <li><strong>States.</strong> Loading, empty, failure, long content, permission denied, evaluation running, partial and failed, each as a scenario override.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>As the work lands</h3>
+      <ul>
+        <li><strong>Patterns.</strong> Page header, filter bar, empty and error states, review decision, evaluation rail, patent summary, client identity. Most of these do not exist as components today; they are inlined in the large screens and appear here as Phase 0 and the redesign extract them.</li>
+        <li><strong>Table.</strong> There is no table primitive yet; ten raw tables become one in Phase 0.5, and its stories arrive with it.</li>
+        <li><strong>Per record.</strong> Every changed component shows default, loading, empty, error, long content, disabled or read-only, keyboard focus, the relevant roles and statuses, and both viewports.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Two deployments, two origins</h3>
+  <div class="prose">
+    <p>The app preview and the Storybook preview are two projects, not one site with a subpath. Each registers its own service worker at its own origin, so neither worker can capture the other's requests, and the app's single-page fallback never swallows a Storybook URL. The design repo's own <code>vercel.json</code> has no API rewrite and a content policy that allows only the local origin. Records link both previews.</p>
+  </div>
+
+  <h3>Before and after</h3>
+  <div class="prose">
+    <p>A story renders the component as it is on its branch, so "current" and "proposed" cannot both be stories in one build, and the design main moves every day, so a branch URL is not a record either. The canonical evidence is what the record commits: the before commit, which is the branch's merge base, and the after commit; the story index; the interaction and accessibility results; the build checksums; and the before and after screenshots. Hosted previews are convenient review surfaces and nothing more, because their retention depends on plan and account settings. Story ids are stable and treated as API: a story an open record names cannot disappear without the record being updated.</p>
+  </div>
+
+  <h3>Tests that run on stories</h3>
+  <ul>
+    <li><strong>Interaction.</strong> Play functions for dialogs opening and closing, tabs, filters, keyboard access, confirmation, focus return, error and retry, and the fixed evaluation states. Serial until the isolation test passes. They never claim persistence or authorization; production QA owns those.</li>
+    <li><strong>Visual.</strong> Screenshots per story in the same pinned Playwright image production's CI uses, taken from the story frame directly rather than the manager, after the ready marker, with vendored fonts, pinned locale and timezone, the mock clock, seeded random and identifier sources, animations disabled, and a fresh browser context per story. Baselines live in the repository; Chromatic is an option later, not a dependency.</li>
+    <li><strong>Accessibility.</strong> The axe addon runs on every story and is configured to fail, not only to report. Inherited screens already carry violations, so those are fingerprinted by story id, rule id, impact and normalised element context, never by selector, and the gate is a ratchet: no new fingerprints anywhere, and zero violations inside the redesigned content root of any story tagged for the redesign, so an inherited shell violation cannot block every page.</li>
+    <li><strong>Unhandled requests and egress.</strong> The worker treats an unhandled request as an error, and a browser-level block in every runner fails any request to a host other than the frame's own origin. Warnings alone are not a gate.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Rules</span><h2>Rules the AI agent works under</h2></div>
+  <div class="prose">
+    <p>You work with Codex, the developer works with Claude. Both read <code>AGENTS.md</code>; Claude Code also reads the root <code>CLAUDE.md</code> and scoped rules under <code>.claude/rules/</code>. Production's CLAUDE.md cannot be loaded as instructions here: it says the design must not change, which is right for production and wrong for this repo, and it carries demo hosts, deploy steps and account references an agent must never use from a mock. Contradictory instruction files are not neutralised by a second file sitting beside them, so precedence has to be stated in the file Claude reads first.</p>
+    <p>The design repo therefore owns its root <code>CLAUDE.md</code>. It states precedence, imports <code>AGENTS.md</code>, and points at production's file, which is preserved and synced as <code>contract/production-CLAUDE.md</code> together with the backend's product rules. The sync reports every upstream change to those files in its commit message so nobody misses a new product rule. The design CLAUDE.md opens with:</p>
+  </div>
+<pre><code>Production behaviour rules remain binding. Read contract/production-CLAUDE.md
+and contract/production-backend-CLAUDE.md for them.
+The production visual-lock rule is suspended only inside an approved DSN record.
+Sections of the production file about the demo environment, deployment and
+accounts do not apply here. Never call a demo or production service from this repo.</code></pre>
+
+  <h3>Three path classes</h3>
+  <div class="prose">
+    <p>Every design branch carries its record and references stories, and most change scenarios or handlers too, so "never touch the tooling" cannot be the rule. Paths fall into three classes and the exporter enforces them.</p>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Class</th><th>Paths</th><th>Rule</th></tr></thead>
+      <tbody>
+        <tr><td>Normally portable</td><td class="mono">src/components/**, src/pages/**, src/index.css, src/style.css, src/styles/**, public/assets/**, public/fonts/**</td><td>Enter the patch without further approval.</td></tr>
+        <tr><td>Portable with build-impact approval</td><td class="mono">index.html, vite.config.ts, tailwind.config.ts, postcss.config.js, tools/tokens.mjs</td><td>Enter the patch only when the record carries an explicit build-impact flag the developer approves. A bundler or entry-point change does not travel as casually as a restyle.</td></tr>
+        <tr><td>Portable with behaviour-impact approval</td><td class="mono">src/lib/roles.ts labels, src/utils/patentLegalStatus.ts, src/contexts/** while UI still lives there, src/hooks/**</td><td>Enter the patch only with the developer's explicit approval recorded, because a label or a status map is product vocabulary. The adapter, auth, analytics and the query plumbing stay off limits.</td></tr>
+        <tr><td>Review support</td><td class="mono">design/stories/**, mock/scenarios/**, mock/handlers/**, changes/DSN-*/**, qa/conformance/baseline-mock/**, screenshot baselines</td><td>Never in the patch. A record must reference at least one story and show coverage for every changed portable component; new stories or scenarios are required only for a state nothing covers yet. Handlers stay subject to the route guard and get their own report.</td></tr>
+        <tr><td>Protected infrastructure</td><td class="mono">mock/runtime/** including the shims and the clock, the route registry and guard, .storybook/**, design/harness/**, tools/design/**, qa/** except baselines, contract/**, vite.design.config.ts, CLAUDE.md, AGENTS.md, .claude/**, CODEOWNERS, vercel.json, package.json, package-lock.json</td><td>Changes only through a tooling PR with owner approval. The exporter rejects a design branch that touches them.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="prose">
+    <p>The token source is deliberately portable: it lives in a production path with its generator, so production can adopt it and later token changes travel as one file.</p>
+  </div>
+  <div class="cols">
+    <div>
+      <h3>Always</h3>
+      <ul>
+        <li>Start from the existing component and its props. Restyle in place; rewrite only with a design record that says so.</li>
+        <li>Put colour, type, spacing, radius and shadow decisions in the token source. No new literal visual values in product files.</li>
+        <li>Use the existing primitives under <code>components/ui</code> first. A new primitive is its own record.</li>
+        <li>Keep every role's routes, redirects and affordances. Add a scenario for every new state you introduce.</li>
+        <li>Run typecheck, the role lint, the build, the invariants and the conformance tier before opening a PR. Read the conformance diff before re-recording.</li>
+        <li>Reference the stories that cover every component you change, selecting scenarios rather than building fixture objects. Add a story or a scenario only for a state nothing covers yet. A change without story coverage is not reviewable.</li>
+        <li>Write the design record: intent, what moved, what stayed, the story ids, screenshots per role, backend impact.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Never</h3>
+      <ul>
+        <li>Touch the adapter, the roles module, auth, analytics or the query hooks from a design branch. Those are behaviour, and behaviour changes go to production as findings.</li>
+        <li>Change protected infrastructure from a design branch: the mock runtime, the route registry and guard, the Storybook config, the harness, the QA corpus, the contract pins, the instruction files. Those change through tooling PRs.</li>
+        <li>Add a dependency, upgrade Tailwind, React, Vite or Radix, or swap a library. Tailwind stays on 3.4.</li>
+        <li>Invent an endpoint, a status value or a role label. Statuses come from the pinned enums.</li>
+        <li>Render an identifier to a reader. Reference numbers only, which a gate enforces.</li>
+        <li>Remove an affordance that authorization depends on to simplify a layout.</li>
+        <li>Re-litigate locked product decisions: the review chain, inventorship, stage gates, one-click view-as, the desktop gate, same-origin uploads, content-free analytics.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Redesign</span><h2>Delivering a full visual redesign on this codebase</h2></div>
+  <div class="prose">
+    <p>The v4 system is close to complete: three typefaces, an ink and brand palette, hairline surfaces, 2px corners, a navy rail. The gap is not the system. It is that production cannot receive a system yet. Roughly four in five colour decisions are literals inside screens of 1,300 to 3,000 lines, three status-colour vocabularies disagree, 750 dead theme branches obscure every file, and the score-progress UI lives inside a React context. A designer restyling those files directly would produce thousand-line diffs against files the developer edits daily.</p>
+  </div>
+
+  <h3>Phase 0. Make production themeable</h3>
+  <div class="prose">
+    <p>This is developer work, in production, on the frontend only, and every step is behaviour-preserving and provable. Each step is a normal production MR that must leave the conformance baseline identical, including its style projection, and must produce a zero-pixel screenshot difference per role and route. A pixel diff is the wrong tool for detecting change and exactly the right tool for proving there was none.</p>
+  </div>
+  <div class="steps">
+    <div class="step"><span class="n">P0.1</span><div><div class="t">Delete the dead theme code</div><div class="d">Replace every dark ternary with its light branch, remove the dark variants and the unused theme hooks. About 750 sites in 43 files, mechanical, AI-assisted, verified by the zero-change gates.</div></div><span class="who">developer</span></div>
+    <div class="step"><span class="n">P0.2</span><div><div class="t">Apply the token map</div><div class="d">The designer supplies a map from the 120 distinct hex values and the raw palette classes to semantic tokens. The developer registers those tokens as named Tailwind colours backed by CSS variables and codemods the literals to them. Screen by screen, in the order the redesign will land.</div></div><span class="who">designer maps, developer applies</span></div>
+    <div class="step"><span class="n">P0.3</span><div><div class="t">One status vocabulary</div><div class="d">A single status map for idea state, patent status, action and request status and due-date status, rendered through the existing chip primitive. Delete the three duplicates and the dead badge helpers.</div></div><span class="who">developer</span></div>
+    <div class="step"><span class="n">P0.4</span><div><div class="t">Move UI out of the analysis context</div><div class="d">The provider keeps the state and the polling. The indicator and the two dialogs become components rendered by the layout. Also lift the runtime-injected style tags into the stylesheet.</div></div><span class="who">developer</span></div>
+    <div class="step"><span class="n">P0.5</span><div><div class="t">Primitive hygiene</div><div class="d">Remove the brand hex from the six primitives that carry it, drop their theme branches, and give the app a table primitive so the ten raw tables can share one.</div></div><span class="who">developer</span></div>
+  </div>
+  <div class="callout">
+    <span class="kicker">Why this belongs in production</span>
+    <p>Production moves 6 to 57 commits a day and the developer touches these exact files for fixes. A refactor of this size done in the design repo would conflict before it could be ported. Done in production, it lands in days, and every later design port shrinks from thousands of lines to the token file and the parts of a screen that actually changed. It is frontend-only, so it sits inside your constraint.</p>
+  </div>
+
+  <h3>Then the redesign, in layers</h3>
+  <div class="steps">
+    <div class="step"><span class="n">L1</span><div><div class="t">Tokens and fonts</div><div class="d">One token source at <code>src/styles/tokens.json</code> in the Design Tokens Community Group format, with its generator at <code>tools/tokens.mjs</code> writing the CSS variables and the Tailwind theme into generated files that the stylesheet and the Tailwind config import. Source, generator and outputs are all portable, so production can regenerate what it receives. This record reconciles the drift: the sheet's green and red against production's, Instrument Sans against Schibsted Grotesk and Newsreader, the unused 0.75rem radius variable, shadows against hairlines. It also vendors the typefaces under <code>public/fonts</code> with local font-face rules, replacing the Google Fonts link in both repos, which makes screenshots deterministic and lets the network gate stay strict. That part is a production-facing change and is decision 9.</div></div><span class="who">designer</span></div>
+    <div class="step"><span class="n">L2</span><div><div class="t">Primitives</div><div class="d">Button, input, select, dialog, card, chip, table, tabs. Same props, new skin. Each state visible in a scenario.</div></div><span class="who">designer</span></div>
+    <div class="step"><span class="n">L3</span><div><div class="t">Chrome and auth</div><div class="d">The 232px navy rail, header, page header slots, desktop gate overlay, and the shared auth shell. Production's nav stays role-conditional; v4's flat seven-item admin nav is its look, not its item list.</div></div><span class="who">designer</span></div>
+    <div class="step"><span class="n">L4</span><div><div class="t">Screens, one record each</div><div class="d">Suggested order: review queue, dashboard, ideas list, idea details, draft workspace, patents list, patent detail, due dates, actions, clients, workspace and profile. The review queue goes first because it is already token-clean, so it needs no Phase 0 work, and because v4 never designed it.</div></div><span class="who">designer</span></div>
+  </div>
+
+  <h3>What v4 does not cover, and the designer must</h3>
+  <div class="prose">
+    <p>Five of six roles have no v4 screen: inventor home, my ideas and the draft form; the committee and counsel review queue; case-owner scoping; the founder tier. Auth beyond login: signup, invite, forgot and reset, the SAML landing. The standalone profile page. Every empty, loading and failure state. The view-as banner and exit. Evaluation running, partial, failed and timed out. Toolbars and pagination. Two v4 renderings disagree on Workspace and on Actions; pick one before building. Dark mode is out of scope; the token structure leaves room for a dark block later.</p>
+  </div>
+  <div class="callout note">
+    <span class="kicker">One conflict to settle</span>
+    <p>The backend's rebuild plan describes a "structured base, glass accents" direction with translucency and blur. The approved v4 sheet is the opposite: opaque, hairline, no shadows. The v4 sheet is later and approved, and production is built on the design lineage rather than the plan's Next.js build, so v4 wins on visuals. The plan's persona surfaces remain the content brief for what each role's screen is for. Surfaces that need data the backend does not have, such as the firm workload board and the founder tiles, can be designed but stay marked conceptual.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Handoff</span><h2>The handoff contract</h2></div>
+  <div class="prose">
+    <p>You chose both a branch and a note. The branch is the source; the note is the intent. The export script turns a branch into a folder that stands on its own, so the developer never has to reconstruct what a change meant from a diff.</p>
+  </div>
+<pre><code>changes/DSN-0007/
+├── README.md          # intent, what moved, what stayed, decisions taken, backend impact: none | unwired | conceptual
+│                      # review surfaces: story ids; approval flags for build-impact or behaviour-impact paths
+├── dsn-0007.patch     # one squashed three-way patch, portable paths only, based on the recorded production commit
+├── structure-diff.md  # generated: per role and page, signatures added or removed, columns dropped, sections reordered
+├── handlers.md        # generated: handlers added or changed, routes wired, unwired or absent, fields and transitions affected
+├── evidence/          # canonical: before and after commits, story index, test results, build checksums
+├── shots/             # canonical: before and after, per story and per role and route, 1440 by 900
+└── drift.txt          # generated: the patch applied in a disposable worktree at the recorded commit and at the latest head
+  <div class="cols">
+    <div>
+      <h3>On the design side</h3>
+      <ul>
+        <li>Branch <code>dsn/0007-review-queue</code> from the design repo's main, which is production plus tooling.</li>
+        <li>Work with the agent under the rules. Add or extend scenarios and the stories that use them. Re-record the conformance baseline and the story screenshots after reading their diffs.</li>
+        <li>Run the export. It writes the folder with a patch built from portable paths only, refuses if the branch changed protected infrastructure, refuses if a changed portable component is covered by no referenced story, flags any build-impact or behaviour-impact path for approval, and applies the patch three-way in a disposable worktree at the recorded production commit and again at the freshly fetched head, running production's gates there and discarding the worktree. Story coverage is required; story-file churn is not.</li>
+        <li>Open the PR. The preview deploy and the folder are the review surface.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>On the production side</h3>
+      <ul>
+        <li>Fetch the folder or the branch. Apply the patch three-way. Conflicts are marked in files, not spread across a patch series.</li>
+        <li>Run the existing gates: typecheck, role lint, build, adapter coverage, route map check.</li>
+        <li>Run the browser tiers against a local build. Use the structural diff as the expected list of what should move, then re-record.</li>
+        <li>Commit with the record id in the message and mark the record ported. A later comparison of screenshots between the two repos closes it as verified.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="prose">
+    <p>Record states: <span class="tag new">proposed</span> <span class="tag">in review</span> <span class="tag change">approved</span> <span class="tag keep">ported</span> <span class="tag keep">verified</span>. A record that declares proposed routes can reach approved and no further while the backend is frozen.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Drift</span><h2>Staying in sync</h2></div>
+  <div class="cols">
+    <div>
+      <h3>Cadence</h3>
+      <ul>
+        <li>Production is the upstream remote. A sync script merges its main into the design main; a scheduled action can run it. Daily while production exceeds ten commits a day, weekly otherwise.</li>
+        <li>Design branches live under a week. A record older than that is rebased before export, and the export refuses to write a patch whose drift check fails.</li>
+        <li>Conflict resolutions are remembered with git's rerere so a repeated sync does not re-resolve the same hunk.</li>
+        <li>Instruction files never merge, and the sync script is the control, not a merge attribute, because an attribute's merge driver has to be configured in every clone and a repository cannot guarantee that. The script saves the design-owned instruction files, merges production, restores them, sanitises and copies production's instructions into <code>contract/</code>, fails if the design preamble changed, and records the upstream instruction diff in the sync commit so a new product rule is read, not lost. The attribute stays as a convenience for local merges.</li>
+        <li>Production's conformance baseline stays untouched and merges cleanly; the design repo records its own under <code>baseline-mock/</code>, selected by mock mode.</li>
+        <li>QA defaults to mock mode in this repo: local base and cookie sessions, and the inherited login fallback credential is removed from the design copy of the session helper. Inherited files still name outside hosts in inert places, such as the shared contract's demo entry, the analytics host, a legacy download fallback and the page metadata. Those are registered in an allow list of inert references. The rule is that no credential exists anywhere, that no executable request reaches a forbidden host, and that the instruction files carry no usable account.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Pins and freezes</h3>
+      <ul>
+        <li>Node 22 in both repos, declared in <code>.nvmrc</code> and the package manifest's engines field. The lockfile is installed with <code>npm ci</code> only.</li>
+        <li>No dependency changes on design branches. The manifest and lockfile are protected infrastructure and never enter a patch.</li>
+        <li>Lockfile policy. The design repo keeps its own augmented lockfile. On sync, production's manifest changes are applied and the lock is reconciled with a lock-only install rather than regenerated. A gate then compares the result with production's lock: every production dependency resolves to upstream's version and integrity, the only additions are the approved tooling set, <code>npm ls</code> shows one copy of react and react-dom and no incompatible or duplicate vite on the app and Storybook path, and a clean install reproduces the tree. No blanket overrides; a narrow one is added only when a duplicate actually appears and every consumer's peer range accepts the root version.</li>
+        <li>Stack freeze: Tailwind 3.4, React 18, Vite 5, Radix as pinned. A Tailwind 4 migration, if ever, is a production decision made once, in production.</li>
+        <li>The production baseline commit is recorded in every design record, so a port always knows what it was written against.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Gates</span><h2>What runs on every design PR</h2></div>
+  <div class="prose">
+    <p>Production's browser tiers only run on a schedule because merge-request code is not deployed and logins are throttled. In the design repo the build is the environment, so everything runs on every PR against a local preview and the mock, with no throttle and no session cache.</p>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Gate</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Typecheck, lint, role lint, production build</td><td><span class="tag keep">Inherited</span></td><td>Unchanged.</td></tr>
+        <tr><td>Contract tier: adapter coverage, auth field contract, status parity, route map check</td><td><span class="tag keep">Inherited</span></td><td>All static. Pass because the adapter is untouched.</td></tr>
+        <tr><td>Layout invariants, no visible UUID, desktop gate</td><td><span class="tag change">Seam</span></td><td>One mock-session branch in the shared session helper and in the layout tier's private login.</td></tr>
+        <tr><td>Conformance, structure and style projection</td><td><span class="tag change">Re-record</span></td><td>Recorded once against the mock for all six roles, then diffed per PR. The founder tier is added; production excludes it today.</td></tr>
+        <tr><td>Journeys</td><td><span class="tag drop">Not as written</span></td><td>They assert server persistence. A later UI-flow variant against the mock is possible; not in the first cut.</td></tr>
+        <tr><td>Static security checks, secret and dependency scanners</td><td><span class="tag keep">Inherited</span></td><td>No secrets needed.</td></tr>
+        <tr><td>Mock route guard</td><td><span class="tag new">New</span></td><td>Every handler key exists in the pinned backend map, or is declared as proposed.</td></tr>
+        <tr><td>No request leaves the machine</td><td><span class="tag new">New</span></td><td>A browser-level block in every runner fails any request to a host other than the frame's own origin. Fonts are vendored and the Google client is shimmed, so nothing needs an exception.</td></tr>
+        <tr><td>Literal visual values</td><td><span class="tag new">New</span></td><td>A ratchet until Phase 0 lands: the count may not rise. A hard lint afterwards.</td></tr>
+        <tr><td>Structural changelog</td><td><span class="tag new">New</span></td><td>The pure conformance diff between two baseline commits, written into the record.</td></tr>
+        <tr><td>Export dry run</td><td><span class="tag new">New</span></td><td>The patch applies three-way in a disposable worktree at the recorded production commit and at the latest head, and production's gates pass there, or the PR is marked drifted.</td></tr>
+        <tr><td>Persona parity, deterministic mock</td><td><span class="tag new">New</span></td><td>Persona table matches the contract's role names and the session fields the screens read; no UUID reaches a display field.</td></tr>
+        <tr><td>Storybook build</td><td><span class="tag new">New</span></td><td>The static catalogue builds and deploys as a preview beside the app.</td></tr>
+        <tr><td>Story interaction tests</td><td><span class="tag new">New</span></td><td>Play functions run in a real browser through the Vitest addon on Vitest 3. A story that makes an unhandled request fails.</td></tr>
+        <tr><td>Story screenshots</td><td><span class="tag new">New</span></td><td>Repository-owned baselines in the pinned Playwright image. A changed baseline needs a reviewer's approval, never the agent's.</td></tr>
+        <tr><td>Story accessibility</td><td><span class="tag new">New</span></td><td>Configured to fail. Inherited violations fingerprinted by story, rule, impact and element context; no new fingerprints, and zero inside redesigned content roots.</td></tr>
+        <tr><td>Manifest and graph parity</td><td><span class="tag new">New</span></td><td>Dependencies equal production's plus the approved tooling set; production packages resolve to upstream's versions and integrity; one copy of react; no incompatible vite.</td></tr>
+        <tr><td>Path classes and coverage</td><td><span class="tag new">New</span></td><td>A design branch changes no protected path; every changed portable component is covered by a referenced story; build-impact and behaviour-impact paths carry their approval flag.</td></tr>
+        <tr><td>Credentials and inert references</td><td><span class="tag new">New</span></td><td>No credential anywhere in the tree. Any outside host named in a file is in the inert-reference allow list, or the build fails.</td></tr>
+        <tr><td>Instruction file parity</td><td><span class="tag new">New</span></td><td>The sanitised copy under <code>contract/</code> equals sanitised upstream at the recorded sync commit; the design CLAUDE.md still opens with the precedence statement.</td></tr>
+        <tr><td>Merge control</td><td><span class="tag new">New</span></td><td>Merging needs the heavy pipeline green for the exact head commit, on upstream-sync PRs too. Owner approval through CODEOWNERS for tokens, snapshot and accessibility baselines, record status changes, protected infrastructure and contract pins.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Sequence</span><h2>Order of work and a pilot</h2></div>
+  <div class="prose">
+    <p>Sizes are estimates for AI-assisted work by one person, given for planning only. The pilot is the first two records, which exercise every part of the pipeline on small, low-conflict changes before any screen is touched.</p>
+  </div>
+  <div class="steps">
+    <div class="step"><span class="n">1</span><div><div class="t">Decisions</div><div class="d">The eight questions below. Half a day.</div></div><span class="who">you, developer</span></div>
+    <div class="step"><span class="n">2a</span><div><div class="t">Two-screen spike</div><div class="d">Fork, the instruction files, the minimal mock runtime, and exactly two screens end to end: the review queue, which is a protected screen with portal chrome, polling and two roles, and the login screen, which needs the auth shell and the Google provider. Each runs in the full app and in Storybook with one play test, one screenshot in the pinned browser image, the accessibility check, the two-persona isolation test, the strict egress block, and an export whose patch applies three-way in a disposable worktree at the recorded production commit, passes production's gates there, and is then discarded. Nothing from the spike is merged into production. Two to three days, then a go or no-go on the rest.</div></div><span class="who">Claude, with you</span></div>
+    <div class="step"><span class="n">2</span><div><div class="t">Scaffold the rest</div><div class="d">The remaining reachable routes and scenarios, the chip, contract pins, sync and export scripts, gates, the mock baseline, preview deploys, the foundations and primitive stories, and the accessibility and screenshot baselines. Four to six days after the spike.</div></div><span class="who">Claude, with you</span></div>
+    <div class="step"><span class="n">2b</span><div><div class="t">First page-story catalogue</div><div class="d">A default-state story for every route and every role that can reach it, plus the state overrides, on the existing page components. About 70 stories. Two to three days, and it can overlap with step 3.</div></div><span class="who">Claude, with you</span></div>
+    <div class="step"><span class="n">3</span><div><div class="t">Phase 0.1 and 0.5 in production</div><div class="d">Dead theme code and primitive hygiene. Two to three days, in parallel with step 2.</div></div><span class="who">developer</span></div>
+    <div class="step"><span class="n">4</span><div><div class="t">Pilot: DSN-0001 tokens, DSN-0002 chrome</div><div class="d">Small diffs, every role affected, both ported within the week. Proves the export, the port recipe and the re-record. Three to four days.</div></div><span class="who">you, then developer</span></div>
+    <div class="step"><span class="n">5</span><div><div class="t">Phase 0.2 to 0.4, screen by screen</div><div class="d">Token map from you, applied by the developer in the order the screens will be redesigned. One to two days per large screen.</div></div><span class="who">you map, developer applies</span></div>
+    <div class="step"><span class="n">6</span><div><div class="t">Primitives and screens</div><div class="d">One record per screen, one to two records a week, each ported within a week of approval. Roughly six weeks for the twelve screens listed.</div></div><span class="who">you, then developer</span></div>
+    <div class="step"><span class="n">7</span><div><div class="t">Retire the old folders</div><div class="d">Archive pulse-design-auto, pulse-design, design and pulse-redesign once their fixtures and the v4 sources are copied in. Do not copy their tracked node_modules or dist.</div></div><span class="who">you</span></div>
+  </div>
+  <h3>Spike exit criteria</h3>
+  <div class="prose">
+    <p>The spike is a success only if every line below is proved, and the full scaffold waits for it.</p>
+  </div>
+  <ul>
+    <li>The full app and Storybook both render the login screen and the review queue.</li>
+    <li>Portal header actions settle reliably and the ready marker fires after them.</li>
+    <li>Google and every other outside request is blocked at the browser level.</li>
+    <li>Two personas cannot contaminate each other in the isolation test.</li>
+    <li>Fixed evaluation states stay fixed across mounts, focus and reloads.</li>
+    <li>Error stories are deterministic with retries off, and the parity story shows production's delay.</li>
+    <li>Screenshots are identical across two clean runs.</li>
+    <li>An accessibility failure blocks, and an inherited fingerprint does not.</li>
+    <li>The portable patch excludes every design-support file.</li>
+    <li>The patch applies in a disposable production worktree and production's gates pass there.</li>
+    <li>A sync preserves the design instructions and reports a new production rule.</li>
+    <li>The augmented lockfile installs reproducibly with one React runtime.</li>
+    <li>The app preview and the Storybook preview deploy independently.</li>
+  </ul>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Decisions</span><h2>Decisions only you can make</h2></div>
+  <div class="decisions">
+    <div class="decision"><span class="n">1</span><div><div class="q">Where the design repo lives</div><div class="r">Two workable options. A private project in the Photon Legal GitLab group gives organisational ownership and protected branches on the free tier, though enforced code-owner approval needs a higher tier. A private repository under your GitHub account needs GitHub Pro for protected branches, which is enough. A bot check on an unprotected repository is not equivalent: an administrator can still merge, force-push or bypass it.</div></div></div>
+    <div class="decision"><span class="n">2</span><div><div class="q">Phase 0 is developer time in production</div><div class="r">It is the single biggest lever on port cost and it sits inside your no-backend constraint. It needs the developer's agreement and about a week of their time spread over the redesign.</div></div></div>
+    <div class="decision"><span class="n">3</span><div><div class="q">The token truth</div><div class="r">The approved sheet says green #1E7B4D and red #B3362F; production ships #2F8D70 and #C96558. DSN-0001 needs you to confirm the sheet wins.</div></div></div>
+    <div class="decision"><span class="n">4</span><div><div class="q">Workspace and Actions</div><div class="r">The v4 bundle and the v4 screens folder disagree on both. The bundle's org, profile and people workspace matches what production built; the screens' document-drafting workspace does not exist and would be conceptual.</div></div></div>
+    <div class="decision"><span class="n">5</span><div><div class="q">Dark mode</div><div class="r">Recommended out of scope. The dead dark code goes regardless; the token structure keeps a dark block possible.</div></div></div>
+    <div class="decision"><span class="n">6</span><div><div class="q">Preview deploys</div><div class="r">A Vercel project on the design repo with no environment variables gives every record a clickable preview. Recommended yes.</div></div></div>
+    <div class="decision"><span class="n">7</span><div><div class="q">Node pin in production</div><div class="r">Production's CI uses Node 22 but the repo declares nothing; your machine runs Node 25. Both repos should declare 22.</div></div></div>
+    <div class="decision"><span class="n">8</span><div><div class="q">The founder tier</div><div class="r">Production bounces the superadmin from client detail and labels the role "Member". The redesign will expose both. Decide whether the design fixes them or records them for the developer.</div></div></div>
+    <div class="decision"><span class="n">9</span><div><div class="q">Vendored fonts in production</div><div class="r">Replacing the Google Fonts link with self-hosted open-licence files is a small production change that makes screenshots deterministic and lets the network gate stay strict. Recommended yes, inside DSN-0001.</div></div></div>
+    <div class="decision"><span class="n">10</span><div><div class="q">Enforced approvals on the design repo</div><div class="r">Follows from decision 1. GitLab: protected branches on Free, enforced code-owner approval on a paid tier. GitHub: protected branches and required checks on Pro. Decide whether owner approval must be enforced by the host or is acceptable as a required status check.</div></div></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Risks</span><h2>What could still go wrong</h2></div>
+  <div class="cols">
+    <div>
+      <ul>
+        <li><strong>Velocity.</strong> Any record older than a week will conflict. The export refuses drifted patches, which is annoying by design.</li>
+        <li><strong>The giants.</strong> Even after Phase 0, restructuring the idea-details screen means editing a 3,000-line file with 39 state hooks. Restyle within existing component boundaries; ask for a production split first when the layout itself must change.</li>
+        <li><strong>Partial proof.</strong> The style projection samples at most 70 named controls per page. The zero-change screenshot gate covers Phase 0; visual review of the redesign itself stays human.</li>
+      </ul>
+    </div>
+    <div>
+      <ul>
+        <li><strong>Mock fidelity.</strong> Behaviour parity stays production's job. The mock models transitions the screens depend on, not every server rule. A design that relies on a mock-only behaviour is a conceptual record.</li>
+        <li><strong>Tool gates.</strong> Figma's code connect needs an organisation plan; Claude Design generates pages that must be transplanted into this repo by an agent, never pasted as new files.</li>
+        <li><strong>One legacy call.</strong> The draft-files download still targets the old API host directly. The mock intercepts it; the redesign should not depend on it.</li>
+        <li><strong>CI minutes.</strong> Browser tiers plus story screenshots run 15 to 25 minutes. With daily syncs and several PRs a week that exhausts a small minutes budget. Cheap gates run on every push; browser tiers and screenshots run when a PR is marked ready and on main.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Review log</span><h2>What changed between versions</h2></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Version</th><th>Change</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">v2</td><td>Storybook from the first commit, sharing the mock scenarios and the harness.</td><td>Six roles and hard-to-reach states; verified feasible on Vite 5 with Vitest 3.</td></tr>
+        <tr><td class="mono">v3</td><td>Design-owned root CLAUDE.md with an explicit precedence statement; production's file synced under <code>contract/</code> and never loaded.</td><td>Production's file says the design must not change and names demo infrastructure. A second rules file does not neutralise a contradiction.</td></tr>
+        <tr><td class="mono">v3</td><td>Three path classes replace "never touch the tooling".</td><td>The v2 rules required stories and scenarios on every branch and an exporter that refused branches touching them. Both could not be true.</td></tr>
+        <tr><td class="mono">v3</td><td>Two preview projects on two origins.</td><td>One origin would put two service workers and the app's single-page fallback in each other's way.</td></tr>
+        <tr><td class="mono">v3</td><td>Lockfile policy: exact pins, root overrides for vite and react, lock-only regeneration, single-copy gate.</td><td>Re-installing the tooling on every sync re-resolves its tree and can nest a second Vite.</td></tr>
+        <tr><td class="mono">v3</td><td>Design-owned mock baseline; QA defaults to mock mode with no demo host or credential in the tree.</td><td>Production's baseline would conflict on every sync, and the inherited QA defaults pointed at the live demo with a fallback password in code.</td></tr>
+        <tr><td class="mono">v3</td><td>A two-screen spike before the full scaffold.</td><td>The harness questions with the most unknowns, portal chrome and the auth shell, are answered on two screens before committing to the route surface and the story catalogue.</td></tr>
+        <tr><td class="mono">v4</td><td>Serial role-aware stories, persistence off outside the full app, a fresh browser context per screenshot, an isolation test before any parallelism.</td><td>Storybook frames share one origin, so the cookie and both storages are shared between stories.</td></tr>
+        <tr><td class="mono">v4</td><td>Immutable before and after evidence per record: commits, commit-addressed deployments, retained builds, committed screenshots.</td><td>Design main moves daily, so a branch URL is not a record.</td></tr>
+        <tr><td class="mono">v4</td><td>Retry statement corrected; harness query client with retries off for error stories plus one parity story.</td><td>Queries retry any thrown error three times by default, not only server errors.</td></tr>
+        <tr><td class="mono">v4</td><td>Fixed evaluation snapshots in stories; the full app progresses on a mock clock.</td><td>Request counts move with mounts, focus and strict-mode effects.</td></tr>
+        <tr><td class="mono">v4</td><td>Inert Google OAuth shim through a design-only Vite config; vendored fonts; egress limited to the frame's origin.</td><td>"Nothing leaves the machine" and an allow-listed identity script could not both be true.</td></tr>
+        <tr><td class="mono">v4</td><td>Token source, generator and outputs all in portable paths.</td><td>Two statements named two locations; only a production path lets production regenerate what it receives.</td></tr>
+        <tr><td class="mono">v4</td><td>A credentials-and-inert-references gate replaces "no demo host in the tree".</td><td>Inherited files legitimately name outside hosts; the old gate could never pass.</td></tr>
+        <tr><td class="mono">v4</td><td>Lockfile: keep the augmented lock, reconcile on sync, compare the resolved graph; overrides only when justified.</td><td>A hoisted lockfile has no reliable tooling subtree, and blanket overrides can hide a real incompatibility.</td></tr>
+        <tr><td class="mono">v4</td><td>Minimal per-story routes under the real layout with a navigation marker; no duplicated route table.</td><td>A second executable route table is another source of truth to drift.</td></tr>
+        <tr><td class="mono">v4</td><td>Adapter-boundary fidelity tests; unwired routes distinguished from absent ones.</td><td>Route existence does not prove the shape or the transitions are real.</td></tr>
+        <tr><td class="mono">v4</td><td>Story readiness and determinism checklist; lazy large-data generation; accessibility fingerprints; merge on the head commit; owner approvals.</td><td>Operational gaps the fourth review listed.</td></tr>
+        <tr><td class="mono">v5</td><td>The sync script, not a merge attribute, is the control for instruction files.</td><td>An attribute's merge driver must be configured in every clone; a repository cannot guarantee that.</td></tr>
+        <tr><td class="mono">v5</td><td>Stale "outside src" wording replaced; the diagram and the copied-verbatim list corrected.</td><td>Token sources and generated styles now live inside src, and agents act on literal contradictions.</td></tr>
+        <tr><td class="mono">v5</td><td>Portable allowlist split into normally portable, build-impact and behaviour-impact classes.</td><td>An entry-point or bundler change should not travel like a restyle; a label or status map is product vocabulary.</td></tr>
+        <tr><td class="mono">v5</td><td>Exporter requires story coverage, not story-file churn.</td><td>A token change already covered by existing stories is a valid record.</td></tr>
+        <tr><td class="mono">v5</td><td>Token source, generator, fonts and updated foundation stories arrive together in DSN-0001; the scaffold reads production values.</td><td>The scaffold must carry no unapproved product change.</td></tr>
+        <tr><td class="mono">v5</td><td>Spike patch and every dry run apply in a disposable production worktree.</td><td>Nothing from a spike is merged into production.</td></tr>
+        <tr><td class="mono">v5</td><td>Committed evidence is canonical; hosted previews are review surfaces.</td><td>Preview retention depends on plan and account settings.</td></tr>
+        <tr><td class="mono">v5</td><td>Every record reports its handler changes.</td><td>A handler change can make a design look feasible by changing data semantics.</td></tr>
+        <tr><td class="mono">v5</td><td>Spike exit criteria written into the sequence; hosting options stated with their approval tiers.</td><td>The fifth review's go for the spike is conditional on those.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="small" style="margin-top:14px">The third review's items 3 to 8 were never received; the fourth review superseded it and is reflected in the v4 rows.</p>
+</section>
+
+<section>
+  <div class="sec-head"><span class="kicker">Sources</span><h2>Research the plan leans on</h2></div>
+  <ul class="sources">
+    <li>shadcn theming through CSS variables and the registry item schema, <a href="https://ui.shadcn.com/docs/theming">ui.shadcn.com/docs/theming</a></li>
+    <li>Tailwind's own upgrade guide, which recommends a separate branch and a careful diff for v4, <a href="https://tailwindcss.com/docs/upgrade-guide">tailwindcss.com/docs/upgrade-guide</a></li>
+    <li>Zalando's LLM-assisted component library migration, Feb 2025, on why swapping libraries mid-stream is a project, <a href="https://engineering.zalando.com/posts/2025/02/llm-migration-ui-component-libraries.html">engineering.zalando.com</a></li>
+    <li>AGENTS.md convention and Claude Code memory rules with path-scoped rule files, <a href="https://agents.md/">agents.md</a>, <a href="https://code.claude.com/docs/en/memory">code.claude.com/docs/en/memory</a></li>
+    <li>Vercel on teaching agents product design with deterministic linters, Jun 2026, <a href="https://vercel.com/blog/teaching-agents-product-design-at-vercel">vercel.com/blog</a></li>
+    <li>Design Tokens Community Group format, stable Oct 2025, <a href="https://www.designtokens.org/tr/2025.10/format/">designtokens.org</a></li>
+    <li>Mock Service Worker browser integration and dynamic scenarios, <a href="https://mswjs.io/docs/integrations/browser">mswjs.io</a>, <a href="https://mswjs.io/docs/best-practices/dynamic-mock-scenarios/">dynamic mock scenarios</a></li>
+    <li>Storybook for React with Vite, network mocking with MSW, and the testing overview, <a href="https://storybook.js.org/docs/get-started/frameworks/react-vite/">react-vite</a>, <a href="https://storybook.js.org/docs/writing-stories/mocking-data-and-modules/mocking-network-requests">mocking network requests</a>, <a href="https://storybook.js.org/docs/writing-tests">writing tests</a></li>
+    <li>Registry peer ranges checked on 3 Sep 2026: @storybook/react-vite 10.6.0 accepts vite ^5 to ^8; vitest 4.1.11 requires vite ^6 to ^8; vitest 3.2.7 runs on vite 5; msw-storybook-addon 3.0.0 requires msw 2 and storybook 9 or newer.</li>
+    <li>Playwright ARIA snapshots for structure rather than pixels, <a href="https://playwright.dev/docs/aria-snapshots">playwright.dev/docs/aria-snapshots</a></li>
+    <li>Figma MCP server and Code Connect seat requirements, <a href="https://help.figma.com/hc/en-us/articles/32132100833559-Guide-to-the-Figma-MCP-server">help.figma.com</a></li>
+    <li>Fowler on branching patterns and integration frequency, <a href="https://martinfowler.com/articles/branching-patterns.html">martinfowler.com</a></li>
+    <li>TanStack Query retry defaults, any failed query retried three times unless overridden, <a href="https://tanstack.com/query/latest/docs/framework/react/guides/query-retries">tanstack.com</a></li>
+    <li>Storybook Vitest addon, which supersedes the test runner, <a href="https://storybook.js.org/docs/writing-tests/integrations/vitest-addon/index">storybook.js.org</a></li>
+  </ul>
+  <p class="small" style="margin-top:22px">Prepared from six read-only audits of pulse-frontend, pulse-backend, atlas, patent-agent, saurrx/pulse-design-auto and the Pulse v4 material. No repository was modified.</p>
+</section>
+
+</main>
