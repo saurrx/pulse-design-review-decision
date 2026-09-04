@@ -173,11 +173,7 @@ const WorkspaceAdminOverview = () => {
   const strip = isDashboardLoading && !unavailable ? (
     <section aria-label="Overview" aria-busy="true" className="flex flex-col gap-4 xl:grid xl:grid-cols-5">
       {[0, 1, 2, 3, 4].map((k) => (
-        <div key={k} className="flex flex-col gap-2">
-          {/* The group overline's height, so the boxes land where they will stay. */}
-          <span className="h-[14px] w-24 rounded bg-[var(--pulse-surface-subtle)]" aria-hidden="true" style={{ visibility: k === 0 || k === 3 ? "visible" : "hidden" }} />
-          <div className="min-h-[108px] animate-pulse rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)]" />
-        </div>
+        <div key={k} className="min-h-[108px] animate-pulse rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)]" />
       ))}
     </section>
   ) : (

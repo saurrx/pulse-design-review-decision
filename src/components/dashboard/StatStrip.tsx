@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 /**
  * The Workspace Admin dashboard's stat strip (DSN-0002).
  *
- * Five scoped numbers in one row, grouped under two overlines: what needs the
- * admin ("Your workspace") and how the program is doing ("Company portfolio").
+ * Five scoped numbers in one row in two groups, what needs the admin and how
+ * the portfolio stands; the groups are named for assistive technology only.
  * Every box is one link to the list its number counts; nothing inside a box is
  * a second control. The top rule's colour is reinforced by the label, and the
  * accessible name carries the label, the number and the qualifier in words, so
@@ -36,7 +36,7 @@ export type StatBoxSpec = {
 
 export type StatGroupSpec = {
   key: string;
-  /** Small-caps overline over the group, e.g. "Your workspace". */
+  /** The group's accessible name, e.g. "Your workspace". Not rendered: the founder dropped the visible overlines on 4 September 2026. */
   overline: string;
   boxes: StatBoxSpec[];
 };
@@ -46,7 +46,6 @@ const NUMS: React.CSSProperties = { fontVariantNumeric: "tabular-nums" };
 const LABEL: React.CSSProperties = { font: "var(--pl-type-metric-label)", letterSpacing: "var(--pl-tracking-metric-label)" };
 const VALUE: React.CSSProperties = { ...NUMS, font: "var(--pl-type-metric-value)", letterSpacing: "var(--pl-tracking-metric-value)" };
 const QUALIFIER: React.CSSProperties = { ...NUMS, font: "var(--pl-type-caption)", letterSpacing: "var(--pl-tracking-caption)" };
-const KICKER: React.CSSProperties = { font: "var(--pl-type-kicker)", letterSpacing: "var(--pl-tracking-kicker)" };
 
 const RULE: Record<StatRule, string> = {
   amber: "var(--pl-amber)",
@@ -96,11 +95,8 @@ export const StatStrip = ({ groups, ariaLabel = "Overview" }: { groups: StatGrou
           key={g.key}
           role="group"
           aria-label={g.overline}
-          className={`flex min-w-0 flex-col gap-2 ${g.boxes.length >= 3 ? "xl:col-span-3" : "xl:col-span-2"}`}
+          className={`flex min-w-0 flex-col ${g.boxes.length >= 3 ? "xl:col-span-3" : "xl:col-span-2"}`}
         >
-          <span className="px-1 uppercase text-[var(--pulse-ink-muted)]" style={KICKER} aria-hidden="true">
-            {g.overline}
-          </span>
           <div className="flex min-w-0 gap-4">
             {g.boxes.map((b) => <StatBox key={b.key} box={b} index={index++} />)}
           </div>

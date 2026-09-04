@@ -50,8 +50,9 @@ once V0 usage evidence exists.
 - `src/components/dashboard/StatStrip.tsx` (new, dashboard-local): the box
   with a coloured top rule, metric label, metric value and one qualifier, the
   whole box a link with a visible focus ring and a spoken accessible name
-  ("Awaiting review, 7, oldest 56 days"). Group overlines "Your workspace" and
-  "Company portfolio". One row of five from 1280 CSS pixels; below that (200%
+  ("Awaiting review, 7, oldest 56 days"). The two groups, "Your workspace" and
+  "Company portfolio", are named for assistive technology only; the founder
+  dropped the visible overlines on 4 September 2026. One row of five from 1280 CSS pixels; below that (200%
   zoom) each group takes its own row. Type and colour come from the token
   source (`--pl-type-metric-*`, `--pl-type-caption`, `--pl-type-kicker`,
   `--pl-amber`, `--pl-red`, `--pl-navy-2`, `--pl-green`, `--pl-border-strong`).
@@ -94,7 +95,7 @@ once V0 usage evidence exists.
   `/due-dates` (the Workspace Admin's Actions destination, R-08).
 
 ## Copy
-Overview · Your workspace / Company portfolio · Awaiting review · Actions due ·
+Overview · Awaiting review · Actions due ·
 30 days · Total patents · Granted (of N patents) · Pending patents (applied or
 in examination) · Patents worldwide
 · Top inventors · Review Inventor Ideas · Open queue → · Review all → · Idea
@@ -171,7 +172,7 @@ rise from empty drafts.
 ## Rendered inspection
 Inspected at 1280×720, 1366×768, 1440×900, 1920×1080 and 200% zoom (640×360
 at scale 2), from the story screenshots under `shots/`.
-- 1280: five boxes in one row with both overlines; the Top inventors header
+- 1280: five boxes in one row; the Top inventors header
   first wrapped to three lines, so the period selector moved under the
   subtitle and the header wraps cleanly. The map, the queue and the pipeline
   hold their grid.
