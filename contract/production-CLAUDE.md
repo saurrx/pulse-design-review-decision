@@ -98,6 +98,30 @@ the name means PHOTON side (historical). `npm run lint:roles`
 (tools/no-substring-roles.mjs) FAILS the build on role.includes() — substring
 checks silently broke during the rename once.
 
+### 4.5a A case owner opens every client; the assignment decides what they can do
+
+Changed 2026-09-03 (pulse-backend F-079). `ClientDetailPage`'s `canViewClient`
+used to require the client be in `user.assigned_client_ids` and otherwise
+rendered `<BlockedRedirect to="/clients" />`. It is now true for any CASE_OWNER.
+
+The page was ALREADY built for this and only the door was shut:
+`isUnassignedCaseOwner` swaps "View as client" for "Request access", and
+`OverviewTab.readOnlyForCaseOwner` renders the record read-only. "Edit client"
+was PHOTON_ADMIN-only and is now also shown to an ASSIGNED case owner, which is
+what `client:configure` in their grants has always meant.
+
+The backend agrees in two places, and both matter: `ClientIsolationGuard` passes
+an unassigned GET (auditing it) and still 403s any other method, and RLS answers
+the read through `app_can_read_client`. Bouncing the page in the browser would
+have refused a request the server is willing to serve.
+
+**`/patents` needed no change and that is worth knowing.** `PatentsContent`
+gates on `!!user?.client_id`, and a photon role carries the `photon-legal`
+sentinel there rather than null — so the query runs, `isUuid` drops the sentinel
+in the adapter, no `client_id` reaches the API, and the row scope decides. After
+the widening that is every client's portfolio, with no frontend edit at all. Do
+not "fix" the sentinel into a null check.
+
 ## 4.6 Two rules the reviewer screens now enforce
 
 **Scores are stored 0-100 and shown out of 10. Everywhere.** `ShowScoreReport`
@@ -121,6 +145,33 @@ inventor-written text always wins where it exists — nobody's own words are
 replaced by a summary — and when the paragraph IS generated the card must say
 so, because a reviewer weighing "what the inventor says" is entitled to know
 when the sentence is a model's summary rather than the inventor's words.
+
+## 4.7 Four rules these screens now enforce
+
+**A toast is for an outcome the reader cannot see.** After a login the outcome
+is the home page; after a delete the row is gone; after a sort the table is
+sorted. 78 success toasts confirming things already on screen were removed on
+2026-09-03. The 20 that remain are clipboard copies, things that leave the
+system with no local trace (invites, reminders, a nudge), downloads, and the
+autofill toast — which reports what the assistant REFUSED to write, and a
+refusal appears nowhere on screen. **Every error toast stays**: a failure has no
+visible outcome, and `lib/toast.ts` counts them for analytics.
+
+**A record is named by its reference, never its row id.** `reference_number`
+(DEMO59) is on an idea from the moment it is created — `ideas.service` writes it
+in the same insert — so there is never a reason to render `idea.id`. A uuid
+cannot be read down a phone, quoted in an email or matched to a paper file.
+`qa/invariant/no-visible-uuid.qa.mjs` is the gate, and it now actually runs.
+
+**The inventor's patents page shows the company's whole portfolio** — 468 rows
+on demo, not 1. The scope rule lives in pulse-backend `common/scope.ts`; note
+that patents and DUE DATES narrow differently on purpose (F-077). Nothing in
+this repo gates it.
+
+**Back from the draft goes to the list for an inventor.** The idea page bounces
+an inventor whose idea is IN_DRAFT straight back to the draft with
+`replace: true`, so "Back to idea" was a dead button and the `replace` poisoned
+the browser's own Back. Do not point it back at `/ideas/:id` for that role.
 
 ## 5. Component map (the big ones are 2000+ lines — grep, don't read whole)
 - pages/Index.tsx — role-branched dashboard. **Every stage number comes from
@@ -192,6 +243,165 @@ when the sentence is a model's summary rather than the inventor's words.
   users had to pan right and down to read it). The gate is its own scroll
   container (min-h-full inner flex) so the message stays reachable on short
   landscape viewports. Keep the floor desktop-only.
+
+## 5.1 Shared components (extracted 2026-09-03, evidence-led)
+
+A type-2 clone scan over `src/` — normalise each line, hash every sliding
+10-line window, merge overlapping hits into maximal blocks — reported **150
+clone groups and 4,937 duplicated lines out of 44,749 (11%)**. What came out of
+it, in order of what the evidence justified rather than what looked tidy:
+
+| Component | Replaced | Note |
+|---|---|---|
+| `components/common/GradientBlobs.tsx` | 8 copies of a 75-line block | **7 of the 8 rendered nothing** — see below |
+[line removed by the design-repo sync: operational credential or account reference]
+| `components/auth/BrandIcons.tsx` | 2 copies each of the Google (24-line) and Microsoft (11-line) marks | Login, Signup |
+| `lib/actionsView.ts` | 4 byte-identical helpers in the two actions screens | `daysColor`, `filterLabel`, `toggleColumn` |
+| `components/patents/LinkedIdeaBadge.tsx` | inline JSX in a 2,600-line file | extracted to make it TESTABLE, not to de-duplicate |
+| `ui/filter-button.tsx` | **18** inline outline-button triggers in **8** drift variants across 6 screens | Date/Clients/Status/Sort/Columns — one style, icons inherit colour |
+| `ui/menu-radio-item.tsx` | **16** hand-styled `DropdownMenuRadioItem`s in **4** drift variants | the `!important` hover/focus overrides are load-bearing |
+| `components/patents/usePatentFields.ts` + `PatentFieldsForm.tsx` | AddPatentModal ↔ FileIdeaModal, **byte-identical** form + logic (3,078 normalised chars, proved by diff) | both modals are now ~115 lines: endpoint + labels only |
+| `lib/dateRange.ts` + `components/patents/DateRangeFilter.tsx` | 138 lines inline in PatentsContent, plus `moment` for "today minus N days" | single use — extracted for testability, and found nameless (F-085) |
+| lucide `Columns3` | 4 copies of an inline 20-line `<svg>` that IS that icon | — |
+
+**Second pass, 2026-09-03 (architecture sweep).** After the first extraction the
+scan still reported 144 groups / 3,992 lines. What the remaining groups actually
+were, screen by screen, was the list-page TOOLBAR — the same filter trigger, the
+same styled radio row, the same popover chrome — copied into Patents, Due Dates,
+Ideas, both Actions screens and Clients, and drifting a class or two each time.
+Structural similarity between whole toolbars was low (sort menus 17–30% similar
+to each other, the two client pickers 49%), so they are NOT one component; the
+PRIMITIVES they are built from are. That is the level the extraction happened at.
+
+Net for the second pass: **PatentsContent −298 lines, DueDatesContent −80,
+IHC/OC actions −68/−67, the two modals −330 each.**
+
+**Registered rather than unified:** the two client-picker popovers (DueDates,
+OCActions) at 49% similarity — the same idea, different enough that one
+component with props would be a redesign of one of them; stale.md F22.
+
+Net: **806 lines deleted, 74 added.**
+
+**The blobs are the lesson.** Seven of the eight copies were invisible: five sat
+inside `<div className="hidden">`, and two more inside a `.pulse-product-page`,
+which `index.css` gives `display: none !important`. That was settled by MEASURING
+— a Playwright probe over the deployed demo counted `.animate-blob` nodes and
+their computed visibility per route, and found 3 in the DOM and **0 visible** on
+/patents, /ideas, /due-dates and /clients, against 3 of 3 on the 404 page.
+Reading the CSS would have found only one of the two mechanisms. Registered as
+atlas `stale.md` F21.
+
+**One extraction is not about duplication at all.** `LinkedIdeaBadge` had a
+single call site. It came out because it could not be verified any other way:
+most of the demo portfolio was imported and carries no idea link — a scan of 500
+patents on demo returns zero — so the badge renders on no screen anyone can
+open. Inline in a 2,600-line file it was unreviewable and untestable; as a
+component it has stories that assert it is round, that it sits ON the
+application-number line rather than under it, that its accessible name carries
+the idea's title, and that `stopPropagation` keeps the row's own click from
+firing too. "I cannot see this in the running app" is a reason to extract.
+
+**What was deliberately NOT extracted, and why.** The scan's second- and
+fourth-biggest groups are the country-code list in `ProfileTab.tsx` and the
+question config in `lib/IdeaDraftQuestion.ts` — those are DATA whose entries
+resemble each other, not duplicated logic, and "componentising" them would buy
+nothing. `handleFilterChange` / `handleSortChange` are byte-identical across the
+two actions screens but close over each screen's own state setters; lifting them
+means inventing a hook to carry state the screens legitimately own, which costs
+more than the duplication does. Duplication that is a fact about the data model
+was extracted; duplication that is a fact about a component's own state was not.
+
+**The biggest single source of duplication is not extracted at all.** Most of the
+top-twenty clone groups contain a `theme === "dark" ? … : …` ternary, and
+`contexts/ThemeContext.tsx` hardcodes `theme: 'light'` with a no-op
+`toggleTheme` — so the dark half of roughly 470 ternaries across 60 files is
+unreachable today. That is a product decision (is dark mode abandoned or
+deferred?), not a refactor, so it is registered as `stale.md` F19 and left alone.
+
+## 5.2 Storybook — every story is also a test
+
+Storybook 10.6 (`@storybook/react-vite`), with `@storybook/addon-vitest` and
+`@storybook/addon-a11y`.
+
+**Coverage as of 2026-09-03: 26 story files, 63 tests** — every component
+extracted in the two sweeps, every `ui/` primitive with behaviour worth
+asserting (button, input, textarea, checkbox, switch, radio-group, tabs, dialog,
+alert-dialog, popover, tooltip, card, badge, progress, separator, collapsible,
+StatusChip, ProductChip), and the two pure libs (`actionsView`, `dateRange`).
+What it is NOT and must not be sold as: role journeys. Storybook renders
+components in isolation; it never logs in or calls the API. "All roles, all
+screens" is the six `qa/journey/*.qa.mjs` files plus the layout invariant (76
+page×viewport combinations across five roles), which run nightly in
+`browser-tiers` and are the right tool for that question.
+
+**The gate keeps finding things.** Second day: `ui/progress.tsx` never forwarded
+`value` to the Radix root, so the readiness bar had `role="progressbar"` and no
+`aria-valuenow` — fixed, and the story is the regression test. The filing-date
+popover had no accessible name — fixed in `DateRangeFilter`. Four more contrast
+findings are registered under stale.md F20 and suppressed one-rule-per-story
+with the reason in the file. Details in pulse-backend findings F-085.
+
+**One React.** The first story to import a Radix package made Vite's dep
+optimizer pre-bundle a second React for that graph, and every hook in the story
+threw `Cannot read properties of null (reading 'useState')`. `vitest.config.ts`
+lists react, react-dom and the Radix packages in `optimizeDeps.include` so there
+is one pre-bundle. If a new story imports a Radix package not on that list and
+hooks start throwing, that is why.
+
+    npm run storybook          # dev, :6006
+    npm run test-storybook     # headless: vitest run --project=storybook
+    npm run build-storybook    # static, into storybook-static/ (gitignored)
+
+`vitest.config.ts` turns **each exported story into a Vitest case**: it renders
+in a real Chromium via Playwright, runs the story's `play` function, and fails on
+an axe violation because `.storybook/preview.tsx` sets `a11y: { test: "error" }`.
+A story with no play function still asserts something real — that the component
+mounts with those props without throwing.
+
+Three things about the setup are load-bearing:
+
+* **It merges the app's own `vite.config.ts`**, so the `@` alias and plugin chain
+  are identical to production. A Storybook that resolves modules differently from
+  the app can go green on code the app cannot build. The app's config is a
+  FUNCTION, and `mergeConfig` rejects a callback, so it is resolved for the test
+  mode first.
+* **`preview.tsx` injects `ThemeContext` directly** rather than wrapping stories
+  in the app's `ThemeProvider`. That provider hardcodes light (F19), so a "dark"
+  story rendered through it would silently be light — worse than having no dark
+  story. This is the one place in the repo that can render the dark branch those
+  ternaries were written for.
+* **There is no `.storybook/vitest.setup.ts`.** Since 10.3 the addon applies the
+  preview annotations itself, and a setup file calling `setProjectAnnotations`
+  makes it SKIP that and warn. Worth knowing because while that file existed the
+  a11y checks were not running at all — deleting it is what surfaced F20.
+
+Stories live BESIDE their component (`Foo.stories.tsx` next to `Foo.tsx`) so the
+two move and get deleted together. They are covered by `npm run typecheck`, which
+the `build` job runs on every MR — a story that does not compile fails CI today.
+The story TESTS run in `browser-tiers` (schedule + manual), first in the job and
+before anything that logs in: they need no demo session, cannot be flaked by a
+Vercel deploy race, and if a shared component is broken there is no point
+spending five demo logins to discover it from a screen. A second per-MR
+Playwright job does not fit a 400-minute month.
+
+**The gate bit on its first run.** Before any story existed for a product screen,
+the a11y check failed `daysColor`'s 7-day band: `text-red-500` (#ef4444) on the
+canvas is 3.5:1 where WCAG AA wants 4.5:1. That colour ships on both actions
+screens. It is suppressed narrowly — one rule, one story, reason in the file —
+rather than recoloured, because the docket's urgency palette is a visual decision
+nobody has taken. Registered as `stale.md` F20; `text-red-600` clears it at 4.9:1.
+
+Every assertion was proved to bite by planting the defect: two blobs instead of
+three, an overlay that renders an invisible div instead of `null`, a lost
+urgency band, a truncated brand path, an icon that stops being `aria-hidden`,
+and an overlay that stops blocking input. **Two of those took three attempts.**
+The overlay's "hidden" assertion originally checked a `data-testid` and
+`toBeEnabled()`, and both passed against a planted full-screen invisible div —
+the div carried no testid, and a covered button is still "enabled".
+`userEvent.click` did not catch it either: it checks `pointer-events` on the
+target, not occlusion, so it dispatched straight at the button. Only
+`document.elementFromPoint` distinguishes "nothing is covering this" from
+"something invisible is". If you write an overlay assertion, hit-test it.
 
 ## 6. Harnesses & testing law
 The four root-level `.mjs` harnesses are **gone**, replaced by `qa/`:
@@ -459,6 +669,44 @@ unreferenced public assets (scraped "Photon Pulse - OC_files" page, spare
 world geojsons — the map uses world-india-pov.json — placeholder/6sense
 svgs). lovable-uploads and public/fonts are now deleted — the fonts had a
 single consumer, the dead pdfGenerator.ts.
+
+**The lockfile trap has a second half (2026-09-03).** The documented fix —
+`rm -rf node_modules package-lock.json && npm install` — is not sufficient on
+macOS, and the pre-commit hook caught it twice. `npm install` on darwin resolves
+some transitive OPTIONAL deps differently from linux (`@emnapi/*` here), so the
+lockfile it writes fails `npm ci` in CI's `node:22-slim` with
+"Missing: @emnapi/core… from lock file". Generate the lockfile in the same
+environment CI uses and then never let a local `npm install` touch it again:
+
+    docker run --rm -v "$PWD":/w -w /w node:22-slim npm install --package-lock-only
+    rm -rf node_modules && npm ci        # ci, NOT install — install rewrites it
+
+Verified both ways: `npm ci` accepts it in `node:22-slim`, and locally it leaves
+the file byte-identical (checked by md5 before and after).
+
+**2026-09-03 sweep** (atlas `stale.md` F16/F17/F18/F21, all now `deleted`):
+27 npm packages removed — ten unused `@radix-ui/*`, `d3-geo`, `html2canvas`,
+`jspdf`, `libphonenumber-js`, `react-day-picker`, both phone-input libraries,
+`embla-carousel-react`, `input-otp`, `react-image`, `react-loader-spinner`,
+`react-to-print`, `vaul`, `caniuse-lite`, `baseline-browser-mapping`,
+`@types/moment` and `@tailwindcss/typography` — together with their
+`manualChunks` entries, which listed phantom modules and produced no chunks.
+**`playwright` is now a declared devDependency**: six QA runners
+`import { chromium } from 'playwright'` and it had only ever arrived
+transitively through `@playwright/test`, which must therefore NOT be removed
+however unused it looks. 40 dead CSS rules (213 lines) and
+`public/assets/google_logo.png` went too; the auth screens render an inline
+`<svg>`, never that file. `favicon.ico` and `robots.txt` show zero references
+and must be KEPT — they are fetched by convention, and `index.html` has no
+`<link rel="icon">`.
+
+Verified after: clean `npm install`, `tsc --noEmit`, `vite build`, all twelve
+`build`-job gates, and the CI `dependencies` gate (osv-scanner) green — no new
+advisories, the same seven deferred ones. The layout invariant and structural
+conformance tiers were run against a LOCAL build and against deployed demo and
+returned identical numbers (2 violations / 24 suppressed, and 129 deviations /
+34 suppressed), which is how "I deleted 806 lines and changed nothing visible"
+was established rather than asserted.
 
 ## 14. Analytics (PostHog — product events, autocapture + heatmaps, NO session replay)
 

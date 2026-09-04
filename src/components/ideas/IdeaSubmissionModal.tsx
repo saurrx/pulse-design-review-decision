@@ -101,7 +101,6 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
 
       refetchIdeas();
       if (silent) {
-        toast.success("Saved to drafts", { position: "top-center" });
       } else {
         navigate(
           `/ideas/${res?.data?.data?.idea_id}/draft?draftId=${res?.data?.data?.id}`,
@@ -194,9 +193,6 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
           >
             Start an idea
           </DialogTitle>
-          <p className={`mt-1 text-sm ${muted}`}>
-            Add a working title. You can build out the details in the draft.
-          </p>
         </DialogHeader>
 
         <form className="flex min-h-0 flex-col" onSubmit={handleSubmit}>
@@ -221,7 +217,7 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
                 }`}
                 type="text"
                 id="idea-title"
-                placeholder="e.g. Self-cooling battery enclosure"
+                placeholder="What would you call it if you were telling a colleague?"
               />
             </div>
 
@@ -229,11 +225,12 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h3 className={`text-sm font-semibold ${ink}`}>
-                    Add context
+                    Already have something written?
                     <span className={`ml-2 font-normal ${muted}`}>Optional</span>
                   </h3>
                   <p className={`mt-1 text-xs ${muted}`}>
-                    Skip this for now, or give us a head start on your draft.
+                    Slides, notes, a sketch, or anything relevant. We turn it into a
+                    draft. You don't start from a blank page.
                   </p>
                 </div>
               </div>
@@ -363,11 +360,7 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
               className="inline-flex h-11 min-w-[150px] items-center justify-center gap-2 rounded-xl bg-[#F9B418] px-5 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:cursor-not-allowed disabled:bg-[#FDF3DC] disabled:text-[#9C9C9C]"
               disabled={!title.trim() || isCreatingIdea}
             >
-              {isCreatingIdea
-                ? "Starting…"
-                : hasSource
-                  ? "Start with context"
-                  : "Start draft"}
+              {isCreatingIdea ? "Saving…" : "Save Idea"}
               {!isCreatingIdea && <ArrowRight className="h-4 w-4" />}
             </button>
           </div>

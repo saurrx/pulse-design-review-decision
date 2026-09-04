@@ -410,7 +410,6 @@ const IdeasContent: React.FC = () => {
       try {
         const response = await API_CONFIG.post(`/api/v1/idea/clone/${ideaId}`);
         if (response.status === 200) {
-          toast.success("Idea cloned successfully");
           return response.data;
         }
       } catch (error) {
@@ -435,7 +434,6 @@ const IdeasContent: React.FC = () => {
           );
 
           if (response?.status === 200) {
-            toast.success("Idea removed successfully");
             return response?.data?.data;
           }
         } catch (error) {
@@ -508,7 +506,6 @@ const IdeasContent: React.FC = () => {
 
   const handleSortChange = (value: SortOption) => {
     setSortOption(value);
-    toast.success(`Sort applied: ${getSortLabel(value)}`);
   };
 
   const handleViewIdea = (ideaId: string) => {
@@ -550,82 +547,6 @@ const IdeasContent: React.FC = () => {
   return (
     <div className="pulse-product-page pulse-table-page relative mx-auto min-h-0 flex-1 w-full max-w-[1680px] overflow-hidden px-6 py-6 lg:px-8">
       <div className="flex h-full flex-col">
-        {/* Animated Gradient Background */}
-        <div className="hidden">
-          {theme === "dark" ? (
-            <>
-              {/* Yellow Gradient Blob */}
-              <div
-                className="absolute w-[600px] h-[600px] rounded-full opacity-20 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0) 70%)",
-                  top: "-10%",
-                  right: "10%",
-                  animationDelay: "0s",
-                }}
-              />
-              {/* Cyan Gradient Blob */}
-              <div
-                className="absolute w-[500px] h-[500px] rounded-full opacity-20 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(6, 182, 212, 0) 70%)",
-                  bottom: "10%",
-                  left: "5%",
-                  animationDelay: "2s",
-                }}
-              />
-              {/* Purple Gradient Blob */}
-              <div
-                className="absolute w-[550px] h-[550px] rounded-full opacity-15 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0) 70%)",
-                  top: "40%",
-                  left: "30%",
-                  animationDelay: "4s",
-                }}
-              />
-            </>
-          ) : (
-            <>
-              {/* Yellow Gradient Blob - Light */}
-              <div
-                className="absolute w-[600px] h-[600px] rounded-full opacity-30 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0) 70%)",
-                  top: "-10%",
-                  right: "10%",
-                  animationDelay: "0s",
-                }}
-              />
-              {/* Cyan Gradient Blob - Light */}
-              <div
-                className="absolute w-[500px] h-[500px] rounded-full opacity-25 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0) 70%)",
-                  bottom: "10%",
-                  left: "5%",
-                  animationDelay: "2s",
-                }}
-              />
-              {/* Pink Gradient Blob - Light */}
-              <div
-                className="absolute w-[550px] h-[550px] rounded-full opacity-20 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(236, 72, 153, 0) 70%)",
-                  top: "40%",
-                  left: "30%",
-                  animationDelay: "4s",
-                }}
-              />
-            </>
-          )}
-        </div>
         <div className="mx-auto flex min-h-0 w-full flex-1 flex-col">
           <>
             <div
@@ -1031,10 +952,11 @@ const IdeasContent: React.FC = () => {
                           <h3
                             className={`mt-3 text-xl font-semibold ${theme === "dark" ? "text-zinc-200" : "text-zinc-900"}`}
                           >
-                            You haven't submitted an idea yet
+                            Every patent starts as a rough idea.
                           </h3>
                           <p className="max-w-md text-center text-sm text-gray-600 dark:text-neutral-400">
-                            A title and short description is enough to start.
+                            Upload notes, slides, or just type a title. Either one is
+                            enough to start.
                           </p>
                           <button
                             type="button"

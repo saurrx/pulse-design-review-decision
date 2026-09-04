@@ -138,10 +138,12 @@ const ClientsPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useUserCookie();
   const isCaseOwner = user?.role === "CASE_OWNER";
-  // `scope` is the enum that makes this readable: a case owner sees only their
-  // assigned clients, an OC admin the whole book, and the two are not the same
-  // screen even though they share a route.
-  useTrackOnce("client_book_viewed", { scope: isCaseOwner ? "assigned" : "all" },
+  // Both roles now see the whole book (F-079) — a case owner reads every client
+  // and is fenced on what they can DO, not on what they can list. `scope` stays
+  // in the event because the two are still different screens: a case owner has
+  // "Request access" where an admin has "View as client". It reports the ROLE's
+  // reach, and after the widening that reach is the same list for both.
+  useTrackOnce("client_book_viewed", { scope: "all" },
     !!user && isOutsideCounselRole(user.role));
   const [isOnboardModalOpen, setIsOnboardModalOpen] =
     useState<iClientOnboardModal>(initialValuesClientOnboardModal);
@@ -175,7 +177,6 @@ const ClientsPage: React.FC = () => {
         const response = await API_CONFIG.post("/api/v1/clients", data);
 
         if (response?.status === 201) {
-          toast.success("Client added successfully");
           // call get all clients query to refresh the list
           setIsOnboardModalOpen(initialValuesClientOnboardModal);
           formik.resetForm();
@@ -218,7 +219,6 @@ const ClientsPage: React.FC = () => {
         );
 
         if (response?.status === 200 || response?.status === 204) {
-          toast.success("Client deleted successfully");
           setClientToDelete(null);
         }
         return response?.data;
@@ -400,82 +400,6 @@ const ClientsPage: React.FC = () => {
             }}
       />
       <div className="pulse-product-page pulse-table-page relative mx-auto flex min-h-0 flex-1 w-full max-w-[1680px] flex-col overflow-hidden px-6 py-6 lg:px-8">
-        {/* Animated Gradient Background */}
-        <div className="hidden">
-          {theme === "dark" ? (
-            <>
-              {/* Yellow Gradient Blob */}
-              <div
-                className="absolute w-[600px] h-[600px] rounded-full opacity-20 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(245, 166, 35, 0.4) 0%, rgba(245, 166, 35, 0) 70%)",
-                  top: "-10%",
-                  right: "10%",
-                  animationDelay: "0s",
-                }}
-              />
-              {/* Cyan Gradient Blob */}
-              <div
-                className="absolute w-[500px] h-[500px] rounded-full opacity-20 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(6, 182, 212, 0) 70%)",
-                  bottom: "10%",
-                  left: "5%",
-                  animationDelay: "2s",
-                }}
-              />
-              {/* Purple Gradient Blob */}
-              <div
-                className="absolute w-[550px] h-[550px] rounded-full opacity-15 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0) 70%)",
-                  top: "40%",
-                  left: "30%",
-                  animationDelay: "4s",
-                }}
-              />
-            </>
-          ) : (
-            <>
-              {/* Yellow Gradient Blob - Light */}
-              <div
-                className="absolute w-[600px] h-[600px] rounded-full opacity-30 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0) 70%)",
-                  top: "-10%",
-                  right: "10%",
-                  animationDelay: "0s",
-                }}
-              />
-              {/* Cyan Gradient Blob - Light */}
-              <div
-                className="absolute w-[500px] h-[500px] rounded-full opacity-25 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0) 70%)",
-                  bottom: "10%",
-                  left: "5%",
-                  animationDelay: "2s",
-                }}
-              />
-              {/* Pink Gradient Blob - Light */}
-              <div
-                className="absolute w-[550px] h-[550px] rounded-full opacity-20 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(236, 72, 153, 0) 70%)",
-                  top: "40%",
-                  left: "30%",
-                  animationDelay: "4s",
-                }}
-              />
-            </>
-          )}
-        </div>
         <div
           className={`pulse-toolbar !mx-0 !mb-5 !mt-0 ${
             theme === "dark" ? "bg-[#0a0a0a] border-b-[#cccccc20]" : "bg-white"

@@ -5,7 +5,7 @@
    "route": "/login",
    "page": "Login",
    "entry": "src/pages/auth/Login.tsx",
-   "components": 16,
+   "components": 18,
    "calls": [
     {
      "method": "POST",
@@ -40,7 +40,7 @@
    "route": "/signup",
    "page": "Signup",
    "entry": "src/pages/auth/Signup.tsx",
-   "components": 13,
+   "components": 15,
    "calls": [
     {
      "method": "POST",
@@ -66,7 +66,7 @@
    "route": "/invite",
    "page": "Invite",
    "entry": "src/pages/auth/Invite.tsx",
-   "components": 13,
+   "components": 14,
    "calls": [
     {
      "method": "POST",
@@ -86,7 +86,7 @@
    "route": "/i/:inviteCode",
    "page": "Invite",
    "entry": "src/pages/auth/Invite.tsx",
-   "components": 13,
+   "components": 14,
    "calls": [
     {
      "method": "POST",
@@ -106,7 +106,7 @@
    "route": "/reset-password",
    "page": "ResetPassword",
    "entry": "src/pages/auth/ResetPassword.tsx",
-   "components": 18,
+   "components": 20,
    "calls": [
     {
      "method": "POST",
@@ -362,7 +362,7 @@
    "route": "/clients/:clientId",
    "page": "ClientDetailPage",
    "entry": "src/pages/client/ClientDetailPage.tsx",
-   "components": 37,
+   "components": 39,
    "calls": [
     {
      "method": "POST",
@@ -664,7 +664,7 @@
    "route": "/ideas/:id",
    "page": "IdeaDetailsPage",
    "entry": "src/pages/IdeaDetailsPage.tsx",
-   "components": 54,
+   "components": 56,
    "calls": [
     {
      "method": "POST",
@@ -1043,7 +1043,7 @@
    "route": "/patents",
    "page": "PatentsPage",
    "entry": "src/pages/PatentsPage.tsx",
-   "components": 41,
+   "components": 45,
    "calls": [
     {
      "method": "GET",
@@ -1084,7 +1084,7 @@
     {
      "method": "GET",
      "call": "/api/v1/patent/export/client/${user?.client_id}?${params.toString()}",
-     "rule": "^\\/api\\/v1\\/patent\\/export\\/client\\/([^/?]+)(\\?.*)?$",
+     "rule": "^\\/api\\/v1\\/patent\\/export\\/client\\/([^/?]+)(?:\\?(.*))?$",
      "v1": [
       "/v1/patents/export"
      ],
@@ -1141,7 +1141,7 @@
    "route": "/patents/:patentId",
    "page": "PatentsPage",
    "entry": "src/pages/PatentsPage.tsx",
-   "components": 41,
+   "components": 45,
    "calls": [
     {
      "method": "GET",
@@ -1182,7 +1182,7 @@
     {
      "method": "GET",
      "call": "/api/v1/patent/export/client/${user?.client_id}?${params.toString()}",
-     "rule": "^\\/api\\/v1\\/patent\\/export\\/client\\/([^/?]+)(\\?.*)?$",
+     "rule": "^\\/api\\/v1\\/patent\\/export\\/client\\/([^/?]+)(?:\\?(.*))?$",
      "v1": [
       "/v1/patents/export"
      ],
@@ -1239,7 +1239,7 @@
    "route": "/due-dates",
    "page": "DueDatesPage",
    "entry": "src/pages/DueDatesPage.tsx",
-   "components": 34,
+   "components": 36,
    "calls": [
     {
      "method": "GET",
@@ -1452,7 +1452,7 @@
    "route": "/actions",
    "page": "ActionsPage",
    "entry": "src/pages/ActionsPage.tsx",
-   "components": 33,
+   "components": 36,
    "calls": [
     {
      "method": "GET",

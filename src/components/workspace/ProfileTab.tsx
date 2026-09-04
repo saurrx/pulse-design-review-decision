@@ -601,7 +601,6 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
         );
 
         if (response.status === 200) {
-          toast.success("Profile updated successfully");
           userCookieUpdate();
         }
       } catch (error) {

@@ -31,7 +31,6 @@ export const usePatentEventCompletion = () => {
     },
     onSuccess: (_event, variables) => {
       queryClient.invalidateQueries({ queryKey: ["all_due_dates"] });
-      toast.success(variables.completed ? "Event marked done" : "Event reopened");
     },
     onError: (error: any) =>
       toast.error(

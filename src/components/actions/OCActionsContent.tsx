@@ -16,11 +16,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -33,7 +29,6 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  ChevronDown,
   Search,
   Filter,
   ArrowUpDown,
@@ -42,6 +37,10 @@ import {
 import Loader from "../Loader";
 import RequestStatusBadge from "./RequestStatusBadge";
 import moment from "moment";
+import { daysColor, filterLabel, toggleColumn } from "@/lib/actionsView";
+import { FilterButton } from "@/components/ui/filter-button";
+import { MenuRadioItem } from "@/components/ui/menu-radio-item";
+import { Columns3 } from "lucide-react";
 
 type FilterOption = "all" | "upcoming" | "dueToday" | "overdue";
 type SortOption = "newest" | "oldest" | "eventAZ" | "eventZA";
@@ -131,25 +130,11 @@ const OCActionsContent: React.FC = () => {
     { id: "requestStatus", label: "Request Status", visible: true, sticky: false },
   ]);
 
-  const toggleColumnVisibility = (columnId: string) => {
-    setColumns(
-      columns.map((col) =>
-        col.id === columnId ? { ...col, visible: !col.visible } : col,
-      ),
-    );
-  };
+  const toggleColumnVisibility = (columnId: string) =>
+    setColumns(toggleColumn(columns, columnId));
 
   const visibleColumns = columns.filter((col) => col.visible);
 
-  const getFilterLabel = (filter: FilterOption): string => {
-    switch (filter) {
-      case "all": return "All Actions";
-      case "upcoming": return "Upcoming";
-      case "dueToday": return "Due Today";
-      case "overdue": return "Overdue";
-      default: return "All Actions";
-    }
-  };
 
   // Same `list` name as the IHC table on purpose: /actions is one screen with
   // two role-specific bodies, and splitting the label would make the breakdown
@@ -228,7 +213,6 @@ const OCActionsContent: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["oc_action_queue"] });
-      toast.success("Status updated");
     },
     onError: (error: any) => {
       toast.error(
@@ -248,13 +232,6 @@ const OCActionsContent: React.FC = () => {
     [updateStatus],
   );
 
-  const getDaysColor = (days: number | null) => {
-    if (days === null) return "";
-    if (days <= 0) return "text-red-600 font-semibold";
-    if (days <= 7) return "text-red-500";
-    if (days <= 30) return "text-amber-600";
-    return "text-green-600";
-  };
 
   if (isLoading) {
     return (
@@ -303,18 +280,7 @@ const OCActionsContent: React.FC = () => {
         {/* Filter dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className={`flex items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-neutral-900 hover:text-neutral-300"
-                  : "hover:bg-transparent bg-transparent border-neutral-200 hover:text-neutral-700 text-[#494949] hover:border-[#F9B418]"
-              }`}
-            >
-              <Filter className="w-4 h-4" />
-              <span>{getFilterLabel(filterOption)}</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
+            <FilterButton icon={<Filter />}><span>{filterLabel(filterOption)}</span></FilterButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className={`w-64 px-3 ${
@@ -373,21 +339,11 @@ const OCActionsContent: React.FC = () => {
         {/* Client filter - searchable */}
         <Popover open={clientPopoverOpen} onOpenChange={setClientPopoverOpen}>
           <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={`w-[180px] h-[42px] justify-between text-sm border rounded font-normal ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-neutral-900 hover:text-neutral-300"
-                  : "hover:bg-transparent bg-transparent border-neutral-200 hover:text-neutral-700 text-[#494949] hover:border-[#F9B418]"
-              }`}
-            >
-              <span className="truncate">
+            <FilterButton><span className="truncate">
                 {clientFilter === "all"
                   ? "All clients"
                   : selectedClientName || "All clients"}
-              </span>
-              <ChevronDown className="w-4 h-4 ml-2 shrink-0 opacity-50" />
-            </Button>
+              </span></FilterButton>
           </PopoverTrigger>
           <PopoverContent
             className={`w-[260px] p-0 ${
@@ -481,18 +437,7 @@ const OCActionsContent: React.FC = () => {
         {/* Sort dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className={`font-sans flex items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-neutral-900 hover:text-neutral-300"
-                  : "hover:bg-transparent bg-transparent hover:text-[#494949] text-[#404040] border-neutral-200 hover:border-[#F9B418]"
-              }`}
-            >
-              <ArrowUpDown className="w-4 h-4" />
-              <span>Sort</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
+            <FilterButton icon={<ArrowUpDown />}><span>Sort</span></FilterButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className={`font-sans w-64 px-3 ${
@@ -508,26 +453,14 @@ const OCActionsContent: React.FC = () => {
               }
               className="grid gap-3 py-2"
             >
-              <DropdownMenuRadioItem
-                value="newest"
-                className={`cursor-pointer ${
-                  theme === "dark"
-                    ? "text-zinc-200 hover:!text-zinc-200 focus:!text-zinc-200 hover:!bg-white/5 focus:!bg-white/5"
-                    : "text-[#404040] hover:!text-[#404040] focus:!text-[#404040] hover:!bg-[#fafafa]"
-                } data-[state=checked]:bg-photon-background-light text-sm`}
-              >
+              <MenuRadioItem
+                value="newest">
                 Newest First
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem
-                value="oldest"
-                className={`cursor-pointer ${
-                  theme === "dark"
-                    ? "text-zinc-200 hover:!text-zinc-200 focus:!text-zinc-200 hover:!bg-white/5 focus:!bg-white/5"
-                    : "text-[#404040] hover:!text-[#404040] focus:!text-[#404040]"
-                } data-[state=checked]:bg-photon-background-light text-sm`}
-              >
+              </MenuRadioItem>
+              <MenuRadioItem
+                value="oldest">
                 Oldest First
-              </DropdownMenuRadioItem>
+              </MenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -535,33 +468,7 @@ const OCActionsContent: React.FC = () => {
         {/* Columns popover */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={`flex items-center gap-2 px-4 py-5 border rounded text-sm font-normal transition-colors whitespace-nowrap ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:text-neutral-300 hover:border-[#F9B418]/50 hover:bg-neutral-900"
-                  : "hover:bg-transparent bg-transparent border-neutral-200 text-[#404040] hover:border-[#F9B418]"
-              }`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-4 h-4"
-              >
-                <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-                <path d="M9 3v18"></path>
-                <path d="M15 3v18"></path>
-              </svg>
-              <span>Columns</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
+            <FilterButton icon={<Columns3 />}><span>Columns</span></FilterButton>
           </PopoverTrigger>
           <PopoverContent
             className={`w-72 p-3 ${
@@ -702,7 +609,7 @@ const OCActionsContent: React.FC = () => {
                               className={`p-3 text-xs ${
                                 isCompleted
                                   ? "text-zinc-500"
-                                  : getDaysColor(action.days_to_deadline)
+                                  : daysColor(action.days_to_deadline)
                               }`}
                             >
                               {isCompleted

@@ -95,7 +95,6 @@ const CoInventorsField = ({ ideaId }: { ideaId?: string }) => {
     onSuccess: () => {
       track("co_inventor_added", { idea_id: ideaId });
       refresh();
-      toast.success("Co-inventor invited and added");
     },
     onError: () => toast.error("Failed to invite co-inventor"),
   });

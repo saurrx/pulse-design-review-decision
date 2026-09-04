@@ -570,7 +570,6 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
           `/api/v1/patent/delete-doc/${id}`,
         );
         if (response?.status === 200) {
-          toast.success("Document removed successfully");
           setLocalDocuments((prev) => prev.filter((doc) => doc.id !== id));
           setNewUploadedFiles((prev) => prev.filter((doc) => doc.id !== id));
           queryClient.invalidateQueries({
@@ -746,7 +745,6 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
         );
 
         if (response?.status === 200) {
-          toast.success("Patent updated successfully");
           handleEditToggle();
           queryClient.invalidateQueries({
             queryKey: ["patentDetails", patentId],
@@ -914,82 +912,6 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
         <Loader />
       ) : (
         <div className={` w-full`}>
-          {/* Animated Gradient Background */}
-          <div className="hidden">
-            {theme === "dark" ? (
-              <>
-                {/* Yellow Gradient Blob */}
-                <div
-                  className="absolute w-[600px] h-[600px] rounded-full opacity-20 blur-3xl animate-blob"
-                  style={{
-                    background:
-                      "radial-gradient(circle, rgba(245, 166, 35, 0.4) 0%, rgba(245, 166, 35, 0) 70%)",
-                    top: "-10%",
-                    right: "10%",
-                    animationDelay: "0s",
-                  }}
-                />
-                {/* Cyan Gradient Blob */}
-                <div
-                  className="absolute w-[500px] h-[500px] rounded-full opacity-20 blur-3xl animate-blob"
-                  style={{
-                    background:
-                      "radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(6, 182, 212, 0) 70%)",
-                    bottom: "10%",
-                    left: "5%",
-                    animationDelay: "2s",
-                  }}
-                />
-                {/* Purple Gradient Blob */}
-                <div
-                  className="absolute w-[550px] h-[550px] rounded-full opacity-15 blur-3xl animate-blob"
-                  style={{
-                    background:
-                      "radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0) 70%)",
-                    top: "40%",
-                    left: "30%",
-                    animationDelay: "4s",
-                  }}
-                />
-              </>
-            ) : (
-              <>
-                {/* Yellow Gradient Blob - Light */}
-                <div
-                  className="absolute w-[600px] h-[600px] rounded-full opacity-30 blur-3xl animate-blob"
-                  style={{
-                    background:
-                      "radial-gradient(circle, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0) 70%)",
-                    top: "-10%",
-                    right: "10%",
-                    animationDelay: "0s",
-                  }}
-                />
-                {/* Cyan Gradient Blob - Light */}
-                <div
-                  className="absolute w-[500px] h-[500px] rounded-full opacity-25 blur-3xl animate-blob"
-                  style={{
-                    background:
-                      "radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0) 70%)",
-                    bottom: "10%",
-                    left: "5%",
-                    animationDelay: "2s",
-                  }}
-                />
-                {/* Pink Gradient Blob - Light */}
-                <div
-                  className="absolute w-[550px] h-[550px] rounded-full opacity-20 blur-3xl animate-blob"
-                  style={{
-                    background:
-                      "radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(236, 72, 153, 0) 70%)",
-                    top: "40%",
-                    left: "30%",
-                    animationDelay: "4s",
-                  }}
-                />
-              </>
-            )}
-          </div>
           <div
             className={`w-full rounded-2xl border px-6 py-5 [box-shadow:var(--pulse-shadow-card)] ${
               theme === "dark"

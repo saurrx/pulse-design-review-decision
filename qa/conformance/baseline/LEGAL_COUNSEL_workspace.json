@@ -64,8 +64,6 @@
     "listitem:<data>",
     "main:",
     "navigation:primary navigation",
-    "option:<data>",
-    "option:<data>+selected",
     "paragraph:<data>",
     "region:notifications (f#)",
     "region:notifications alt+t",

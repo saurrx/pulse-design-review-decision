@@ -45,7 +45,6 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
       API_CONFIG.post(`/api/v1/clients/${clientId}/invite-link`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
-      toast.success("Inventor invite link generated");
     },
     onError: () => toast.error("Could not generate the link. Try again."),
   });
@@ -57,7 +56,6 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
       API_CONFIG.post(`/api/v1/clients/${clientId}/invite-link`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
-      toast.success("New link generated. The previous link and QR no longer work.");
     },
     onError: () => toast.error("Could not regenerate the link. Try again."),
   });
@@ -68,7 +66,6 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
       API_CONFIG.delete(`/api/v1/clients/${clientId}/invite-link/${inviteLinkData?.id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["client_invite_link", clientId] });
-      toast.success("Invite link deactivated");
     },
     onError: () => toast.error("Could not deactivate the link. Try again."),
   });
@@ -163,7 +160,6 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
     mutationFn: async ({ userId, role }: { userId: string; role: string }) =>
       API_CONFIG.put(`/api/v1/auth/update-profile/${userId}`, { role }),
     onSuccess: () => {
-      toast.success("Member role updated");
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
     },
     onError: (error: any) => toast.error(error?.response?.data?.message || "Could not update member role"),
@@ -173,7 +169,6 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
     mutationFn: async (userId: string) => API_CONFIG.delete(`/api/v1/users/${userId}`),
     onSuccess: (_, userId) => {
       setLocalUsers((current) => current.filter((person) => String(person.id) !== userId));
-      toast.success("Member removed");
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
     },
     onError: (error: any) => toast.error(error?.response?.data?.message || "Could not remove member"),
@@ -188,7 +183,6 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
     mutationFn: async (userId: string) =>
       API_CONFIG.put(`/api/v1/auth/update-profile/${userId}`, { status: "ACTIVE" }),
     onSuccess: () => {
-      toast.success("Member reactivated");
       queryClient.invalidateQueries({ queryKey: ["client", clientId] });
     },
     onError: (error: any) => toast.error(error?.response?.data?.message || "Could not reactivate member"),

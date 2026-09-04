@@ -29,10 +29,21 @@ const defaultHeaderForRoute = (
     };
   }
   if (/^\/ideas\/[^/]+\/draft$/.test(pathname)) {
-    return {
-      title: "Working submission",
-      back: { label: "Back to idea", to: pathname.replace(/\/draft$/, "") },
-    };
+    // An INVENTOR goes back to the LIST, not to the idea page.
+    //
+    // The idea page bounces them straight back here: IdeaDetailsContent
+    // redirects an inventor whose idea is IN_DRAFT to this workspace, with
+    // `replace: true`. So "Back to idea" looked like a dead button — one
+    // navigation out, one redirect in, no visible change — and the `replace`
+    // poisoned the browser's own Back for anyone who arrived via the idea page.
+    // Other roles read that page rather than being bounced off it, so they keep
+    // the closer target.
+    return role === "INVENTOR"
+      ? { title: "Working submission", back: { label: "Back to my ideas", to: "/ideas" } }
+      : {
+          title: "Working submission",
+          back: { label: "Back to idea", to: pathname.replace(/\/draft$/, "") },
+        };
   }
   if (/^\/ideas\/[^/]+$/.test(pathname)) {
     return {

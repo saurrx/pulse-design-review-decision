@@ -277,7 +277,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
       onSuccess: (idea) => {
         queryClient.setQueryData(["ideaDetails", ideaId], idea);
         queryClient.invalidateQueries({ queryKey: ["fetch_ideas"] });
-        toast.success("Status updated");
       },
       onError: (error: any) => {
         toast.error(
@@ -307,7 +306,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           );
 
           if (response?.status === 200) {
-            toast.success("Inventor removed successfully", { position: "top-center" });
             return response?.data?.data;
           }
         } catch (error) {
@@ -429,7 +427,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         );
 
         if (response?.status === 201) {
-          toast.success("Draft added successfully", { position: "top-center" });
           navigate(
             `/ideas/${ideaId}/draft?draftId=${response?.data?.data?.id}`,
           );
@@ -483,7 +480,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           );
 
           if (response?.status === 200) {
-            toast.success("Idea rejected successfully", { position: "top-center" });
             return response?.data?.data;
           }
         } catch (error) {
@@ -535,7 +531,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         }
       },
       onSuccess: () => {
-        toast.success("Draft cloned successfully", { position: "top-center" });
         queryClient.invalidateQueries({
           queryKey: ["idea_draft", ideaId],
         });
@@ -577,7 +572,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         );
 
         if (response?.status === 200) {
-          toast.success("Draft sent for review", { position: "top-center" });
         }
       } catch (error) {
         console.error("Error sending to IHC:", error);
@@ -609,7 +603,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           },
         );
         if (response?.status === 200) {
-          toast.success("Draft sent to Photon Legal successfully", { position: "top-center" });
           setInstructions("");
         }
       } catch (error) {
@@ -855,9 +848,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                       `api/v1/idea/add/inventor/${ideaId}/${inventorId}`,
                     );
                     if (addResponse?.status === 200) {
-                      toast.success(
-                        `Inventor ${inventor.email} added successfully`, { position: "top-center" }
-                      );
                     }
                   } catch (addError: any) {
                     console.error("Error adding inventor to idea:", addError);
@@ -898,7 +888,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
       setExtraInventors([]);
       setDeletedInventorIds([]);
       setOriginalInventorIds([]);
-      toast.success("Changes saved successfully", { position: "top-center" });
     } catch (error) {
       console.error("Error saving changes:", error, { position: "top-center" });
       toast.error("Failed to save changes", { position: "top-center" });
@@ -1051,7 +1040,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
 
           if (response.status === 200) {
             const data = response?.data?.data;
-            toast.success("Evaluation underway", { position: "top-center" });
             setIsDisableScoreTransition(false);
             setEnableScorePolling(true);
           }
@@ -1081,7 +1069,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
     onSuccess: () => {
       setOpenEvaluatePopup(false);
       setPatentInput("");
-      toast.success("Re-evaluation started successfully.", { position: "top-center" });
     },
     onError: (err: any) => {
       toast.error(
@@ -1316,7 +1303,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           );
 
           if (response.status === 201) {
-            toast.success("Draft updated successfully", { position: "top-center" });
             // Update local state with new data
             if (ideaDraft?.[0]) {
               const updatedDraft = {
@@ -1445,7 +1431,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           );
 
           if (response?.status === 201) {
-            toast.success("Files uploaded successfully", { position: "top-center" });
           }
           return response?.data;
         } catch (error) {
@@ -1471,7 +1456,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
         );
 
         if (response.status === 200) {
-          toast.success("File deleted successfully", { position: "top-center" });
           queryClient.invalidateQueries({
             queryKey: ["ideaDetails", ideaId],
           });
@@ -1961,82 +1945,6 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
        of a long disclosure was unreachable rather than merely below the fold.
        h-full + min-h-0 fills the space the layout actually gives it. */
     <div className="pulse-product-page relative flex min-h-0 flex-1 flex-col overflow-hidden">
-      {/* Animated Gradient Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-        {theme === "dark" ? (
-          <>
-            {/* Yellow Gradient Blob */}
-            <div
-              className="absolute w-[600px] h-[600px] rounded-full opacity-20 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(245, 166, 35, 0.4) 0%, rgba(245, 166, 35, 0) 70%)",
-                top: "-10%",
-                right: "10%",
-                animationDelay: "0s",
-              }}
-            />
-            {/* Cyan Gradient Blob */}
-            <div
-              className="absolute w-[500px] h-[500px] rounded-full opacity-20 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(6, 182, 212, 0) 70%)",
-                bottom: "10%",
-                left: "5%",
-                animationDelay: "2s",
-              }}
-            />
-            {/* Purple Gradient Blob */}
-            <div
-              className="absolute w-[550px] h-[550px] rounded-full opacity-15 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0) 70%)",
-                top: "40%",
-                left: "30%",
-                animationDelay: "4s",
-              }}
-            />
-          </>
-        ) : (
-          <>
-            {/* Yellow Gradient Blob - Light */}
-            <div
-              className="absolute w-[600px] h-[600px] rounded-full opacity-30 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0) 70%)",
-                top: "-10%",
-                right: "10%",
-                animationDelay: "0s",
-              }}
-            />
-            {/* Cyan Gradient Blob - Light */}
-            <div
-              className="absolute w-[500px] h-[500px] rounded-full opacity-25 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0) 70%)",
-                bottom: "10%",
-                left: "5%",
-                animationDelay: "2s",
-              }}
-            />
-            {/* Pink Gradient Blob - Light */}
-            <div
-              className="absolute w-[550px] h-[550px] rounded-full opacity-20 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(236, 72, 153, 0) 70%)",
-                top: "40%",
-                left: "30%",
-                animationDelay: "4s",
-              }}
-            />
-          </>
-        )}
-      </div>
 
       {/* Header Section with Gradient */}
       <motion.div
@@ -2327,7 +2235,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                   <main className="w-full lg:w-[60%]">
                     <PatentPaperView
                       title={mainIdeaData?.title}
-                      irn={mainIdeaData?.id?.toUpperCase()}
+                      irn={mainIdeaData?.reference_number}
                       submissionDate={
                         mainIdeaData?.submission_date
                           ? moment(mainIdeaData.submission_date).format(
@@ -2451,7 +2359,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
               ) : (
                 <PatentPaperView
                   title={mainIdeaData?.title}
-                  irn={mainIdeaData?.id?.toUpperCase()}
+                  irn={mainIdeaData?.reference_number}
                   inventors={(mainIdeaData?.IdeaInventor || [])
                     .map((x: any) => x?.inventor?.name)
                     .filter(Boolean)}

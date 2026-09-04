@@ -792,7 +792,12 @@ const MyIdeas = ({
     <div className={`${CARD_CLASS} flex h-full min-h-[280px] flex-col`}>
       <div className="flex items-center justify-between gap-3">
         <StatLabel>My ideas</StatLabel>
-        <SubmitIdeaButton onClick={onSubmit} />
+        {/* Removed only from the EMPTY state, which is what "remove the submit
+            idea from the top right box" was about — that screen already carries
+            a large "Submit your first idea" call to action below, and two
+            buttons for one action is the clutter. An inventor who HAS ideas has
+            no other way to start one from this card, so it stays for them. */}
+        {recent.length > 0 && <SubmitIdeaButton onClick={onSubmit} />}
       </div>
 
       {recent.length === 0 ? (
@@ -813,10 +818,10 @@ const MyIdeas = ({
             <path d="M10 22h4" />
           </svg>
           <div className="text-sm font-semibold text-[#0C0C0C]">
-            You haven't submitted an idea yet
+            Every patent starts as a rough idea.
           </div>
           <div className="max-w-[300px] text-xs leading-[18px] text-[#727272]">
-            It takes 2 minutes — a title and short description is enough to
+            Upload notes, slides, or just type a title. Either one is enough to
             start.
           </div>
           <div className="mt-2">
@@ -957,7 +962,17 @@ const PortfolioComposition = ({
   const pieData = hasData
     ? segments.filter((s) => s.count > 0)
     : [{ label: "Empty", count: 1, color: "#F5F5F5" }];
-  const useCompactLegend = segments.length > 3;
+  // The legend used to render EVERY segment, so a portfolio with nothing granted
+  // read "Granted 0 · 0%" — a row whose only content is its own absence, and a
+  // reader has to check each one to learn there is nothing there. The donut has
+  // always filtered; the legend now agrees with it.
+  //
+  // Filtered from `segments` AFTER colours are assigned by index above, or the
+  // donut and the legend would disagree about which colour means what. When the
+  // portfolio is empty the donut shows its grey placeholder and this is empty
+  // too — nothing to caption.
+  const legend = segments.filter((s) => s.count > 0);
+  const useCompactLegend = legend.length > 3;
 
   if (hasError) {
     return (
@@ -1013,7 +1028,7 @@ const PortfolioComposition = ({
         </div>
       </div>
       <div className={`mt-2 grid ${useCompactLegend ? "grid-cols-2 gap-x-5" : "grid-cols-1"}`}>
-        {segments.map((seg, i) => (
+        {legend.map((seg, i) => (
           <div
             key={seg.label}
             className={`flex min-w-0 items-center justify-between gap-3 py-2 ${

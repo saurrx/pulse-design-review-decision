@@ -113,7 +113,6 @@ const CaseOwnersTab: React.FC = () => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["case-owners"] });
-      toast.success("Client assignments updated");
       setOwner(null);
     },
     onError: () => toast.error("Could not update client assignments"),

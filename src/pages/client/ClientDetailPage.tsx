@@ -44,12 +44,16 @@ const ClientDetailPage: React.FC = () => {
     onError: () => toast.error("Couldn't send the request. Try again."),
   });
   const isCaseOwner = user?.role === "CASE_OWNER";
-  const assignedClientIds: string[] = Array.isArray(user?.assigned_client_ids)
-    ? user.assigned_client_ids
-    : [];
-  const canViewClient =
-    user?.role === "PHOTON_ADMIN" ||
-    (isCaseOwner && !!clientId && assignedClientIds.includes(clientId));
+  // A case owner OPENS any client; the assignment decides what they can do
+  // there, not whether they can look (2026-09-03, F-079). The backend agrees in
+  // two places — ClientIsolationGuard passes an unassigned GET and audits it,
+  // and RLS answers it through app_can_read_client — so bouncing the page here
+  // would refuse a request the server is willing to serve.
+  //
+  // Everything downstream was already built for this: `isUnassignedCaseOwner`
+  // swaps "View as client" for "Request access", and OverviewTab renders the
+  // record read-only. The only thing missing was letting them arrive.
+  const canViewClient = user?.role === "PHOTON_ADMIN" || isCaseOwner;
   const [isEditMode, setIsEditMode] = useState(false);
   // Only once the role check below has passed — a record the caller is bounced
   // off was never opened, it was refused, and redirect_blocked says that.
@@ -106,7 +110,6 @@ const ClientDetailPage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["case-owners"] });
       setIsOwnerDialogOpen(false);
-      toast.success("Case Owner updated");
     },
   });
 
@@ -137,7 +140,6 @@ const ClientDetailPage: React.FC = () => {
             Cookies.remove("pl_user", { path: "/" });
             Cookies.set("pl_user", JSON.stringify(userData), { secure: true, sameSite: "lax", path: "/" });
 
-            toast.success("Entered client mode successfully");
 
             // Entering a view-as session: re-identify as the viewed user with the
             // view flag, and record the transition. Ids/enums only, never name/email.
@@ -245,7 +247,8 @@ const ClientDetailPage: React.FC = () => {
                   <span className="hidden lg:inline">View as client</span>
                 </Button>
                 )}
-                {user?.role === "PHOTON_ADMIN" && (
+                {(user?.role === "PHOTON_ADMIN"
+                  || (isCaseOwner && !isUnassignedCaseOwner)) && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -261,82 +264,6 @@ const ClientDetailPage: React.FC = () => {
           ) : null}
       />
       <div className="pulse-product-page h-full dark:bg-[#0a0a0a]">
-        {/* Animated Gradient Background */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
-          {theme === "dark" ? (
-            <>
-              {/* Yellow Gradient Blob */}
-              <div
-                className="absolute w-[600px] h-[600px] rounded-full opacity-20 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(245, 166, 35, 0.4) 0%, rgba(245, 166, 35, 0) 70%)",
-                  top: "-10%",
-                  right: "10%",
-                  animationDelay: "0s",
-                }}
-              />
-              {/* Cyan Gradient Blob */}
-              <div
-                className="absolute w-[500px] h-[500px] rounded-full opacity-20 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(6, 182, 212, 0) 70%)",
-                  bottom: "10%",
-                  left: "5%",
-                  animationDelay: "2s",
-                }}
-              />
-              {/* Purple Gradient Blob */}
-              <div
-                className="absolute w-[550px] h-[550px] rounded-full opacity-15 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0) 70%)",
-                  top: "40%",
-                  left: "30%",
-                  animationDelay: "4s",
-                }}
-              />
-            </>
-          ) : (
-            <>
-              {/* Yellow Gradient Blob - Light */}
-              <div
-                className="absolute w-[600px] h-[600px] rounded-full opacity-30 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0) 70%)",
-                  top: "-10%",
-                  right: "10%",
-                  animationDelay: "0s",
-                }}
-              />
-              {/* Cyan Gradient Blob - Light */}
-              <div
-                className="absolute w-[500px] h-[500px] rounded-full opacity-25 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0) 70%)",
-                  bottom: "10%",
-                  left: "5%",
-                  animationDelay: "2s",
-                }}
-              />
-              {/* Pink Gradient Blob - Light */}
-              <div
-                className="absolute w-[550px] h-[550px] rounded-full opacity-20 blur-3xl animate-blob"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(236, 72, 153, 0) 70%)",
-                  top: "40%",
-                  left: "30%",
-                  animationDelay: "4s",
-                }}
-              />
-            </>
-          )}
-        </div>
         {/* Client identity summary */}
         <div
           className={`relative z-10 flex-shrink-0 ${

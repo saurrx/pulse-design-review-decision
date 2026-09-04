@@ -1,22 +1,25 @@
 import type { StorybookConfig } from "@storybook/react-vite";
-import { mergeConfig } from "vite";
-import { DESIGN_ALIASES } from "../mock/runtime/aliases.mjs";
 
 /**
- * Storybook reuses production's vite.config.ts (the framework loads it) plus
- * the design fork's aliases, so the Google OAuth shim applies here too. The
- * worker script is served from public/, exactly as in the full app.
+ * Storybook 10, React + Vite.
+ *
+ * It reads the app's own `vite.config.ts` — including the `@` path alias — so a
+ * story imports a component exactly the way the app does. There is deliberately
+ * no `viteFinal` override: the moment Storybook's build diverges from the app's,
+ * a story can pass while the screen it stands for is broken, which is the
+ * failure mode this whole harness exists to avoid.
+ *
+ * Stories live BESIDE the component (`Foo.stories.tsx` next to `Foo.tsx`) rather
+ * than in a parallel tree, so a component and its stories move and get deleted
+ * together.
  */
 const config: StorybookConfig = {
-  framework: "@storybook/react-vite",
-  stories: ["../design/stories/**/*.stories.@(ts|tsx)", "../design/stories/**/*.mdx"],
+  stories: ["../src/**/*.stories.@(ts|tsx)"],
+  addons: ["@storybook/addon-a11y", "@storybook/addon-vitest"],
+  framework: { name: "@storybook/react-vite", options: {} },
+  // The app's own index.css/style.css are loaded in preview.ts; nothing here
+  // needs a static dir except the two brand assets the auth screens reference.
   staticDirs: ["../public"],
-  addons: ["@storybook/addon-docs", "@storybook/addon-a11y", "@storybook/addon-vitest", "msw-storybook-addon"],
-  core: { disableTelemetry: true },
-  viteFinal: async (cfg) => {
-    const merged = mergeConfig(cfg, { resolve: { alias: DESIGN_ALIASES } });
-    if (merged.server) delete (merged.server as { proxy?: unknown }).proxy;
-    return merged;
-  },
 };
+
 export default config;

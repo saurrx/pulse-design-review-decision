@@ -6,15 +6,12 @@ import { Input } from "@/components/ui/input";
 import {
   Filter,
   Search,
-  Columns,
   ChevronDown,
-  Check,
   FileSearch,
   ChevronsRight,
   ChevronRight,
   ChevronLeft,
   ChevronsLeft,
-  FileText,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -23,7 +20,6 @@ import {
   Pencil,
   X,
   Loader2,
-  CalendarDays,
   Tags as TagsIcon,
 } from "lucide-react";
 import {
@@ -33,35 +29,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { toast } from "@/lib/toast";
 import { isOutsideCounselRole } from "@/lib/roleAccess";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
 import { ProductChip } from "@/components/ui/product-chip";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import API_CONFIG, { assetUrl } from "@/lib/apiConfig";
@@ -69,19 +48,15 @@ import useUserCookie from "@/hooks/use-auth";
 import Cookies from "js-cookie";
 import Loader from "../Loader";
 import moment from "moment";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useTheme } from "@/hooks/useTheme";
 import PatentTagsCell from "./PatentTagsCell";
-import {
-  PATENT_LEGAL_STATUS_META,
-  PATENT_LEGAL_STATUS_VALUES,
-  type PatentLegalStatus,
-} from "@/utils/patentLegalStatus";
+import DateRangeFilter from "@/components/patents/DateRangeFilter";
+import { resolveDateRange, dateFilterLabel, type DatePreset } from "@/lib/dateRange";
+import LinkedIdeaBadge from "@/components/patents/LinkedIdeaBadge";
+import { FilterButton } from "@/components/ui/filter-button";
+import { MenuRadioItem } from "@/components/ui/menu-radio-item";
+import { Columns3 } from "lucide-react";
+import { PATENT_LEGAL_STATUS_META, PATENT_LEGAL_STATUS_VALUES, type PatentLegalStatus } from "@/utils/patentLegalStatus";
 
 interface Patent {
   id: string;
@@ -141,37 +116,6 @@ interface Patent {
 // bookmarked URLs keep working, but the UI no longer surfaces them.
 type FilterOption = PatentLegalStatus;
 type SortOption = "newest" | "oldest" | "titleAZ" | "titleZA";
-
-// Filing-date filter. Presets resolve to a rolling window ending today;
-// "custom" uses the user-picked from/to. "all" means no date constraint.
-type DatePreset = "all" | "last30" | "last60" | "last90" | "custom";
-
-const DATE_PRESET_LABELS: Record<DatePreset, string> = {
-  all: "All time",
-  last30: "Last 30 days",
-  last60: "Last 60 days",
-  last90: "Last 90 days",
-  custom: "Custom range",
-};
-
-// Turn the preset + custom inputs into concrete YYYY-MM-DD bounds for the
-// API. Presets are anchored to today; custom passes through whatever the
-// user entered (either bound may be empty).
-const resolveDateRange = (
-  preset: DatePreset,
-  from: string,
-  to: string,
-): { from?: string; to?: string } => {
-  if (preset === "all") return {};
-  if (preset === "custom") {
-    return { from: from || undefined, to: to || undefined };
-  }
-  const days = preset === "last30" ? 30 : preset === "last60" ? 60 : 90;
-  return {
-    from: moment().subtract(days, "days").format("YYYY-MM-DD"),
-    to: moment().format("YYYY-MM-DD"),
-  };
-};
 
 interface SortConfig {
   sortBy: string;
@@ -705,7 +649,6 @@ const PatentsContent = (props: PatentsContentProps) => {
         return response?.data;
       },
       onSuccess: () => {
-        toast.success("Status updated");
         setEditingPatentId(null);
         queryClient.invalidateQueries({ queryKey: ["patents"] });
       },
@@ -853,7 +796,6 @@ const PatentsContent = (props: PatentsContentProps) => {
       }
       return next;
     });
-    toast.success(`Column visibility updated`);
   };
 
   const getStatusBadgeStyle = (status: string) => {
@@ -893,7 +835,6 @@ const PatentsContent = (props: PatentsContentProps) => {
     setSortConfig(newSortConfig);
     setSortOption(value);
     setCurrentPage(1); // Reset to first page when sort changes
-    toast.success(`Sort applied: ${getSortLabel(value)}`);
   };
 
   // Clicking a column header sorts by that DB field. First click on a new
@@ -963,14 +904,7 @@ const PatentsContent = (props: PatentsContentProps) => {
 
   const dateFilterActive = datePreset !== "all";
 
-  const getDateFilterLabel = (): string => {
-    if (datePreset === "custom") {
-      const from = customFrom || "…";
-      const to = customTo || "…";
-      return `${from} → ${to}`;
-    }
-    return DATE_PRESET_LABELS[datePreset];
-  };
+  const getDateFilterLabel = (): string => dateFilterLabel(datePreset, customFrom, customTo);
 
   const getSortLabel = (sort: SortOption): string => {
     switch (sort) {
@@ -1436,82 +1370,6 @@ const PatentsContent = (props: PatentsContentProps) => {
 
   return (
     <div className="relative flex min-h-0 w-full min-w-0 flex-1 flex-col">
-      {/* Animated Gradient Background */}
-      <div className="hidden">
-        {theme === "dark" ? (
-          <>
-            {/* Yellow Gradient Blob */}
-            <div
-              className="absolute w-[600px] h-[600px] rounded-full opacity-20 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(245, 166, 35, 0.4) 0%, rgba(245, 166, 35, 0) 70%)",
-                top: "-10%",
-                right: "10%",
-                animationDelay: "0s",
-              }}
-            />
-            {/* Cyan Gradient Blob */}
-            <div
-              className="absolute w-[500px] h-[500px] rounded-full opacity-20 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(6, 182, 212, 0.3) 0%, rgba(6, 182, 212, 0) 70%)",
-                bottom: "10%",
-                left: "5%",
-                animationDelay: "2s",
-              }}
-            />
-            {/* Purple Gradient Blob */}
-            <div
-              className="absolute w-[550px] h-[550px] rounded-full opacity-15 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(168, 85, 247, 0) 70%)",
-                top: "40%",
-                left: "30%",
-                animationDelay: "4s",
-              }}
-            />
-          </>
-        ) : (
-          <>
-            {/* Yellow Gradient Blob - Light */}
-            <div
-              className="absolute w-[600px] h-[600px] rounded-full opacity-30 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(245, 166, 35, 0.2) 0%, rgba(245, 166, 35, 0) 70%)",
-                top: "-10%",
-                right: "10%",
-                animationDelay: "0s",
-              }}
-            />
-            {/* Cyan Gradient Blob - Light */}
-            <div
-              className="absolute w-[500px] h-[500px] rounded-full opacity-25 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0) 70%)",
-                bottom: "10%",
-                left: "5%",
-                animationDelay: "2s",
-              }}
-            />
-            {/* Pink Gradient Blob - Light */}
-            <div
-              className="absolute w-[550px] h-[550px] rounded-full opacity-20 blur-3xl animate-blob"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(236, 72, 153, 0) 70%)",
-                top: "40%",
-                left: "30%",
-                animationDelay: "4s",
-              }}
-            />
-          </>
-        )}
-      </div>
       <div className="flex min-h-0 w-full flex-1 flex-col bg-transparent">
         <div className="pulse-toolbar !mx-0 !mb-5 !mt-0 items-center">
           <div className="pulse-toolbar-tight flex w-full flex-wrap items-center gap-2">
@@ -1548,32 +1406,7 @@ const PatentsContent = (props: PatentsContentProps) => {
             {isOutsideCounselRole(user?.role) && (
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={`shrink-0 gap-1 hover:bg-transparent border h-[42px] rounded hover:border-[#F9B418] ${
-                      theme === "dark"
-                        ? "bg-zinc-900 border-[#cccccc20] hover:bg-zinc-900 hover:border-[#F9B418]/50"
-                        : "bg-white text-neutral-700"
-                    }`}
-                  >
-                    <Building2
-                      className={`${
-                        theme === "dark" ? "text-zinc-200" : "text-neutral-700"
-                      }`}
-                    />
-                    <span
-                      className={`font-sans font-normal ml-1 ${
-                        theme === "dark" ? "text-zinc-200" : "text-neutral-700"
-                      }`}
-                    >
-                      Clients
-                    </span>
-                    <ChevronDown
-                      className={`h-3 w-3 ml-1 ${
-                        theme === "dark" ? "text-zinc-200" : "text-foreground"
-                      }`}
-                    />
-                  </Button>
+                  <FilterButton icon={<Building2 />}>Clients</FilterButton>
                 </PopoverTrigger>
                 <PopoverContent
                   className={`w-[280px]  rounded-lg border p-0 ${
@@ -1685,39 +1518,14 @@ const PatentsContent = (props: PatentsContentProps) => {
 
             <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={`flex shrink-0 items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
-                    theme === "dark"
-                      ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-white/5 hover:text-neutral-300"
-                      : "hover:bg-transparent bg-transparent border-neutral-200 text-neutral-700 hover:text-[#494949] hover:border-[#F9B418]"
-                  }`}
-                >
-                  <Filter
-                    className={`h-4 w-4  ${
-                      theme == "dark" ? "text-gray-300" : "text-neutral-700"
-                    }`}
-                  />
-                  <span
-                    className={`font-sans font-normal ${
-                      theme === "dark" ? "text-zinc-200" : "text-neutral-700"
-                    }`}
-                  >
-                    Status
-                  </span>
+                <FilterButton icon={<Filter />}>Status
                   {filterOption.length ? (
                     <span className="h-5 w-5 font-sans rounded-full bg-[#F9B418] text-black">
                       {filterOption.length}
                     </span>
                   ) : (
                     ""
-                  )}
-                  <ChevronDown
-                    className={`h-3 w-3 ${
-                      theme === "dark" ? "text-gray-300" : "text-foreground"
-                    }`}
-                  />
-                </Button>
+                  )}</FilterButton>
               </PopoverTrigger>
 
               <PopoverContent
@@ -1791,39 +1599,14 @@ const PatentsContent = (props: PatentsContentProps) => {
 
             <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={`flex shrink-0 items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
-                    theme === "dark"
-                      ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-white/5 hover:text-neutral-300"
-                      : "hover:bg-transparent bg-transparent border-neutral-200 text-neutral-700 hover:text-[#494949] hover:border-[#F9B418]"
-                  }`}
-                >
-                  <TagsIcon
-                    className={`h-4 w-4 ${
-                      theme == "dark" ? "text-gray-300" : "text-neutral-700"
-                    }`}
-                  />
-                  <span
-                    className={`font-sans font-normal ${
-                      theme === "dark" ? "text-zinc-200" : "text-neutral-700"
-                    }`}
-                  >
-                    Tags
-                  </span>
+                <FilterButton icon={<TagsIcon />}>Tags
                   {selectedTags.length ? (
                     <span className="h-5 w-5 font-sans rounded-full bg-[#F9B418] text-black">
                       {selectedTags.length}
                     </span>
                   ) : (
                     ""
-                  )}
-                  <ChevronDown
-                    className={`h-3 w-3 ${
-                      theme === "dark" ? "text-gray-300" : "text-foreground"
-                    }`}
-                  />
-                </Button>
+                  )}</FilterButton>
               </PopoverTrigger>
 
               <PopoverContent
@@ -1924,187 +1707,19 @@ const PatentsContent = (props: PatentsContentProps) => {
               </PopoverContent>
             </Popover>
 
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={`flex shrink-0 items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
-                    theme === "dark"
-                      ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-white/5 hover:text-neutral-300"
-                      : "hover:bg-transparent bg-transparent border-neutral-200 text-neutral-700 hover:text-[#494949] hover:border-[#F9B418]"
-                  }`}
-                >
-                  <CalendarDays
-                    className={`h-4 w-4 ${
-                      theme == "dark" ? "text-gray-300" : "text-neutral-700"
-                    }`}
-                  />
-                  <span
-                    className={`font-sans font-normal ${
-                      theme === "dark" ? "text-zinc-200" : "text-neutral-700"
-                    }`}
-                  >
-                    Date
-                  </span>
-                  {dateFilterActive && (
-                    <span className="h-2 w-2 rounded-full bg-[#F9B418]" />
-                  )}
-                  <ChevronDown
-                    className={`h-3 w-3 ${
-                      theme === "dark" ? "text-gray-300" : "text-foreground"
-                    }`}
-                  />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent
-                sideOffset={8}
-                className={`w-[260px] p-0 ${
-                  theme === "dark"
-                    ? "bg-neutral-900 border border-[#cccccc20]"
-                    : ""
-                }`}
-              >
-                <div
-                  className={`font-bold font-sans px-4 pt-3 text-sm ${
-                    theme === "dark" ? "text-zinc-200" : "text-neutral-900"
-                  }`}
-                >
-                  Filter by Filing Date
-                </div>
-                <div className="font-sans p-3 space-y-0.5">
-                  {(
-                    ["all", "last30", "last60", "last90", "custom"] as DatePreset[]
-                  ).map((preset) => {
-                    const active = datePreset === preset;
-                    return (
-                      <button
-                        key={preset}
-                        type="button"
-                        onClick={() => handleDatePresetChange(preset)}
-                        className={`flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors ${
-                          active
-                            ? "bg-[#F9B418]/15 text-[#F9B418]"
-                            : theme === "dark"
-                              ? "text-zinc-200 hover:bg-white/5"
-                              : "text-neutral-700 hover:bg-neutral-100"
-                        }`}
-                      >
-                        <span>{DATE_PRESET_LABELS[preset]}</span>
-                        {active && <Check className="h-3.5 w-3.5" />}
-                      </button>
-                    );
-                  })}
-
-                  {datePreset === "custom" && (
-                    <div className="mt-2 space-y-2 border-t pt-3 dark:border-[#cccccc20]">
-                      <div className="space-y-1">
-                        <label
-                          className={`text-xs ${
-                            theme === "dark"
-                              ? "text-neutral-400"
-                              : "text-neutral-500"
-                          }`}
-                        >
-                          From
-                        </label>
-                        <Input
-                          type="date"
-                          value={customFrom}
-                          max={customTo || undefined}
-                          onChange={(e) => {
-                            setCustomFrom(e.target.value);
-                            setCurrentPage(1);
-                          }}
-                          className={`h-8 text-xs ${
-                            theme === "dark"
-                              ? "bg-neutral-950 border-[#cccccc20] text-zinc-200 [color-scheme:dark]"
-                              : "bg-white border-neutral-200 text-neutral-700"
-                          }`}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label
-                          className={`text-xs ${
-                            theme === "dark"
-                              ? "text-neutral-400"
-                              : "text-neutral-500"
-                          }`}
-                        >
-                          To
-                        </label>
-                        <Input
-                          type="date"
-                          value={customTo}
-                          min={customFrom || undefined}
-                          onChange={(e) => {
-                            setCustomTo(e.target.value);
-                            setCurrentPage(1);
-                          }}
-                          className={`h-8 text-xs ${
-                            theme === "dark"
-                              ? "bg-neutral-950 border-[#cccccc20] text-zinc-200 [color-scheme:dark]"
-                              : "bg-white border-neutral-200 text-neutral-700"
-                          }`}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {dateFilterActive && (
-                    <button
-                      type="button"
-                      onClick={clearDateFilter}
-                      className="mt-2 w-full rounded px-2 py-1.5 text-left text-xs text-neutral-400 transition-colors hover:bg-[#F9B418]/10 hover:text-[#F9B418]"
-                    >
-                      Clear date filter
-                    </button>
-                  )}
-                </div>
-              </PopoverContent>
-            </Popover>
+            <DateRangeFilter
+              preset={datePreset}
+              from={customFrom}
+              to={customTo}
+              onPresetChange={handleDatePresetChange}
+              onFromChange={(v) => { setCustomFrom(v); setCurrentPage(1); }}
+              onToChange={(v) => { setCustomTo(v); setCurrentPage(1); }}
+              onClear={clearDateFilter}
+            />
 
             <Popover>
               <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={`shrink-0 gap-1 hover:bg-transparent border h-[42px] rounded hover:border-[#F9B418] ${
-                    theme === "dark"
-                      ? "bg-zinc-900 border-[#cccccc20] hover:bg-zinc-900 hover:border-[#F9B418]/50"
-                      : "hover:text-foreground bg-white text-neutral-700"
-                  }`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className={`mr-1 ${
-                      theme === "dark" ? "text-zinc-200" : "text-neutral-700"
-                    }`}
-                    aria-hidden="true"
-                  >
-                    <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-                    <path d="M9 3v18"></path>
-                    <path d="M15 3v18"></path>
-                  </svg>
-                  <span
-                    className={`font-sans font-normal ${
-                      theme === "dark" ? "text-zinc-200" : "text-neutral-700"
-                    }`}
-                  >
-                    Columns
-                  </span>
-                  <ChevronDown
-                    className={`h-3 w-3 ml-1 ${
-                      theme === "dark" ? "text-zinc-200" : "text-foreground"
-                    }`}
-                  />
-                </Button>
+                <FilterButton icon={<Columns3 />}>Columns</FilterButton>
               </PopoverTrigger>
               <PopoverContent
                 className={`w-[240px] p-0 ${
@@ -2185,32 +1800,7 @@ const PatentsContent = (props: PatentsContentProps) => {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={`shrink-0 gap-1 hover:bg-transparent border h-[42px] rounded hover:border-[#F9B418] ${
-                    theme === "dark"
-                      ? "bg-zinc-900 border-[#cccccc20] hover:bg-zinc-900 hover:border-[#F9B418]/50"
-                      : "hover:text-foreground bg-white text-neutral-700"
-                  }`}
-                >
-                  <ArrowUpDown
-                    className={`h-4 w-4 mr-1 ${
-                      theme == "dark" ? "text-gray-300" : "text-neutral-700"
-                    }`}
-                  />
-                  <span
-                    className={`font-sans font-normal ${
-                      theme === "dark" ? "text-zinc-200" : "text-neutral-700"
-                    }`}
-                  >
-                    Sort
-                  </span>
-                  <ChevronDown
-                    className={`h-3 w-3 ml-1 ${
-                      theme === "dark" ? "text-gray-300" : "text-foreground"
-                    }`}
-                  />
-                </Button>
+                <FilterButton icon={<ArrowUpDown />}>Sort</FilterButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className={`w-[180px] p-2 ${
@@ -2234,46 +1824,22 @@ const PatentsContent = (props: PatentsContentProps) => {
                   }
                   className="w-[180px]"
                 >
-                  <DropdownMenuRadioItem
-                    value="newest"
-                    className={`cursor-pointer font-sans ${
-                      theme === "dark"
-                        ? "text-zinc-200 hover:!text-zinc-200 hover:!bg-transparent focus:!bg-transparent data-[state=checked]:bg-photon-background-light"
-                        : "text-neutral-700 hover:!bg-white hover:!text-neutral-700 hover:bg-photon-background-light hover:text-foreground data-[state=checked]:bg-photon-background-light"
-                    }`}
-                  >
+                  <MenuRadioItem
+                    value="newest">
                     Newest First
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem
-                    value="oldest"
-                    className={`cursor-pointer font-sans ${
-                      theme === "dark"
-                        ? "text-zinc-200 hover:!text-zinc-200 hover:!bg-transparent focus:!bg-transparent data-[state=checked]:bg-photon-background-light"
-                        : "text-neutral-700 hover:!bg-white hover:!text-neutral-700 hover:bg-photon-background-light hover:text-foreground data-[state=checked]:bg-photon-background-light"
-                    }`}
-                  >
+                  </MenuRadioItem>
+                  <MenuRadioItem
+                    value="oldest">
                     Oldest First
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem
-                    value="titleAZ"
-                    className={`cursor-pointer font-sans ${
-                      theme === "dark"
-                        ? "text-zinc-200 hover:!text-zinc-200 hover:!bg-transparent focus:!bg-transparent data-[state=checked]:bg-photon-background-light"
-                        : "text-neutral-700 hover:!bg-white hover:!text-neutral-700 hover:bg-photon-background-light hover:text-foreground data-[state=checked]:bg-photon-background-light"
-                    }`}
-                  >
+                  </MenuRadioItem>
+                  <MenuRadioItem
+                    value="titleAZ">
                     Title (A-Z)
-                  </DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem
-                    value="titleZA"
-                    className={`cursor-pointer font-sans ${
-                      theme === "dark"
-                        ? "text-zinc-200 hover:!text-zinc-200 hover:!bg-transparent focus:!bg-transparent data-[state=checked]:bg-photon-background-light"
-                        : "text-neutral-700 hover:!bg-white hover:!text-neutral-700 hover:bg-photon-background-light hover:text-foreground data-[state=checked]:bg-photon-background-light"
-                    }`}
-                  >
+                  </MenuRadioItem>
+                  <MenuRadioItem
+                    value="titleZA">
                     Title (Z-A)
-                  </DropdownMenuRadioItem>
+                  </MenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -2549,25 +2115,30 @@ const PatentsContent = (props: PatentsContentProps) => {
                                   theme === "dark"
                                     ? "text-neutral-300"
                                     : "text-[#0C0C0C]"
-                                } text-[13px] tabular-nums whitespace-nowrap flex items-center gap-2`}
+                                } text-[13px] tabular-nums whitespace-nowrap flex items-center gap-1.5`}
                               >
-                                                {client.application_number}
+                                {client.application_number}
+                                {/* This filing came from a disclosure on the
+                                    platform — a small population and worth
+                                    saying, since most of the portfolio was
+                                    imported.
+
+                                    A circular ICON beside the number, not a
+                                    "Linked idea" chip on its own row. The chip
+                                    cost a second line in a sticky column that is
+                                    already narrow, and it repeated a word the
+                                    tooltip says better; the mark belongs ON the
+                                    number it qualifies. The tooltip still names
+                                    the idea, because a bare icon tells a reader
+                                    a link exists without telling them to what. */}
+                                {client?.IdeaPatentLink?.[0]?.idea?.id && (
+                                  <LinkedIdeaBadge
+                                    ideaId={client.IdeaPatentLink[0].idea.id}
+                                    ideaTitle={client.IdeaPatentLink[0].idea.title}
+                                    onOpen={(id) => navigate(`/ideas/${id}`)}
+                                  />
+                                )}
                               </span>
-                              {client?.IdeaPatentLink?.[0]?.idea?.id && (
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(
-                                      `/ideas/${client.IdeaPatentLink[0].idea.id}`,
-                                    );
-                                  }}
-                                  className="ml-6 text-left text-xs text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300 truncate"
-                                  title={client.IdeaPatentLink[0].idea.title}
-                                >
-                                  ↳ Linked to idea
-                                </button>
-                              )}
                             </div>
                           </td>
 
