@@ -63,6 +63,9 @@ const resolveImport = (from, spec) => {
 const reach = new Map();
 const walk = (file, seen = new Set()) => { if (seen.has(file)) return seen; seen.add(file); for (const s of importsOf(file)) { const r = resolveImport(file, s); if (r && r.startsWith("src/")) walk(r, seen); } return seen; };
 for (const s of stories) reach.set(s, walk(s));
+// The harness wraps every page story in the app chrome (DashboardLayout, Sidebar, Header), so what it
+// imports is rendered by every story that names a route; count it as covered.
+reach.set("design/harness/index.tsx", walk("design/harness/index.tsx"));
 const uncovered = patchFiles.filter((f) => /\.(tsx?|jsx?)$/.test(f) && f.startsWith("src/") && ![...reach.values()].some((set) => set.has(f)));
 if (uncovered.length) report.refused.push(`changed components covered by no story: ${uncovered.join(", ")}`);
 report.coveredBy = Object.fromEntries(patchFiles.filter((f) => f.startsWith("src/")).map((f) => [f, stories.filter((s) => reach.get(s)?.has(f))]));

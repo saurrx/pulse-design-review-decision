@@ -1,0 +1,189 @@
+{
+  "id": "DSN-0002",
+  "designBase": "15dc92caed19ef397b1d3f1dcd96447db6a4f441",
+  "productionBase": "a14da2ed0707e0be435c67a6e526fe5f7b5c0dd1",
+  "head": "2bc25bc8cfb48282d9eed6b96019c950c98e7fa0",
+  "upstreamHead": "a14da2ed0707e0be435c67a6e526fe5f7b5c0dd1",
+  "classes": {
+    "reviewSupport": [
+      "changes/DSN-0002/README.md",
+      "changes/DSN-0002/shots/after-legacy-reference-screens-dashboard--large-portfolio.png",
+      "changes/DSN-0002/shots/after-legacy-reference-screens-dashboard--legal-counsel.png",
+      "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--data-unavailable.png",
+      "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--empty-portfolio.png",
+      "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--large-aging-queue.png",
+      "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--loading.png",
+      "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--long-titles.png",
+      "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--no-pending-reviews.png",
+      "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--no-submissions-this-quarter.png",
+      "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--one-urgent-review.png",
+      "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--typical.png",
+      "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--width-1280--at-1280x720.png",
+      "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--width-1920--at-1920x1080.png",
+      "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--zoom-200--at-640x360@2.png",
+      "changes/DSN-0002/shots/before-legacy-reference-screens-dashboard--large-portfolio.png",
+      "changes/DSN-0002/shots/before-legacy-reference-screens-dashboard--legal-counsel.png",
+      "design/a11y-baseline.json",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx",
+      "mock/handlers/dashboard.ts",
+      "mock/scenarios/build.ts",
+      "mock/scenarios/v0/index.ts",
+      "mock/scenarios/v0/personas.ts",
+      "qa/conformance/baseline-mock/LEGAL_COUNSEL_actions.json",
+      "qa/conformance/baseline-mock/LEGAL_COUNSEL_due-dates.json",
+      "qa/conformance/baseline-mock/LEGAL_COUNSEL_ideas.json",
+      "qa/conformance/baseline-mock/LEGAL_COUNSEL_index.json",
+      "qa/conformance/baseline-mock/LEGAL_COUNSEL_patents.json",
+      "qa/conformance/baseline-mock/LEGAL_COUNSEL_profile.json",
+      "qa/conformance/baseline-mock/LEGAL_COUNSEL_workspace.json",
+      "qa/conformance/baseline-mock/TECH_COMMITTEE_index.json",
+      "qa/visual/baselines/legacy-reference-screens-dashboard--large-portfolio.png",
+      "qa/visual/baselines/legacy-reference-screens-dashboard--legal-counsel.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--data-unavailable.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--empty-portfolio.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--large-aging-queue.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--loading.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--long-titles.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--no-actions-due.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--no-pending-reviews.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--no-submissions-this-quarter.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--one-urgent-review.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--reduced-motion--at-1440x900.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--single-inventor.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--typical.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--width-1280--at-1280x720.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--width-1366--at-1366x768.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--width-1440--at-1440x900.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--width-1920--at-1920x1080.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--zoom-200--at-640x360@2.png"
+    ],
+    "unclassified": [
+      "design/v0/COVERAGE.md",
+      "design/v0/coverage.json",
+      "mock/proposed-fields.json"
+    ],
+    "portable": [
+      "src/components/DashboardLayout.tsx",
+      "src/components/PatentWorldMap.tsx",
+      "src/components/Sidebar.tsx",
+      "src/components/TopInventors.tsx",
+      "src/components/dashboard/DashboardStats.tsx",
+      "src/components/dashboard/StatStrip.tsx",
+      "src/components/dashboard/WorkspaceAdminOverview.tsx",
+      "src/index.css",
+      "src/pages/Index.tsx"
+    ]
+  },
+  "flags": [
+    "behaviour-impact approval required (fingerprint changed)"
+  ],
+  "refused": [
+    "unclassified paths, add them to tools/design/paths.mjs: design/v0/COVERAGE.md, design/v0/coverage.json, mock/proposed-fields.json",
+    "changed components covered by no story: src/components/DashboardLayout.tsx, src/components/Sidebar.tsx"
+  ],
+  "behaviour": {
+    "src/components/DashboardLayout.tsx": {
+      "permission": {
+        "added": [
+          "title: role === \"INVENTOR\" ? \"Your invention workspace\" : role === \"LEGAL_COUNSEL\" ? \"Overview\" : \"Portfolio overview\","
+        ],
+        "removed": [
+          "title: role === \"INVENTOR\" ? \"Your invention workspace\" : \"Portfolio overview\","
+        ]
+      }
+    },
+    "src/components/TopInventors.tsx": {
+      "props": {
+        "added": [
+          "TopInventorsProps.empty",
+          "TopInventorsProps.error",
+          "TopInventorsProps.loading",
+          "TopInventorsProps.periods",
+          "TopInventorsProps.v0"
+        ],
+        "removed": []
+      }
+    },
+    "src/components/dashboard/WorkspaceAdminOverview.tsx": {
+      "api": {
+        "added": [
+          "GET /api/v1/dashboard",
+          "GET /api/v1/idea/fetch-by-user?page=1&limit=100&status={x}",
+          "GET /api/v1/idea/pipeline"
+        ],
+        "removed": []
+      },
+      "queryKeys": {
+        "added": [
+          "\"dashboard\",scope",
+          "\"dashboard_ideas\",scope,false",
+          "\"dashboard_pipeline\",scope"
+        ],
+        "removed": []
+      },
+      "navigation": {
+        "added": [
+          "/ideas/${id}",
+          "/ideas?search=${encodeURIComponent(e.name)}",
+          "/ideas?status=${REVIEW_STATUS}",
+          "/patents?jurisdiction=${encodeURIComponent(j)}",
+          "/patents?status=ACTIVE_GRANTED",
+          "/workspace"
+        ],
+        "removed": []
+      },
+      "vocabulary": {
+        "added": [
+          "FILED",
+          "SEND_TO_OC",
+          "SENT_TO_IHC",
+          "UNDER_REVIEW"
+        ],
+        "removed": []
+      }
+    },
+    "src/pages/Index.tsx": {
+      "vocabulary": {
+        "added": [
+          "LEGAL_COUNSEL"
+        ],
+        "removed": []
+      },
+      "permission": {
+        "added": [
+          "if (user?.role === \"LEGAL_COUNSEL\") return <WorkspaceAdminOverview />;"
+        ],
+        "removed": []
+      }
+    }
+  },
+  "coveredBy": {
+    "src/components/DashboardLayout.tsx": [],
+    "src/components/PatentWorldMap.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/Sidebar.tsx": [],
+    "src/components/TopInventors.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/dashboard/DashboardStats.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/dashboard/StatStrip.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/dashboard/WorkspaceAdminOverview.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/index.css": [],
+    "src/pages/Index.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ]
+  }
+}
