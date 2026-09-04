@@ -24,7 +24,7 @@ Excluded from V0 everywhere: world map, checkout, purchasing, billing, price sel
 | Ideas list | Inventor, Workspace Admin, Case Owner, Photon Admin | `/ideas` | 8 | 11 | none |  |
 | Idea detail and status | Inventor, Workspace Admin, Case Owner, Photon Admin | `/ideas/:id` | 6 | 17 | conceptual |  |
 | Review decision | Workspace Admin | `/ideas/:id` | 3 | 12 | none |  |
-| Workspace Admin dashboard | Workspace Admin | `/` | 4 | 8 | unwired |  |
+| Workspace Admin dashboard | Workspace Admin | `/` | 10 | 17 | conceptual | DSN-0002 |
 | Patent portfolio | Inventor, Workspace Admin, Case Owner, Photon Admin | `/patents` | 7 | 12 | none |  |
 | Patent detail | Inventor, Workspace Admin, Case Owner, Photon Admin | `/patents/:patentId` | 6 | 15 | unwired |  |
 | Actions | Workspace Admin, Case Owner, Photon Admin | `/due-dates`, `/actions` | 5 | 14 | none |  |
@@ -35,7 +35,7 @@ Excluded from V0 everywhere: world map, checkout, purchasing, billing, price sel
 | Photon Admin dashboard | Photon Admin | `/` | 3 | 9 | unwired |  |
 | Authentication and access | Inventor, Workspace Admin, Case Owner, Photon Admin | `/login`, `/signup`, `/i/:inviteCode`, `/invite`, `/forgot-password`, `/reset-password`, `/auth/saml/callback` | 3 | 11 | none |  |
 
-17 surfaces, 200 intended stories, 10 V0 scenarios; backend impact conceptual on 2, unwired on 7, none on 8.
+17 surfaces, 209 intended stories, 17 V0 scenarios; backend impact conceptual on 3, unwired on 6, none on 8.
 
 ## Inventor home
 
@@ -151,19 +151,19 @@ Brief: `product-context/surfaces/review-decision.md` · Storybook title: `Surfac
 
 ## Workspace Admin dashboard
 
-Brief: `product-context/surfaces/workspace-admin-dashboard.md` · Storybook title: `Surfaces/Workspace Admin dashboard` · DSN: none yet
+Brief: `product-context/surfaces/workspace-admin-dashboard.md` · Storybook title: `Surfaces/Workspace Admin dashboard` · DSN: DSN-0002
 
 - **Personas:** Workspace Admin
 - **User goal:** Clear the review queue and understand whether the invention program is moving.
 - **Business goal:** Reduce submission-to-decision time and increase ideas sent to Photon.
 - **Routes:** `/` (Workspace Admin)
-- **Required scenarios:** `v0/workspace-admin/queue`, `v0/workspace-admin/empty`, `v0/shape/slow`, `v0/shape/failure`
-- **States:** loading — needs-your-review list first; empty — no pending reviews; no recent ideas; no inventors yet; success — pending reviews oldest first with days waiting, pipeline, momentum, compact portfolio summary; error — data unavailable; the review list still loads independently; permission — not applicable
-- **Surface-specific states:** no-pending-reviews, one-urgent-review, large-aging-queue, no-recent-ideas, healthy-growth, declining-submissions, data-unavailable
+- **Required scenarios:** `v0/workspace-admin/queue`, `v0/workspace-admin/empty`, `v0/workspace-admin/one-urgent-review`, `v0/workspace-admin/large-aging-queue`, `v0/workspace-admin/no-actions-due`, `v0/workspace-admin/quiet-quarter`, `v0/workspace-admin/empty-portfolio`, `v0/workspace-admin/single-inventor`, `v0/workspace-admin/long-titles`, `v0/shape/slow`
+- **States:** loading — stat strip skeleton at final size, then the queue; the map loads last; empty — no pending reviews; no Actions due; no submissions this quarter; empty portfolio; one inventor; success — five scoped stat boxes (awaiting review with oldest wait, Actions due in 30 days, submitted this quarter with delta, total patents, granted), Patents worldwide, Top inventors by period, Review Inventor Ideas oldest first, Idea pipeline; error — overview numbers unavailable with retry; the queue still loads independently; permission — Workspace Admin only; dates appear only in the Actions box
+- **Surface-specific states:** typical, no-pending-reviews, one-urgent-review, large-aging-queue, no-actions-due, no-submissions-this-quarter, empty-portfolio, single-inventor, long-titles, loading, data-unavailable, widths, zoom-200, reduced-motion
 - **Navigation badge:** none
-- **Backend impact:** unwired — Pipeline counts exist; a submissions and filings trend by period is not exposed today.
-- **Intended story ids:** `surfaces-workspace-admin-dashboard--no-pending-reviews`, `surfaces-workspace-admin-dashboard--one-urgent-review`, `surfaces-workspace-admin-dashboard--large-aging-queue`, `surfaces-workspace-admin-dashboard--no-recent-ideas`, `surfaces-workspace-admin-dashboard--healthy-growth`, `surfaces-workspace-admin-dashboard--declining-submissions`, `surfaces-workspace-admin-dashboard--data-unavailable`, `surfaces-workspace-admin-dashboard--loading`
-- **Excluded here:** world map, cost analytics, aggregate metrics before pending reviews
+- **Backend impact:** conceptual — BF-5: GET /v1/dashboard needs workspace-scoped aggregates (awaiting review and oldest wait, Actions due in 30 days and next date, submissions per calendar quarter with the prior-quarter delta, patents filed this quarter, patents by jurisdiction, top inventors per period), each exposing the filter its number links to. Pipeline counts and patent totals exist today.
+- **Intended story ids:** `surfaces-workspace-admin-dashboard--typical`, `surfaces-workspace-admin-dashboard--no-pending-reviews`, `surfaces-workspace-admin-dashboard--one-urgent-review`, `surfaces-workspace-admin-dashboard--large-aging-queue`, `surfaces-workspace-admin-dashboard--no-actions-due`, `surfaces-workspace-admin-dashboard--no-submissions-this-quarter`, `surfaces-workspace-admin-dashboard--empty-portfolio`, `surfaces-workspace-admin-dashboard--single-inventor`, `surfaces-workspace-admin-dashboard--long-titles`, `surfaces-workspace-admin-dashboard--loading`, `surfaces-workspace-admin-dashboard--data-unavailable`, `surfaces-workspace-admin-dashboard--width-1280`, `surfaces-workspace-admin-dashboard--width-1366`, `surfaces-workspace-admin-dashboard--width-1440`, `surfaces-workspace-admin-dashboard--width-1920`, `surfaces-workspace-admin-dashboard--zoom-200`, `surfaces-workspace-admin-dashboard--reduced-motion`
+- **Excluded here:** cost analytics, aggregate metrics before pending reviews, cumulative ideas and filings chart, portfolio donut, not-yet-active list and nudge, due-dates timeline
 
 ## Patent portfolio
 

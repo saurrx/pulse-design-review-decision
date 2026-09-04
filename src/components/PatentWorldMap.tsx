@@ -375,6 +375,12 @@ const PatentWorldMap = (props: any) => {
 
   const { isPatentDialogOpen, setIsPatentDialogOpen } = props;
   const mapHeight = Number(props.height) || 480;
+  // DSN-0002 (Workspace Admin dashboard): a title and subtitle that state the
+  // total, a jurisdiction list as the text alternative, and country clicks
+  // that open the Patent Portfolio for that jurisdiction.
+  const v0 = props.v0 as
+    | { title: string; subtitle: string; onOpenJurisdiction?: (jurisdiction: string) => void; heading?: "h2" | "h3" }
+    | undefined;
 
   const { isFetching: isFetchingPatents, data: patentData } = useQuery({
     queryKey: ["patents", user?.client_id],
@@ -585,20 +591,32 @@ const PatentWorldMap = (props: any) => {
           } pt-6 px-6`}
         >
           <div>
-            <h3
-              className={`font-sans text-[15px] font-semibold tracking-[-0.01em] ${
-                theme === "dark" ? "text-white" : "text-neutral-900"
-              }`}
-            >
-              Patent World Map
-            </h3>
+            {v0?.heading === "h2" ? (
+              <h2 className="font-sans text-[16px] font-semibold leading-5 tracking-[-0.015em] text-[var(--pulse-ink)]">{v0.title}</h2>
+            ) : (
+              <h3
+                className={`font-sans text-[15px] font-semibold tracking-[-0.01em] ${
+                  theme === "dark" ? "text-white" : "text-neutral-900"
+                }`}
+              >
+                {v0?.title ?? "Patent World Map"}
+              </h3>
+            )}
             <p
               className={`mt-1 font-sans text-xs label-muted ${
                 theme === "dark" ? "text-zinc-400" : "text-neutral-500"
               }`}
             >
-              Global patent distribution by country
+              {v0?.subtitle ?? "Global patent distribution by country"}
             </p>
+            {v0 && (
+              <ul className="sr-only" aria-label="Patents by jurisdiction">
+                {countriesWithPatents.map((c: any) => (
+                  <li key={c.id}>{c.country} {c.granted + c.pending}</li>
+                ))}
+                {countriesWithPatents.length === 0 && <li>No patents added yet</li>}
+              </ul>
+            )}
           </div>
           <div
             className={`inline-flex overflow-hidden rounded-lg border ${
@@ -749,6 +767,11 @@ const PatentWorldMap = (props: any) => {
                               strokeWidth={stat ? 0.8 : 0.5}
                               tabIndex={-1}
                               className="rsm-geography"
+                              onClick={() => {
+                                if (!stat || !v0?.onOpenJurisdiction) return;
+                                const iso2 = Object.entries(ISO2_TO_ISO3).find(([, iso3]) => iso3 === geo.properties?.iso_code)?.[0];
+                                v0.onOpenJurisdiction((iso2 ?? String(geo.properties?.iso_code ?? "")).toUpperCase());
+                              }}
                               onMouseEnter={(e: React.MouseEvent) => {
                                 if (!stat) return;
                                 if (
@@ -799,8 +822,8 @@ const PatentWorldMap = (props: any) => {
                 {/* Base layer: no data message */}
                 {countriesWithPatents.length === 0 && (
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="text-photon-gray-600 text-lg">
-                      No patent data available
+                    <div className={v0 ? "text-[13px] text-[var(--pulse-ink-muted)]" : "text-photon-gray-600 text-lg"}>
+                      {v0 ? "No patents added yet" : "No patent data available"}
                     </div>
                   </div>
                 )}

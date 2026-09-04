@@ -14,6 +14,27 @@
       "type": "string (request body of POST /v1/ideas)",
       "finding": "BF-1",
       "reason": "A Workspace Admin selects the real primary inventor when starting an idea on their behalf. Requires idea:create and idea:submit for LEGAL_COUNSEL, which GRANTS does not carry today."
+    },
+    {
+      "entity": "Dashboard",
+      "field": "workspace",
+      "type": "object (GET /v1/dashboard, V0 scenarios only)",
+      "finding": "BF-5",
+      "reason": "Workspace-scoped aggregates for the Workspace Admin dashboard (DSN-0002): awaiting_review, oldest_waiting_days, actions_due_30_days, next_action_due_at, submitted_this_quarter, submitted_last_quarter, quarter_start, quarter_end, patents_filed_this_quarter. Each number links to a filtered list; the backend must expose the same filter parameters so the link lands on the identical list. Nothing is counted in the browser from a paged list."
+    },
+    {
+      "entity": "Dashboard",
+      "field": "top_inventors",
+      "type": "{ this_quarter: Row[]; all_time: Row[] } where Row = { id, name, ideas, patents } (GET /v1/dashboard, V0 scenarios only)",
+      "finding": "BF-5",
+      "reason": "Top inventors by ideas submitted and by patents filed, per period, for the Workspace Admin dashboard (DSN-0002 founder override keeps the ranking). Names only, never identifiers to the reader."
+    },
+    {
+      "entity": "Dashboard",
+      "field": "patents_by_jurisdiction",
+      "type": "Array<{ jurisdiction, count }> (GET /v1/dashboard, V0 scenarios only)",
+      "finding": "BF-5",
+      "reason": "The jurisdiction list that is the text alternative of the Patents worldwide panel and the subtitle's jurisdiction count (DSN-0002)."
     }
   ],
   "collections": [

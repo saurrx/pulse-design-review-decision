@@ -86,6 +86,19 @@
     }
   }
 
+  /* A one-time entrance for dashboard numbers: transform only, no fade, so
+     contrast is final from the first frame. Static under reduced motion. */
+  @keyframes pulse-rise {
+    from { transform: translateY(6px); }
+    to { transform: translateY(0); }
+  }
+  .pulse-rise {
+    animation: pulse-rise 240ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pulse-rise { animation: none; }
+  }
+
   :focus-visible {
     outline: 2px solid var(--pulse-focus);
     outline-offset: 2px;

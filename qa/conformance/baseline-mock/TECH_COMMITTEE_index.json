@@ -20,7 +20,7 @@
     "button:filed #",
     "button:go to overview",
     "button:granted #",
-    "button:ideas",
+    "button:ideas+pressed",
     "button:list",
     "button:low-latency torque estimation from motor back-emf ripple daniel osei - /# waiting #d",
     "button:modular gripper fingers with swappable compliant pads priya raman # /# waiting #d",
@@ -315,7 +315,7 @@
       "textAlign": "left",
       "textTransform": "none"
     },
-    "button:ideas": {
+    "button:ideas+pressed": {
       "alignItems": "center",
       "backgroundColor": "rgb(255, 255, 255)",
       "borderBottomWidth": "0px",
@@ -328,7 +328,7 @@
       "fontFamily": "Schibsted Grotesk",
       "fontSize": "13px",
       "fontStyle": "normal",
-      "fontWeight": "500",
+      "fontWeight": "600",
       "gap": "6px",
       "justifyContent": "center",
       "letterSpacing": "normal",

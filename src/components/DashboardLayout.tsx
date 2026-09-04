@@ -18,7 +18,7 @@ const defaultHeaderForRoute = (
 ): DashboardHeaderConfig => {
   if (pathname === "/") {
     return {
-      title: role === "INVENTOR" ? "Your invention workspace" : "Portfolio overview",
+      title: role === "INVENTOR" ? "Your invention workspace" : role === "LEGAL_COUNSEL" ? "Overview" : "Portfolio overview",
     };
   }
   if (pathname === "/clients") return { title: "Clients" };

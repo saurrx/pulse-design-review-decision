@@ -34,7 +34,23 @@ type TopInventorsProps = {
   /** Inventors/teams with zero submissions across all history (up to 3 shown). */
   notYetActive?: QuietInventor[];
   onNudge?: (inventor: QuietInventor) => void;
+  /**
+   * DSN-0002, the Workspace Admin dashboard: rows per period with a period
+   * selector that defaults to this quarter (matching the stat strip), the
+   * Ideas | Patents toggle stated by weight, underline and aria-pressed, and
+   * an empty state that points at Workspace › People.
+   */
+  v0?: {
+    periods: { thisQuarter: InventorEntry[]; allTime: InventorEntry[] };
+    empty: { text: string; linkLabel: string; onLink: () => void };
+    /** The ranking has not arrived, or failed: never the empty copy. */
+    loading?: boolean;
+    error?: { onRetry: () => void };
+  };
 };
+
+type Period = "thisQuarter" | "allTime";
+const PERIOD_LABEL: Record<Period, string> = { thisQuarter: "This quarter", allTime: "All time" };
 
 const NUMS: React.CSSProperties = { fontVariantNumeric: "tabular-nums" };
 
@@ -52,11 +68,14 @@ const TopInventors = ({
   onOpenInventor,
   notYetActive = [],
   onNudge,
+  v0,
 }: TopInventorsProps) => {
   const { user } = useUserCookie();
   const navigate = useNavigate();
   const isOC = isOutsideCounselRole(user?.role);
-  const hasToggle = !!entries && !isOC;
+  const [period, setPeriod] = React.useState<Period>("thisQuarter");
+  const rows = v0 ? v0.periods[period] : entries;
+  const hasToggle = !!rows && !isOC;
 
   const [metric, setMetric] = React.useState<Metric>(() => {
     try {
@@ -86,24 +105,30 @@ const TopInventors = ({
   };
 
   const ranked = React.useMemo(() => {
-    if (!entries) return [];
-    return entries
+    if (!rows) return [];
+    return rows
       .filter((e) => e[metric] > 0)
       .sort((a, b) => b[metric] - a[metric])
       .slice(0, 5);
-  }, [entries, metric]);
+  }, [rows, metric]);
 
   return (
     <div className={`${PRODUCT_CARD_CLASS} flex h-full min-h-[320px] flex-col`}>
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className={PRODUCT_CARD_TITLE_CLASS}>
-            {isOC ? "Top Clients" : "Top Inventors"}
-          </div>
+      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+        <div className="min-w-0">
+          {v0 ? (
+            <h2 className={PRODUCT_CARD_TITLE_CLASS}>Top inventors</h2>
+          ) : (
+            <div className={PRODUCT_CARD_TITLE_CLASS}>
+              {isOC ? "Top Clients" : "Top Inventors"}
+            </div>
+          )}
           <div className={PRODUCT_CARD_DESCRIPTION_CLASS}>
-            {hasToggle
-              ? SUBTITLES[metric]
-              : subtitle ?? (isOC ? "By patent count" : "By ideas · All time")}
+            {v0
+              ? `${metric === "ideas" ? "Ideas submitted" : "Patents filed"} · ${PERIOD_LABEL[period]}`
+              : hasToggle
+                ? SUBTITLES[metric]
+                : subtitle ?? (isOC ? "By patent count" : "By ideas · All time")}
           </div>
         </div>
         {hasToggle && (
@@ -111,10 +136,12 @@ const TopInventors = ({
             {(["ideas", "patents"] as Metric[]).map((m) => (
               <button
                 key={m}
+                type="button"
+                aria-pressed={metric === m}
                 onClick={() => pickMetric(m)}
                 className={`${PRODUCT_SEGMENTED_ITEM_CLASS} capitalize ${
                   metric === m
-                    ? "bg-white text-[var(--pulse-ink)] shadow-sm"
+                    ? "bg-white font-semibold text-[var(--pulse-ink)] underline decoration-[var(--pulse-brand)] decoration-2 underline-offset-4 shadow-sm"
                     : "text-[var(--pulse-ink-muted)] hover:text-[var(--pulse-ink)]"
                 }`}
               >
@@ -133,6 +160,20 @@ const TopInventors = ({
         )}
       </div>
 
+      {v0 && (
+        <label className="mt-3 flex items-center justify-between gap-2 border-t border-[var(--pulse-line)] pt-3 text-xs text-[var(--pulse-ink-muted)]">
+          <span>Period</span>
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value as Period)}
+            className="h-8 rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-2 text-xs font-medium text-[var(--pulse-ink-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)]"
+          >
+            <option value="thisQuarter">This quarter</option>
+            <option value="allTime">All time</option>
+          </select>
+        </label>
+      )}
+
       {/* No inner scroll: the card is a leaderboard, and a five-row list that
           scrolls inside a fixed card is a list you cannot see. Both branches
           cap at five, and long names truncate rather than pushing the count
@@ -140,20 +181,22 @@ const TopInventors = ({
       <div className="mt-2 flex min-h-0 flex-col justify-start overflow-hidden">
         {hasToggle ? (
           <>
-            {ranked.map((e, index) => (
+            {!(v0?.loading || v0?.error) && ranked.map((e, index) => (
               <button
                 key={e.id ?? e.name}
+                type="button"
                 onClick={() => onOpenInventor?.(e)}
+                aria-label={`${index + 1}. ${e.name}, ${e[metric]} ${metric}`}
                 className={`group flex min-h-14 w-full items-center justify-between gap-3 rounded-lg py-2 text-left transition-colors hover:bg-[var(--pulse-surface-subtle)] ${
                   index > 0 ? "border-t border-[var(--pulse-line)]" : ""
                 }`}
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[var(--pulse-surface-subtle)] text-xs font-semibold text-[var(--pulse-ink-muted)]" style={NUMS}>
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[var(--pulse-surface-subtle)] text-xs font-semibold text-[var(--pulse-ink-muted)]" style={NUMS} aria-hidden="true">
                     {index + 1}
                   </span>
                   <div className="min-w-0">
-                    <div className="truncate text-[13px] font-medium text-[var(--pulse-ink-secondary)] group-hover:text-[var(--pulse-ink)]">
+                    <div className="truncate text-[13px] font-medium text-[var(--pulse-ink-secondary)] group-hover:text-[var(--pulse-ink)]" title={e.name}>
                       {e.name}
                     </div>
                   </div>
@@ -166,7 +209,26 @@ const TopInventors = ({
                 </span>
               </button>
             ))}
-            {ranked.length === 0 && (
+            {v0?.loading && (
+              <div className="mt-2 flex flex-col gap-3" role="status" aria-busy="true" aria-label="Loading top inventors">
+                {[0, 1, 2].map((k) => <div key={k} className="h-9 animate-pulse rounded-md bg-[var(--pulse-surface-subtle)]" />)}
+              </div>
+            )}
+            {v0?.error && !v0.loading && (
+              <div role="status" className="flex flex-col items-start gap-2 py-6 text-[13px] text-[var(--pulse-ink-muted)]">
+                <span>Could not load top inventors.</span>
+                <button type="button" onClick={v0.error.onRetry} className="rounded-lg border border-[var(--pulse-line)] px-2.5 py-1 text-[12px] font-semibold text-[var(--pulse-ink)] hover:bg-[var(--pulse-surface-subtle)]">Retry</button>
+              </div>
+            )}
+            {ranked.length === 0 && v0 && !v0.loading && !v0.error && (
+              <div className="flex flex-col items-center gap-1.5 py-6 text-center text-[13px] text-[var(--pulse-ink-muted)]">
+                <span>{v0.empty.text}</span>
+                <button type="button" onClick={v0.empty.onLink} className="font-medium text-[var(--pulse-ink-secondary)] underline underline-offset-2 hover:text-[var(--pulse-ink)]">
+                  {v0.empty.linkLabel}
+                </button>
+              </div>
+            )}
+            {ranked.length === 0 && !v0 && (
               <div className="py-6 text-center text-[13px] text-[var(--pulse-ink-muted)]">
                 No {metric} yet.
               </div>

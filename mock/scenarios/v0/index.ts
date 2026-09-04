@@ -39,6 +39,54 @@ const northwind = (): IdeaSpec[] => [
   { invention: 12, author: U.inventor, state: "DRAFT", ageDays: 2, completion: 100, evaluation: { state: "SUCCEEDED", score: 66 } },
   { invention: 13, author: U.coinventor, state: "DRAFT", ageDays: 1, completion: 0 },
   { invention: 14, author: U.inventor, state: "DRAFT", ageDays: 1, completion: 100 },
+  // The oldest wait in the queue, past the 30-day aging threshold (DSN-0002).
+  { invention: 15, author: U.coinventor, state: "LEGAL_REVIEW", ageDays: 56, evaluation: { state: "SUCCEEDED", score: 81 } },
+];
+
+/* ---- Workspace Admin dashboard states (product-context/surfaces/workspace-admin-dashboard.md, DSN-0002) ---- */
+
+const LONG_TITLE = "Self-calibrating multi-axis interferometric displacement sensor with thermally compensated reference cavity for in-line metrology of large precision components";
+
+/** One idea waiting past the aging threshold, everything else decided. */
+const oneUrgentReview = (): IdeaSpec[] => [
+  { invention: 0, author: U.inventor, coInventors: [U.coinventor], state: "LEGAL_REVIEW", ageDays: 41, evaluation: { state: "SUCCEEDED", score: 74 } },
+  { invention: 8, author: U.inventor, state: "SENT_TO_PHOTON", ageDays: 12, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 81 } },
+  { invention: 10, author: U.coinventor, state: "FILED", ageDays: 140, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 77 } },
+  { invention: 7, author: U.coinventor, state: "REJECTED", ageDays: 45, reviewer: U.admin2, comment: "The mechanism was shown at a trade fair more than a year ago." },
+];
+
+/** Forty ideas waiting, ages spread from two days to ten weeks; several past the threshold. */
+const largeAgingQueue = (): IdeaSpec[] => Array.from({ length: 40 }, (_, k) => ({
+  invention: k, author: k % 3 === 0 ? U.coinventor : U.inventor, coInventors: k % 5 === 0 ? [U.coinventor] : undefined,
+  state: "LEGAL_REVIEW" as const, ageDays: 2 + Math.round((k * 68) / 39),
+  evaluation: k % 4 === 3 ? undefined : { state: "SUCCEEDED" as const, score: 35 + ((k * 17) % 60) },
+}));
+
+/** Nothing submitted this calendar quarter; four were submitted last quarter. Two of those are still waiting. */
+const quietQuarter = (): IdeaSpec[] => [
+  { invention: 3, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 70, evaluation: { state: "SUCCEEDED", score: 58 } },
+  { invention: 4, author: U.coinventor, state: "LEGAL_REVIEW", ageDays: 81 },
+  { invention: 8, author: U.inventor, state: "SENT_TO_PHOTON", ageDays: 75, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 81 } },
+  { invention: 10, author: U.inventor, state: "FILED", ageDays: 88, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 77 } },
+  { invention: 9, author: U.coinventor, state: "FILED", ageDays: 160, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 69 } },
+];
+
+/** One inventor is the whole program so far. */
+const singleInventor = (): IdeaSpec[] => [
+  { invention: 0, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 4, evaluation: { state: "SUCCEEDED", score: 74 } },
+  { invention: 2, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 11 },
+  { invention: 8, author: U.inventor, state: "SENT_TO_PHOTON", ageDays: 20, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 81 } },
+  { invention: 10, author: U.inventor, state: "FILED", ageDays: 140, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 77 } },
+];
+
+/** 120-character titles and a long inventor name in the queue and the ranking. */
+const longTitles = (): IdeaSpec[] => [
+  { invention: 0, author: U.longNameInventor, coInventors: [U.inventor], state: "LEGAL_REVIEW", ageDays: 34, title: LONG_TITLE, evaluation: { state: "SUCCEEDED", score: 74 } },
+  { invention: 1, author: U.longNameInventor, state: "LEGAL_REVIEW", ageDays: 9, title: `${LONG_TITLE.slice(0, 60)} (variant B, revised after the encoder trial)`, evaluation: { state: "SUCCEEDED", score: 62 } },
+  { invention: 2, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 6, title: LONG_TITLE.replace("multi-axis", "dual-axis") },
+  { invention: 3, author: U.coinventor, state: "LEGAL_REVIEW", ageDays: 2, evaluation: { state: "SUCCEEDED", score: 23 } },
+  { invention: 8, author: U.longNameInventor, state: "SENT_TO_PHOTON", ageDays: 15, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 81 } },
+  { invention: 10, author: U.longNameInventor, state: "FILED", ageDays: 140, reviewer: U.admin, title: LONG_TITLE, evaluation: { state: "SUCCEEDED", score: 77 } },
 ];
 
 /** The idea at index `at` becomes a resubmission: a changes-requested round before the current review, revision 2. */
@@ -54,10 +102,10 @@ function resubmitted(name: string, d: Data, at: number) {
   idea.revision = 2;
 }
 
-function northwindBuild(name: string, portfolios: Record<string, ReturnType<typeof portfolio>> = SMALL): Data {
+function northwindBuild(name: string, portfolios: Record<string, ReturnType<typeof portfolio>> = SMALL, ideas: IdeaSpec[] = northwind()): Data {
   const rng = rngFor(name);
   const d = emptyDataV0();
-  buildIdeas(rng, NORTHWIND, northwind(), d, 1);
+  buildIdeas(rng, NORTHWIND, ideas, d, 1);
   resubmitted(name, d, 2);
   d.portfolios = portfolios;
   seedOperations(rng, d);
@@ -86,6 +134,30 @@ const workspaceAdminQueue = v0("v0/workspace-admin/queue", "Workspace Admin queu
 const workspaceAdminEmpty = v0("v0/workspace-admin/empty", "New workspace at Beacon, no inventors yet",
   "Elin Sørensen's workspace six weeks in: no inventors, no ideas, a small imported portfolio, the activation emails that follow from that state.",
   U.beaconAdmin.email, [U.beaconAdmin.email, U.caseOwner.email], () => { const d = emptyDataV0(); d.portfolios = SMALL; seedOperations(rngFor("v0/workspace-admin/empty"), d, { requestsPerClient: 2 }); return d; });
+
+/* Workspace Admin dashboard states. Each is Northwind with a different shape of program. */
+const ADMIN = [U.admin.email, U.admin2.email, U.inventor.email];
+const oneUrgent = v0("v0/workspace-admin/one-urgent-review", "One idea waiting past the aging threshold",
+  "A single idea has waited 41 days for a decision; everything else in the program is decided. The dashboard's one-urgent-review state.",
+  U.admin.email, ADMIN, () => northwindBuild("v0/workspace-admin/one-urgent-review", SMALL, oneUrgentReview()));
+const largeQueue = v0("v0/workspace-admin/large-aging-queue", "Forty ideas waiting, several past the threshold",
+  "A large aging queue: forty ideas awaiting review with waits from two days to ten weeks. The dashboard shows six and links to the rest.",
+  U.admin.email, ADMIN, () => northwindBuild("v0/workspace-admin/large-aging-queue", SMALL, largeAgingQueue()));
+const noActionsDue = v0("v0/workspace-admin/no-actions-due", "Nothing due in the next 30 days",
+  "Northwind's queue with a portfolio that has no upcoming due dates: the Actions box reads none due.",
+  U.admin.email, ADMIN, () => northwindBuild("v0/workspace-admin/no-actions-due", { [NORTHWIND.id]: portfolio(180, "northwind-v1", NORTHWIND, 0), [BEACON.id]: SMALL[BEACON.id] }));
+const quiet = v0("v0/workspace-admin/quiet-quarter", "No submissions this quarter",
+  "Nothing was submitted this calendar quarter and four were submitted last quarter: a declining program. Top inventors has nobody this quarter.",
+  U.admin.email, ADMIN, () => northwindBuild("v0/workspace-admin/quiet-quarter", SMALL, quietQuarter()));
+const emptyPortfolio = v0("v0/workspace-admin/empty-portfolio", "No patents added yet",
+  "Northwind's idea program is running but no patent data has been added: the portfolio boxes read zero and the map has no markers.",
+  U.admin.email, ADMIN, () => northwindBuild("v0/workspace-admin/empty-portfolio", { [NORTHWIND.id]: portfolio(0, "northwind-none", NORTHWIND), [BEACON.id]: SMALL[BEACON.id] }));
+const single = v0("v0/workspace-admin/single-inventor", "One inventor is the whole program",
+  "Every idea so far comes from one inventor: Top inventors has one row.",
+  U.admin.email, ADMIN, () => northwindBuild("v0/workspace-admin/single-inventor", SMALL, singleInventor()));
+const longTitleIdeas = v0("v0/workspace-admin/long-titles", "Long titles and a long inventor name",
+  "Idea titles of 120 characters and a five-word inventor name in the queue, the ranking and the pipeline.",
+  U.admin.email, [U.admin.email, U.longNameInventor.email, U.inventor.email], () => northwindBuild("v0/workspace-admin/long-titles", SMALL, longTitles()));
 
 const caseOwnerMyWork = v0("v0/case-owner/my-work", "Case Owner with two assigned clients",
   "Devika Nair covers Northwind and, since five days, Beacon: an idea newly sent to Photon Legal, urgent Actions and dates, Beacon's onboarding incomplete. Jonas Weber has no assigned client yet.",
@@ -116,6 +188,6 @@ const authFailures = v0("v0/auth/failures", "Authentication failures",
   "The only V0 scenario that returns 401 on purpose: invalid login, expired session with a failed refresh, revoked access, SSO failure, unknown domain at signup.",
   U.admin.email, [U.admin.email], () => { const d = emptyDataV0({ authFails: true }); d.portfolios = SMALL; return d; });
 
-export const V0_SCENARIOS: Record<string, ScenarioDef> = Object.fromEntries([inventorFirstRun, inventorPortfolio, workspaceAdminQueue, workspaceAdminEmpty, caseOwnerMyWork, photonAdminFirm, large, failure, slow, authFailures].map((s) => [s.name, s]));
+export const V0_SCENARIOS: Record<string, ScenarioDef> = Object.fromEntries([inventorFirstRun, inventorPortfolio, workspaceAdminQueue, workspaceAdminEmpty, oneUrgent, largeQueue, noActionsDue, quiet, emptyPortfolio, single, longTitleIdeas, caseOwnerMyWork, photonAdminFirm, large, failure, slow, authFailures].map((s) => [s.name, s]));
 export const DEFAULT_V0_SCENARIO = workspaceAdminQueue.name;
 export { ORBITAL };

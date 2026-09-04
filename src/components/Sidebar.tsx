@@ -100,7 +100,8 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
     return [
       { label: "Overview", path: "/", icon: LayoutDashboard },
       {
-        label: "Review queue",
+        // DSN-0002 founder decision: the queue is "Review Inventor Ideas".
+        label: "Review Inventor Ideas",
         path: "/ideas",
         icon: ClipboardCheck,
         badge: reviewCount,

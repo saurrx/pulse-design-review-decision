@@ -40,7 +40,7 @@
     "link:open full record for moisture-cured adhesive with delayed tack for panel assembly",
     "link:overview",
     "link:patents",
-    "link:review queue #",
+    "link:review inventor ideas #",
     "link:workspace",
     "list:",
     "listitem:<data>",
@@ -669,7 +669,7 @@
       "textAlign": "start",
       "textTransform": "none"
     },
-    "link:review queue #": {
+    "link:review inventor ideas #": {
       "alignItems": "center",
       "backgroundColor": "rgb(250, 250, 250)",
       "borderBottomWidth": "0px",

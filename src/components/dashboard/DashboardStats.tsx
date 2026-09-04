@@ -381,12 +381,24 @@ const IdeaPipeline = ({
   onClientSelectionChange,
   hasError = false,
   onRetry,
+  periodLabel,
+  oldestWaitingDays,
+  heading = "div",
+  loading = false,
 }: {
   submitted: number;
   reviewPending: number;
   sentToOC: number;
   filed: number;
   granted: number;
+  /** DSN-0002: the window the stages count, shown beside the title ("All time"). */
+  periodLabel?: string;
+  /** DSN-0002: the sublabel under Review pending, "oldest waiting 56d". */
+  oldestWaitingDays?: number | null;
+  /** DSN-0002: render the title as a section heading. */
+  heading?: "div" | "h2";
+  /** DSN-0002: the counts have not arrived; skeleton rows, never zeros. */
+  loading?: boolean;
   /** The numbers did not arrive. Renders a stated failure, never zeros. */
   hasError?: boolean;
   onRetry?: () => void;
@@ -399,9 +411,9 @@ const IdeaPipeline = ({
   selectedClientIds?: string[] | null;
   onClientSelectionChange?: (clientIds: string[] | null) => void;
 }) => {
-  const stages = [
+  const stages: Array<{ key: string; label: string; count: number; color: string; sub?: string }> = [
     { key: "submitted", label: "Submitted", count: submitted, color: "var(--pulse-data-primary)" },
-    { key: "review", label: "Review Pending", count: reviewPending, color: "var(--pl-amber)" },
+    { key: "review", label: heading === "h2" ? "Review pending" : "Review Pending", count: reviewPending, color: "var(--pl-amber)", sub: oldestWaitingDays ? `oldest waiting ${oldestWaitingDays}d` : undefined },
     { key: "sent_to_oc", label: "Sent to Photon Legal", count: sentToOC, color: "var(--pulse-data-ai)" },
     { key: "filed", label: "Filed", count: filed, color: "var(--pulse-data-cyan)" },
     { key: "granted", label: "Granted", count: granted, color: "var(--pulse-data-success)" },
@@ -444,9 +456,14 @@ const IdeaPipeline = ({
     <div className={`${CARD_CLASS} flex h-full min-h-[320px] flex-col`}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <StatLabel>{title}</StatLabel>
+          {heading === "h2" ? <h2 className={PRODUCT_CARD_TITLE_CLASS}>{title}</h2> : <StatLabel>{title}</StatLabel>}
           <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">Ideas by stage</p>
         </div>
+        {periodLabel && (
+          <span className="inline-flex h-8 items-center rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-2.5 text-xs font-medium text-[var(--pulse-ink-secondary)]" title="The window these counts cover">
+            {periodLabel}
+          </span>
+        )}
         {clientOptions.length > 1 && onClientSelectionChange && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -491,6 +508,11 @@ const IdeaPipeline = ({
           </DropdownMenu>
         )}
       </div>
+      {loading ? (
+        <div className="mt-5 flex flex-1 flex-col justify-between gap-3" role="status" aria-busy="true" aria-label="Loading the pipeline">
+          {stages.map((s) => <div key={s.key} className="h-8 animate-pulse rounded-md bg-[var(--pulse-surface-subtle)]" />)}
+        </div>
+      ) : (
       <div className="mt-5 flex flex-1 flex-col justify-between">
         {stages.map((s, i) => {
           const inner = (
@@ -502,6 +524,9 @@ const IdeaPipeline = ({
                 </span>
                 <span className="text-base font-semibold text-[var(--pulse-ink)]" style={NUMS}>{s.count}</span>
               </span>
+              {s.sub && (
+                <span className="mt-0.5 block text-xs text-[var(--pulse-ink-muted)]" style={NUMS}>{s.sub}</span>
+              )}
               <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-[var(--pulse-surface-subtle)]">
                 <span
                   className="block h-full rounded-full transition-[width]"
@@ -532,6 +557,7 @@ const IdeaPipeline = ({
           );
         })}
       </div>
+      )}
     </div>
   );
 };
@@ -571,6 +597,7 @@ const NeedsReview = ({
   waitingLabel = "waiting",
   hasError = false,
   onRetry,
+  v0,
 }: {
   /** Ideas waiting on the viewer, oldest first. */
   rows: ReviewQueueRow[];
@@ -592,13 +619,28 @@ const NeedsReview = ({
   actionLabel?: string;
   showScore?: boolean;
   waitingLabel?: string;
+  /**
+   * The Workspace Admin queue of DSN-0002: titled "Review Inventor Ideas", six
+   * rows then "Review all", age as "56d" and red only past the aging threshold
+   * (with the word "waiting" so colour never carries it alone), a dash with
+   * accessible text for an unevaluated idea, the caught-up state's own copy.
+   */
+  v0?: {
+    /** The rows have not arrived yet: skeleton rows, never the caught-up copy. */
+    loading?: boolean;
+    /** Days after which a wait is overdue. */
+    agingThresholdDays: number;
+    /** Copy for an empty queue, and where its link goes. */
+    empty: { text: string; linkLabel?: string; to?: string };
+    onEmptyLink?: () => void;
+  };
 }) => {
   const oldestWait = Math.max(0, ...rows.map((row) => row.waitingDays));
   // The card sits in a fixed-height dashboard row beside the pipeline. Rendering
   // every queued idea stretched it — 124 rows tall on a real workspace — which
   // dragged the whole grid row with it and distorted the pipeline next to it.
   // Show a card's worth and let the overflow row carry the rest.
-  const VISIBLE_ROWS = 5;
+  const VISIBLE_ROWS = v0 ? 6 : 5;
   const visibleRows = rows.slice(0, VISIBLE_ROWS);
   const hiddenCount = rows.length - visibleRows.length;
   const rowColumns = showScore
@@ -607,19 +649,21 @@ const NeedsReview = ({
 
   return (
   <div className={`${CARD_CLASS} relative flex h-full min-h-[320px] flex-col overflow-hidden`}>
-    <span
+    {!v0 && <span
       className="absolute inset-x-0 top-0 h-[3px]"
       style={{
         background:
           "linear-gradient(90deg, var(--pulse-data-accent) 0 34%, var(--pulse-data-risk) 34% 52%, var(--pulse-data-ai) 52% 70%, var(--pulse-data-cyan) 70% 84%, var(--pulse-data-success) 84% 100%)",
       }}
       aria-hidden="true"
-    />
+    />}
     <div className="flex items-start justify-between gap-5 border-b border-[var(--pulse-line)] pb-4">
       <div>
-        <StatLabel>{title === "Needs your review" ? "Review queue" : title}</StatLabel>
+        {v0 ? <h2 className={PRODUCT_CARD_TITLE_CLASS}>{title}</h2> : <StatLabel>{title === "Needs your review" ? "Review queue" : title}</StatLabel>}
         <p className="mt-1 flex flex-wrap items-center gap-x-2 text-xs text-[var(--pulse-ink-muted)]">
-          {hasError ? <span>Not loaded</span> : (<>
+          {hasError ? <span>Not loaded</span> : v0 ? (
+            <span>{v0.loading ? "Loading" : `${rows.length} awaiting decision`}</span>
+          ) : (<>
             <span>{rows.length} awaiting decision</span>
             <span aria-hidden="true">·</span>
             <span>Oldest {oldestWait > 0 ? `${oldestWait}d` : "—"}</span>
@@ -640,6 +684,25 @@ const NeedsReview = ({
     {hasError ? (
       // Never "all caught up" for a request that failed.
       <CardError onRetry={onRetry} label="Could not load the review queue." />
+    ) : v0?.loading ? (
+      <div className="mt-3 flex flex-1 flex-col gap-3" role="status" aria-busy="true" aria-label="Loading the queue">
+        {[0, 1, 2, 3].map((k) => (
+          <div key={k} className="h-9 animate-pulse rounded-md bg-[var(--pulse-surface-subtle)]" />
+        ))}
+      </div>
+    ) : rows.length === 0 && v0 ? (
+      <div className="flex flex-1 flex-col items-center justify-center gap-2 py-6 text-center">
+        <div className="text-[15px] font-semibold text-[var(--pulse-ink)]">{v0.empty.text}</div>
+        {v0.empty.linkLabel && (
+          <button
+            type="button"
+            onClick={v0.onEmptyLink}
+            className="text-[13px] font-medium text-[var(--pulse-ink-secondary)] underline underline-offset-2 hover:text-[var(--pulse-ink)]"
+          >
+            {v0.empty.linkLabel}
+          </button>
+        )}
+      </div>
     ) : rows.length === 0 ? (
       <div className="flex flex-1 flex-col items-center justify-center gap-1 py-6 text-center">
         <div className="text-base font-semibold text-[#0C0C0C]">
@@ -648,6 +711,63 @@ const NeedsReview = ({
         <div className="text-xs text-[#727272]">
           {laterCount} idea{laterCount === 1 ? "" : "s"} in later stages
         </div>
+      </div>
+    ) : v0 ? (
+      <div className="mt-2 flex flex-1 flex-col">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="text-left text-xs font-medium text-[var(--pulse-ink-muted)]">
+              <th scope="col" className="px-3 pb-1 pt-1 font-medium">Ideas</th>
+              <th scope="col" className="w-[140px] px-3 pb-1 pt-1 font-medium">Inventor</th>
+              <th scope="col" className="w-[64px] px-3 pb-1 pt-1 text-right font-medium">Score</th>
+              <th scope="col" className="w-[104px] px-3 pb-1 pt-1 text-right font-medium">Age</th>
+            </tr>
+          </thead>
+          <tbody>
+            {visibleRows.map((r) => {
+              const overdue = r.waitingDays > v0.agingThresholdDays;
+              return (
+                <tr
+                  key={r.id}
+                  className="cursor-pointer border-t border-[var(--pulse-line)] transition-colors hover:bg-[var(--pulse-surface-subtle)] focus-within:bg-[var(--pulse-surface-subtle)]"
+                  onClick={() => onOpen(r.id)}
+                >
+                  <td className="max-w-0 px-3 py-2.5">
+                    <a
+                      href="#"
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); onOpen(r.id); }}
+                      className="block min-h-6 truncate text-[13px] font-medium text-[var(--pulse-ink)] no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)] focus-visible:ring-offset-1"
+                      title={r.title}
+                    >
+                      {r.title}
+                    </a>
+                  </td>
+                  <td className="max-w-0 truncate px-3 py-2.5 text-xs text-[var(--pulse-ink-secondary)]" title={r.secondary}>{r.secondary}</td>
+                  <td className="px-3 py-2.5 text-right text-[13px] text-[var(--pulse-ink)]" style={NUMS}>
+                    {typeof r.score === "number" ? (
+                      <span className="font-semibold">{(r.score / 10).toFixed(1)}</span>
+                    ) : (
+                      <><span aria-hidden="true">—</span><span className="sr-only">Not evaluated</span></>
+                    )}
+                  </td>
+                  <td className={`whitespace-nowrap px-3 py-2.5 text-right text-xs ${overdue ? "font-semibold text-[var(--pl-red-text)]" : "text-[var(--pulse-ink-muted)]"}`} style={NUMS}>
+                    {overdue ? <>{r.waitingDays}d <span className="font-normal">waiting</span></> : `${r.waitingDays}d`}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {hiddenCount > 0 && (
+          <button
+            type="button"
+            onClick={onViewAll ?? onReviewAll ?? (() => onOpen(rows[0].id))}
+            className="mt-auto flex w-full items-center justify-between gap-3 rounded-lg border-t border-[var(--pulse-line)] px-3 py-2.5 text-left text-[13px] font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:bg-[var(--pulse-surface-subtle)]"
+          >
+            <span style={NUMS}>{hiddenCount} more waiting</span>
+            <span className="text-xs text-[var(--pulse-ink-muted)]">Review all →</span>
+          </button>
+        )}
       </div>
     ) : (
       <div className="mt-2 flex flex-1 flex-col">

@@ -20,10 +20,22 @@ import { useTheme } from "@/hooks/useTheme";
 import { toast } from "@/lib/toast";
 import { motion } from "framer-motion";
 import { isOutsideCounselRole } from "@/lib/roleAccess";
+import WorkspaceAdminOverview from "../components/dashboard/WorkspaceAdminOverview";
 
 const DAY_MS = 86400000;
 
+/**
+ * The dashboard at "/". A Workspace Admin (LEGAL_COUNSEL in the backend's
+ * vocabulary) gets the V0 Overview of DSN-0002; every other role keeps the
+ * composition below. Branching in a wrapper keeps each body's hook order fixed.
+ */
 const Index = () => {
+  const { user } = useUserCookie();
+  if (user?.role === "LEGAL_COUNSEL") return <WorkspaceAdminOverview />;
+  return <LegacyIndex />;
+};
+
+const LegacyIndex = () => {
   const { theme } = useTheme();
   const { user } = useUserCookie();
   const navigate = useNavigate();

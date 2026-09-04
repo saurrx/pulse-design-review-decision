@@ -59,7 +59,7 @@
     "link:actions",
     "link:overview",
     "link:patents",
-    "link:review queue #",
+    "link:review inventor ideas #",
     "link:workspace",
     "list:",
     "listitem:<data>",
@@ -746,7 +746,7 @@
       "textAlign": "start",
       "textTransform": "none"
     },
-    "link:review queue #": {
+    "link:review inventor ideas #": {
       "alignItems": "center",
       "backgroundColor": "rgba(0, 0, 0, 0)",
       "borderBottomWidth": "0px",

@@ -38,6 +38,8 @@ export const V0_USERS = {
   // Inventors at Northwind
   inventor: user("inventor@northwind.test", "Anika Sharma", "INVENTOR", NORTHWIND, { country_code: "DE", country_name: "Germany" }),
   coinventor: user("coinventor@northwind.test", "Mateo Ruiz", "INVENTOR", NORTHWIND),
+  /** Long-content states: a legally long name that must truncate without losing the count. */
+  longNameInventor: user("longname@northwind.test", "Rosalind Kowalczyk-Vanderberg de la Fuente Aldana", "INVENTOR", NORTHWIND),
   newInventor: user("new.inventor@northwind.test", "Ines Duarte", "INVENTOR", NORTHWIND, { last_login_at: clock.hoursAgo(1), created_at: clock.daysAgo(2) }),
   invitedInventor: user("invited@northwind.test", "Kwame Mensah", "INVENTOR", NORTHWIND, { status: "INVITED", last_login_at: null, created_at: clock.daysAgo(3) }),
   suspendedInventor: user("former@northwind.test", "Ivan Novak", "INVENTOR", NORTHWIND, { status: "SUSPENDED", last_login_at: clock.daysAgo(90) }),

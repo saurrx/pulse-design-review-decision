@@ -19,6 +19,8 @@ export type IdeaSpec = {
   completion?: number;       // for drafts: 0..100
   /** V0: the Workspace Admin who submitted on behalf of the author (proposed field submitted_by_id). */
   submittedBy?: User;
+  /** Overrides the invention's title; for long-content states. */
+  title?: string;
 };
 
 export type Data = Omit<Db, "scenario" | "seedVersion">;
@@ -41,7 +43,7 @@ export function buildIdeas(rng: Rng, client: Client, specs: IdeaSpec[], data: Da
     const created = clock.daysAgo(spec.ageDays + 2);
     const submitted = spec.state === "DRAFT" ? null : clock.daysAgo(spec.ageDays);
     const idea: Idea = {
-      id: ideaId, client_id: client.id, author_id: spec.author.id, submitted_by_id: spec.submittedBy?.id ?? null, title: inv.title,
+      id: ideaId, client_id: client.id, author_id: spec.author.id, submitted_by_id: spec.submittedBy?.id ?? null, title: spec.title ?? inv.title,
       body: i % 3 === 0 ? `A short inventor-written summary of ${inv.title.toLowerCase()}.` : null,
       reference: `${client.idea_reference_prefix}-${String(seq).padStart(4, "0")}`, reference_seq: seq,
       state: spec.state, revision: 1, submitted_at: submitted, created_at: created, updated_at: clock.daysAgo(Math.max(0, spec.ageDays - 1)),
