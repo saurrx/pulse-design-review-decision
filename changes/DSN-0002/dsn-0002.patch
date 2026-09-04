@@ -12,7 +12,7 @@ index 4fbb77a80556f75b3a240d29fba7a5f006df4ca1..be7d6d345ab038a12c5fb1003c3e9211
    }
    if (pathname === "/clients") return { title: "Clients" };
 diff --git a/src/components/PatentWorldMap.tsx b/src/components/PatentWorldMap.tsx
-index a44c28c2f45dbd8a4d5944565d3530b051e37ffc..9b1edfd61dae546ebde9a9b777ca42f8221b3ef0 100644
+index a44c28c2f45dbd8a4d5944565d3530b051e37ffc..064ae3ebd0b1f9f16bc9934361086a9531b85281 100644
 --- a/src/components/PatentWorldMap.tsx
 +++ b/src/components/PatentWorldMap.tsx
 @@ -375,6 +375,12 @@ const PatentWorldMap = (props: any) => {
@@ -28,7 +28,7 @@ index a44c28c2f45dbd8a4d5944565d3530b051e37ffc..9b1edfd61dae546ebde9a9b777ca42f8
  
    const { isFetching: isFetchingPatents, data: patentData } = useQuery({
      queryKey: ["patents", user?.client_id],
-@@ -585,20 +591,32 @@ const PatentWorldMap = (props: any) => {
+@@ -585,20 +591,35 @@ const PatentWorldMap = (props: any) => {
            } pt-6 px-6`}
          >
            <div>
@@ -58,18 +58,21 @@ index a44c28c2f45dbd8a4d5944565d3530b051e37ffc..9b1edfd61dae546ebde9a9b777ca42f8
 -              Global patent distribution by country
 +              {v0?.subtitle ?? "Global patent distribution by country"}
              </p>
-+            {v0 && (
-+              <ul className="sr-only" aria-label="Patents by jurisdiction">
-+                {countriesWithPatents.map((c: any) => (
-+                  <li key={c.id}>{c.country} {c.granted + c.pending}</li>
-+                ))}
-+                {countriesWithPatents.length === 0 && <li>No patents added yet</li>}
-+              </ul>
++            {v0 && countriesWithPatents.length > 0 && (
++              // The text alternative to the map: the same counts as a list, one line until opened.
++              <details className="mt-1 font-sans text-xs text-[var(--pulse-ink-muted)]">
++                <summary className="cursor-pointer select-none hover:text-[var(--pulse-ink)]">By jurisdiction</summary>
++                <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5" aria-label="Patents by jurisdiction">
++                  {[...countriesWithPatents].sort((a: any, b: any) => (b.granted + b.pending) - (a.granted + a.pending)).map((c: any) => (
++                    <li key={c.id} className="text-[var(--pulse-ink-secondary)]">{c.country} <span className="font-semibold text-[var(--pulse-ink)]">{c.granted + c.pending}</span></li>
++                  ))}
++                </ul>
++              </details>
 +            )}
            </div>
            <div
              className={`inline-flex overflow-hidden rounded-lg border ${
-@@ -749,6 +767,11 @@ const PatentWorldMap = (props: any) => {
+@@ -749,6 +770,11 @@ const PatentWorldMap = (props: any) => {
                                strokeWidth={stat ? 0.8 : 0.5}
                                tabIndex={-1}
                                className="rsm-geography"
@@ -81,7 +84,7 @@ index a44c28c2f45dbd8a4d5944565d3530b051e37ffc..9b1edfd61dae546ebde9a9b777ca42f8
                                onMouseEnter={(e: React.MouseEvent) => {
                                  if (!stat) return;
                                  if (
-@@ -799,8 +822,8 @@ const PatentWorldMap = (props: any) => {
+@@ -799,8 +825,8 @@ const PatentWorldMap = (props: any) => {
                  {/* Base layer: no data message */}
                  {countriesWithPatents.length === 0 && (
                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -283,7 +286,7 @@ index 21dcc32e3c5cd916e9ebcbc33a5510ba1d0feed3..d5bb5e24c47ced4115527233058b4745
                  No {metric} yet.
                </div>
 diff --git a/src/components/dashboard/DashboardStats.tsx b/src/components/dashboard/DashboardStats.tsx
-index 8c4fa9837f1bf4a03d8d6396de612ffd198fd247..da8b9884a524ae2e57d9c129251286ab0b2d5d20 100644
+index 8c4fa9837f1bf4a03d8d6396de612ffd198fd247..245fd9409be445f2977b941ad544843fa31c29bf 100644
 --- a/src/components/dashboard/DashboardStats.tsx
 +++ b/src/components/dashboard/DashboardStats.tsx
 @@ -381,12 +381,24 @@ const IdeaPipeline = ({
@@ -498,7 +501,7 @@ index 8c4fa9837f1bf4a03d8d6396de612ffd198fd247..da8b9884a524ae2e57d9c129251286ab
 +                    {typeof r.score === "number" ? (
 +                      <span className="font-semibold">{(r.score / 10).toFixed(1)}</span>
 +                    ) : (
-+                      <><span aria-hidden="true">—</span><span className="sr-only">Not evaluated</span></>
++                      <span role="img" aria-label="Not evaluated">—</span>
 +                    )}
 +                  </td>
 +                  <td className={`whitespace-nowrap px-3 py-2.5 text-right text-xs ${overdue ? "font-semibold text-[var(--pl-red-text)]" : "text-[var(--pulse-ink-muted)]"}`} style={NUMS}>
@@ -525,7 +528,7 @@ index 8c4fa9837f1bf4a03d8d6396de612ffd198fd247..da8b9884a524ae2e57d9c129251286ab
          <div className={`grid ${rowColumns} gap-3 px-3 pb-1 pt-1 text-xs font-medium text-[var(--pulse-ink-muted)]`}>
 diff --git a/src/components/dashboard/StatStrip.tsx b/src/components/dashboard/StatStrip.tsx
 new file mode 100644
-index 0000000000000000000000000000000000000000..015e5fd3c4f7aa5ab3bc6f49b8311c0ac08435f4
+index 0000000000000000000000000000000000000000..2e2e7f18e57987db8ae2b573d67d49fd7777fffb
 --- /dev/null
 +++ b/src/components/dashboard/StatStrip.tsx
 @@ -0,0 +1,109 @@
@@ -599,16 +602,16 @@ index 0000000000000000000000000000000000000000..015e5fd3c4f7aa5ab3bc6f49b8311c0a
 +      to={box.to}
 +      title={box.title}
 +      aria-label={spoken(box)}
-+      className="group relative flex h-full min-h-[108px] flex-col overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-4 pb-4 pt-5 no-underline transition-colors hover:bg-[var(--pulse-surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pulse-canvas)]"
++      className="group relative flex h-full min-h-[132px] flex-col overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-5 pb-5 pt-6 no-underline transition-colors hover:bg-[var(--pulse-surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pulse-canvas)]"
 +    >
 +      <span className="absolute inset-x-0 top-0 h-[3px]" style={{ background: RULE[box.rule] }} aria-hidden="true" />
 +      <span className="truncate text-[var(--pulse-ink-muted)]" style={LABEL}>
 +        {box.label}
 +      </span>
-+      <span className="mt-2 block text-[var(--pulse-ink)]" style={VALUE}>
++      <span className="mt-3 block text-[var(--pulse-ink)]" style={VALUE}>
 +        {box.value === null ? <span aria-hidden="true">—</span> : box.value}
 +      </span>
-+      <span className="mt-1.5 block text-[var(--pulse-ink-secondary)]" style={QUALIFIER}>
++      <span className="mt-2 block text-[var(--pulse-ink-secondary)]" style={QUALIFIER}>
 +        {box.qualifier}
 +      </span>
 +    </Link>
@@ -640,7 +643,7 @@ index 0000000000000000000000000000000000000000..015e5fd3c4f7aa5ab3bc6f49b8311c0a
 +export default StatStrip;
 diff --git a/src/components/dashboard/WorkspaceAdminOverview.tsx b/src/components/dashboard/WorkspaceAdminOverview.tsx
 new file mode 100644
-index 0000000000000000000000000000000000000000..76bfacbba7727dee4e8e76f0c549d1e281a3a143
+index 0000000000000000000000000000000000000000..bca65c8fcb1d40e2dc4048e559c2ec840d09adc0
 --- /dev/null
 +++ b/src/components/dashboard/WorkspaceAdminOverview.tsx
 @@ -0,0 +1,277 @@
@@ -819,7 +822,7 @@ index 0000000000000000000000000000000000000000..76bfacbba7727dee4e8e76f0c549d1e2
 +  const strip = isDashboardLoading && !unavailable ? (
 +    <section aria-label="Overview" aria-busy="true" className="flex flex-col gap-4 xl:grid xl:grid-cols-5">
 +      {[0, 1, 2, 3, 4].map((k) => (
-+        <div key={k} className="min-h-[108px] animate-pulse rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)]" />
++        <div key={k} className="min-h-[132px] animate-pulse rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)]" />
 +      ))}
 +    </section>
 +  ) : (

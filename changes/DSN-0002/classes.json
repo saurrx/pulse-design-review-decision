@@ -2,13 +2,14 @@
   "id": "DSN-0002",
   "designBase": "649b06b3a4a3bfc53bee00458545806af4681eed",
   "productionBase": "a14da2ed0707e0be435c67a6e526fe5f7b5c0dd1",
-  "head": "af94defdcd4142c0f253d4ce74f5c0d31f001900",
+  "head": "d05019dfb7daf17567e60a7a0b958ad211ef5c59",
   "upstreamHead": "a14da2ed0707e0be435c67a6e526fe5f7b5c0dd1",
   "classes": {
     "reviewSupport": [
       "changes/DSN-0002/README.md",
       "changes/DSN-0002/classes.json",
       "changes/DSN-0002/dsn-0002.patch",
+      "changes/DSN-0002/gates.txt",
       "changes/DSN-0002/shots/after-legacy-reference-screens-dashboard--large-portfolio.png",
       "changes/DSN-0002/shots/after-legacy-reference-screens-dashboard--legal-counsel.png",
       "changes/DSN-0002/shots/after-surfaces-workspace-admin-dashboard--data-unavailable.png",
