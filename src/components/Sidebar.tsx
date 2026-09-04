@@ -15,7 +15,6 @@ import {
   UsersRound,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ROLE_LABEL } from "@/lib/roles";
 import { useQuery } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { toast } from "@/lib/toast";
@@ -84,9 +83,9 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
     // The committee reviews and passes to legal counsel — same working view as
     // counsel, but no workspace administration, so Profile instead of Settings.
     return [
-      { label: "Overview", path: "/", icon: LayoutDashboard },
+      { label: "Home", path: "/", icon: LayoutDashboard },
       {
-        label: "Review queue",
+        label: "Ideas",
         path: "/ideas",
         icon: ClipboardCheck,
         badge: reviewCount,
@@ -98,10 +97,9 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
 
   if (role === "LEGAL_COUNSEL") {
     return [
-      { label: "Overview", path: "/", icon: LayoutDashboard },
+      { label: "Home", path: "/", icon: LayoutDashboard },
       {
-        // DSN-0002 founder decision: the queue is "Review Inventor Ideas".
-        label: "Review Inventor Ideas",
+        label: "Ideas",
         path: "/ideas",
         icon: ClipboardCheck,
         badge: reviewCount,
@@ -335,16 +333,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[var(--pulse-surface-subtle)] text-xs font-semibold text-[var(--pulse-ink)]">
                 {initials(user?.name, user?.email)}
               </span>
-              {!collapsed && (
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">
-                    {user?.name || user?.email}
-                  </span>
-                  <span className="block truncate text-xs text-[var(--pulse-ink-muted)]">
-                    {role ? ROLE_LABEL[role] ?? "Member" : "Member"}
-                  </span>
-                </span>
-              )}
+              {!collapsed && <span className="min-w-0 flex-1 truncate text-sm font-semibold">{user?.name || user?.email}</span>}
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent

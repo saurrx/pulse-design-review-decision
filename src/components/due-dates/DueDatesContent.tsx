@@ -95,14 +95,17 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
   initialView = "list",
   onHeaderStateChange,
 }) => {
+  const initialParams = useMemo(() => new URLSearchParams(window.location.search), []);
+  const initialSearch = initialParams.get("search") ?? "";
+  const focusedApplication = initialParams.get("focus");
   const isMobile = useIsMobile();
   const [viewType, setViewType] = useState<DueDatesViewType>(initialView);
   const [rowHeight, setRowHeight] = useState<string>("medium");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>(initialSearch);
   // The search term now reaches the API, so the query key needs to settle
   // rather than fire once per keystroke. The INPUT stays instant; only the
   // request waits.
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>(initialSearch.trim());
   useEffect(() => {
     const t = setTimeout(() => setSearchTerm(searchQuery.trim()), 350);
     return () => clearTimeout(t);
@@ -255,6 +258,14 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
   });
 
   const dueDatesTotal = Number(dueDatesData?.pagination?.total) || 0;
+
+  useEffect(() => {
+    if (!focusedApplication || !dueDatesData?.data?.length) return;
+    const frame = requestAnimationFrame(() => {
+      document.querySelector('[data-deadline-focus="true"]')?.scrollIntoView({ block: "center" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [dueDatesData, focusedApplication]);
 
   useEffect(() => {
     onHeaderStateChange?.({
@@ -1696,8 +1707,13 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                     >
                       {dueDatesData?.data?.map((client: any, index: number) => (
                         <tr
-                          key={index}
+                          key={client.id ?? index}
+                          data-deadline-focus={focusedApplication && client.patent?.application_number === focusedApplication ? "true" : undefined}
                           className={`border-b transition-colors ${
+                            focusedApplication && client.patent?.application_number === focusedApplication
+                              ? "bg-[var(--pulse-brand-soft)]"
+                              : ""
+                          } ${
                             theme === "dark"
                               ? "border-neutral-900 hover:bg-white/[0.02]"
                               : "border-neutral-200 hover:bg-neutral-50"

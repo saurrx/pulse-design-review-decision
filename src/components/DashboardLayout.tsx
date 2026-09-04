@@ -55,7 +55,7 @@ const defaultHeaderForRoute = (
     return {
       title:
         role === "LEGAL_COUNSEL" || role === "TECH_COMMITTEE"
-          ? "Review queue"
+          ? "Ideas"
           : role === "INVENTOR"
             ? "My ideas"
             : "Ideas",
@@ -68,13 +68,10 @@ const defaultHeaderForRoute = (
     };
   }
   if (pathname === "/patents") return { title: "Patents" };
-  if (pathname === "/due-dates") return { title: "Actions" };
-  // Both pages are titled "Actions", and that is not a collision: no role has
-  // both in its nav. Client-side roles reach /due-dates through "Actions";
-  // Photon-side roles reach /actions through their single "Actions" item, and
-  // this queue IS their action list. Titling it "Operations" contradicted the
-  // nav item they arrived through, which is the confusion the earlier comment
-  // here was trying to prevent.
+  if (pathname === "/due-dates") return { title: role === "LEGAL_COUNSEL" ? "Deadlines" : "Actions" };
+  // Photon-side roles reach /actions through "Actions". The Workspace Admin
+  // reaches /due-dates through "Deadlines"; legacy committee navigation keeps
+  // its existing "Actions" label.
   if (pathname === "/actions") return { title: "Actions" };
   if (pathname === "/assistant") return { title: "AI assistant" };
   if (pathname === "/profile") return { title: "My profile" };

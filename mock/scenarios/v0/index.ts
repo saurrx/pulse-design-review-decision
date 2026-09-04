@@ -2,6 +2,7 @@ import type { ScenarioDef } from "../../runtime/types";
 import { uuid } from "../../runtime/prng";
 import { clock } from "../../runtime/clock";
 import { buildIdeas, emptyData, portfolio, rngFor, seedOperations, type Data, type IdeaSpec } from "../build";
+import { generatePortfolio } from "../portfolio";
 import { BEACON, NORTHWIND, ORBITAL, V0_ACCESS, V0_ALL_USERS, V0_CLIENTS, V0_USERS as U } from "./personas";
 import { outboxFor } from "./emails";
 
@@ -26,19 +27,19 @@ const LARGE = { [NORTHWIND.id]: portfolio(14356, "northwind-large", NORTHWIND, 0
 const northwind = (): IdeaSpec[] => [
   { invention: 0, author: U.inventor, coInventors: [U.coinventor], state: "LEGAL_REVIEW", ageDays: 1, evaluation: { state: "SUCCEEDED", score: 74 } },
   { invention: 1, author: U.coinventor, state: "LEGAL_REVIEW", ageDays: 3, submittedBy: U.admin, evaluation: { state: "SUCCEEDED", score: 62 } },
-  { invention: 2, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 6 },
+  { invention: 2, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 6, evaluation: { state: "SUCCEEDED", score: 68 } },
   { invention: 3, author: U.coinventor, state: "LEGAL_REVIEW", ageDays: 12, evaluation: { state: "SUCCEEDED", score: 23 } },
   { invention: 4, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 19, evaluation: { state: "PARTIAL", score: 58 } },
-  { invention: 5, author: U.coinventor, state: "LEGAL_REVIEW", ageDays: 33, evaluation: { state: "RUNNING" } },
-  { invention: 6, author: U.inventor, state: "CHANGES_REQUESTED", ageDays: 9, reviewer: U.admin, comment: "Please add the measured drift figures from the encoder test so the novelty is supported by data." },
-  { invention: 7, author: U.coinventor, state: "REJECTED", ageDays: 45, reviewer: U.admin2, comment: "The mechanism was shown at a trade fair more than a year ago; the overlay alone is not distinguishing." },
-  { invention: 8, author: U.inventor, state: "SENT_TO_PHOTON", ageDays: 1, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 81 } },
-  { invention: 9, author: U.coinventor, state: "SENT_TO_PHOTON", ageDays: 38, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 69 } },
+  { invention: 5, author: U.coinventor, state: "LEGAL_REVIEW", ageDays: 33, evaluation: { state: "SUCCEEDED", score: 71 } },
+  { invention: 6, author: U.inventorPriya, state: "CHANGES_REQUESTED", ageDays: 9, reviewer: U.admin, comment: "Please add the measured drift figures from the encoder test so the novelty is supported by data." },
+  { invention: 7, author: U.inventorLucas, state: "REJECTED", ageDays: 45, reviewer: U.admin2, comment: "The mechanism was shown at a trade fair more than a year ago; the overlay alone is not distinguishing." },
+  { invention: 8, author: U.inventorHana, state: "SENT_TO_PHOTON", ageDays: 1, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 81 } },
+  { invention: 9, author: U.inventorPriya, state: "SENT_TO_PHOTON", ageDays: 38, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 69 } },
   { invention: 10, author: U.inventor, state: "FILED", ageDays: 140, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 77 } },
   { invention: 11, author: U.inventor, state: "DRAFT", ageDays: 4, completion: 40 },
   { invention: 12, author: U.inventor, state: "DRAFT", ageDays: 2, completion: 100, evaluation: { state: "SUCCEEDED", score: 66 } },
   { invention: 13, author: U.coinventor, state: "DRAFT", ageDays: 1, completion: 0 },
-  { invention: 14, author: U.inventor, state: "DRAFT", ageDays: 1, completion: 100 },
+  { invention: 14, author: U.inventor, state: "DRAFT", ageDays: 1, completion: 100, evaluation: { state: "RUNNING" } },
   // The oldest wait in the queue, past the 30-day aging threshold (DSN-0002).
   { invention: 15, author: U.coinventor, state: "LEGAL_REVIEW", ageDays: 56, evaluation: { state: "SUCCEEDED", score: 81 } },
 ];
@@ -59,13 +60,13 @@ const oneUrgentReview = (): IdeaSpec[] => [
 const largeAgingQueue = (): IdeaSpec[] => Array.from({ length: 40 }, (_, k) => ({
   invention: k, author: k % 3 === 0 ? U.coinventor : U.inventor, coInventors: k % 5 === 0 ? [U.coinventor] : undefined,
   state: "LEGAL_REVIEW" as const, ageDays: 2 + Math.round((k * 68) / 39),
-  evaluation: k % 4 === 3 ? undefined : { state: "SUCCEEDED" as const, score: 35 + ((k * 17) % 60) },
+  evaluation: { state: "SUCCEEDED" as const, score: 35 + ((k * 17) % 60) },
 }));
 
 /** Nothing submitted this calendar quarter; four were submitted last quarter. Two of those are still waiting. */
 const quietQuarter = (): IdeaSpec[] => [
   { invention: 3, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 70, evaluation: { state: "SUCCEEDED", score: 58 } },
-  { invention: 4, author: U.coinventor, state: "LEGAL_REVIEW", ageDays: 81 },
+  { invention: 4, author: U.coinventor, state: "LEGAL_REVIEW", ageDays: 81, evaluation: { state: "SUCCEEDED", score: 64 } },
   { invention: 8, author: U.inventor, state: "SENT_TO_PHOTON", ageDays: 75, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 81 } },
   { invention: 10, author: U.inventor, state: "FILED", ageDays: 88, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 77 } },
   { invention: 9, author: U.coinventor, state: "FILED", ageDays: 160, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 69 } },
@@ -74,7 +75,7 @@ const quietQuarter = (): IdeaSpec[] => [
 /** One inventor is the whole program so far. */
 const singleInventor = (): IdeaSpec[] => [
   { invention: 0, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 4, evaluation: { state: "SUCCEEDED", score: 74 } },
-  { invention: 2, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 11 },
+  { invention: 2, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 11, evaluation: { state: "SUCCEEDED", score: 68 } },
   { invention: 8, author: U.inventor, state: "SENT_TO_PHOTON", ageDays: 20, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 81 } },
   { invention: 10, author: U.inventor, state: "FILED", ageDays: 140, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 77 } },
 ];
@@ -83,7 +84,7 @@ const singleInventor = (): IdeaSpec[] => [
 const longTitles = (): IdeaSpec[] => [
   { invention: 0, author: U.longNameInventor, coInventors: [U.inventor], state: "LEGAL_REVIEW", ageDays: 34, title: LONG_TITLE, evaluation: { state: "SUCCEEDED", score: 74 } },
   { invention: 1, author: U.longNameInventor, state: "LEGAL_REVIEW", ageDays: 9, title: `${LONG_TITLE.slice(0, 60)} (variant B, revised after the encoder trial)`, evaluation: { state: "SUCCEEDED", score: 62 } },
-  { invention: 2, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 6, title: LONG_TITLE.replace("multi-axis", "dual-axis") },
+  { invention: 2, author: U.inventor, state: "LEGAL_REVIEW", ageDays: 6, title: LONG_TITLE.replace("multi-axis", "dual-axis"), evaluation: { state: "SUCCEEDED", score: 68 } },
   { invention: 3, author: U.coinventor, state: "LEGAL_REVIEW", ageDays: 2, evaluation: { state: "SUCCEEDED", score: 23 } },
   { invention: 8, author: U.longNameInventor, state: "SENT_TO_PHOTON", ageDays: 15, reviewer: U.admin, evaluation: { state: "SUCCEEDED", score: 81 } },
   { invention: 10, author: U.longNameInventor, state: "FILED", ageDays: 140, reviewer: U.admin, title: LONG_TITLE, evaluation: { state: "SUCCEEDED", score: 77 } },
@@ -102,12 +103,40 @@ function resubmitted(name: string, d: Data, at: number) {
   idea.revision = 2;
 }
 
+/**
+ * Give the established Northwind portfolio named V0 inventors for the dashboard
+ * ranking. These are overlays on generated records, so the portfolio total and
+ * application data stay stable while the mock gains deterministic attribution.
+ */
+function seedDashboardPatentInventors(d: Data) {
+  const spec = d.portfolios[NORTHWIND.id];
+  if (!spec) return;
+  const patents = generatePortfolio(NORTHWIND, spec).patents;
+  const ranked = [
+    [U.coinventor, 5],
+    [U.inventor, 4],
+    [U.inventorPriya, 3],
+    [U.inventorHana, 2],
+    [U.inventorLucas, 1],
+  ] as const;
+  let at = 0;
+  for (const [inventor, count] of ranked) {
+    for (let k = 0; k < count && at < patents.length; k++, at++) {
+      d.patentOverrides[patents[at].id] = {
+        inventors: [inventor.name],
+        filing_date: clock.daysAgo(2 + at * 3),
+      };
+    }
+  }
+}
+
 function northwindBuild(name: string, portfolios: Record<string, ReturnType<typeof portfolio>> = SMALL, ideas: IdeaSpec[] = northwind()): Data {
   const rng = rngFor(name);
   const d = emptyDataV0();
   buildIdeas(rng, NORTHWIND, ideas, d, 1);
   resubmitted(name, d, 2);
   d.portfolios = portfolios;
+  seedDashboardPatentInventors(d);
   seedOperations(rng, d);
   // A failed import in Northwind's history, for the Photon exception states.
   d.imports.push({ id: uuid(rng), client_id: NORTHWIND.id, file_id: d.files[0]?.id ?? uuid(rng), status: "FAILED", rows_total: 41, created_count: 0, updated_count: 0, unchanged_count: 0, failed_count: 41, due_dates_created: 0, duplicate_in_file: 3, unmapped_columns: ["Renewal owner"], errors: [{ row: 2, message: "Jurisdiction column is empty." }], completed_at: clock.daysAgo(2), created_at: clock.daysAgo(2), imported_by_id: U.caseOwner.id });
@@ -128,7 +157,7 @@ const inventorPortfolio = v0("v0/inventor/portfolio", "Inventor with ideas in ev
   U.inventor.email, [U.inventor.email, U.coinventor.email, U.admin.email], () => northwindBuild("v0/inventor/portfolio"));
 
 const workspaceAdminQueue = v0("v0/workspace-admin/queue", "Workspace Admin queue at Northwind",
-  "Six ideas awaiting the one review stage, oldest 33 days, one without an evaluation, one submitted on behalf of an inventor by the admin, one resubmitted after changes. Two Workspace Admins. Actions with contextual dates.",
+  "Seven scored ideas awaiting the one review stage, oldest 56 days, one submitted on behalf of an inventor by the admin, one resubmitted after changes. Five contributing inventors, two Workspace Admins, and deadlines with contextual dates.",
   U.admin.email, [U.admin.email, U.admin2.email, U.inventor.email, U.caseOwner.email], () => northwindBuild("v0/workspace-admin/queue"));
 
 const workspaceAdminEmpty = v0("v0/workspace-admin/empty", "New workspace at Beacon, no inventors yet",

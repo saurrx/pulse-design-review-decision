@@ -8,18 +8,32 @@ import type { Idea, Patent } from "../runtime/types";
 const DAY = 86_400_000;
 const quarterStart = (t: number) => { const d = new Date(t); return Date.UTC(d.getUTCFullYear(), Math.floor(d.getUTCMonth() / 3) * 3, 1); };
 const previousQuarterStart = (t: number) => { const d = new Date(quarterStart(t)); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - 3, 1); };
+const monthStart = (t: number) => { const d = new Date(t); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1); };
+const yearStart = (t: number) => Date.UTC(new Date(t).getUTCFullYear(), 0, 1);
 const within = (iso: string | null | undefined, from: number, to: number) => !!iso && Date.parse(iso) >= from && Date.parse(iso) < to;
 
 /** BF-5: workspace-scoped dashboard aggregates (mock/proposed-fields.json). Names only; identifiers are for links, never for reading. */
 function v0Aggregates(ideas: Idea[], patents: Patent[], scope: string[] | null) {
   const db = getDb();
   const now = clock.now();
-  const qStart = quarterStart(now), pStart = previousQuarterStart(now);
+  const qStart = quarterStart(now), pStart = previousQuarterStart(now), mStart = monthStart(now), yStart = yearStart(now);
   const pending = ideas.filter((i) => i.state === "LEGAL_REVIEW" || i.state === "TECH_REVIEW");
   const waitDays = (i: Idea) => Math.max(0, Math.floor((now - Date.parse(i.submitted_at ?? i.created_at)) / DAY));
   const due = allDueDates(scope).filter((d) => d.status === "PENDING" && Date.parse(d.due_at) >= now).sort((a, b) => a.due_at.localeCompare(b.due_at));
   const due30 = due.filter((d) => Date.parse(d.due_at) < now + 30 * DAY);
   const submittedIn = (from: number, to: number) => ideas.filter((i) => within(i.submitted_at, from, to));
+  const pipeline = (rows: Idea[]) => {
+    const count = (...states: Idea["state"][]) => rows.filter((idea) => states.includes(idea.state)).length;
+    const waiting = rows.filter((idea) => idea.state === "LEGAL_REVIEW" || idea.state === "TECH_REVIEW");
+    return {
+      submitted: count("TECH_REVIEW", "LEGAL_REVIEW", "CHANGES_REQUESTED", "REJECTED", "SENT_TO_PHOTON", "FILED"),
+      reviewPending: waiting.length,
+      sentToPhoton: count("SENT_TO_PHOTON"),
+      filed: count("FILED"),
+      granted: 0,
+      oldestWaitingDays: waiting.length ? Math.max(...waiting.map(waitDays)) : null,
+    };
+  };
   const rank = (rows: Idea[], filed: Patent[]) => {
     const per = new Map<string, { id: string; name: string; ideas: number; patents: number }>();
     const bump = (id: string, key: "ideas" | "patents") => { const u = db.users.find((x) => x.id === id); if (!u) return; const e = per.get(id) ?? { id, name: u.name, ideas: 0, patents: 0 }; e[key]++; per.set(id, e); };
@@ -40,9 +54,17 @@ function v0Aggregates(ideas: Idea[], patents: Patent[], scope: string[] | null) 
       quarter_start: new Date(qStart).toISOString().slice(0, 10),
       quarter_end: new Date(Date.UTC(new Date(qStart).getUTCFullYear(), new Date(qStart).getUTCMonth() + 3, 0)).toISOString().slice(0, 10),
       patents_filed_this_quarter: patents.filter((p) => within(p.filing_date, qStart, now + DAY)).length,
+      idea_pipeline: {
+        this_quarter: pipeline(submittedIn(qStart, now + DAY)),
+        last_quarter: pipeline(submittedIn(pStart, qStart)),
+        all_time: pipeline(ideas.filter((idea) => !!idea.submitted_at)),
+      },
     },
     top_inventors: {
+      this_month: rank(submittedIn(mStart, now + DAY), patents.filter((p) => within(p.filing_date, mStart, now + DAY))),
       this_quarter: rank(submittedIn(qStart, now + DAY), patents.filter((p) => within(p.filing_date, qStart, now + DAY))),
+      last_quarter: rank(submittedIn(pStart, qStart), patents.filter((p) => within(p.filing_date, pStart, qStart))),
+      this_year: rank(submittedIn(yStart, now + DAY), patents.filter((p) => within(p.filing_date, yStart, now + DAY))),
       all_time: rank(ideas.filter((i) => !!i.submitted_at), patents),
     },
     patents_by_jurisdiction: [...byJ.entries()].map(([jurisdiction, count]) => ({ jurisdiction, count })).sort((a, b) => b.count - a.count),

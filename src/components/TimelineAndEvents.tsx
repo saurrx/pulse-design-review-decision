@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Calendar, CheckCircle2, ChevronLeft, ChevronRight, List, RotateCcw } from "lucide-react";
+import { ArrowRight, Calendar, CheckCircle2, ChevronLeft, ChevronRight, List, RotateCcw } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useTheme } from "@/hooks/useTheme";
 import useUserCookie from "@/hooks/use-auth";
@@ -21,6 +21,7 @@ import {
   ProductChip,
   type ProductChipTone,
 } from "@/components/ui/product-chip";
+import { useNavigate } from "react-router-dom";
 
 const DUE_SOON_DAYS = 30;
 
@@ -102,12 +103,19 @@ const EventChip = ({ event, showClientName, canManageEvents, eventCompletion }: 
   canManageEvents: boolean;
   eventCompletion: { mutate: (v: { eventId: string; completed: boolean }) => void; isPending: boolean };
 }) => {
+  const navigate = useNavigate();
   const tone = getEventTone(event);
   const eventTitle = event.event_name || event.event || "Event";
   const clientName =
     event.patent?.assignee_original || event.patent?.client_name || event.counsel || "";
   const applicationNumber = event.patent?.application_number;
   const done = isPatentEventCompleted(event);
+  const openDeadline = () => {
+    const search = applicationNumber || eventTitle;
+    const params = new URLSearchParams({ search });
+    if (applicationNumber) params.set("focus", applicationNumber);
+    navigate(`/due-dates?${params.toString()}`);
+  };
 
   return (
     <div className="space-y-1">
@@ -117,7 +125,7 @@ const EventChip = ({ event, showClientName, canManageEvents, eventCompletion }: 
             <ProductChip
               kind="status"
               tone={tone}
-              className="pointer-events-none w-full max-w-full justify-start"
+              className="pointer-events-none w-full max-w-full justify-start [&>span:first-child]:rounded-full"
             >
               {eventTitle}
             </ProductChip>
@@ -155,6 +163,14 @@ const EventChip = ({ event, showClientName, canManageEvents, eventCompletion }: 
               </div>
             )}
           </dl>
+          <button
+            type="button"
+            onClick={openDeadline}
+            className="inline-flex items-center gap-1.5 font-semibold text-[var(--pulse-info)] hover:underline"
+          >
+            View deadline
+            <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+          </button>
           {canManageEvents && (
             <button
               type="button"
@@ -568,7 +584,7 @@ const TimelineAndEvents = ({
                         </div>
                       </div>
                     </div>
-                    <ProductChip kind="status" tone={getEventTone(item)} className="min-w-[64px] justify-center">
+                    <ProductChip kind="status" tone={getEventTone(item)} className="min-w-[64px] justify-center [&>span:first-child]:rounded-full">
                       {isCleared
                         ? "Cleared"
                         : isOverdue

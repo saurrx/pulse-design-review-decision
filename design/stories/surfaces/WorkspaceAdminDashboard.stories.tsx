@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, within, waitFor } from "storybook/test";
+import { expect, userEvent, within, waitFor } from "storybook/test";
 import Index from "@/pages/Index";
 import { route } from "../../../mock/runtime/registry";
 
@@ -25,7 +25,7 @@ const strip = async (canvas: ReturnType<typeof within>) => {
   await canvas.findByRole("link", { name: /^Awaiting review,/ }, { timeout: 10_000 });
   return {
     awaiting: canvas.getByRole("link", { name: /^Awaiting review,/ }),
-    actions: canvas.getByRole("link", { name: /^Actions due · 30 days,/ }),
+    actions: canvas.getByRole("link", { name: /^Deadlines · 30 days,/ }),
     patents: canvas.getByRole("link", { name: /^Total patents,/ }),
     granted: canvas.getByRole("link", { name: /^Granted,/ }),
     pending: canvas.getByRole("link", { name: /^Pending patents,/ }),
@@ -39,13 +39,43 @@ export const Typical: Story = {
     const canvas = within(canvasElement);
     const boxes = await strip(canvas);
     await expect(boxes.awaiting).toHaveAccessibleName(/Awaiting review, 7, oldest 56 days/);
+    await expect(canvas.queryByRole("group", { name: "Your workspace" })).toBeNull();
+    await expect(canvas.queryByRole("group", { name: "Company portfolio" })).toBeNull();
     await expect(canvas.getByRole("heading", { name: "Review Inventor Ideas" })).toBeVisible();
+    const scoreHeader = canvas.getByRole("columnheader", { name: /Score sorted highest first/ });
+    await expect(scoreHeader).toHaveAttribute("aria-sort", "descending");
+    await expect(canvas.queryByRole("img", { name: "Not evaluated" })).toBeNull();
+    await userEvent.click(canvas.getByRole("button", { name: /Submitted/ }));
+    await expect(canvas.getByRole("columnheader", { name: /Submitted sorted oldest first/ })).toHaveAttribute("aria-sort", "ascending");
+    await userEvent.click(canvas.getByRole("button", { name: /Score/ }));
+    await expect(scoreHeader).toHaveAttribute("aria-sort", "descending");
     // Both queue controls: the primary button in the header and the footer link.
     await expect(canvas.getByRole("button", { name: /Open queue/ })).toBeVisible();
-    await expect(await canvas.findByRole("button", { name: /more waiting/ }, { timeout: 10_000 })).toBeVisible();
+    await expect(await canvas.findByRole("button", { name: /Showing 6 of 7/ }, { timeout: 10_000 })).toBeVisible();
     await expect(canvas.getByRole("heading", { name: "Patents worldwide" })).toBeVisible();
+    await expect(canvas.queryByText("By jurisdiction")).toBeNull();
+    await expect(canvas.queryByRole("list", { name: "Patents by jurisdiction" })).toBeNull();
+    await expect(canvas.queryByText(/^\d+ patents$/)).toBeNull();
+    await expect(await canvas.findByRole("img", { name: /^United States, \d+ patents, \d+ granted, \d+ pending$/ })).toBeVisible();
     await expect(canvas.getByRole("heading", { name: "Top inventors" })).toBeVisible();
+    const inventorPeriod = canvas.getByRole("combobox", { name: "Period" });
+    await expect(within(inventorPeriod).getAllByRole("option")).toHaveLength(5);
+    await expect(await canvas.findAllByRole("button", { name: /^\d+\. .+, \d+ ideas?$/ }, { timeout: 10_000 })).toHaveLength(5);
+    await canvas.getByRole("button", { name: "Patents" }).click();
+    await expect(await canvas.findAllByRole("button", { name: /^\d+\. .+, \d+ patents?$/ })).toHaveLength(5);
+    await canvas.getByRole("button", { name: "Ideas" }).click();
     await expect(canvas.getByRole("heading", { name: "Idea pipeline" })).toBeVisible();
+    const pipelinePeriod = canvas.getByRole("combobox", { name: "Pipeline period" });
+    await expect(canvas.getByText("usually 1–2 months")).toBeVisible();
+    await expect(canvas.getByText("company average: 9 months")).toBeVisible();
+    await expect(canvas.getByText("with outside counsel")).toBeVisible();
+    await expect(within(pipelinePeriod).getAllByRole("option")).toHaveLength(3);
+    await userEvent.selectOptions(pipelinePeriod, "last_quarter");
+    await expect(pipelinePeriod).toHaveValue("last_quarter");
+    await userEvent.selectOptions(pipelinePeriod, "all_time");
+    await expect(canvas.getByRole("heading", { name: "Timeline & Events" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "Calendar" })).toBeVisible();
+    await expect(canvas.getByRole("button", { name: "List" })).toBeVisible();
     await expect(await canvas.findByRole("table")).toBeVisible();
     // No "1+ pending action" footer, no cumulative chart, no donut, no Nudge.
     await expect(canvas.queryByText(/pending action/)).toBeNull();
@@ -73,8 +103,7 @@ export const OneUrgentReview: Story = {
     await expect(boxes.awaiting).toHaveAccessibleName(/Awaiting review, 1, oldest 41 days/);
     await expect(await canvas.findAllByRole("row", {}, { timeout: 10_000 })).toHaveLength(2);
     const table = within(canvas.getByRole("table"));
-    await expect(table.getByText(/41d/)).toBeVisible();
-    await expect(table.getByText("waiting")).toBeVisible();
+    await expect(table.getByRole("cell", { name: /41 days ago, past 30 day threshold/ })).toBeVisible();
   },
 };
 
@@ -85,8 +114,8 @@ export const LargeAgingQueue: Story = {
     const boxes = await strip(canvas);
     await expect(boxes.awaiting).toHaveAccessibleName(/Awaiting review, 40,/);
     await expect(await canvas.findAllByRole("row", {}, { timeout: 10_000 })).toHaveLength(7);
-    await expect(canvas.getByRole("button", { name: /34 more waiting/ })).toBeVisible();
-    await expect(canvas.getAllByText("waiting").length).toBeGreaterThan(1);
+    await expect(canvas.getByRole("button", { name: /Showing 6 of 40/ })).toBeVisible();
+    await expect(canvas.getAllByRole("cell", { name: /past 30 day threshold/ }).length).toBeGreaterThan(1);
   },
 };
 
@@ -95,7 +124,7 @@ export const NoActionsDue: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const boxes = await strip(canvas);
-    await expect(boxes.actions).toHaveAccessibleName(/Actions due · 30 days, 0, none due in 30 days/);
+    await expect(boxes.actions).toHaveAccessibleName(/Deadlines · 30 days, 0, none due in 30 days/);
   },
 };
 

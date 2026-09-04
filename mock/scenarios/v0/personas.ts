@@ -38,6 +38,9 @@ export const V0_USERS = {
   // Inventors at Northwind
   inventor: user("inventor@northwind.test", "Anika Sharma", "INVENTOR", NORTHWIND, { country_code: "DE", country_name: "Germany" }),
   coinventor: user("coinventor@northwind.test", "Mateo Ruiz", "INVENTOR", NORTHWIND),
+  inventorPriya: user("priya@northwind.test", "Priya Nwosu", "INVENTOR", NORTHWIND),
+  inventorLucas: user("lucas@northwind.test", "Lucas Meyer", "INVENTOR", NORTHWIND),
+  inventorHana: user("hana@northwind.test", "Hana Sato", "INVENTOR", NORTHWIND),
   /** Long-content states: a legally long name that must truncate without losing the count. */
   longNameInventor: user("longname@northwind.test", "Rosalind Kowalczyk-Vanderberg de la Fuente Aldana", "INVENTOR", NORTHWIND),
   newInventor: user("new.inventor@northwind.test", "Ines Duarte", "INVENTOR", NORTHWIND, { last_login_at: clock.hoursAgo(1), created_at: clock.daysAgo(2) }),

@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRight, ChevronDown, RotateCcw, Users } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, RotateCcw, Users } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -26,6 +26,12 @@ import {
   PRODUCT_CARD_TITLE_CLASS,
 } from "@/components/ui/product-surfaces";
 import { ProductChip } from "@/components/ui/product-chip";
+import {
+  Tooltip as ProductTooltip,
+  TooltipContent as ProductTooltipContent,
+  TooltipProvider as ProductTooltipProvider,
+  TooltipTrigger as ProductTooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const CARD_CLASS = PRODUCT_CARD_CLASS;
 const NUMS: React.CSSProperties = { fontVariantNumeric: "tabular-nums" };
@@ -368,6 +374,35 @@ const PortfolioMotion = ({
 
 /* --------------------------------- Idea pipeline --------------------------------- */
 
+const PipelinePeriodControl = ({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options?: Array<{ value: string; label: string }>;
+  value?: string;
+  onChange?: (value: string) => void;
+}) => {
+  if (!options?.length || !value || !onChange) {
+    return <span className="mt-1 block text-xs font-medium text-[var(--pulse-ink-muted)]">{label}</span>;
+  }
+  return (
+    <label className="relative mt-1 inline-flex items-center text-xs font-medium text-[var(--pulse-ink-muted)]">
+      <span className="sr-only">Pipeline period</span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="cursor-pointer appearance-none border-0 bg-transparent py-0 pl-0 pr-5 font-sans text-xs font-medium text-[var(--pulse-ink-muted)] outline-none focus-visible:rounded-xs focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)]"
+      >
+        {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+      </select>
+      <ChevronDown className="pointer-events-none absolute right-0 h-3.5 w-3.5" aria-hidden="true" />
+    </label>
+  );
+};
+
 const IdeaPipeline = ({
   submitted,
   reviewPending,
@@ -382,6 +417,9 @@ const IdeaPipeline = ({
   hasError = false,
   onRetry,
   periodLabel,
+  periodOptions,
+  selectedPeriod,
+  onPeriodChange,
   oldestWaitingDays,
   heading = "div",
   loading = false,
@@ -393,6 +431,10 @@ const IdeaPipeline = ({
   granted: number;
   /** DSN-0002: the window the stages count, shown beside the title ("All time"). */
   periodLabel?: string;
+  /** DSN-0002: real server-aggregated windows available to the pipeline. */
+  periodOptions?: Array<{ value: string; label: string }>;
+  selectedPeriod?: string;
+  onPeriodChange?: (value: string) => void;
   /** DSN-0002: the sublabel under Review pending, "oldest waiting 56d". */
   oldestWaitingDays?: number | null;
   /** DSN-0002: render the title as a section heading. */
@@ -414,9 +456,9 @@ const IdeaPipeline = ({
   const stages: Array<{ key: string; label: string; count: number; color: string; sub?: string }> = [
     { key: "submitted", label: "Submitted", count: submitted, color: "var(--pulse-data-primary)" },
     { key: "review", label: heading === "h2" ? "Review pending" : "Review Pending", count: reviewPending, color: "var(--pl-amber)", sub: oldestWaitingDays ? `oldest waiting ${oldestWaitingDays}d` : undefined },
-    { key: "sent_to_oc", label: "Sent to Photon Legal", count: sentToOC, color: "var(--pulse-data-ai)" },
-    { key: "filed", label: "Filed", count: filed, color: "var(--pulse-data-cyan)" },
-    { key: "granted", label: "Granted", count: granted, color: "var(--pulse-data-success)" },
+    { key: "sent_to_oc", label: "Sent to Photon Legal", count: sentToOC, color: "var(--pulse-data-ai)", sub: heading === "h2" ? "with outside counsel" : undefined },
+    { key: "filed", label: "Filed", count: filed, color: "var(--pulse-data-cyan)", sub: heading === "h2" ? "usually 1–2 months" : undefined },
+    { key: "granted", label: "Granted", count: granted, color: "var(--pulse-data-success)", sub: heading === "h2" ? "company average: 9 months" : undefined },
   ];
   const maxStageCount = Math.max(1, ...stages.map((stage) => stage.count));
   const allClientIds = clientOptions.map((client) => client.id);
@@ -445,7 +487,11 @@ const IdeaPipeline = ({
       <div className={`${CARD_CLASS} flex h-full min-h-[320px] flex-col`}>
         <div>
           <StatLabel>{title}</StatLabel>
-          <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">Ideas by stage</p>
+          {heading === "h2" && periodLabel ? (
+            <PipelinePeriodControl label={periodLabel} options={periodOptions} value={selectedPeriod} onChange={onPeriodChange} />
+          ) : (
+            <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">Ideas by stage</p>
+          )}
         </div>
         <CardError onRetry={onRetry} label="Could not load the pipeline." />
       </div>
@@ -457,9 +503,13 @@ const IdeaPipeline = ({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           {heading === "h2" ? <h2 className={PRODUCT_CARD_TITLE_CLASS}>{title}</h2> : <StatLabel>{title}</StatLabel>}
-          <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">Ideas by stage</p>
+          {heading === "h2" && periodLabel ? (
+            <PipelinePeriodControl label={periodLabel} options={periodOptions} value={selectedPeriod} onChange={onPeriodChange} />
+          ) : (
+            <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">Ideas by stage</p>
+          )}
         </div>
-        {periodLabel && (
+        {periodLabel && heading !== "h2" && (
           <span className="inline-flex h-8 items-center rounded-xs border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-2.5 text-xs font-medium text-[var(--pulse-ink-secondary)]" title="The window these counts cover">
             {periodLabel}
           </span>
@@ -513,8 +563,30 @@ const IdeaPipeline = ({
           {stages.map((s) => <div key={s.key} className="h-8 animate-pulse rounded-xs bg-[var(--pulse-surface-subtle)]" />)}
         </div>
       ) : (
-      <div className="mt-5 flex flex-1 flex-col justify-between">
+      <div className={`relative mt-4 flex flex-col ${heading === "h2" ? "justify-start before:absolute before:bottom-[45px] before:left-[5px] before:top-[17px] before:w-px before:bg-[var(--pulse-line)]" : "flex-1 justify-between"}`}>
         {stages.map((s, i) => {
+          if (heading === "h2") {
+            const timelineInner = (
+              <>
+                <span className="relative z-10 h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: s.color }} aria-hidden="true" />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[13px] font-medium text-[var(--pl-navy-2)]">{s.label}</span>
+                  {s.sub && <span className="mt-1 block text-xs text-[var(--pulse-ink-muted)]" style={NUMS}>{s.sub}</span>}
+                </span>
+                <span className="shrink-0 self-center text-lg font-semibold text-[var(--pl-navy-2)]" style={NUMS}>{s.count}</span>
+              </>
+            );
+            const timelineRow = `relative flex min-h-[64px] w-full items-start gap-4 py-3 text-left ${
+              i > 0 ? "before:absolute before:left-6 before:right-0 before:top-0 before:h-px before:bg-[var(--pulse-line)]" : ""
+            }`;
+            return onStageClick ? (
+              <button key={s.key} type="button" onClick={() => onStageClick(s.key)} className={`${timelineRow} rounded-xs transition-colors hover:bg-[var(--pulse-surface-subtle)]`}>
+                {timelineInner}
+              </button>
+            ) : (
+              <div key={s.key} className={timelineRow}>{timelineInner}</div>
+            );
+          }
           const inner = (
             <span className="min-w-0 flex-1">
               <span className="flex items-center justify-between gap-3">
@@ -583,7 +655,16 @@ export type ReviewQueueRow = {
   secondary?: string;
   score?: number | null;
   waitingDays: number;
+  submittedAt?: string;
+  resubmitted?: boolean;
 };
+
+const SUBMITTED_DATE = new Intl.DateTimeFormat("en-GB", {
+  day: "numeric",
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
 
 const NeedsReview = ({
   rows,
@@ -635,14 +716,33 @@ const NeedsReview = ({
     onEmptyLink?: () => void;
   };
 }) => {
+  const [sort, setSort] = React.useState<{ column: "score" | "submitted"; direction: "ascending" | "descending" }>({
+    column: "score",
+    direction: "descending",
+  });
   const oldestWait = Math.max(0, ...rows.map((row) => row.waitingDays));
   // The card sits in a fixed-height dashboard row beside the pipeline. Rendering
   // every queued idea stretched it — 124 rows tall on a real workspace — which
   // dragged the whole grid row with it and distorted the pipeline next to it.
   // Show a card's worth and let the overflow row carry the rest.
   const VISIBLE_ROWS = v0 ? 6 : 5;
-  const visibleRows = rows.slice(0, VISIBLE_ROWS);
-  const hiddenCount = rows.length - visibleRows.length;
+  const sortedRows = React.useMemo(() => {
+    if (!v0) return rows;
+    const direction = sort.direction === "ascending" ? 1 : -1;
+    return [...rows].sort((a, b) => {
+      const primary = sort.column === "score"
+        ? ((a.score ?? -1) - (b.score ?? -1)) * direction
+        : (new Date(a.submittedAt ?? 0).getTime() - new Date(b.submittedAt ?? 0).getTime()) * direction;
+      return primary || a.waitingDays - b.waitingDays;
+    });
+  }, [rows, sort, v0]);
+  const visibleRows = sortedRows.slice(0, VISIBLE_ROWS);
+  const hiddenCount = sortedRows.length - visibleRows.length;
+  const sortBy = (column: "score" | "submitted") => {
+    setSort((current) => current.column === column
+      ? { column, direction: current.direction === "ascending" ? "descending" : "ascending" }
+      : { column, direction: column === "score" ? "descending" : "ascending" });
+  };
   const rowColumns = showScore
     ? "grid-cols-[minmax(0,1fr)_120px_64px_94px]"
     : "grid-cols-[minmax(0,1fr)_120px_94px]";
@@ -714,57 +814,97 @@ const NeedsReview = ({
       </div>
     ) : v0 ? (
       <div className="mt-2 flex flex-1 flex-col">
+        <ProductTooltipProvider delayDuration={150}>
         <table className="w-full border-collapse">
           <thead>
             <tr className="text-left text-xs font-medium text-[var(--pulse-ink-muted)]">
               <th scope="col" className="px-3 pb-1 pt-1 font-medium">Ideas</th>
               <th scope="col" className="w-[140px] px-3 pb-1 pt-1 font-medium">Inventor</th>
-              <th scope="col" className="w-[64px] px-3 pb-1 pt-1 text-right font-medium">Score</th>
-              <th scope="col" className="w-[104px] px-3 pb-1 pt-1 text-right font-medium">Age</th>
+              <th scope="col" aria-sort={sort.column === "score" ? sort.direction : undefined} className="w-[76px] px-3 pb-1 pt-1 font-medium">
+                <button type="button" onClick={() => sortBy("score")} className="ml-auto flex items-center justify-end gap-1 hover:text-[var(--pulse-ink)] focus-visible:rounded-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)]">
+                  Score
+                  {sort.column === "score" && (sort.direction === "descending" ? <ArrowDown className="h-3 w-3" aria-hidden="true" /> : <ArrowUp className="h-3 w-3" aria-hidden="true" />)}
+                  {sort.column === "score" && <span className="sr-only">sorted {sort.direction === "descending" ? "highest first" : "lowest first"}</span>}
+                </button>
+              </th>
+              <th scope="col" aria-sort={sort.column === "submitted" ? sort.direction : undefined} className="w-[164px] px-3 pb-1 pt-1 font-medium">
+                <button type="button" onClick={() => sortBy("submitted")} className="ml-auto flex items-center justify-end gap-1 hover:text-[var(--pulse-ink)] focus-visible:rounded-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)]">
+                  Submitted
+                  {sort.column === "submitted" && (sort.direction === "ascending" ? <ArrowUp className="h-3 w-3" aria-hidden="true" /> : <ArrowDown className="h-3 w-3" aria-hidden="true" />)}
+                  {sort.column === "submitted" && <span className="sr-only">sorted {sort.direction === "ascending" ? "oldest first" : "newest first"}</span>}
+                </button>
+              </th>
             </tr>
           </thead>
           <tbody>
             {visibleRows.map((r) => {
               const overdue = r.waitingDays > v0.agingThresholdDays;
+              const relativeSubmitted = r.waitingDays === 0 ? "today" : `${r.waitingDays} day${r.waitingDays === 1 ? "" : "s"} ago`;
+              const absoluteSubmitted = r.submittedAt ? SUBMITTED_DATE.format(new Date(r.submittedAt)) : "date unavailable";
               return (
                 <tr
                   key={r.id}
-                  className="cursor-pointer border-t border-[var(--pulse-line)] transition-colors hover:bg-[var(--pulse-surface-subtle)] focus-within:bg-[var(--pulse-surface-subtle)]"
+                  className="group cursor-pointer border-t border-[var(--pulse-line)] transition-colors hover:bg-[var(--pulse-surface-subtle)] focus-within:bg-[var(--pulse-surface-subtle)]"
                   onClick={() => onOpen(r.id)}
                 >
-                  <td className="max-w-0 px-3 py-2.5">
+                  <td className="max-w-0 px-3 py-3">
                     <a
                       href="#"
                       onClick={(e) => { e.preventDefault(); e.stopPropagation(); onOpen(r.id); }}
-                      className="block min-h-6 truncate text-[13px] font-medium text-[var(--pulse-ink)] no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)] focus-visible:ring-offset-1"
+                      className="block min-h-6 truncate text-sm font-normal text-[var(--pulse-ink)] no-underline group-hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)] focus-visible:ring-offset-1"
                       title={r.title}
                     >
                       {r.title}
                     </a>
                   </td>
-                  <td className="max-w-0 truncate px-3 py-2.5 text-xs text-[var(--pulse-ink-secondary)]" title={r.secondary}>{r.secondary}</td>
-                  <td className="px-3 py-2.5 text-right text-[13px] text-[var(--pulse-ink)]" style={NUMS}>
+                  <td className="max-w-0 truncate px-3 py-3 text-xs text-[var(--pulse-ink-secondary)]" title={r.secondary}>{r.secondary}</td>
+                  <td className="px-3 py-3 text-right text-[13px] text-[var(--pulse-ink)]" style={NUMS}>
                     {typeof r.score === "number" ? (
                       <span className="font-semibold">{(r.score / 10).toFixed(1)}</span>
                     ) : (
                       <span role="img" aria-label="Not evaluated">—</span>
                     )}
                   </td>
-                  <td className={`whitespace-nowrap px-3 py-2.5 text-right text-xs ${overdue ? "font-semibold text-[var(--pl-red-text)]" : "text-[var(--pulse-ink-muted)]"}`} style={NUMS}>
-                    {overdue ? <>{r.waitingDays}d <span className="font-normal">waiting</span></> : `${r.waitingDays}d`}
+                  <td
+                    className="whitespace-nowrap px-3 py-3 text-right text-xs"
+                    style={NUMS}
+                    aria-label={`${r.resubmitted ? "resubmitted, " : ""}${relativeSubmitted}${overdue ? ", past 30 day threshold" : ""}, submitted ${absoluteSubmitted}`}
+                  >
+                    <span className="inline-flex items-center justify-end gap-1.5">
+                      {r.resubmitted && (
+                        <ProductTooltip>
+                          <ProductTooltipTrigger asChild>
+                            <span tabIndex={0} className="inline-flex text-[var(--pulse-ink-muted)] focus-visible:rounded-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)]">
+                              <RotateCcw className="h-3 w-3" aria-hidden="true" />
+                              <span className="sr-only">Resubmitted, </span>
+                            </span>
+                          </ProductTooltipTrigger>
+                          <ProductTooltipContent side="top" className="text-xs">Resubmitted</ProductTooltipContent>
+                        </ProductTooltip>
+                      )}
+                      <ProductTooltip>
+                        <ProductTooltipTrigger asChild>
+                          <span tabIndex={0} className={`${overdue ? "font-medium text-[var(--pl-red-text)]" : "font-normal text-[var(--pulse-ink-muted)]"} focus-visible:rounded-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)]`}>
+                            {relativeSubmitted}
+                          </span>
+                        </ProductTooltipTrigger>
+                        <ProductTooltipContent side="top" className="text-xs">{absoluteSubmitted}</ProductTooltipContent>
+                      </ProductTooltip>
+                    </span>
                   </td>
                 </tr>
               );
             })}
           </tbody>
         </table>
+        </ProductTooltipProvider>
         {hiddenCount > 0 && (
           <button
             type="button"
             onClick={onViewAll ?? onReviewAll ?? (() => onOpen(rows[0].id))}
             className="mt-auto flex w-full items-center justify-between gap-3 rounded-xs border-t border-[var(--pulse-line)] px-3 py-2.5 text-left text-[13px] font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:bg-[var(--pulse-surface-subtle)]"
           >
-            <span style={NUMS}>{hiddenCount} more waiting</span>
+            <span style={NUMS}>Showing {visibleRows.length} of {rows.length}</span>
             <span className="text-xs text-[var(--pulse-ink-muted)]">Review all →</span>
           </button>
         )}

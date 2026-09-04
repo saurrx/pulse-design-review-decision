@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 /**
  * The Workspace Admin dashboard's stat strip (DSN-0002).
  *
- * Five scoped numbers in one row in two groups, what needs the admin and how
- * the portfolio stands; the groups are named for assistive technology only.
+ * Five scoped numbers in one row in two layout groups, what needs the admin
+ * and how the portfolio stands.
  * Every box is one link to the list its number counts; nothing inside a box is
  * a second control. The top rule's colour is reinforced by the label, and the
  * accessible name carries the label, the number and the qualifier in words, so
@@ -27,6 +27,8 @@ export type StatBoxSpec = {
   qualifier: string;
   /** The same qualifier for the accessible name, spelt out: "oldest 56 days". */
   qualifierSpoken?: string;
+  /** Optional semantic emphasis for the supporting line. */
+  qualifierTone?: "amber" | "green";
   rule: StatRule;
   /** Where the box goes. The list it lands on must be the one the number counts. */
   to: string;
@@ -36,8 +38,6 @@ export type StatBoxSpec = {
 
 export type StatGroupSpec = {
   key: string;
-  /** The group's accessible name, e.g. "Your workspace". Not rendered: the founder dropped the visible overlines on 4 September 2026. */
-  overline: string;
   boxes: StatBoxSpec[];
 };
 
@@ -55,6 +55,11 @@ const RULE: Record<StatRule, string> = {
   neutral: "var(--pl-border-strong)",
 };
 
+const QUALIFIER_TONE: Record<NonNullable<StatBoxSpec["qualifierTone"]>, string> = {
+  amber: "var(--pl-amber-text)",
+  green: "var(--pl-green-text)",
+};
+
 const spoken = (b: StatBoxSpec) =>
   `${b.label}, ${b.value === null ? "not available" : b.value}, ${b.qualifierSpoken ?? b.qualifier}`;
 
@@ -68,16 +73,19 @@ const StatBox = ({ box, index }: { box: StatBoxSpec; index: number }) => (
       to={box.to}
       title={box.title}
       aria-label={spoken(box)}
-      className="group relative flex h-full min-h-[132px] flex-col overflow-hidden rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-5 pb-5 pt-6 no-underline transition-colors hover:bg-[var(--pulse-surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pulse-canvas)]"
+      className="group relative flex h-full min-h-[132px] cursor-pointer flex-col overflow-hidden rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-5 pb-5 pt-6 no-underline transition-colors hover:border-[var(--pulse-line-strong)] hover:bg-[var(--pulse-surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pulse-canvas)]"
     >
       <span className="absolute inset-x-0 top-0 h-[3px] rounded-t-md" style={{ background: RULE[box.rule] }} aria-hidden="true" />
       <span className="truncate text-[var(--pulse-ink-muted)]" style={LABEL}>
         {box.label}
       </span>
-      <span className="mt-3 block text-[var(--pulse-ink)]" style={VALUE}>
+      <span className="mt-3 block text-[var(--pl-navy-2)]" style={VALUE}>
         {box.value === null ? <span aria-hidden="true">—</span> : box.value}
       </span>
-      <span className="mt-2 block text-[var(--pulse-ink-secondary)]" style={QUALIFIER}>
+      <span
+        className="mt-2 block text-[var(--pulse-ink-secondary)]"
+        style={{ ...QUALIFIER, color: box.qualifierTone ? QUALIFIER_TONE[box.qualifierTone] : undefined }}
+      >
         {box.qualifier}
       </span>
     </Link>
@@ -93,8 +101,6 @@ export const StatStrip = ({ groups, ariaLabel = "Overview" }: { groups: StatGrou
       {groups.map((g) => (
         <div
           key={g.key}
-          role="group"
-          aria-label={g.overline}
           className={`flex min-w-0 flex-col ${g.boxes.length >= 3 ? "xl:col-span-3" : "xl:col-span-2"}`}
         >
           <div className="flex min-w-0 gap-4">

@@ -42,3 +42,6 @@ storybook-static/
 .vitest-attachments/
 __screenshots__/
 .vercel
+
+# October desktop — local canvas state
+.october/

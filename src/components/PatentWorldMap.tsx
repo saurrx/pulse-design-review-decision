@@ -10,7 +10,6 @@ import {
   Geographies,
   Geography,
   ZoomableGroup,
-  Marker,
 } from "react-simple-maps";
 import { motion } from "framer-motion";
 
@@ -28,12 +27,8 @@ const MARKER = {
   SELECTED_SIZE: 2.5,
 };
 
-// Helper function to calculate marker size
-const calculateMarkerSize = (granted: number, pending: number) => {
-  const total = granted + pending;
-  // Base size is 6, max size is 15
-  return Math.min(15, Math.max(6, Math.log(total + 1) * 3 + 6));
-};
+const TOOLTIP_WIDTH = 200;
+const TOOLTIP_EDGE_GAP = 12;
 
 // Define types for patent data
 interface PatentData {
@@ -376,10 +371,9 @@ const PatentWorldMap = (props: any) => {
   const { isPatentDialogOpen, setIsPatentDialogOpen } = props;
   const mapHeight = Number(props.height) || 480;
   // DSN-0002 (Workspace Admin dashboard): a title and subtitle that state the
-  // total, a jurisdiction list as the text alternative, and country clicks
-  // that open the Patent Portfolio for that jurisdiction.
+  // total and hover/focus detail for each mapped jurisdiction.
   const v0 = props.v0 as
-    | { title: string; subtitle: string; onOpenJurisdiction?: (jurisdiction: string) => void; heading?: "h2" | "h3" }
+    | { title: string; subtitle: string; heading?: "h2" | "h3" }
     | undefined;
 
   const { isFetching: isFetchingPatents, data: patentData } = useQuery({
@@ -404,6 +398,7 @@ const PatentWorldMap = (props: any) => {
 
     // Europe
     { id: "gb", country: "United Kingdom", position: { x: -2, y: 54 } }, // UK
+    { id: "de", country: "Germany", position: { x: 10, y: 51 } },
     { id: "ru", country: "Russia", position: { x: 105, y: 61 } }, // Russia (eastern part)
 
     // Asia & Middle East
@@ -496,13 +491,6 @@ const PatentWorldMap = (props: any) => {
     () => Math.max(1, ...Object.values(countsByIso3).map((c) => c.total)),
     [countsByIso3],
   );
-  const minCountryTotal = useMemo(() => {
-    const totals = Object.values(countsByIso3)
-      .map((country) => country.total)
-      .filter((total) => total > 0);
-    return totals.length ? Math.min(...totals) : 0;
-  }, [countsByIso3]);
-
   const [zoomLevel, setZoomLevel] = useState(2);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const rootContainerRef = useRef<HTMLDivElement>(null);
@@ -510,7 +498,29 @@ const PatentWorldMap = (props: any) => {
     x: number;
     y: number;
     country: any;
+    below?: boolean;
   } | null>(null);
+  const [hoveredCountryId, setHoveredCountryId] = useState<string | null>(null);
+
+  const clampTooltipX = (x: number, containerWidth: number) => {
+    const half = TOOLTIP_WIDTH / 2;
+    if (containerWidth <= TOOLTIP_WIDTH + TOOLTIP_EDGE_GAP * 2) return containerWidth / 2;
+    return Math.min(containerWidth - half - TOOLTIP_EDGE_GAP, Math.max(half + TOOLTIP_EDGE_GAP, x));
+  };
+
+  const showTargetTooltip = (target: Element, country: { id: string; country: string; granted: number; pending: number }) => {
+    if (!rootContainerRef.current) return;
+    const markerRect = target.getBoundingClientRect();
+    const rootRect = rootContainerRef.current.getBoundingClientRect();
+    const markerTop = markerRect.top - rootRect.top;
+    const below = markerTop < 180;
+    setTooltipPosition({
+      x: clampTooltipX(markerRect.left + markerRect.width / 2 - rootRect.left, rootRect.width),
+      y: below ? markerRect.bottom - rootRect.top + 8 : markerTop,
+      country,
+      below,
+    });
+  };
 
   const handleMarkerClick = (countryId: string) => {
     setSelectedCountryId((prevId) => (prevId === countryId ? null : countryId));
@@ -609,17 +619,6 @@ const PatentWorldMap = (props: any) => {
             >
               {v0?.subtitle ?? "Global patent distribution by country"}
             </p>
-            {v0 && countriesWithPatents.length > 0 && (
-              // The text alternative to the map: the same counts as a list, one line until opened.
-              <details className="mt-1 font-sans text-xs text-[var(--pulse-ink-muted)]">
-                <summary className="cursor-pointer select-none hover:text-[var(--pulse-ink)]">By jurisdiction</summary>
-                <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5" aria-label="Patents by jurisdiction">
-                  {[...countriesWithPatents].sort((a: any, b: any) => (b.granted + b.pending) - (a.granted + a.pending)).map((c: any) => (
-                    <li key={c.id} className="text-[var(--pulse-ink-secondary)]">{c.country} <span className="font-semibold text-[var(--pulse-ink)]">{c.granted + c.pending}</span></li>
-                  ))}
-                </ul>
-              </details>
-            )}
           </div>
           <div
             className={`inline-flex overflow-hidden rounded-sm border ${
@@ -680,41 +679,6 @@ const PatentWorldMap = (props: any) => {
             </button>
           </div>
         </div>
-        <div
-          className={`-mt-2 z-10 px-6 pb-4 ${
-            isPatentDialogOpen
-              ? `${theme === "dark" ? "bg-neutral-900" : "bg-neutral-50"}`
-              : `${
-                  theme === "dark"
-                    ? "bg-neutral-900 group-hover:bg-neutral-900"
-                    : "bg-white"
-                }`
-          } pt-4 px-6 rounded-none`}
-        >
-          <div className="flex items-center gap-3 text-xs">
-            <span
-              className={`font-medium ${
-                theme === "dark" ? "text-zinc-300" : "text-zinc-600"
-              }`}
-            >
-              {minCountryTotal} patent{minCountryTotal === 1 ? "" : "s"}
-            </span>
-            <div
-              className="h-2 w-28 rounded-full"
-              style={{
-                background:
-                  "linear-gradient(90deg, #EEEEF5 0%, #11103C 100%)",
-              }}
-            />
-            <span
-              className={`font-medium ${
-                theme === "dark" ? "text-zinc-300" : "text-zinc-600"
-              }`}
-            >
-              {maxCountryTotal} patent{maxCountryTotal === 1 ? "" : "s"}
-            </span>
-          </div>
-        </div>
         <div className="flex-1 min-h-0">
           <div className="relative w-full h-full flex flex-col">
             <div
@@ -748,68 +712,68 @@ const PatentWorldMap = (props: any) => {
                     <Geographies geography="/world-india-pov.json">
                       {({ geographies }) =>
                         geographies.map((geo) => {
-                          const stat =
-                            countsByIso3[geo.properties?.iso_code as string];
-                          const baseFill = stat
-                            ? navyFor(stat.total, maxCountryTotal)
-                            : theme === "dark"
-                              ? "#27272a"
-                              : "#e4e4e7";
+                          const iso3 = geo.properties?.iso_code as string;
+                          const stat = countsByIso3[iso3];
+                          const iso2 = Object.entries(ISO2_TO_ISO3).find(([, code]) => code === iso3)?.[0];
+                          const countryName = countryPatentData.find((country) => country.id === iso2)?.country ?? geo.properties?.name;
+                          const isHovered = !!iso2 && hoveredCountryId === iso2;
+                          const baseFill = v0
+                            ? stat ? "var(--pl-blue)" : "var(--pl-bg-muted)"
+                            : stat
+                              ? navyFor(stat.total, maxCountryTotal)
+                              : theme === "dark"
+                                ? "#27272a"
+                                : "#e4e4e7";
                           return (
                             <Geography
                               key={geo.rsmKey}
                               geography={geo}
                               fill={baseFill}
-                              stroke={
-                                stat
-                                  ? "#11103C"
-                                  : theme === "dark"
-                                    ? "#18181b"
-                                    : "#d4d4d8"
-                              }
-                              strokeWidth={stat ? 0.8 : 0.5}
-                              tabIndex={-1}
+                              fillOpacity={v0 && stat ? isHovered ? 0.22 : 0.12 : 1}
+                              stroke={v0 ? stat ? "var(--pulse-surface)" : "var(--pulse-line-strong)" : !v0 && stat ? "#11103C" : theme === "dark" ? "#18181b" : "#d4d4d8"}
+                              strokeWidth={v0 ? stat ? 0.75 : 0.5 : !v0 && stat ? 0.8 : 0.5}
+                              role={v0 && stat ? "img" : undefined}
+                              tabIndex={v0 && stat ? 0 : -1}
+                              aria-label={v0 && stat ? `${countryName}, ${stat.total} patent${stat.total === 1 ? "" : "s"}, ${stat.granted} granted, ${stat.pending} pending` : undefined}
                               className="rsm-geography"
-                              onClick={() => {
-                                if (!stat || !v0?.onOpenJurisdiction) return;
-                                const iso2 = Object.entries(ISO2_TO_ISO3).find(([, iso3]) => iso3 === geo.properties?.iso_code)?.[0];
-                                v0.onOpenJurisdiction((iso2 ?? String(geo.properties?.iso_code ?? "")).toUpperCase());
+                              onFocus={(event: React.FocusEvent<SVGPathElement>) => {
+                                if (!stat || !iso2) return;
+                                setHoveredCountryId(iso2);
+                                showTargetTooltip(event.currentTarget, { id: iso2, country: countryName, granted: stat.granted, pending: stat.pending });
+                              }}
+                              onBlur={() => {
+                                setHoveredCountryId(null);
+                                setTooltipPosition(null);
                               }}
                               onMouseEnter={(e: React.MouseEvent) => {
                                 if (!stat) return;
-                                if (
-                                  mapContainerRef.current &&
-                                  rootContainerRef.current
-                                ) {
-                                  const mapRect =
-                                    mapContainerRef.current.getBoundingClientRect();
-                                  const rootRect =
-                                    rootContainerRef.current.getBoundingClientRect();
+                                if (iso2) setHoveredCountryId(iso2);
+                                if (rootContainerRef.current) {
+                                  const rootRect = rootContainerRef.current.getBoundingClientRect();
+                                  const pointerY = e.clientY - rootRect.top;
+                                  const below = pointerY < 180;
                                   setTooltipPosition({
-                                    x:
-                                      e.clientX -
-                                      mapRect.left +
-                                      (mapRect.left - rootRect.left),
-                                    y:
-                                      e.clientY -
-                                      mapRect.top +
-                                      (mapRect.top - rootRect.top) -
-                                      16,
+                                    x: clampTooltipX(e.clientX - rootRect.left, rootRect.width),
+                                    y: below ? pointerY + 16 : pointerY - 16,
                                     country: {
                                       id: geo.properties?.iso_code,
-                                      country: geo.properties?.name,
+                                      country: countryName,
                                       ...stat,
                                     },
+                                    below,
                                   });
                                 }
                               }}
-                              onMouseLeave={() => setTooltipPosition(null)}
+                              onMouseLeave={() => {
+                                setHoveredCountryId(null);
+                                setTooltipPosition(null);
+                              }}
                               style={{
                                 default: { outline: "none" },
                                 hover: {
                                   outline: "none",
-                                  fill: stat ? "#F9B418" : baseFill,
-                                  cursor: stat ? "pointer" : "default",
+                                  fill: !v0 && stat ? "#F9B418" : baseFill,
+                                  cursor: "default",
                                 },
                                 pressed: { outline: "none" },
                               }}
@@ -842,7 +806,8 @@ const PatentWorldMap = (props: any) => {
             style={{
               left: `${tooltipPosition.x}px`,
               top: `${Math.max(10, tooltipPosition.y)}px`,
-              transform: 'translate(-50%, -100%)',
+              width: `${TOOLTIP_WIDTH}px`,
+              transform: tooltipPosition.below ? "translate(-50%, 0)" : "translate(-50%, -100%)",
             }}
             onClick={(e) => {
               e.stopPropagation();
@@ -856,7 +821,7 @@ const PatentWorldMap = (props: any) => {
               } patent-tooltip rounded-xs shadow-lg p-2 border pointer-events-auto`}
               style={{
                 filter: "drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))",
-                minWidth: "160px",
+                width: "100%",
               }}
             >
               <div
