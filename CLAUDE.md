@@ -258,6 +258,27 @@ it, in order of what the evidence justified rather than what looked tidy:
 | `components/auth/BrandIcons.tsx` | 2 copies each of the Google (24-line) and Microsoft (11-line) marks | Login, Signup |
 | `lib/actionsView.ts` | 4 byte-identical helpers in the two actions screens | `daysColor`, `filterLabel`, `toggleColumn` |
 | `components/patents/LinkedIdeaBadge.tsx` | inline JSX in a 2,600-line file | extracted to make it TESTABLE, not to de-duplicate |
+| `ui/filter-button.tsx` | **18** inline outline-button triggers in **8** drift variants across 6 screens | Date/Clients/Status/Sort/Columns — one style, icons inherit colour |
+| `ui/menu-radio-item.tsx` | **16** hand-styled `DropdownMenuRadioItem`s in **4** drift variants | the `!important` hover/focus overrides are load-bearing |
+| `components/patents/usePatentFields.ts` + `PatentFieldsForm.tsx` | AddPatentModal ↔ FileIdeaModal, **byte-identical** form + logic (3,078 normalised chars, proved by diff) | both modals are now ~115 lines: endpoint + labels only |
+| `lib/dateRange.ts` + `components/patents/DateRangeFilter.tsx` | 138 lines inline in PatentsContent, plus `moment` for "today minus N days" | single use — extracted for testability, and found nameless (F-085) |
+| lucide `Columns3` | 4 copies of an inline 20-line `<svg>` that IS that icon | — |
+
+**Second pass, 2026-09-03 (architecture sweep).** After the first extraction the
+scan still reported 144 groups / 3,992 lines. What the remaining groups actually
+were, screen by screen, was the list-page TOOLBAR — the same filter trigger, the
+same styled radio row, the same popover chrome — copied into Patents, Due Dates,
+Ideas, both Actions screens and Clients, and drifting a class or two each time.
+Structural similarity between whole toolbars was low (sort menus 17–30% similar
+to each other, the two client pickers 49%), so they are NOT one component; the
+PRIMITIVES they are built from are. That is the level the extraction happened at.
+
+Net for the second pass: **PatentsContent −298 lines, DueDatesContent −80,
+IHC/OC actions −68/−67, the two modals −330 each.**
+
+**Registered rather than unified:** the two client-picker popovers (DueDates,
+OCActions) at 49% similarity — the same idea, different enough that one
+component with props would be a redesign of one of them; stale.md F22.
 
 Net: **806 lines deleted, 74 added.**
 
@@ -301,6 +322,31 @@ deferred?), not a refactor, so it is registered as `stale.md` F19 and left alone
 
 Storybook 10.6 (`@storybook/react-vite`), with `@storybook/addon-vitest` and
 `@storybook/addon-a11y`.
+
+**Coverage as of 2026-09-03: 26 story files, 63 tests** — every component
+extracted in the two sweeps, every `ui/` primitive with behaviour worth
+asserting (button, input, textarea, checkbox, switch, radio-group, tabs, dialog,
+alert-dialog, popover, tooltip, card, badge, progress, separator, collapsible,
+StatusChip, ProductChip), and the two pure libs (`actionsView`, `dateRange`).
+What it is NOT and must not be sold as: role journeys. Storybook renders
+components in isolation; it never logs in or calls the API. "All roles, all
+screens" is the six `qa/journey/*.qa.mjs` files plus the layout invariant (76
+page×viewport combinations across five roles), which run nightly in
+`browser-tiers` and are the right tool for that question.
+
+**The gate keeps finding things.** Second day: `ui/progress.tsx` never forwarded
+`value` to the Radix root, so the readiness bar had `role="progressbar"` and no
+`aria-valuenow` — fixed, and the story is the regression test. The filing-date
+popover had no accessible name — fixed in `DateRangeFilter`. Four more contrast
+findings are registered under stale.md F20 and suppressed one-rule-per-story
+with the reason in the file. Details in pulse-backend findings F-085.
+
+**One React.** The first story to import a Radix package made Vite's dep
+optimizer pre-bundle a second React for that graph, and every hook in the story
+threw `Cannot read properties of null (reading 'useState')`. `vitest.config.ts`
+lists react, react-dom and the Radix packages in `optimizeDeps.include` so there
+is one pre-bundle. If a new story imports a Radix package not on that list and
+hooks start throwing, that is why.
 
     npm run storybook          # dev, :6006
     npm run test-storybook     # headless: vitest run --project=storybook

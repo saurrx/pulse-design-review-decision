@@ -17,17 +17,12 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  ChevronDown,
   Search,
   Filter,
   ArrowUpDown,
@@ -40,6 +35,9 @@ import CountrySelector from "./CountrySelector";
 import SubmitActionsDialog from "./SubmitActionsDialog";
 import moment from "moment";
 import { daysColor, filterLabel, toggleColumn } from "@/lib/actionsView";
+import { FilterButton } from "@/components/ui/filter-button";
+import { MenuRadioItem } from "@/components/ui/menu-radio-item";
+import { Columns3 } from "lucide-react";
 
 type FilterOption = "all" | "upcoming" | "dueToday" | "overdue";
 type SortOption = "newest" | "oldest" | "eventAZ" | "eventZA";
@@ -359,18 +357,7 @@ const IHCActionsContent: React.FC = () => {
         {/* Filter dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className={`flex items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-neutral-900 hover:text-neutral-300"
-                  : "hover:bg-transparent bg-transparent border-neutral-200 hover:text-neutral-700 text-[#494949] hover:border-[#F9B418]"
-              }`}
-            >
-              <Filter className="w-4 h-4" />
-              <span>{filterLabel(filterOption)}</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
+            <FilterButton icon={<Filter />}><span>{filterLabel(filterOption)}</span></FilterButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className={`w-64 px-3 ${
@@ -411,18 +398,7 @@ const IHCActionsContent: React.FC = () => {
         {/* Status filter dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className={`flex items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-neutral-900 hover:text-neutral-300"
-                  : "hover:bg-transparent bg-transparent border-neutral-200 hover:text-neutral-700 text-[#494949] hover:border-[#F9B418]"
-              }`}
-            >
-              <Filter className="w-4 h-4" />
-              <span>{getStatusLabel(statusFilter)}</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
+            <FilterButton icon={<Filter />}><span>{getStatusLabel(statusFilter)}</span></FilterButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className={`w-56 px-3 ${
@@ -462,18 +438,7 @@ const IHCActionsContent: React.FC = () => {
         {/* Sort dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className={`font-sans flex items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-neutral-900 hover:text-neutral-300"
-                  : "hover:bg-transparent bg-transparent hover:text-[#494949] text-[#404040] border-neutral-200 hover:border-[#F9B418]"
-              }`}
-            >
-              <ArrowUpDown className="w-4 h-4" />
-              <span>Sort</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
+            <FilterButton icon={<ArrowUpDown />}><span>Sort</span></FilterButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className={`font-sans w-64 px-3 ${
@@ -489,26 +454,14 @@ const IHCActionsContent: React.FC = () => {
               }
               className="grid gap-3 py-2"
             >
-              <DropdownMenuRadioItem
-                value="newest"
-                className={`cursor-pointer ${
-                  theme === "dark"
-                    ? "text-zinc-200 hover:!text-zinc-200 focus:!text-zinc-200 hover:!bg-white/5 focus:!bg-white/5"
-                    : "text-[#404040] hover:!text-[#404040] focus:!text-[#404040] hover:!bg-[#fafafa]"
-                } data-[state=checked]:bg-photon-background-light text-sm`}
-              >
+              <MenuRadioItem
+                value="newest">
                 Newest First
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem
-                value="oldest"
-                className={`cursor-pointer ${
-                  theme === "dark"
-                    ? "text-zinc-200 hover:!text-zinc-200 focus:!text-zinc-200 hover:!bg-white/5 focus:!bg-white/5"
-                    : "text-[#404040] hover:!text-[#404040] focus:!text-[#404040]"
-                } data-[state=checked]:bg-photon-background-light text-sm`}
-              >
+              </MenuRadioItem>
+              <MenuRadioItem
+                value="oldest">
                 Oldest First
-              </DropdownMenuRadioItem>
+              </MenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -516,33 +469,7 @@ const IHCActionsContent: React.FC = () => {
         {/* Columns popover */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={`flex items-center gap-2 px-4 py-5 border rounded text-sm font-normal transition-colors whitespace-nowrap ${
-                theme === "dark"
-                  ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:text-neutral-300 hover:border-[#F9B418]/50 hover:bg-neutral-900"
-                  : "hover:bg-transparent bg-transparent border-neutral-200 text-[#404040] hover:border-[#F9B418]"
-              }`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-4 h-4"
-              >
-                <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-                <path d="M9 3v18"></path>
-                <path d="M15 3v18"></path>
-              </svg>
-              <span>Columns</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
+            <FilterButton icon={<Columns3 />}><span>Columns</span></FilterButton>
           </PopoverTrigger>
           <PopoverContent
             className={`w-72 p-3 ${

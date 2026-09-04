@@ -22,7 +22,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
@@ -30,39 +29,22 @@ import { toast } from "@/lib/toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import DueDatesCalendar from "./DueDatesCalendar";
 import useUserCookie from "@/hooks/use-auth";
 import { isOutsideCounselRole } from "@/lib/roleAccess";
-import {
-  isPatentEventCompleted,
-  usePatentEventCompletion,
-} from "@/hooks/usePatentEventCompletion";
+import { isPatentEventCompleted, usePatentEventCompletion } from "@/hooks/usePatentEventCompletion";
 import API_CONFIG from "@/lib/apiConfig";
 import Loader from "../Loader";
 import moment from "moment";
-import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  ProductChip,
-  type ProductChipTone,
-} from "@/components/ui/product-chip";
-import {
-  PATENT_LEGAL_STATUS_META,
-  type PatentLegalStatus,
-} from "@/utils/patentLegalStatus";
+import { ProductChip, type ProductChipTone } from "@/components/ui/product-chip";
+import { PATENT_LEGAL_STATUS_META, type PatentLegalStatus } from "@/utils/patentLegalStatus";
 import ActionDropdown from "@/components/actions/ActionDropdown";
+import { FilterButton } from "@/components/ui/filter-button";
+import { MenuRadioItem } from "@/components/ui/menu-radio-item";
+import { Columns3 } from "lucide-react";
 
 interface DueDate {
   id: string;
@@ -1025,20 +1007,9 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                 {/* <div className="flex items-center gap-3 flex-shrink-0"> */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={`flex items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
-                        theme === "dark"
-                          ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-neutral-900 hover:text-neutral-300"
-                          : "hover:bg-transparent bg-transparent border-neutral-200 hover:text-neutral-700 text-[#494949] hover:border-[#F9B418]"
-                      }`}
-                    >
-                      <Filter className="w-4 h-4" />
-                      <span>
+                    <FilterButton icon={<Filter />}><span>
                         {getFilterLabel(filterOption)}
-                      </span>
-                      <ChevronDown className="w-4 h-4" />
-                    </Button>
+                      </span></FilterButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     className={`w-64 px-3 ${
@@ -1084,16 +1055,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                     }}
                   >
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={`flex items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
-                          theme === "dark"
-                            ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-white/5 hover:text-neutral-300"
-                            : "hover:bg-transparent bg-transparent border-neutral-200 text-neutral-700 hover:text-[#494949] hover:border-[#F9B418]"
-                        }`}
-                      >
-                        <Building2 className="w-4 h-4" />
-                        <span>Clients</span>
+                      <FilterButton icon={<Building2 />}><span>Clients</span>
                         {selectedClientIds.length > 0 && (
                           <Badge
                             variant="outline"
@@ -1105,9 +1067,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                           >
                             {selectedClientIds.length}
                           </Badge>
-                        )}
-                        <ChevronDown className="w-4 h-4" />
-                      </Button>
+                        )}</FilterButton>
                     </PopoverTrigger>
 
                     <PopoverContent
@@ -1250,18 +1210,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={`font-sans flex items-center gap-2 px-4 py-5 border rounded font-normal text-sm transition-colors whitespace-nowrap ${
-                        theme === "dark"
-                          ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:bg-neutral-900 hover:text-neutral-300"
-                          : "hover:bg-transparent bg-transparent hover:text-[#494949] text-[#404040] border-neutral-200 hover:border-[#F9B418]"
-                      }`}
-                    >
-                      <ArrowUpDown className="w-4 h-4" />
-                      <span>Sort</span>
-                      <ChevronDown className="w-4 h-4" />
-                    </Button>
+                    <FilterButton icon={<ArrowUpDown />}><span>Sort</span></FilterButton>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     className={`font-sans w-64 px-3 ${
@@ -1277,83 +1226,33 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                       }
                       className="grid gap-3 py-2"
                     >
-                      <DropdownMenuRadioItem
-                        value="newest"
-                        className={`cursor-pointer ${
-                          theme === "dark"
-                            ? "text-zinc-200 hover:!text-zinc-200 focus:!text-zinc-200 hover:!bg-white/5 focus:!bg-white/5"
-                            : "text-[#404040] hover:!text-[#404040] focus:!text-[#404040] hover:!bg-[#fafafa]"
-                        } data-[state=checked]:bg-photon-background-light text-sm`}
-                      >
+                      <MenuRadioItem
+                        value="newest">
                         Newest First
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem
-                        value="oldest"
-                        className={`cursor-pointer ${
-                          theme === "dark"
-                            ? "text-zinc-200 hover:!text-zinc-200 focus:!text-zinc-200 hover:!bg-white/5 focus:!bg-white/5"
-                            : "text-[#404040] hover:!text-[#404040] focus:!text-[#404040]"
-                        } data-[state=checked]:bg-photon-background-light text-sm`}
-                      >
+                      </MenuRadioItem>
+                      <MenuRadioItem
+                        value="oldest">
                         Oldest First
-                      </DropdownMenuRadioItem>
+                      </MenuRadioItem>
                       {/* The two event orderings have had a label and a
                           SortOption all along and were never offered — there
                           was nothing behind them until /v1/due-dates learned to
                           sort by event name. */}
-                      <DropdownMenuRadioItem
-                        value="eventAZ"
-                        className={`cursor-pointer ${
-                          theme === "dark"
-                            ? "text-zinc-200 hover:!text-zinc-200 focus:!text-zinc-200 hover:!bg-white/5 focus:!bg-white/5"
-                            : "text-[#404040] hover:!text-[#404040] focus:!text-[#404040]"
-                        } data-[state=checked]:bg-photon-background-light text-sm`}
-                      >
+                      <MenuRadioItem
+                        value="eventAZ">
                         Event (A-Z)
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem
-                        value="eventZA"
-                        className={`cursor-pointer ${
-                          theme === "dark"
-                            ? "text-zinc-200 hover:!text-zinc-200 focus:!text-zinc-200 hover:!bg-white/5 focus:!bg-white/5"
-                            : "text-[#404040] hover:!text-[#404040] focus:!text-[#404040]"
-                        } data-[state=checked]:bg-photon-background-light text-sm`}
-                      >
+                      </MenuRadioItem>
+                      <MenuRadioItem
+                        value="eventZA">
                         Event (Z-A)
-                      </DropdownMenuRadioItem>
+                      </MenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={`flex items-center gap-2 px-4 py-5 border rounded text-sm font-normal transition-colors whitespace-nowrap ${
-                        theme === "dark"
-                          ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:text-neutral-300 hover:border-[#F9B418]/50 hover:bg-neutral-900"
-                          : "hover:bg-transparent bg-transparent border-neutral-200 text-[#404040]  hover:border-[#F9B418]"
-                      }`}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="lucide lucide-columns3 lucide-columns-3 w-4 h-4"
-                      >
-                        <rect width="18" height="18" x="3" y="3" rx="2"></rect>
-                        <path d="M9 3v18"></path>
-                        <path d="M15 3v18"></path>
-                      </svg>
-                      <span className="sm:inline">Columns</span>
-                      <ChevronDown className="w-4 h-4" />
-                    </Button>
+                    <FilterButton icon={<Columns3 />}><span className="sm:inline">Columns</span></FilterButton>
                   </PopoverTrigger>
                   <PopoverContent
                     className={`w-72 p-3 ${
