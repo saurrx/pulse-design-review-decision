@@ -54,7 +54,7 @@ export function RejectIdeaModal({ isOpen, onClose, ideaName, onSubmit, reason, s
 
         <div className="space-y-6 py-4">
           {/* Warning Box */}
-          <div className={`rounded-lg p-4 border ${
+          <div className={`rounded-md p-4 border ${
             theme === "light"
               ? "border-gray-200 bg-gray-50/50"
               : "border-white/10 bg-white/5"
@@ -85,7 +85,7 @@ export function RejectIdeaModal({ isOpen, onClose, ideaName, onSubmit, reason, s
               onChange={(e) => setReason(e.target.value)}
               placeholder="Provide a clear, constructive explanation for why this disclosure is being rejected (e.g., 'This invention lacks novelty as similar solutions exist in the market...')"
               rows={6}
-              className={`ph-no-capture w-full px-4 py-3 rounded-lg border resize-none transition-all focus:outline-none focus:ring-2 focus:ring-red-500/30 ${
+              className={`ph-no-capture w-full px-4 py-3 rounded-sm border resize-none transition-all focus:outline-none focus:ring-2 focus:ring-red-500/30 ${
                 theme === "light"
                   ? "bg-transparent border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-red-500/50"
                   : "bg-transparent border-white/10 text-white placeholder:text-neutral-500 focus:border-red-500/50"
@@ -106,7 +106,7 @@ export function RejectIdeaModal({ isOpen, onClose, ideaName, onSubmit, reason, s
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder="Type REJECT"
-              className={`w-full px-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-red-500/30 ${
+              className={`w-full px-4 py-3 rounded-sm border transition-all focus:outline-none focus:ring-2 focus:ring-red-500/30 ${
                 theme === "light"
                   ? "bg-transparent border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-red-500/50"
                   : "bg-transparent border-white/10 text-white placeholder:text-neutral-500 focus:border-red-500/50"

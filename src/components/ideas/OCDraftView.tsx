@@ -13,7 +13,7 @@ const OCDraftView: React.FC<OCDraftViewProps> = ({ ideaDraft, theme = "light" })
     <div className="flex flex-col h-full">
       <div className="mx-auto w-full space-y-6 px-6 pb-10">
         {ideaDraft[0]?.meta_data?.map((section) => (
-          <div key={section.id} id={section.id} className={`rounded-lg backdrop-blur-sm border p-6 ${theme === "light"
+          <div key={section.id} id={section.id} className={`rounded-md backdrop-blur-sm border p-6 ${theme === "light"
             ? "border-gray-200 bg-white/80"
             : "border-white/10 bg-black/40"
             }`}>
@@ -61,7 +61,7 @@ const OCDraftView: React.FC<OCDraftViewProps> = ({ ideaDraft, theme = "light" })
                         required
                         disabled
                         placeholder="Enter your reponse..."
-                        className={`min-h-[70px] bg-gray-50/5 text-sm rounded-lg ${theme === "dark"
+                        className={`min-h-[70px] bg-gray-50/5 text-sm rounded-sm ${theme === "dark"
                           ? "border-[#cccccc20] text-neutral-200"
                           : "border-gray-200 text-zinc-900"
                           } border transition-all w-full resize-y`}

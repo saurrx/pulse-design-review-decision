@@ -24,7 +24,7 @@ export function SsoButton({ onStart, disabled }: { onStart: () => void; disabled
       type="button"
       onClick={onStart}
       disabled={disabled}
-      className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-5 rounded-sm border border-white/10 bg-white/5 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <svg
         width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -96,7 +96,7 @@ export function SsoEmailStep({ onCancel }: { onCancel: () => void }) {
       <button
         type="button"
         onClick={submit}
-        className="w-full py-3 rounded-xl bg-[#F9B418] text-black font-medium hover:bg-[#F9B418]/90 transition-all font-sans"
+        className="w-full py-3 rounded-sm bg-[#F9B418] text-black font-medium hover:bg-[#F9B418]/90 transition-all font-sans"
         style={{ boxShadow: "rgba(249, 180, 24, 0.3) 0px 0px 20px" }}
       >
         Continue with SSO

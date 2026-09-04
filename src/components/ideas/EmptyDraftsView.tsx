@@ -11,7 +11,7 @@ const EmptyDraftsView: React.FC<EmptyDraftsViewProps> = ({ onCreateDraft }) => {
   return (
     <div className="flex flex-1 items-center justify-center px-6 py-12">
       <div
-        className={`flex w-full max-w-lg flex-col items-center rounded-xl border px-8 py-12 text-center ${
+        className={`flex w-full max-w-lg flex-col items-center rounded-md border px-8 py-12 text-center ${
           theme === "dark"
             ? "border-neutral-800 bg-neutral-900/50"
             : "border-neutral-200 bg-white shadow-sm"

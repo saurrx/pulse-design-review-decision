@@ -120,7 +120,7 @@ const ProvenanceChip = ({ p }: { p: Provenance }) => {
   const meta = PROVENANCE_CHIP[p];
   return (
     <span
-      className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-2 py-0.5"
+      className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xs px-2 py-0.5"
       style={{ backgroundColor: `${meta.marker}14` }}
     >
       <span
@@ -750,7 +750,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
   const card = dark
     ? "border-[#cccccc20] bg-[#0e0e0e]"
     : "border-[#E8E8E8] bg-white";
-  const fieldCls = `w-full resize-y rounded-xl border bg-transparent px-3 py-2 text-sm outline-none focus-visible:border-[#F9B418] ${
+  const fieldCls = `w-full resize-y rounded-sm border bg-transparent px-3 py-2 text-sm outline-none focus-visible:border-[#F9B418] ${
     dark
       ? "border-white/10 text-neutral-100 placeholder:text-neutral-500"
       : "border-[#E8E8E8] text-neutral-900 placeholder:text-neutral-400"
@@ -780,7 +780,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
             {idea?.title || "Working submission"}
           </h1>
           <div className={`mt-2 flex flex-wrap items-center gap-2 text-xs ${muted}`}>
-            <span className="inline-flex h-7 items-center gap-1.5 rounded-md border border-[var(--pulse-line)] bg-white px-2.5 font-medium text-[#484E59]">
+            <span className="inline-flex h-7 items-center gap-1.5 rounded-xs border border-[var(--pulse-line)] bg-white px-2.5 font-medium text-[#484E59]">
               <span className="h-[7px] w-[7px] bg-[#727272]" /> In draft
             </span>
             {savedAt && <span>· {savedLabel(savedAt)}</span>}
@@ -799,7 +799,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
               is to be taken up before the questionnaire is touched. */}
         {slimBanner ? (
           <div
-            className={`mb-5 flex items-center justify-between gap-3 rounded-xl border px-4 py-2.5 ${card}`}
+            className={`mb-5 flex items-center justify-between gap-3 rounded-md border px-4 py-2.5 ${card}`}
           >
             <span className={`text-[13px] ${muted}`}>
               <Sparkles className="mr-1.5 inline h-3.5 w-3.5 text-[#F9B418]" />
@@ -827,7 +827,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
             </div>
           </div>
         ) : (
-          <div className="mb-5 rounded-xl border border-[#F9B418]/60 bg-[#F9B418]/5 p-5">
+          <div className="mb-5 rounded-md border border-[#F9B418]/60 bg-[#F9B418]/5 p-5">
             <div className="flex items-start gap-3">
               <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-[#F9B418]" />
               <div className="min-w-0 flex-1">
@@ -843,7 +843,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isAutofilling}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#F9B418] px-3.5 py-2 text-[13px] font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 rounded-sm bg-[#F9B418] px-3.5 py-2 text-[13px] font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:opacity-50"
                   >
                     <Upload className="h-4 w-4" />
                     {isAutofilling ? "Analyzing..." : "Upload document"}
@@ -852,7 +852,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                     type="button"
                     onClick={() => setPasteOpen((v) => !v)}
                     disabled={isAutofilling}
-                    className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-[13px] font-medium transition-colors ${
+                    className={`inline-flex items-center gap-1.5 rounded-sm border px-3.5 py-2 text-[13px] font-medium transition-colors ${
                       dark
                         ? "border-white/15 text-neutral-300 hover:border-white/30"
                         : "border-[#C8C8C8] text-[#444444] hover:bg-[#F5F5F5]"
@@ -881,7 +881,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
           }}
         />
         {pasteOpen && (
-          <div className={`mb-5 rounded-xl border p-4 ${card}`}>
+          <div className={`mb-5 rounded-md border p-4 ${card}`}>
             <textarea
               rows={5}
               value={pasteText}
@@ -901,7 +901,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                 type="button"
                 disabled={!pasteText.trim() || isAutofilling}
                 onClick={() => runAutofill({ text: pasteText.trim() })}
-                className="rounded-xl bg-[#F9B418] px-3.5 py-1.5 text-[13px] font-semibold text-[#0C0C0C] hover:bg-[#DA9700] disabled:opacity-50"
+                className="rounded-sm bg-[#F9B418] px-3.5 py-1.5 text-[13px] font-semibold text-[#0C0C0C] hover:bg-[#DA9700] disabled:opacity-50"
               >
                 {isAutofilling ? "Analyzing..." : "Pre-fill from text"}
               </button>
@@ -935,7 +935,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                   key={o.id}
                   type="button"
                   onClick={() => scrollToSection(o.id)}
-                  className={`flex w-full items-center gap-2 rounded-xl px-2 py-1.5 text-left text-[13px] transition-colors ${
+                  className={`flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-[13px] transition-colors ${
                     active
                       ? `font-semibold ${ink} ${dark ? "bg-white/5" : "bg-white"}`
                       : `${muted} hover:${ink}`
@@ -979,7 +979,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                 <section
                   key={s.id}
                   ref={(el) => (sectionRefs.current[s.id] = el as HTMLDivElement | null)}
-                  className={`rounded-xl border ${card}`}
+                  className={`rounded-md border ${card}`}
                 >
                   <button
                     type="button"
@@ -1030,7 +1030,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                             </p>
                             {meta.core && (
                               <div
-                                className={`mb-2 rounded-xl border px-3 py-2.5 text-xs ${card} ${muted}`}
+                                className={`mb-2 rounded-sm border px-3 py-2.5 text-xs ${card} ${muted}`}
                               >
                                 <ul className="list-disc space-y-1 pl-4">
                                   {COACH_PROMPTS.map((p) => (
@@ -1068,7 +1068,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                                   type="button"
                                   disabled={draftingField === q.id}
                                   onClick={() => draftField(q.id, q.text)}
-                                  className={`absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-xl px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
+                                  className={`absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-sm px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
                                     dark
                                       ? "bg-[#0e0e0e] text-neutral-300 hover:bg-white/10"
                                       : "bg-white text-[#444444] hover:bg-[#F5F5F5]"
@@ -1105,7 +1105,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                                 });
                               return (
                                 <div
-                                  className="ph-no-capture mt-2 rounded-xl px-3 py-2.5"
+                                  className="ph-no-capture mt-2 rounded-sm px-3 py-2.5"
                                   style={{ backgroundColor: `${tone.bg}0F` }}
                                 >
                                   <div className="mb-1 flex items-center gap-1.5">
@@ -1122,7 +1122,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                                   </p>
                                   {review.example && (
                                     <div
-                                      className={`mt-2 rounded-lg border px-3 py-2 text-[13px] leading-relaxed ${
+                                      className={`mt-2 rounded-sm border px-3 py-2 text-[13px] leading-relaxed ${
                                         dark
                                           ? "border-white/10 bg-white/[0.04] text-neutral-300"
                                           : "border-[#E8E8E8] bg-white text-[#444444]"
@@ -1139,7 +1139,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                                           setAnswer(q.id, review.example!, true);
                                           dismiss();
                                         }}
-                                        className="rounded-xl bg-[#F9B418] px-3 py-1 text-xs font-semibold text-[#0C0C0C] hover:bg-[#DA9700]"
+                                        className="rounded-sm bg-[#F9B418] px-3 py-1 text-xs font-semibold text-[#0C0C0C] hover:bg-[#DA9700]"
                                       >
                                         Replace my answer
                                       </button>
@@ -1167,7 +1167,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
             {/* Attachments */}
             <section
               ref={(el) => (sectionRefs.current["attachments"] = el as HTMLDivElement | null)}
-              className={`rounded-xl border ${card}`}
+              className={`rounded-md border ${card}`}
             >
               <button
                 type="button"
@@ -1202,7 +1202,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                   {attachments.map((f: any) => (
                     <div
                       key={f.id}
-                      className={`flex h-10 items-center gap-2 rounded-xl border px-3 text-sm ${
+                      className={`flex h-10 items-center gap-2 rounded-sm border px-3 text-sm ${
                         dark ? "border-white/10" : "border-[#E8E8E8]"
                       } ${ink}`}
                     >
@@ -1224,7 +1224,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                   <button
                     type="button"
                     onClick={() => attachInputRef.current?.click()}
-                    className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-[13px] font-medium transition-colors ${
+                    className={`inline-flex items-center gap-1.5 rounded-sm border px-3.5 py-2 text-[13px] font-medium transition-colors ${
                       dark
                         ? "border-white/15 text-neutral-300 hover:border-white/30"
                         : "border-[#C8C8C8] text-[#444444] hover:bg-[#F5F5F5]"
@@ -1240,7 +1240,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
 
         {/* Right rail: preliminary signal */}
         <aside className="w-full shrink-0 space-y-4 lg:sticky lg:top-4 lg:w-[36%]">
-          <div className={`rounded-xl border p-5 ${card}`}>
+          <div className={`rounded-md border p-5 ${card}`}>
             <div className="flex items-center justify-between gap-3">
               <div>
                 <div className={`text-xs font-medium uppercase tracking-[0.05em] ${muted}`}>
@@ -1268,7 +1268,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                     key={item.id}
                     type="button"
                     onClick={() => scrollToSection(item.id)}
-                    className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-[13px] transition-colors hover:bg-[var(--pulse-surface-subtle)] ${muted}`}
+                    className={`flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-[13px] transition-colors hover:bg-[var(--pulse-surface-subtle)] ${muted}`}
                   >
                     {item.id === "attachments" && !done ? (
                       <span className="w-4 shrink-0" />
@@ -1291,7 +1291,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
             </nav>
           </div>
 
-          <div className={`rounded-xl border p-4 ${card}`}>
+          <div className={`rounded-md border p-4 ${card}`}>
             <div
               className={`text-xs font-medium uppercase tracking-[0.05em] ${muted}`}
             >
@@ -1310,7 +1310,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                 </div>
                 {dirtySinceScore && (
                   <span
-                    className="mt-2 inline-flex items-center gap-1.5 rounded-xl px-2 py-0.5"
+                    className="mt-2 inline-flex items-center gap-1.5 rounded-xs px-2 py-0.5"
                     style={{ backgroundColor: "#F9B41814" }}
                   >
                     <span className="h-[6px] w-[6px] bg-[#F9B418]" />
@@ -1386,7 +1386,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
             )}
           </div>
 
-          <div className={`rounded-xl border p-5 ${card}`}>
+          <div className={`rounded-md border p-5 ${card}`}>
             <div className={`text-xs font-medium uppercase tracking-[0.05em] ${muted}`}>
               Contributors
             </div>
@@ -1408,7 +1408,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
         {/* Low-score coaching panel (state C, score < 4) */}
         {scored && score10! < 4 && strengthenTips.length > 0 && (
           <div
-            className={`mb-3 rounded-xl border px-4 py-3 ${
+            className={`mb-3 rounded-md border px-4 py-3 ${
               dark ? "border-[#cccccc20] bg-[#0e0e0e]" : "border-[#E8E8E8] bg-[#FAFAFA]"
             }`}
           >
@@ -1473,7 +1473,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                 type="button"
                 onClick={() => startScoring()}
                 disabled={isScoring || scoringActive}
-                className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 ${
+                className={`rounded-sm border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 ${
                   dark
                     ? "border-white/15 text-neutral-300 hover:border-white/30"
                     : "border-[#C8C8C8] text-[#444444] hover:bg-[#F5F5F5]"
@@ -1488,7 +1488,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                 type="button"
                 onClick={handleFinish}
                 disabled={isScoring || scoringActive}
-                className={`rounded-xl bg-[#F9B418] px-5 py-2.5 text-sm font-semibold text-[#0C0C0C] transition-all hover:bg-[#DA9700] disabled:opacity-60 ${
+                className={`rounded-sm bg-[#F9B418] px-5 py-2.5 text-sm font-semibold text-[#0C0C0C] transition-all hover:bg-[#DA9700] disabled:opacity-60 ${
                   pulseNow
                     ? "shadow-[0_0_0_6px_rgba(249,180,24,0.35)]"
                     : "shadow-none"
@@ -1505,7 +1505,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                   type="button"
                   onClick={handleSend}
                   disabled={isSending}
-                  className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 ${
+                  className={`rounded-sm border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50 ${
                     dark
                       ? "border-white/15 text-neutral-300 hover:border-white/30"
                       : "border-[#C8C8C8] text-[#444444] hover:bg-[#F5F5F5]"
@@ -1516,7 +1516,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                 <button
                   type="button"
                   onClick={() => scrollToSection(weakestSectionId)}
-                  className="rounded-xl bg-[#F9B418] px-5 py-2.5 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700]"
+                  className="rounded-sm bg-[#F9B418] px-5 py-2.5 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700]"
                 >
                   Strengthen submission
                 </button>
@@ -1526,7 +1526,7 @@ const DraftWorkspace = ({ ideaId }: { ideaId?: string }) => {
                 type="button"
                 onClick={handleSend}
                 disabled={isSending}
-                className="rounded-xl bg-[#F9B418] px-5 py-2.5 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:opacity-60"
+                className="rounded-sm bg-[#F9B418] px-5 py-2.5 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:opacity-60"
               >
                 {isSending ? "Sending..." : "Send for review"}
               </button>

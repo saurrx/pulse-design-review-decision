@@ -312,7 +312,7 @@ const ClientDetails = forwardRef<ClientDetailsRef, ClientDetailsProps>(
     return (
       <>
         <div
-          className={`border rounded-xl p-6 backdrop-blur-xl mt-2 ${
+          className={`border rounded-md p-6 backdrop-blur-xl mt-2 ${
             theme === "dark"
               ? "bg-neutral-900 border-[#cccccc20]"
               : "bg-white/80 border-neutral-200"
@@ -343,7 +343,7 @@ const ClientDetails = forwardRef<ClientDetailsRef, ClientDetailsProps>(
                       className="w-full h-full object-contain"
                     />
                     {isEditMode && (
-                      <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-lg cursor-pointer opacity-0 hover:opacity-100 transition-opacity">
+                      <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md cursor-pointer opacity-0 hover:opacity-100 transition-opacity">
                         <Upload className="w-5 h-5 text-white" />
                         <input
                           type="file"
@@ -475,7 +475,7 @@ const ClientDetails = forwardRef<ClientDetailsRef, ClientDetailsProps>(
                     {isEditMode && (
                       <button
                         onClick={() => handleRemoveAdmin(email)}
-                        className="p-2 rounded-md transition-colors ml-2 flex-shrink-0 text-neutral-500 hover:text-red-600"
+                        className="p-2 rounded-sm transition-colors ml-2 flex-shrink-0 text-neutral-500 hover:text-red-600"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -518,7 +518,7 @@ const ClientDetails = forwardRef<ClientDetailsRef, ClientDetailsProps>(
                 />
                 <button
                   onClick={handleAddAdmin}
-                  className={`px-4 py-2 border rounded-md text-sm ${
+                  className={`px-4 py-2 border rounded-sm text-sm ${
                     theme === "dark"
                       ? "border-[#cccccc20] text-zinc-300"
                       : "border-neutral-200 text-neutral-600"
@@ -566,7 +566,7 @@ const ClientDetails = forwardRef<ClientDetailsRef, ClientDetailsProps>(
                   theme === "dark"
                     ? "bg-zinc-800 border-[#cccccc20] text-zinc-400"
                     : "!bg-white border-neutral-200 text-neutral-900"
-                } focus-visible:ring-1 focus-visible:ring-offset-0 resize-none rounded-lg`}
+                } focus-visible:ring-1 focus-visible:ring-offset-0 resize-none rounded-sm`}
               />
             ) : (
               <p
@@ -587,7 +587,7 @@ const ClientDetails = forwardRef<ClientDetailsRef, ClientDetailsProps>(
               theme === "dark"
                 ? "hover:bg-red-400/5 border-[#cccccc20] hover:border-red-500/20"
                 : "hover:bg-red-50 border-neutral-200 hover:border-red-200"
-            } hover:text-red-600 w-full mt-4 px-4 py-2.5 rounded-lg text-xs transition-all flex items-center justify-center gap-2 text-neutral-400 border`}
+            } hover:text-red-600 w-full mt-4 px-4 py-2.5 rounded-sm text-xs transition-all flex items-center justify-center gap-2 text-neutral-400 border`}
             onClick={() => {
               // TODO: Implement offload client functionality
               toast.info("Offload client functionality coming soon");

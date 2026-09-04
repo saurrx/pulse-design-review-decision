@@ -148,7 +148,7 @@ const Invite = () => {
             {!isSent ? <button
               type="submit"
               disabled={isLoadingSendInvitation}
-              className="w-full py-3 rounded-xl bg-[#F9B418] text-black font-medium hover:bg-[#F9B418]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-sans"
+              className="w-full py-3 rounded-sm bg-[#F9B418] text-black font-medium hover:bg-[#F9B418]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-sans"
               style={{ boxShadow: "rgba(249, 180, 24, 0.3) 0px 0px 20px" }}
             >
               {isLoadingSendInvitation ? "Inviting..." : "Next"}
@@ -156,7 +156,7 @@ const Invite = () => {
               type="button"
               onClick={() => navigate("/login")}
               disabled={isLoadingSendInvitation}
-              className="w-full py-3 rounded-xl bg-[#F9B418] text-black font-medium hover:bg-[#F9B418]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-sans"
+              className="w-full py-3 rounded-sm bg-[#F9B418] text-black font-medium hover:bg-[#F9B418]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-sans"
               style={{ boxShadow: "rgba(249, 180, 24, 0.3) 0px 0px 20px" }}
             >
               Back to Login

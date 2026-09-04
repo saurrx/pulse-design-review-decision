@@ -474,7 +474,7 @@ const IdeasContent: React.FC = () => {
             ? { mark: "#F9B418", text: "#7E5A00" }
             : { mark: "#B3362F", text: "#8E2B25" };
     return (
-      <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-2.5 py-1.5">
+      <span className="inline-flex items-center gap-2 whitespace-nowrap rounded-xs border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-2.5 py-1.5">
         <span className="h-[7px] w-[7px] shrink-0" style={{ background: tone.mark }} />
         <span
           className="font-mono text-xs font-semibold uppercase leading-none"
@@ -560,7 +560,7 @@ const IdeasContent: React.FC = () => {
                   />
                   <Input
                     name="search"
-                    className={`pl-10 rounded h-[42px] pb-2.5 ${theme === "dark"
+                    className={`pl-10 rounded-sm h-[42px] pb-2.5 ${theme === "dark"
                       ? "bg-neutral-900 border border-[#cccccc20] text-zinc-200 placeholder:text-neutral-600"
                       : "text-zinc-900 placeholder:text-neutral-400 bg-neutral-50"
                       }`}
@@ -589,7 +589,7 @@ const IdeasContent: React.FC = () => {
                     <Tooltip delayDuration={0}>
                       <TooltipTrigger asChild>
                         <Button
-                          className="h-[42px] gap-1 rounded-lg bg-[#F9B418] font-semibold text-[#0C0C0C] hover:bg-[#DA9700]"
+                          className="h-[42px] gap-1 rounded-sm bg-[#F9B418] font-semibold text-[#0C0C0C] hover:bg-[#DA9700]"
                           onClick={() => setIsSubmitModalOpen(true)}
                           size={isMobile ? "sm" : "default"}
                         >
@@ -603,7 +603,7 @@ const IdeasContent: React.FC = () => {
                           theme === "dark"
                             ? "text-neutral-300 bg-neutral-900 border-[#cccccc20]"
                             : "text-neutral-700"
-                        } rounded-xl py-2 font-sans text-xs font-normal`}
+                        } rounded-xs py-2 font-sans text-xs font-normal`}
                       >
                         Submit a new innovation idea for review
                       </TooltipContent>
@@ -617,7 +617,7 @@ const IdeasContent: React.FC = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className={`h-[42px] min-w-[150px] justify-between gap-2 rounded border px-4 font-sans font-normal hover:border-[#F9B418] ${theme === "dark"
+                        className={`h-[42px] min-w-[150px] justify-between gap-2 rounded-sm border px-4 font-sans font-normal hover:border-[#F9B418] ${theme === "dark"
                           ? "bg-neutral-900 border-[#cccccc20] hover:bg-zinc-900 text-neutral-300"
                           : "hover:bg-transparent text-neutral-700 bg-white"
                           }`}
@@ -634,7 +634,7 @@ const IdeasContent: React.FC = () => {
                     </PopoverTrigger>
                     <PopoverContent
                       align="end"
-                      className={`w-[280px] rounded-md border p-4 shadow-md ${theme === "dark"
+                      className={`w-[280px] rounded-lg border p-4 shadow-md ${theme === "dark"
                         ? "bg-neutral-900 border-neutral-800"
                         : "bg-white border-photon-border-light"
                         }`}
@@ -687,7 +687,7 @@ const IdeasContent: React.FC = () => {
                     <Button
                       variant="outline"
                       size={isMobile ? "sm" : "sm"}
-                      className={`border py-5 px-4 font-sans font-normal rounded hover:border-[#F9B418] ${theme === "dark"
+                      className={`border py-5 px-4 font-sans font-normal rounded-sm hover:border-[#F9B418] ${theme === "dark"
                         ? "bg-neutral-900  border-[#cccccc20] hover:bg-zinc-900"
                         : "hover:bg-transparent text-neutral-700 bg-white"
                         }`}
@@ -726,7 +726,7 @@ const IdeasContent: React.FC = () => {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent
-                    className={`w-[280px] rounded-md border shadow-md p-4 ${theme === "dark"
+                    className={`w-[280px] rounded-lg border shadow-md p-4 ${theme === "dark"
                       ? "bg-neutral-900 border-neutral-800"
                       : "bg-white border-photon-border-light"
                       }`}
@@ -779,7 +779,7 @@ const IdeasContent: React.FC = () => {
                 </Popover>
 
                 <Select value={sortOption} onValueChange={handleSortChange}>
-                  <SelectTrigger className="w-[110px] rounded h-[42px] text-xs md:text-sm font-sans hover:border-[#F9B418] dark:bg-neutral-900">
+                  <SelectTrigger className="w-[110px] rounded-sm h-[42px] text-xs md:text-sm font-sans hover:border-[#F9B418] dark:bg-neutral-900">
                     <ArrowUpDown
                       className={`w-4 h-4 ${theme === "dark" && "text-neutral-300"
                         }`}
@@ -923,7 +923,7 @@ const IdeasContent: React.FC = () => {
                                 e.stopPropagation();
                                 handleViewIdea(idea.id);
                               }}
-                              className="flex shrink-0 items-center gap-1.5 rounded-xl bg-[#F9B418] px-3.5 py-2 text-[13px] font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700]"
+                              className="flex shrink-0 items-center gap-1.5 rounded-sm bg-[#F9B418] px-3.5 py-2 text-[13px] font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700]"
                             >
                               Review
                               <ArrowRight className="h-3.5 w-3.5" />
@@ -961,7 +961,7 @@ const IdeasContent: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => setIsSubmitModalOpen(true)}
-                            className="mt-4 rounded-xl bg-[#F9B418] px-6 py-3 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700]"
+                            className="mt-4 rounded-sm bg-[#F9B418] px-6 py-3 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700]"
                           >
                             Submit your first idea
                           </button>
@@ -1154,7 +1154,7 @@ const IdeasContent: React.FC = () => {
                       <div className="mt-3 w-full">
                         <div className="border-t border-input/50 pt-3 w-full"></div>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium mt-2 inline-block ${getStatusBadgeStyle(
+                          className={`px-2 py-1 rounded-xs text-xs font-medium mt-2 inline-block ${getStatusBadgeStyle(
                             idea.status,
                           )}`}
                         >
@@ -1198,7 +1198,7 @@ const IdeasContent: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${theme === "dark"
+                  className={`flex items-center justify-center rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${theme === "dark"
                     ? "hover:bg-white/5 text-neutral-400 hover:text-neutral-200"
                     : "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900"
                     }`}
@@ -1211,7 +1211,7 @@ const IdeasContent: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${theme === "dark"
+                  className={`flex items-center justify-center rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${theme === "dark"
                     ? "hover:bg-white/5 text-neutral-400 hover:text-neutral-200"
                     : "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900"
                     }`}
@@ -1257,7 +1257,7 @@ const IdeasContent: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${theme === "dark"
+                  className={`flex items-center justify-center rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${theme === "dark"
                     ? "hover:bg-white/5 text-neutral-400 hover:text-neutral-200"
                     : "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900"
                     }`}
@@ -1272,7 +1272,7 @@ const IdeasContent: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${theme === "dark"
+                  className={`flex items-center justify-center rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${theme === "dark"
                     ? "hover:bg-white/5 text-neutral-400 hover:text-neutral-200"
                     : "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900"
                     }`}
@@ -1320,7 +1320,7 @@ const IdeasContent: React.FC = () => {
           <AlertDialogFooter>
             <AlertDialogCancel
               disabled={isDeleting}
-              className={`bg-transparent border rounded-lg font-sans ${theme === "dark"
+              className={`bg-transparent border rounded-sm font-sans ${theme === "dark"
                 ? "border-[#cccccc20] text-zinc-300 hover:bg-transparent hover:text-zinc-300 bg-input/30 border-white"
                 : ""
                 }`}
@@ -1330,7 +1330,7 @@ const IdeasContent: React.FC = () => {
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
-              className={`text-zinc-100 font-bold rounded-lg font-sans bg-[#ff0000] hover:bg-[#db0f0f]`}
+              className={`text-zinc-100 font-bold rounded-sm font-sans bg-[#ff0000] hover:bg-[#db0f0f]`}
             >
               {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>

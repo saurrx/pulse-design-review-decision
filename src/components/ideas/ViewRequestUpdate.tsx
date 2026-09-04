@@ -125,10 +125,10 @@ export default function ViewRequestUpdate({
                 (file: any) => (
                   <div
                     key={file.id}
-                    className="flex items-center p-3 border rounded-lg"
+                    className="flex items-center p-3 border rounded-md"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="bg-[#FDF3DC] p-2 rounded">
+                      <div className="bg-[#FDF3DC] p-2 rounded-xs">
                         <svg
                           width="20"
                           height="20"

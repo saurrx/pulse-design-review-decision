@@ -157,7 +157,7 @@ const CaseOwnersTab: React.FC = () => {
   };
 
   if (isLoading) {
-    return <div className="rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] p-10 text-center text-sm text-[var(--pulse-ink-muted)]">Loading access…</div>;
+    return <div className="rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] p-10 text-center text-sm text-[var(--pulse-ink-muted)]">Loading access…</div>;
   }
 
   return (
@@ -175,7 +175,7 @@ const CaseOwnersTab: React.FC = () => {
         </Button>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] shadow-[0_18px_45px_-38px_rgba(17,16,60,0.45)]">
+      <div className="overflow-hidden rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] shadow-[0_18px_45px_-38px_rgba(17,16,60,0.45)]">
         <div className="flex flex-col gap-3 border-b border-neutral-200 p-4 md:flex-row md:items-center md:justify-between">
           <div className="relative w-full md:max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
@@ -196,24 +196,24 @@ const CaseOwnersTab: React.FC = () => {
                     <p className="truncate text-xs text-neutral-500">{caseOwner.email}</p>
                   </div>
                 </div>
-                <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${caseOwner.role === "PHOTON_ADMIN" ? "bg-purple-50 text-purple-700" : "bg-blue-50 text-blue-700"}`}>
+                <span className={`shrink-0 rounded-xs px-2.5 py-1 text-xs font-medium ${caseOwner.role === "PHOTON_ADMIN" ? "bg-purple-50 text-purple-700" : "bg-blue-50 text-blue-700"}`}>
                   {caseOwner.role === "PHOTON_ADMIN" ? "OC Admin" : "Case Owner"}
                 </span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {caseOwner.role === "PHOTON_ADMIN" ? (
-                  <span className="rounded-full border border-purple-200 bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-700">All clients</span>
+                  <span className="rounded-xs border border-purple-200 bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-700">All clients</span>
                 ) : caseOwner.clients.length ? (
                   <>
-                    {caseOwner.clients.slice(0, 3).map((client) => <span key={client.id} className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-xs text-neutral-700">{client.name}</span>)}
-                    {caseOwner.clients.length > 3 && <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600">+{caseOwner.clients.length - 3} more</span>}
+                    {caseOwner.clients.slice(0, 3).map((client) => <span key={client.id} className="rounded-xs border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-xs text-neutral-700">{client.name}</span>)}
+                    {caseOwner.clients.length > 3 && <span className="rounded-xs bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600">+{caseOwner.clients.length - 3} more</span>}
                   </>
                 ) : (
                   <span className="text-xs font-medium text-amber-700">No clients assigned</span>
                 )}
               </div>
               <div className="flex items-center justify-between gap-3 border-t border-neutral-100 pt-3">
-                <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${caseOwner.active ? "bg-emerald-50 text-emerald-700" : "bg-neutral-100 text-neutral-500"}`}>
+                <span className={`inline-flex items-center gap-1.5 rounded-xs px-2.5 py-1 text-xs font-medium ${caseOwner.active ? "bg-emerald-50 text-emerald-700" : "bg-neutral-100 text-neutral-500"}`}>
                   <span className={`h-1.5 w-1.5 rounded-full ${caseOwner.active ? "bg-emerald-500" : "bg-neutral-400"}`} />
                   {caseOwner.active ? "Active" : "Invited"}
                 </span>
@@ -249,12 +249,12 @@ const CaseOwnersTab: React.FC = () => {
                     </td>
                     <td className="max-w-[420px] px-5 py-4">
                       <div className="flex flex-wrap gap-1.5">
-                        {caseOwner.role === "PHOTON_ADMIN" ? <span className="rounded-full border border-purple-200 bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-700">All clients</span> : caseOwner.clients.length ? caseOwner.clients.slice(0, 2).map((client) => <span key={client.id} className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-xs text-neutral-700">{client.name}</span>) : <span className="text-xs font-medium text-amber-700">No clients assigned</span>}
-                        {caseOwner.role === "CASE_OWNER" && caseOwner.clients.length > 2 && <span className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600">+{caseOwner.clients.length - 2} more</span>}
+                        {caseOwner.role === "PHOTON_ADMIN" ? <span className="rounded-xs border border-purple-200 bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-700">All clients</span> : caseOwner.clients.length ? caseOwner.clients.slice(0, 2).map((client) => <span key={client.id} className="rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-xs text-neutral-700">{client.name}</span>) : <span className="text-xs font-medium text-amber-700">No clients assigned</span>}
+                        {caseOwner.role === "CASE_OWNER" && caseOwner.clients.length > 2 && <span className="rounded-xs bg-neutral-100 px-2.5 py-1 text-xs text-neutral-600">+{caseOwner.clients.length - 2} more</span>}
                       </div>
                     </td>
-                    <td className="px-5 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${caseOwner.role === "PHOTON_ADMIN" ? "bg-purple-50 text-purple-700" : "bg-blue-50 text-blue-700"}`}>{caseOwner.role === "PHOTON_ADMIN" ? "OC Admin" : "Case Owner"}</span></td>
-                    <td className="px-5 py-4"><span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${caseOwner.active ? "bg-emerald-50 text-emerald-700" : "bg-neutral-100 text-neutral-500"}`}><span className={`h-1.5 w-1.5 rounded-full ${caseOwner.active ? "bg-emerald-500" : "bg-neutral-400"}`} />{caseOwner.active ? "Active" : "Invited"}</span></td>
+                    <td className="px-5 py-4"><span className={`rounded-xs px-2.5 py-1 text-xs font-medium ${caseOwner.role === "PHOTON_ADMIN" ? "bg-purple-50 text-purple-700" : "bg-blue-50 text-blue-700"}`}>{caseOwner.role === "PHOTON_ADMIN" ? "OC Admin" : "Case Owner"}</span></td>
+                    <td className="px-5 py-4"><span className={`inline-flex items-center gap-1.5 rounded-xs px-2.5 py-1 text-xs font-medium ${caseOwner.active ? "bg-emerald-50 text-emerald-700" : "bg-neutral-100 text-neutral-500"}`}><span className={`h-1.5 w-1.5 rounded-full ${caseOwner.active ? "bg-emerald-500" : "bg-neutral-400"}`} />{caseOwner.active ? "Active" : "Invited"}</span></td>
                     <td className="px-5 py-4 text-right">{caseOwner.role === "CASE_OWNER" ? <Button variant="outline" size="sm" onClick={() => openAssignments(caseOwner)} className="gap-1.5">Manage clients <ChevronRight className="h-3.5 w-3.5" /></Button> : <span className="text-xs text-neutral-400">Full access</span>}</td>
                   </tr>
                 );
@@ -275,11 +275,11 @@ const CaseOwnersTab: React.FC = () => {
                 copies of the same control, all writing one piece of state and
                 fighting each other, and interactive elements nested in a button
                 so changing the access type also toggled that client. */}
-            <div className="mb-4 space-y-2 rounded-lg border border-neutral-200 p-3">
+            <div className="mb-4 space-y-2 rounded-md border border-neutral-200 p-3">
               <div className="flex items-center gap-2">
                 <label htmlFor="access-kind" className="text-xs font-medium text-neutral-500">Access type</label>
                 <select id="access-kind" value={accessKind} onChange={(e) => setAccessKind(e.target.value as any)}
-                  className="h-8 rounded-md border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700">
+                  className="h-8 rounded-sm border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700">
                   <option value="ASSIGNMENT">Permanent assignment</option>
                   <option value="TEMPORARY">Temporary</option>
                   <option value="STEP_IN">Step-in cover</option>
@@ -289,9 +289,9 @@ const CaseOwnersTab: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <input value={accessReason} onChange={(e) => setAccessReason(e.target.value)}
                     placeholder="Reason (required)"
-                    className="h-8 flex-1 rounded-md border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700" />
+                    className="h-8 flex-1 rounded-sm border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700" />
                   <input type="date" value={accessExpiry} onChange={(e) => setAccessExpiry(e.target.value)}
-                    className="h-8 rounded-md border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700" />
+                    className="h-8 rounded-sm border border-neutral-200 bg-transparent px-2 text-xs dark:border-neutral-700" />
                 </div>
               )}
             </div>
@@ -300,7 +300,7 @@ const CaseOwnersTab: React.FC = () => {
                 const selected = selectedClientIds.includes(client.id);
                 const existingOwner = clientOwner.get(client.id);
                 const reassigned = selected && existingOwner && existingOwner.id !== owner?.id;
-                return <button key={client.id} onClick={() => toggleClient(client.id, "manage")} className={`w-full rounded-xl border p-4 text-left transition-colors ${selected ? "border-[#F9B418] bg-amber-50" : "border-neutral-200 hover:border-neutral-300"}`}><div className="flex items-start gap-3"><span className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded border ${selected ? "border-[#F9B418] bg-[#F9B418] text-black" : "border-neutral-300 bg-white"}`}>{selected && <Check className="h-3.5 w-3.5" />}</span><div className="flex-1"><div className="flex items-center justify-between"><p className="text-sm font-semibold text-neutral-900">{client.name}</p><span className="text-xs text-neutral-500">{client.patentCount} patents · {client.activeIdeas} active ideas</span></div>{reassigned && <p className="mt-2 text-xs font-medium text-amber-700">Currently owned by {existingOwner.name} — saving will reassign it.</p>}</div></div></button>;
+                return <button key={client.id} onClick={() => toggleClient(client.id, "manage")} className={`w-full rounded-md border p-4 text-left transition-colors ${selected ? "border-[#F9B418] bg-amber-50" : "border-neutral-200 hover:border-neutral-300"}`}><div className="flex items-start gap-3"><span className={`mt-0.5 flex h-5 w-5 items-center justify-center rounded-xs border ${selected ? "border-[#F9B418] bg-[#F9B418] text-black" : "border-neutral-300 bg-white"}`}>{selected && <Check className="h-3.5 w-3.5" />}</span><div className="flex-1"><div className="flex items-center justify-between"><p className="text-sm font-semibold text-neutral-900">{client.name}</p><span className="text-xs text-neutral-500">{client.patentCount} patents · {client.activeIdeas} active ideas</span></div>{reassigned && <p className="mt-2 text-xs font-medium text-amber-700">Currently owned by {existingOwner.name} — saving will reassign it.</p>}</div></div></button>;
               })}
             </div>
           </div>
@@ -314,8 +314,8 @@ const CaseOwnersTab: React.FC = () => {
           <div className="space-y-4 py-2">
             <div><label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-600">Name</label><Input value={newOwnerName} onChange={(e) => setNewOwnerName(e.target.value)} placeholder="Full name" /></div>
             <div><label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-600">Email</label><Input value={newOwnerEmail} onChange={(e) => setNewOwnerEmail(e.target.value)} placeholder="name@photonlegal.com" /></div>
-            <div><label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-600">Role</label><div className="grid grid-cols-2 rounded-lg border border-neutral-200 bg-neutral-50 p-1"><button onClick={() => setNewMemberRole("CASE_OWNER")} className={`rounded-md px-3 py-2 text-sm font-medium ${newMemberRole === "CASE_OWNER" ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500"}`}>Case Owner</button><button onClick={() => setNewMemberRole("PHOTON_ADMIN")} className={`rounded-md px-3 py-2 text-sm font-medium ${newMemberRole === "PHOTON_ADMIN" ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500"}`}>OC Admin</button></div><p className="mt-2 text-xs text-neutral-500">{newMemberRole === "PHOTON_ADMIN" ? "OC Admins automatically have access to all clients." : "Case Owners only see clients assigned to them."}</p></div>
-            {newMemberRole === "CASE_OWNER" && <div><div className="mb-2 flex items-center justify-between"><label className="text-xs font-semibold uppercase tracking-wider text-neutral-600">Initial client access</label><span className="text-xs text-neutral-500">{newOwnerClients.length} selected</span></div><div className="max-h-56 space-y-2 overflow-y-auto">{clients.map((client) => { const selected = newOwnerClients.includes(client.id); const existingOwner = clientOwner.get(client.id); return <button key={client.id} onClick={() => toggleClient(client.id, "new")} className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left ${selected ? "border-[#F9B418] bg-amber-50" : "border-neutral-200"}`}><span className={`flex h-5 w-5 items-center justify-center rounded border ${selected ? "border-[#F9B418] bg-[#F9B418]" : "border-neutral-300"}`}>{selected && <Check className="h-3.5 w-3.5" />}</span><span className="flex-1 text-sm font-medium text-neutral-800">{client.name}</span>{existingOwner && <span className="text-xs text-neutral-500">{existingOwner.name}</span>}</button>; })}</div></div>}
+            <div><label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-neutral-600">Role</label><div className="grid grid-cols-2 rounded-sm border border-neutral-200 bg-neutral-50 p-1"><button onClick={() => setNewMemberRole("CASE_OWNER")} className={`rounded-xs px-3 py-2 text-sm font-medium ${newMemberRole === "CASE_OWNER" ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500"}`}>Case Owner</button><button onClick={() => setNewMemberRole("PHOTON_ADMIN")} className={`rounded-xs px-3 py-2 text-sm font-medium ${newMemberRole === "PHOTON_ADMIN" ? "bg-white text-neutral-900 shadow-sm" : "text-neutral-500"}`}>OC Admin</button></div><p className="mt-2 text-xs text-neutral-500">{newMemberRole === "PHOTON_ADMIN" ? "OC Admins automatically have access to all clients." : "Case Owners only see clients assigned to them."}</p></div>
+            {newMemberRole === "CASE_OWNER" && <div><div className="mb-2 flex items-center justify-between"><label className="text-xs font-semibold uppercase tracking-wider text-neutral-600">Initial client access</label><span className="text-xs text-neutral-500">{newOwnerClients.length} selected</span></div><div className="max-h-56 space-y-2 overflow-y-auto">{clients.map((client) => { const selected = newOwnerClients.includes(client.id); const existingOwner = clientOwner.get(client.id); return <button key={client.id} onClick={() => toggleClient(client.id, "new")} className={`flex w-full items-center gap-3 rounded-md border p-3 text-left ${selected ? "border-[#F9B418] bg-amber-50" : "border-neutral-200"}`}><span className={`flex h-5 w-5 items-center justify-center rounded-xs border ${selected ? "border-[#F9B418] bg-[#F9B418]" : "border-neutral-300"}`}>{selected && <Check className="h-3.5 w-3.5" />}</span><span className="flex-1 text-sm font-medium text-neutral-800">{client.name}</span>{existingOwner && <span className="text-xs text-neutral-500">{existingOwner.name}</span>}</button>; })}</div></div>}
           </div>
           <DialogFooter><Button variant="outline" onClick={() => setShowAddOwner(false)}>Cancel</Button><Button disabled={!newOwnerName.trim() || !newOwnerEmail.trim() || addOwnerMutation.isPending} onClick={() => addOwnerMutation.mutate()} className="gap-2 bg-[#F9B418] text-black hover:bg-[#E7A615]"><BriefcaseBusiness className="h-4 w-4" />{addOwnerMutation.isPending ? "Sending…" : `Invite ${newMemberRole === "PHOTON_ADMIN" ? "OC Admin" : "Case Owner"}`}</Button></DialogFooter>
         </DialogContent>

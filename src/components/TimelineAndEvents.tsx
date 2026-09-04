@@ -375,7 +375,7 @@ const TimelineAndEvents = ({
               <button
                 onClick={handlePreviousMonth}
                 aria-label="Previous month"
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--pulse-line)] bg-white text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]"
+                className="flex h-9 w-9 items-center justify-center rounded-sm border border-[var(--pulse-line)] bg-white text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -387,7 +387,7 @@ const TimelineAndEvents = ({
               <button
                 onClick={handleNextMonth}
                 aria-label="Next month"
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--pulse-line)] bg-white text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]"
+                className="flex h-9 w-9 items-center justify-center rounded-sm border border-[var(--pulse-line)] bg-white text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -401,19 +401,19 @@ const TimelineAndEvents = ({
             was in flight — a false empty. Loading now says loading, and the
             empty banner waits for the data to have actually arrived. */}
         {viewMode === "calendar" && isLoading && (
-          <div className="mb-3 flex items-center justify-center gap-2 rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-4 py-2 text-center text-[13px] text-[var(--pulse-ink-muted)]">
+          <div className="mb-3 flex items-center justify-center gap-2 rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-4 py-2 text-center text-[13px] text-[var(--pulse-ink-muted)]">
             <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-neutral-300 border-t-[#F9B418] motion-reduce:animate-none" aria-hidden />
             Loading {currentDate.toLocaleString("en-US", { month: "long" })}…
           </div>
         )}
         {viewMode === "calendar" && !isLoading && Object.keys(eventsByDay).length === 0 && (
-          <div className="mb-3 rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-4 py-2 text-center text-[13px] text-[var(--pulse-ink-muted)]">
+          <div className="mb-3 rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-4 py-2 text-center text-[13px] text-[var(--pulse-ink-muted)]">
             No deadlines or meetings in{" "}
             {currentDate.toLocaleString("en-US", { month: "long" })}
           </div>
         )}
         {viewMode === "calendar" && (
-          <div className={`overflow-hidden rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface)] font-sans transition-opacity ${isLoading ? "opacity-50" : ""}`}>
+          <div className={`overflow-hidden rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] font-sans transition-opacity ${isLoading ? "opacity-50" : ""}`}>
             {/* Week Day Headers */}
             <div className="grid grid-cols-7 border-b border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]">
               {weekDays.map((day) => (
@@ -592,7 +592,7 @@ const TimelineAndEvents = ({
                         theme === "dark"
                           ? "bg-zinc-800 border-[#cccccc20] text-gray-400"
                           : "bg-[#00000005] text-gray-500"
-                      } mx-3 mb-3 border rounded-lg text-xs`}
+                      } mx-3 mb-3 border rounded-xs text-xs`}
                     >
                       Application No:{" "}
                       <span

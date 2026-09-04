@@ -17,8 +17,8 @@ const stack = (fam: readonly string[]) => fam.map((f) => (f.includes(" ") ? `"${
 const ui = stack(fontFamily.sans), display = stack(fontFamily.display), mono = stack(fontFamily.mono);
 const font = (k: keyof typeof type): React.CSSProperties => { const t = type[k]; const fam = t.font === "display" ? display : t.font === "mono" ? mono : ui; return { font: `${t.weight} ${t.size}px/${t.line}px ${fam}`, letterSpacing: `${t.tracking}px`, textTransform: ("transform" in t ? t.transform : "none") as "uppercase" | "none" }; };
 /** Outline-only styles: they never set a background, so a coloured element can take one without being overwritten. */
-const edgeHairline: React.CSSProperties = { outline: outline.hairline.value, outlineOffset: outline.hairline.offset, borderRadius: radius };
-const edgeStrong: React.CSSProperties = { outline: outline.strong.value, outlineOffset: outline.strong.offset, borderRadius: radius };
+const edgeHairline: React.CSSProperties = { outline: outline.hairline.value, outlineOffset: outline.hairline.offset, borderRadius: radius.md };
+const edgeStrong: React.CSSProperties = { outline: outline.strong.value, outlineOffset: outline.strong.offset, borderRadius: radius.sm };
 /** Surface styles: the edge plus the white ground, for cards, tables, tags and controls that sit on pl-bg. */
 const hairline: React.CSSProperties = { ...edgeHairline, background: colors.pl.bg };
 const strong: React.CSSProperties = { ...edgeStrong, background: colors.pl.bg };
@@ -43,18 +43,18 @@ const Section = ({ title, note, children }: { title: string; note?: string; chil
 );
 /** A status tag exactly as the specification draws it: white surface, square marker, hairline outline, mono label. */
 const Tag = ({ label, family }: { label: string; family: "green" | "blue" | "red" | "amber" | "slate" }) => (
-  <span style={{ ...strong, display: "inline-flex", width: "fit-content", justifySelf: "start", alignItems: "center", gap: space[2], padding: padding.tag, color: C[`${family}-text`], ...font("mono-label") }}>
+  <span style={{ ...strong, borderRadius: radius.xs, display: "inline-flex", width: "fit-content", justifySelf: "start", alignItems: "center", gap: space[2], padding: padding.tag, color: C[`${family}-text`], ...font("mono-label") }}>
     <span aria-hidden="true" style={{ width: size.marker, height: size.marker, background: family === "amber" ? C.brand : C[family], flexShrink: 0 }} />{label}
   </span>
 );
 const PrimaryButton = ({ children, hover, disabled }: { children: React.ReactNode; hover?: boolean; disabled?: boolean }) => (
-  <button type="button" disabled={disabled} style={{ padding: padding.button, background: disabled ? C["bg-muted"] : hover ? C["brand-deep"] : C.brand, color: disabled ? C["text-4"] : C.ink, border: 0, borderRadius: radius, ...font("button"), cursor: disabled ? "not-allowed" : "pointer" }}>{children}</button>
+  <button type="button" disabled={disabled} style={{ padding: padding.button, background: disabled ? C["bg-muted"] : hover ? C["brand-deep"] : C.brand, color: disabled ? C["text-4"] : C.ink, border: 0, borderRadius: radius.sm, ...font("button"), cursor: disabled ? "not-allowed" : "pointer" }}>{children}</button>
 );
 const SecondaryButton = ({ children, hover, focused }: { children: React.ReactNode; hover?: boolean; focused?: boolean }) => (
   <button type="button" style={{ ...strong, ...(focused ? focus : {}), padding: padding.button, background: hover ? C["bg-muted"] : C.bg, color: C.ink, border: 0, ...font("button-secondary"), cursor: "pointer" }}>{children}</button>
 );
 const InkButton = ({ children }: { children: React.ReactNode }) => (
-  <button type="button" style={{ padding: padding["button-sm"], background: C.ink, color: C.bg, border: 0, borderRadius: radius, ...font("button-sm"), cursor: "pointer" }}>{children}</button>
+  <button type="button" style={{ padding: padding["button-sm"], background: C.ink, color: C.bg, border: 0, borderRadius: radius.sm, ...font("button-sm"), cursor: "pointer" }}>{children}</button>
 );
 const Field = ({ label, value, help, state }: { label: string; value: string; help?: string; state?: "rest" | "focus" | "error" | "disabled" }) => {
   const id = label.toLowerCase().replace(/\W+/g, "-");
@@ -191,18 +191,19 @@ export const RadiusAndBorders: StoryObj = {
   name: "Radius and borders",
   render: () => (
     <Page title="Radius and borders">
-      <Section title={`Radius ${radius}`} note="squared everywhere except circular markers">
+      <Section title="Radius" note="one token per element class (DSN-0003); the full scale is Foundations/Radius">
         <div style={{ display: "flex", gap: space[4], flexWrap: "wrap", alignItems: "center" }}>
-          <div style={{ ...hairline, width: 160, height: 72, display: "grid", placeItems: "center", ...font("body-sm") }}>card</div>
-          <div style={{ ...strong, width: 160, height: 72, display: "grid", placeItems: "center", ...font("body-sm") }}>input, tag, secondary</div>
+          <div style={{ ...hairline, width: 160, height: 72, display: "grid", placeItems: "center", ...font("body-sm") }}>card · md</div>
+          <div style={{ ...strong, width: 160, height: 72, display: "grid", placeItems: "center", ...font("body-sm") }}>input, secondary · sm</div>
+          <Tag label="Awaiting review" family="amber" />
           <PrimaryButton>Approve &amp; send</PrimaryButton>
-          <div style={{ width: 40, height: 40, background: C["navy-2"], color: C.bg, borderRadius: "50%", display: "grid", placeItems: "center", ...font("caption") }}>AS</div>
+          <div style={{ width: 40, height: 40, background: C["navy-2"], color: C.bg, borderRadius: radius.full, display: "grid", placeItems: "center", ...font("caption") }}>AS</div>
         </div>
       </Section>
       <Section title="Outlines, not shadows" note="every surface is separated by an inset hairline">
         <dl style={{ margin: 0, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: space[6] }}>
           {(Object.keys(outline) as Array<keyof typeof outline>).map((k) => (
-            <div key={k} style={{ outline: outline[k].value, outlineOffset: outline[k].offset, borderRadius: radius, padding: padding.card, background: C.bg }}>
+            <div key={k} style={{ outline: outline[k].value, outlineOffset: outline[k].offset, borderRadius: radius.md, padding: padding.card, background: C.bg }}>
               <dt style={{ ...font("mono-label"), color: C["text-3"] }}>outline-{k}</dt>
               <dd style={{ ...font("mono"), margin: `${space[1]} 0 ${space[2]}` }}>{outline[k].value} · offset {outline[k].offset}</dd>
               <dd style={{ ...font("help"), color: C["text-2"], margin: 0 }}>{outline[k].role}</dd>
@@ -213,7 +214,7 @@ export const RadiusAndBorders: StoryObj = {
       </Section>
       <Section title="Emphasis edges" note="a brand edge on a banner, a brand rule under a section">
         <div style={{ display: "grid", gap: space[4] }}>
-          <div style={{ background: C["amber-tint"], borderLeft: `${size["banner-edge"]} solid ${C.brand}`, borderRadius: radius, padding: padding.banner, display: "flex", justifyContent: "space-between", alignItems: "center", gap: space[3] }}>
+          <div style={{ background: C["amber-tint"], borderLeft: `${size["banner-edge"]} solid ${C.brand}`, borderRadius: radius.md, padding: padding.banner, display: "flex", justifyContent: "space-between", alignItems: "center", gap: space[3] }}>
             <div><div style={{ ...font("body"), fontWeight: 600 }}>Instruction needed: renewal due in 12 days</div><div style={{ ...font("body-sm"), color: C["text-2"] }}>EP 3 811 902 B1 · Northwind Instruments · owned by Devika Nair</div></div>
             <InkButton>Open Actions</InkButton>
           </div>
@@ -257,7 +258,7 @@ export const ButtonsAndInputs: StoryObj = {
   name: "Buttons and inputs",
   render: () => (
     <Page title="Buttons and inputs">
-      <Section title="Actions" note="pl-brand · pl-ink · pl-radius 2">
+      <Section title="Actions" note="pl-brand · pl-ink · pl-radius-sm">
         <div style={{ display: "flex", gap: space[3], flexWrap: "wrap", alignItems: "center" }}>
           <PrimaryButton>Approve &amp; send</PrimaryButton>
           <SecondaryButton>Save draft</SecondaryButton>
@@ -342,7 +343,7 @@ export const States: StoryObj = {
   render: () => (
     <Page title="Focus, disabled, loading and error states">
       <Section title="Focus" note="pl-blue 1.5px inset, on every control">
-        <div style={{ display: "flex", gap: space[3], flexWrap: "wrap", alignItems: "center" }}><SecondaryButton focused>Save draft</SecondaryButton><span style={{ ...focus, borderRadius: radius, padding: `${space[2]} ${space[3]}`, ...font("link"), color: C["blue-text"] }}>Open review ›</span></div>
+        <div style={{ display: "flex", gap: space[3], flexWrap: "wrap", alignItems: "center" }}><SecondaryButton focused>Save draft</SecondaryButton><span style={{ ...focus, borderRadius: radius.sm, padding: `${space[2]} ${space[3]}`, ...font("link"), color: C["blue-text"] }}>Open review ›</span></div>
       </Section>
       <Section title="Disabled" note="muted fill, text-4, no outline change">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: space[6], alignItems: "start" }}>
@@ -352,15 +353,15 @@ export const States: StoryObj = {
       </Section>
       <Section title="Loading" note="the label stays; activity shows beside it; no spinner for trivial waits">
         <div style={{ display: "flex", gap: space[3], flexWrap: "wrap", alignItems: "center" }}>
-          <button type="button" aria-busy="true" style={{ padding: padding.button, background: C.brand, color: C.ink, border: 0, borderRadius: radius, ...font("button"), display: "inline-flex", alignItems: "center", gap: space[2] }}><span aria-hidden="true" style={{ width: 12, height: 12, border: `2px solid ${C.ink}`, borderRightColor: "transparent", borderRadius: "50%", display: "inline-block" }} />Sending to Photon Legal</button>
-          <div role="status" style={{ display: "grid", gap: space[2], width: 320 }}><span style={{ ...font("help"), color: C["text-3"] }}>Organising your material</span><span aria-hidden="true" style={{ display: "block", height: 8, background: C["bg-muted"], borderRadius: radius, overflow: "hidden" }}><span style={{ display: "block", width: "45%", height: "100%", background: C.brand }} /></span></div>
-          <div aria-hidden="true" style={{ display: "grid", gap: space[2], width: 320 }}>{[100, 80, 60].map((w) => <span key={w} style={{ display: "block", height: 12, width: `${w}%`, background: C["bg-muted"], borderRadius: radius }} />)}</div>
+          <button type="button" aria-busy="true" style={{ padding: padding.button, background: C.brand, color: C.ink, border: 0, borderRadius: radius.sm, ...font("button"), display: "inline-flex", alignItems: "center", gap: space[2] }}><span aria-hidden="true" style={{ width: 12, height: 12, border: `2px solid ${C.ink}`, borderRightColor: "transparent", borderRadius: "50%", display: "inline-block" }} />Sending to Photon Legal</button>
+          <div role="status" style={{ display: "grid", gap: space[2], width: 320 }}><span style={{ ...font("help"), color: C["text-3"] }}>Organising your material</span><span aria-hidden="true" style={{ display: "block", height: 8, background: C["bg-muted"], borderRadius: radius.full, overflow: "hidden" }}><span style={{ display: "block", width: "45%", height: "100%", background: C.brand }} /></span></div>
+          <div aria-hidden="true" style={{ display: "grid", gap: space[2], width: 320 }}>{[100, 80, 60].map((w) => <span key={w} style={{ display: "block", height: 12, width: `${w}%`, background: C["bg-muted"], borderRadius: radius.xs }} />)}</div>
         </div>
       </Section>
       <Section title="Error" note="explained beside the field, entered work preserved, a recovery action named">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: space[6], alignItems: "start" }}>
           <Field label="Co-inventor email" value="mateo.ruiz@northwind" help="Enter a work email at northwind.test, for example mateo.ruiz@northwind.test." state="error" />
-          <div role="alert" style={{ background: C["red-tint"], borderLeft: `${size["banner-edge"]} solid ${C.red}`, borderRadius: radius, padding: padding.banner, display: "flex", justifyContent: "space-between", alignItems: "center", gap: space[3] }}>
+          <div role="alert" style={{ background: C["red-tint"], borderLeft: `${size["banner-edge"]} solid ${C.red}`, borderRadius: radius.md, padding: padding.banner, display: "flex", justifyContent: "space-between", alignItems: "center", gap: space[3] }}>
             <div><div style={{ ...font("body"), fontWeight: 600 }}>Your draft was not saved</div><div style={{ ...font("body-sm"), color: C["text-2"] }}>The connection dropped. Your answers are kept on this page.</div></div>
             <InkButton>Try again</InkButton>
           </div>

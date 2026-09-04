@@ -13,7 +13,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div className="flex flex-col w-full">
         <textarea
           className={cn(
-            "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-[#F9B418] placeholder:text-zinc-500 focus-visible:outline-none focus:border-none focus-visible:ring-1 focus-visible:ring-[#F9B418] focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50",
+            "flex min-h-[80px] w-full rounded-sm border border-input bg-background px-3 py-2 text-sm ring-offset-[#F9B418] placeholder:text-zinc-500 focus-visible:outline-none focus:border-none focus-visible:ring-1 focus-visible:ring-[#F9B418] focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50",
             error ? "border-red-500" : "border-input",
             className
           )}

@@ -693,10 +693,10 @@ const ReviewQueueWorkspace = () => {
   if (isPending) {
     return (
       <div className="flex h-full flex-col p-8">
-        <div className="h-8 w-48 animate-pulse rounded bg-[#e9e9e4]" />
+        <div className="h-8 w-48 animate-pulse rounded-xs bg-[#e9e9e4]" />
         <div className="mt-8 grid flex-1 grid-cols-[420px_minmax(0,1fr)] gap-4">
-          <div className="animate-pulse rounded-xl border border-[var(--pulse-line)] bg-white" />
-          <div className="animate-pulse rounded-xl border border-[var(--pulse-line)] bg-white" />
+          <div className="animate-pulse rounded-md border border-[var(--pulse-line)] bg-white" />
+          <div className="animate-pulse rounded-md border border-[var(--pulse-line)] bg-white" />
         </div>
       </div>
     );
@@ -705,7 +705,7 @@ const ReviewQueueWorkspace = () => {
   if (isError) {
     return (
       <div className="grid h-full place-items-center p-8">
-        <div className="max-w-md rounded-xl border border-[#dfb6b2] bg-white p-6 text-center">
+        <div className="max-w-md rounded-md border border-[#dfb6b2] bg-white p-6 text-center">
           <h1 className="text-xl font-semibold">The review queue could not load</h1>
           <p className="mt-2 text-sm text-[var(--pulse-ink-muted)]">
             Your work is safe. Refresh the page or try again in a moment.
@@ -725,7 +725,7 @@ const ReviewQueueWorkspace = () => {
   return (
     <div className="flex h-[calc(100dvh-64px)] min-h-[720px] flex-col">
       <div className="mx-auto flex min-h-0 w-full max-w-[1680px] flex-1 gap-4 px-6 py-6 lg:px-8">
-        <section className="flex w-[380px] shrink-0 flex-col overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-white shadow-[0_1px_2px_rgba(20,20,16,0.04)] xl:w-[420px]">
+        <section className="flex w-[380px] shrink-0 flex-col overflow-hidden rounded-md border border-[var(--pulse-line)] bg-white shadow-[0_1px_2px_rgba(20,20,16,0.04)] xl:w-[420px]">
           <div className="border-b border-[var(--pulse-line)] p-3">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--pulse-ink-muted)]" />
@@ -733,13 +733,13 @@ const ReviewQueueWorkspace = () => {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Search title or inventor"
-                className="h-10 w-full rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] pl-9 pr-9 text-sm outline-none transition focus:border-[var(--pulse-line-strong)] focus:bg-white"
+                className="h-10 w-full rounded-sm border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] pl-9 pr-9 text-sm outline-none transition focus:border-[var(--pulse-line-strong)] focus:bg-white"
               />
               {search && (
                 <button
                   type="button"
                   onClick={() => setSearch("")}
-                  className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-[var(--pulse-ink-muted)] hover:bg-[#ecece7] hover:text-[var(--pulse-ink)]"
+                  className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-sm text-[var(--pulse-ink-muted)] hover:bg-[#ecece7] hover:text-[var(--pulse-ink)]"
                   aria-label="Clear search"
                 >
                   <X className="h-4 w-4" />
@@ -752,7 +752,7 @@ const ReviewQueueWorkspace = () => {
                   key={item.value}
                   type="button"
                   onClick={() => setView(item.value)}
-                  className={`shrink-0 whitespace-nowrap rounded-md px-2 py-1.5 text-[11px] font-semibold transition-colors ${
+                  className={`shrink-0 whitespace-nowrap rounded-sm px-2 py-1.5 text-[11px] font-semibold transition-colors ${
                     view === item.value
                       ? "bg-[var(--pulse-ink)] text-white"
                       : "text-[var(--pulse-ink-muted)] hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]"
@@ -766,7 +766,7 @@ const ReviewQueueWorkspace = () => {
 
           <div className="flex items-center justify-between border-b border-[var(--pulse-line)] px-4 py-2 text-xs text-[var(--pulse-ink-muted)]">
             <span>{filteredIdeas.length} ideas · oldest first</span>
-            <span><kbd className="rounded border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-1.5 py-0.5 font-sans">J</kbd> <kbd className="rounded border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-1.5 py-0.5 font-sans">K</kbd> to move</span>
+            <span><kbd className="rounded-xs border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-1.5 py-0.5 font-sans">J</kbd> <kbd className="rounded-xs border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-1.5 py-0.5 font-sans">K</kbd> to move</span>
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
@@ -823,7 +823,7 @@ const ReviewQueueWorkspace = () => {
           </div>
         </section>
 
-        <section className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-white shadow-[0_1px_2px_rgba(20,20,16,0.04)]">
+        <section className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-md border border-[var(--pulse-line)] bg-white shadow-[0_1px_2px_rgba(20,20,16,0.04)]">
           {!selectedIdea ? (
             <div className="grid flex-1 place-items-center p-8 text-center">
               <div>
@@ -857,7 +857,7 @@ const ReviewQueueWorkspace = () => {
                   <Link
                     onClick={() => track("review_full_record_opened", { idea_id: selectedIdea.id })}
                     to={`/ideas/${selectedIdea.id}`}
-                    className="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg border border-[var(--pulse-line)] bg-white px-3 text-sm font-semibold text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]"
+                    className="inline-flex h-9 shrink-0 items-center gap-2 rounded-sm border border-[var(--pulse-line)] bg-white px-3 text-sm font-semibold text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]"
                     aria-label={`Open full record for ${selectedIdea.title}`}
                   >
                     <FileText className="h-4 w-4" />
@@ -900,9 +900,9 @@ const ReviewQueueWorkspace = () => {
                 {detailTab === "brief" && (
                   <div className="mx-auto max-w-4xl space-y-5">
                     {draftChangedSinceLastView && (
-                    <div className="rounded-xl border border-[#b7bedf] bg-[var(--pulse-info-soft)] p-4">
+                    <div className="rounded-md border border-[#b7bedf] bg-[var(--pulse-info-soft)] p-4">
                       <div className="flex items-start gap-3">
-                        <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white text-[var(--pulse-info)] shadow-sm">
+                        <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-xs bg-white text-[var(--pulse-info)] shadow-sm">
                           <Sparkles className="h-4 w-4" />
                         </span>
                         <div>
@@ -915,7 +915,7 @@ const ReviewQueueWorkspace = () => {
                     </div>
                     )}
 
-                    <article className="rounded-xl border border-[var(--pulse-line)] bg-white p-6">
+                    <article className="rounded-md border border-[var(--pulse-line)] bg-white p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-muted)]">Invention summary</p>
@@ -932,7 +932,7 @@ const ReviewQueueWorkspace = () => {
                       </p>
                     </article>
 
-                    <article className="rounded-xl border border-[var(--pulse-line)] bg-white p-6">
+                    <article className="rounded-md border border-[var(--pulse-line)] bg-white p-6">
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-muted)]">Evaluation evidence</p>
@@ -962,7 +962,7 @@ const ReviewQueueWorkspace = () => {
                     </article>
 
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="rounded-xl border border-[var(--pulse-line)] bg-white p-5">
+                      <div className="rounded-md border border-[var(--pulse-line)] bg-white p-5">
                         <div className="flex items-start justify-between gap-4">
                           <div>
                             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-muted)]">Evaluation signal</p>
@@ -977,7 +977,7 @@ const ReviewQueueWorkspace = () => {
                           A review aid, not a filing recommendation. Inspect the evidence before deciding.
                         </p>
                       </div>
-                      <div className="rounded-xl border border-[var(--pulse-line)] bg-white p-5">
+                      <div className="rounded-md border border-[var(--pulse-line)] bg-white p-5">
                         <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-muted)]">Review readiness</p>
                         <div className="mt-3 text-sm">
                           <div className="flex items-center justify-between gap-4"><span className="inline-flex items-center gap-2"><FileText className="h-4 w-4 text-[var(--pulse-ink-muted)]" />Submitted draft</span><span className={`font-semibold ${reviewDraft ? "text-[var(--pulse-success)]" : "text-[var(--pulse-danger)]"}`}>{reviewDraft ? "Available" : "Missing"}</span></div>
@@ -989,7 +989,7 @@ const ReviewQueueWorkspace = () => {
                 )}
 
                 {detailTab === "submission" && (
-                  <article className="mx-auto max-w-4xl rounded-xl border border-[var(--pulse-line)] bg-white p-6">
+                  <article className="mx-auto max-w-4xl rounded-md border border-[var(--pulse-line)] bg-white p-6">
                     <div className="flex items-start justify-between gap-4 border-b border-[var(--pulse-line)] pb-5">
                       <div>
                         <h3 className="text-lg font-semibold">Inventor submission</h3>
@@ -1059,7 +1059,7 @@ const ReviewQueueWorkspace = () => {
                 {detailTab === "aiReport" && (
                   <div className="mx-auto max-w-4xl">
                     {evaluationReport?.scoringResult ? (
-                      <section className="overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-white">
+                      <section className="overflow-hidden rounded-md border border-[var(--pulse-line)] bg-white">
                         <div className="flex items-center justify-between gap-4 border-b border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-5 py-3">
                           <h3 className="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-secondary)]">Patent Analysis Report</h3>
                           <ProvenanceTag />
@@ -1081,7 +1081,7 @@ const ReviewQueueWorkspace = () => {
                         </div>
                       </section>
                     ) : evaluationRunning ? (
-                      <div className="rounded-xl border border-[var(--pulse-line)] bg-white p-6">
+                      <div className="rounded-md border border-[var(--pulse-line)] bg-white p-6">
                         <h3 className="font-mono text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-secondary)]">Patent Analysis in progress</h3>
                         <div className="mt-4">
                           <EvaluationProgress
@@ -1092,7 +1092,7 @@ const ReviewQueueWorkspace = () => {
                         <p className="mt-3 text-xs text-[var(--pulse-ink-muted)]">The report appears here the moment the scan completes — no refresh needed.</p>
                       </div>
                     ) : (
-                      <div className="rounded-xl border border-dashed border-[var(--pulse-line-strong)] bg-white p-8 text-center">
+                      <div className="rounded-md border border-dashed border-[var(--pulse-line-strong)] bg-white p-8 text-center">
                         <Sparkles className="mx-auto h-5 w-5 text-[var(--pulse-ink-muted)]" />
                         <h3 className="mt-3 text-sm font-semibold">AI evaluation is not available</h3>
                         <p className="mt-1 text-sm text-[var(--pulse-ink-muted)]">This submission does not yet have a completed Patent Analysis Report.</p>
@@ -1102,7 +1102,7 @@ const ReviewQueueWorkspace = () => {
                 )}
 
                 {detailTab === "activity" && (
-                  <div className="mx-auto max-w-4xl rounded-xl border border-[var(--pulse-line)] bg-white p-6">
+                  <div className="mx-auto max-w-4xl rounded-md border border-[var(--pulse-line)] bg-white p-6">
                     <p className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-muted)]">Lifecycle</p>
                     <h3 className="mt-2 text-lg font-semibold">Review progress</h3>
                     <ReviewLifecycleTimeline idea={selectedIdea} />
@@ -1140,7 +1140,7 @@ const ReviewQueueWorkspace = () => {
                   </p>
                 )}
                 {!isCommittee && selectedIdea.status === "UNDER_REVIEW" && (
-                  <p className="rounded-lg border border-dashed border-[var(--pulse-line-strong)] bg-[var(--pulse-surface-subtle)] px-4 py-2.5 text-sm text-[var(--pulse-ink-muted)]">
+                  <p className="rounded-md border border-dashed border-[var(--pulse-line-strong)] bg-[var(--pulse-surface-subtle)] px-4 py-2.5 text-sm text-[var(--pulse-ink-muted)]">
                     Under Tech Committee review — it reaches your queue once the committee sends it on.
                   </p>
                 )}
@@ -1148,7 +1148,7 @@ const ReviewQueueWorkspace = () => {
                   <div className="flex items-center gap-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button type="button" className="grid h-10 w-10 place-items-center rounded-lg border border-[var(--pulse-line)] bg-white text-[var(--pulse-ink-secondary)] hover:border-[var(--pulse-line-strong)] hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]" aria-label="More decision actions" title="More decision actions">
+                        <button type="button" className="grid h-10 w-10 place-items-center rounded-sm border border-[var(--pulse-line)] bg-white text-[var(--pulse-ink-secondary)] hover:border-[var(--pulse-line-strong)] hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]" aria-label="More decision actions" title="More decision actions">
                           <MoreHorizontal className="h-4 w-4" />
                         </button>
                       </DropdownMenuTrigger>
@@ -1158,8 +1158,8 @@ const ReviewQueueWorkspace = () => {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <button type="button" onClick={() => setDecisionDialog("request")} className="h-10 whitespace-nowrap rounded-lg border border-[var(--pulse-line)] bg-white px-4 text-sm font-semibold text-[var(--pulse-ink-secondary)] hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]" aria-keyshortcuts="U" title="Request update (U)">Request Update from Inventor</button>
-                    <button type="button" onClick={() => approveMutation.mutate()} disabled={!reviewDraft || approveMutation.isPending} className="inline-flex h-10 min-w-[180px] items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[var(--pulse-brand)] px-4 text-sm font-semibold text-[var(--pulse-ink)] shadow-[0_1px_0_rgba(0,0,0,0.1)] hover:bg-[var(--pulse-brand-hover)] disabled:cursor-not-allowed disabled:opacity-50" aria-keyshortcuts="Control+Enter Meta+Enter" title={reviewDraft ? `${isCommittee ? "Send to Legal Counsel" : "Send to Photon Legal"} (⌘/Ctrl+Enter)` : "A submitted draft is required"}>{approveMutation.isPending ? "Sending…" : isCommittee ? "Send to Legal Counsel" : "Send to Photon Legal"}<ArrowRight className="h-4 w-4" /></button>
+                    <button type="button" onClick={() => setDecisionDialog("request")} className="h-10 whitespace-nowrap rounded-sm border border-[var(--pulse-line)] bg-white px-4 text-sm font-semibold text-[var(--pulse-ink-secondary)] hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]" aria-keyshortcuts="U" title="Request update (U)">Request Update from Inventor</button>
+                    <button type="button" onClick={() => approveMutation.mutate()} disabled={!reviewDraft || approveMutation.isPending} className="inline-flex h-10 min-w-[180px] items-center justify-center gap-2 whitespace-nowrap rounded-sm bg-[var(--pulse-brand)] px-4 text-sm font-semibold text-[var(--pulse-ink)] shadow-[0_1px_0_rgba(0,0,0,0.1)] hover:bg-[var(--pulse-brand-hover)] disabled:cursor-not-allowed disabled:opacity-50" aria-keyshortcuts="Control+Enter Meta+Enter" title={reviewDraft ? `${isCommittee ? "Send to Legal Counsel" : "Send to Photon Legal"} (⌘/Ctrl+Enter)` : "A submitted draft is required"}>{approveMutation.isPending ? "Sending…" : isCommittee ? "Send to Legal Counsel" : "Send to Photon Legal"}<ArrowRight className="h-4 w-4" /></button>
                   </div>
                 )}
               </div>
@@ -1177,7 +1177,7 @@ const ReviewQueueWorkspace = () => {
           }
         }}
       >
-        <DialogContent className="max-w-lg rounded-xl border-[var(--pulse-line)] bg-white p-0 shadow-2xl">
+        <DialogContent className="max-w-lg rounded-lg border-[var(--pulse-line)] bg-white p-0 shadow-2xl">
           <DialogHeader className="border-b border-[var(--pulse-line)] p-6 text-left">
             <DialogTitle className="text-xl font-semibold tracking-[-0.01em]">
               {decisionDialog === "request" ? "Request an update" : "Decline disclosure"}
@@ -1197,18 +1197,18 @@ const ReviewQueueWorkspace = () => {
               value={decisionNote}
               onChange={(event) => setDecisionNote(event.target.value)}
               placeholder={decisionDialog === "request" ? "For example: clarify how the heater traces are patterned and attach the latest test results." : "Explain why this disclosure should not proceed."}
-              className="ph-no-capture mt-2 min-h-32 rounded-lg border-[var(--pulse-line)] bg-white text-sm leading-6 focus-visible:ring-[var(--pulse-focus)]"
+              className="ph-no-capture mt-2 min-h-32 rounded-sm border-[var(--pulse-line)] bg-white text-sm leading-6 focus-visible:ring-[var(--pulse-focus)]"
               autoFocus
             />
             <p className="mt-2 text-xs text-[var(--pulse-ink-muted)]">Be specific and use plain language. The inventor will see this verbatim.</p>
           </div>
           <DialogFooter className="border-t border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] p-4">
-            <button type="button" onClick={() => setDecisionDialog(null)} className="h-10 rounded-lg px-4 text-sm font-semibold text-[var(--pulse-ink-secondary)] hover:bg-white">Cancel</button>
+            <button type="button" onClick={() => setDecisionDialog(null)} className="h-10 rounded-sm px-4 text-sm font-semibold text-[var(--pulse-ink-secondary)] hover:bg-white">Cancel</button>
             <button
               type="button"
               disabled={!decisionNote.trim() || requestUpdateMutation.isPending || declineMutation.isPending}
               onClick={() => decisionDialog === "request" ? requestUpdateMutation.mutate() : declineMutation.mutate()}
-              className={`h-10 rounded-lg px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${decisionDialog === "request" ? "bg-[var(--pulse-brand)] text-[var(--pulse-ink)] hover:bg-[var(--pulse-brand-hover)]" : "bg-[var(--pulse-danger)] text-white hover:brightness-95"}`}
+              className={`h-10 rounded-sm px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${decisionDialog === "request" ? "bg-[var(--pulse-brand)] text-[var(--pulse-ink)] hover:bg-[var(--pulse-brand-hover)]" : "bg-[var(--pulse-danger)] text-white hover:brightness-95"}`}
             >
               {requestUpdateMutation.isPending || declineMutation.isPending
                 ? "Saving…"

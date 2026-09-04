@@ -65,7 +65,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
                 role="radio"
                 aria-checked={isActive}
                 onClick={() => onPresetChange(p)}
-                className={`flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors ${
+                className={`flex w-full items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-left text-sm transition-colors ${
                   isActive
                     ? "bg-[#F9B418]/15 text-[#F9B418]"
                     : "text-neutral-700 hover:bg-neutral-100 dark:text-zinc-200 dark:hover:bg-white/5"
@@ -108,7 +108,7 @@ const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
             <button
               type="button"
               onClick={onClear}
-              className="mt-2 w-full rounded px-2 py-1.5 text-left text-xs text-neutral-400 transition-colors hover:bg-[#F9B418]/10 hover:text-[#F9B418]"
+              className="mt-2 w-full rounded-sm px-2 py-1.5 text-left text-xs text-neutral-400 transition-colors hover:bg-[#F9B418]/10 hover:text-[#F9B418]"
             >
               Clear date filter
             </button>

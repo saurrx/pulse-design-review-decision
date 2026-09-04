@@ -37,13 +37,13 @@ const ChipField: React.FC<{
     <div>
       <Label htmlFor={inputId} className="text-xs font-medium">{label}</Label>
       <div
-        className="mt-1 flex flex-wrap items-center gap-1 rounded-md border border-neutral-300 px-2 py-1.5 focus-within:ring-1 focus-within:ring-ring dark:border-neutral-800"
+        className="mt-1 flex flex-wrap items-center gap-1 rounded-sm border border-neutral-300 px-2 py-1.5 focus-within:ring-1 focus-within:ring-ring dark:border-neutral-800"
         data-testid={`chip-field-${kind}`}
       >
         {list.map((c) => (
           <span
             key={c}
-            className="inline-flex items-center gap-1 rounded-full border border-neutral-200 bg-neutral-100 px-2 py-0.5 text-xs text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
+            className="inline-flex items-center gap-1 rounded-xs border border-neutral-200 bg-neutral-100 px-2 py-0.5 text-xs text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
           >
             {c}
             <button

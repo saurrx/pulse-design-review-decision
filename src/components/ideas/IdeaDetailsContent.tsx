@@ -1607,7 +1607,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
     return (
       <div
         key={step.id}
-        className={`flex items-center gap-3 p-3 rounded-md ${step.status === "active" ? "bg-primary/10" : ""
+        className={`flex items-center gap-3 p-3 rounded-sm ${step.status === "active" ? "bg-primary/10" : ""
           }`}
       >
         {stepIcon()}
@@ -1629,7 +1629,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
     return (
       <div
         id="supporting-files"
-        className={`mb-10 border rounded-lg ${theme === "dark" ? "bg-zinc-900 border-[#cccccc20]" : "bg-white"
+        className={`mb-10 border rounded-md ${theme === "dark" ? "bg-zinc-900 border-[#cccccc20]" : "bg-white"
           }`}
       >
         <div className="px-6 py-4">
@@ -1667,7 +1667,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                   className={`w-full border-2 border-dashed cursor-pointer ${theme === "dark"
                     ? "bg-[#cccccc20] border-[#cccccc20]"
                     : "bg-[#cccccc10] border-gray-300 hover:bg-gray-50"
-                    } rounded-lg p-6 text-center transition-colors`}
+                    } rounded-md p-6 text-center transition-colors`}
                 >
                   <Upload className="mx-auto h-6 w-6 text-gray-500 mb-3" />
                   <p
@@ -1701,7 +1701,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
               {mainIdeaData?.IdeaFiles?.map((file: any, index: number) => (
                 <div
                   key={file?.id ?? index}
-                  className={`flex w-full items-center justify-between p-3 rounded border ${theme === "dark"
+                  className={`flex w-full items-center justify-between p-3 rounded-md border ${theme === "dark"
                     ? "border-white/10 bg-white/5"
                     : "border-neutral-200 bg-neutral-50"
                     }`}
@@ -1730,7 +1730,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                           "_blank",
                         )
                       }
-                      className={`p-1.5 rounded transition-colors ${theme === "dark"
+                      className={`p-1.5 rounded-sm transition-colors ${theme === "dark"
                         ? "hover:bg-white/10 text-neutral-400 hover:text-neutral-200"
                         : "hover:bg-neutral-200 text-neutral-500 hover:text-neutral-700"
                         }`}
@@ -1750,7 +1750,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                             }
                           }}
                           disabled={isDeletingFile && deletingFileId === file?.id}
-                          className={`p-1.5 rounded transition-colors ${theme === "dark"
+                          className={`p-1.5 rounded-sm transition-colors ${theme === "dark"
                             ? "hover:bg-red-500/10 text-neutral-400 hover:text-red-400"
                             : "hover:bg-red-50 text-neutral-500 hover:text-red-600"
                             }`}
@@ -2022,7 +2022,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                   <button
                     type="button"
                     disabled={isUpdatingOCStatus}
-                    className="inline-flex h-10 min-w-[190px] items-center justify-between gap-3 rounded-xl border border-[#E8E8E8] bg-white px-3.5 text-[13px] font-medium text-[#444444] transition-colors hover:border-[#C8C8C8] hover:text-[#0C0C0C] disabled:cursor-wait disabled:opacity-60"
+                    className="inline-flex h-10 min-w-[190px] items-center justify-between gap-3 rounded-sm border border-[#E8E8E8] bg-white px-3.5 text-[13px] font-medium text-[#444444] transition-colors hover:border-[#C8C8C8] hover:text-[#0C0C0C] disabled:cursor-wait disabled:opacity-60"
                     aria-label={`OC workflow status: ${ocWorkflowLabel}`}
                   >
                     <span className="flex items-center gap-2">
@@ -2073,7 +2073,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           )}
 
           {isReviewWorkspace && user?.role !== "TECH_COMMITTEE" && isUnderCommitteeReview && (
-            <p className="ml-auto self-center rounded-lg border border-dashed border-[var(--pulse-line-strong)] bg-[var(--pulse-surface-subtle)] px-4 py-2.5 text-sm text-[var(--pulse-ink-muted)]">
+            <p className="ml-auto self-center rounded-md border border-dashed border-[var(--pulse-line-strong)] bg-[var(--pulse-surface-subtle)] px-4 py-2.5 text-sm text-[var(--pulse-ink-muted)]">
               Under Tech Committee review — it reaches your queue once the committee sends it on.
             </p>
           )}
@@ -2085,7 +2085,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                   type="button"
                   disabled={isLoadingToOC}
                   onClick={() => setOpenSendToOCModal(true)}
-                  className="flex h-9 items-center gap-2 rounded-xl bg-[#F9B418] px-5 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="flex h-9 items-center gap-2 rounded-sm bg-[#F9B418] px-5 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {user?.role === "TECH_COMMITTEE" ? "Send to Legal Counsel" : "Send to Photon Legal"}
                   <ArrowRight className="h-4 w-4" />
@@ -2124,7 +2124,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className={`flex h-9 w-9 items-center justify-center rounded-xl border transition-colors ${theme === "light"
+                    className={`flex h-9 w-9 items-center justify-center rounded-sm border transition-colors ${theme === "light"
                       ? "border-gray-200 text-gray-600 hover:bg-[#F5F5F5]"
                       : "border-neutral-800 text-neutral-400 hover:bg-white/5"
                       }`}
@@ -2181,7 +2181,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
       ) : isInventorOverview ? (
         <div className="relative z-10 min-h-0 flex-1 overflow-y-auto bg-[var(--pulse-canvas)] pb-10">
           <div className="mx-auto w-full max-w-[1160px] px-6 py-8">
-            <section className="overflow-hidden rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] [box-shadow:var(--pulse-shadow-card)]">
+            <section className="overflow-hidden rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] [box-shadow:var(--pulse-shadow-card)]">
               <div className="flex items-start gap-4 border-l-4 border-l-[#F9B418] px-6 py-5">
                 <span
                   className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full ${
@@ -2217,7 +2217,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowViewContentsModal(true)}
-                    className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl bg-[#F9B418] px-4 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700]"
+                    className="inline-flex h-10 shrink-0 items-center gap-2 rounded-sm bg-[#F9B418] px-4 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700]"
                   >
                     View request <ArrowRight className="h-4 w-4" />
                   </button>
@@ -2260,7 +2260,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
 
                   <aside className="w-full lg:sticky lg:top-4 lg:w-[40%]">
                     {latestScoreReport ? (
-                      <div className="overflow-hidden rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)]">
+                      <div className="overflow-hidden rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)]">
                         <div className="border-b border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-5 py-4 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--pulse-ink-muted)]">
                           AI evaluation
                         </div>
@@ -2304,7 +2304,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                     <button
                       type="button"
                       onClick={handleDownloadFiles}
-                      className="inline-flex h-9 items-center gap-2 rounded-xl border border-[var(--pulse-line)] px-3.5 text-sm font-medium text-[var(--pulse-ink-secondary)] hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
+                      className="inline-flex h-9 items-center gap-2 rounded-sm border border-[var(--pulse-line)] px-3.5 text-sm font-medium text-[var(--pulse-ink-secondary)] hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
                     >
                       <Download className="h-4 w-4" /> Download files
                     </button>
@@ -2384,7 +2384,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                   (x: any) => x?.inventor?.id !== mainIdeaData?.created_by_id,
                 );
                 return (
-                  <div className="mb-4 flex items-center justify-between rounded-xl border border-[#E8E8E8] bg-white px-4 py-3">
+                  <div className="mb-4 flex items-center justify-between rounded-md border border-[#E8E8E8] bg-white px-4 py-3">
                     <span className="text-[13px] font-medium text-[#0C0C0C]">
                       Co-inventors
                     </span>
@@ -2401,7 +2401,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
               })()}
               {ideaDraft?.[0]?.api_evaluation_id &&
                 !ideaDraft?.[0]?.CheckDraftSoreLog?.[0]?.score_meta_data && (
-                <div className="mb-4 overflow-hidden rounded-xl border border-[#E8E8E8] bg-white">
+                <div className="mb-4 overflow-hidden rounded-md border border-[#E8E8E8] bg-white">
                   <div className="border-b border-[#E8E8E8] bg-[#FAFAFA] px-4 py-3 font-mono text-xs font-semibold uppercase tracking-[1px] text-[#444444]">
                     Patent Analysis Report
                   </div>
@@ -2417,7 +2417,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                 </div>
               )}
               {ideaDraft?.[0]?.CheckDraftSoreLog?.[0]?.score_meta_data && (
-                <div className="overflow-hidden rounded-xl border border-[#E8E8E8] bg-white">
+                <div className="overflow-hidden rounded-md border border-[#E8E8E8] bg-white">
                   <div className="border-b border-[#E8E8E8] bg-[#FAFAFA] px-4 py-3 font-mono text-xs font-semibold uppercase tracking-[1px] text-[#444444]">
                     Patent Analysis Report
                   </div>
@@ -2457,7 +2457,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
               {ideaDraft?.[0]?.CheckDraftSoreLog?.[0]?.score_meta_data &&
                 mainIdeaData?.status?.toUpperCase() !== "IN_DRAFT" &&
                 (user?.role === "LEGAL_COUNSEL" || isOutsideCounselRole(user?.role)) && (
-                  <div className="mb-8 overflow-hidden rounded-xl border border-[#E8E8E8] bg-white">
+                  <div className="mb-8 overflow-hidden rounded-md border border-[#E8E8E8] bg-white">
                     <div className="border-b border-[#E8E8E8] bg-[#FAFAFA] px-4 py-3 font-mono text-xs font-semibold uppercase tracking-[1px] text-[#444444]">
                       Patent Analysis Report
                     </div>
@@ -2507,7 +2507,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                         mainIdeaData?.status?.toUpperCase() ===
                         "IN_DRAFT")) && (
                         <Button
-                          className={`flex items-center gap-2 px-4 py-2 rounded-md h-9 border transition-colors bg-transparent hover:bg-transparent ${theme === "dark"
+                          className={`flex items-center gap-2 px-4 py-2 rounded-sm h-9 border transition-colors bg-transparent hover:bg-transparent ${theme === "dark"
                             ? "border-neutral-800 hover:border-[#F5A623]/50 text-neutral-400"
                             : "border-gray-200 hover:border-[#F5A623] text-neutral-600"
                             } hover:text-[#F5A623]`}
@@ -2531,7 +2531,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                         className={` bg-[#F9B418] font-semibold h-9 font-sans ${theme === "dark"
                           ? "text-neutral-900 hover:bg-[#F9B418]"
                           : "text-gray-900 hover:bg-[#F9B418]"
-                          } gap-2 rounded-lg`}
+                          } gap-2 rounded-sm`}
                         type="button"
                         disabled={!selectedDraftId}
                         onClick={() => setOpenSendToOCModal(true)}
@@ -2706,9 +2706,9 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
             className={`${theme === "dark"
               ? "bg-neutral-950 border-white/10"
               : "border-gray-200"
-              } !rounded-2xl sm:max-w-lg !max-w-[80vw] !bg-transparent w-full p-0 h-[96vh] overflow-none border`}
+              } !rounded-lg sm:max-w-lg !max-w-[80vw] !bg-transparent w-full p-0 h-[96vh] overflow-none border`}
           >
-            <div className="flex rounded-tl-2xl rounded-tr-2xl border-b-[thick] items-center justify-between px-8 py-5 shrink-0 border-neutral-200 bg-neutral-50 dark:border-white/10 dark:bg-neutral-900">
+            <div className="flex rounded-t-lg border-b-[thick] items-center justify-between px-8 py-5 shrink-0 border-neutral-200 bg-neutral-50 dark:border-white/10 dark:bg-neutral-900">
               <div>
                 <h2 className="text-xl font-semibold font-sans text-neutral-900 dark:text-neutral-100">
                   Patent Analysis Report
@@ -2733,7 +2733,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
               <div className="flex items-center gap-3">
                 <Button
                   variant="outline"
-                  className={`flex rounded-xl items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all border border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-white/10 dark:text-neutral-300 dark:hover:text-neutral-300 bg-transparent dark:hover:bg-white/5 dark:hover:border-white/20`}
+                  className={`flex rounded-sm items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all border border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-white/10 dark:text-neutral-300 dark:hover:text-neutral-300 bg-transparent dark:hover:bg-white/5 dark:hover:border-white/20`}
                   onClick={() => setOpenEvaluatePopup(true)}
                 >
                   <RefreshCcw className="h-4 w-4" /> Re-run Analysis
@@ -2743,7 +2743,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                   priorArt={draftReport?.priorArt}
                 />
                 <Button
-                  className={`p-2.5 rounded-lg transition-all bg-transparent hover:bg-neutral-200 text-neutral-600 hover:text-neutral-900 dark:hover:bg-white/10 dark:text-neutral-400 dark:hover:text-neutral-300`}
+                  className={`p-2.5 rounded-sm transition-all bg-transparent hover:bg-neutral-200 text-neutral-600 hover:text-neutral-900 dark:hover:bg-white/10 dark:text-neutral-400 dark:hover:text-neutral-300`}
                   onClick={() => setShowPatentReportModal(false)}
                 >
                   <X className="h-5 w-5" size={20} />
@@ -2790,13 +2790,13 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
           </AlertDialogHeader>
           <Textarea
             onChange={(e) => setPatentInput(e.target.value)}
-            className="h-10 bg-transparent uppercase font-sans text-neutral-900 dark:text-neutral-300 dark:bg-neutral-900 border dark:border-[#cccccc20] rounded-md placeholder:text-neutral-400 dark:placeholder:text-neutral-600"
+            className="h-10 bg-transparent uppercase font-sans text-neutral-900 dark:text-neutral-300 dark:bg-neutral-900 border dark:border-[#cccccc20] rounded-sm placeholder:text-neutral-400 dark:placeholder:text-neutral-600"
             placeholder="US1234567A1, US342567B1..."
           />
           <AlertDialogFooter>
             <AlertDialogCancel
               disabled={isReEvalLoading}
-              className={`bg-transparent border rounded-lg font-sans ${theme === "dark"
+              className={`bg-transparent border rounded-sm font-sans ${theme === "dark"
                 ? "border-[#cccccc20] text-zinc-300 hover:bg-transparent hover:text-zinc-300 bg-input/30 border-white"
                 : ""
                 }`}
@@ -2806,7 +2806,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
             <AlertDialogAction
               onClick={handleReEvalSubmit}
               //disabled={isDeleting}
-              className={`text-zinc-900 font-semibold rounded-lg font-sans bg-[#F9B418] hover:bg-[#F9B41890]`}
+              className={`text-zinc-900 font-semibold rounded-sm font-sans bg-[#F9B418] hover:bg-[#F9B41890]`}
             >
               {isReEvalLoading ? "Submitting..." : "Submit"}
             </AlertDialogAction>
@@ -2837,7 +2837,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
                 </div>
               )}
 
-              <div className="space-y-1 bg-gray-100 rounded-lg p-2">
+              <div className="space-y-1 bg-gray-100 rounded-md p-2">
                 {analysisSteps.map((step, index) =>
                   renderAnalysisStep(step, index),
                 )}
@@ -2848,7 +2848,7 @@ const IdeaDetailsContent: React.FC<IdeaDetailsContentProps> = ({
               <Button
                 variant="outline"
                 onClick={handleRunInBackground}
-                className="rounded-md"
+                className="rounded-sm"
                 disabled={analysisSteps.every(
                   (step) => step.status === "completed",
                 )}

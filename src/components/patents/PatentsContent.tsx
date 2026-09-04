@@ -1234,7 +1234,7 @@ const PatentsContent = (props: PatentsContentProps) => {
 
     return (
       <div
-        className={`pulse-pagination-bar relative z-20 !mx-0 !mb-0 !mt-0 rounded-xl border ${
+        className={`pulse-pagination-bar relative z-20 !mx-0 !mb-0 !mt-0 rounded-md border ${
           theme === "dark"
             ? "bg-neutral-950 border-[#cccccc20]"
             : "bg-white border-photon-gray-300"
@@ -1255,7 +1255,7 @@ const PatentsContent = (props: PatentsContentProps) => {
               <select
                 value={itemsPerPage.toString()}
                 onChange={(e) => handleItemsPerPageChange(e.target.value)}
-                className={`border rounded pl-3 pr-8 py-1.5 text-sm appearance-none focus:outline-none focus:border-[#F9B418] transition-colors ${
+                className={`border rounded-sm pl-3 pr-8 py-1.5 text-sm appearance-none focus:outline-none focus:border-[#F9B418] transition-colors ${
                   theme === "dark"
                     ? "bg-neutral-900 border-neutral-800 text-neutral-300"
                     : "bg-white border-neutral-200 text-neutral-700"
@@ -1385,7 +1385,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                 />
                 <Input
                   name="search"
-                  className={`pl-10 h-[42px] pb-2.5 rounded ${
+                  className={`pl-10 h-[42px] pb-2.5 rounded-sm ${
                     theme === "dark"
                       ? "bg-neutral-900 border border-[#cccccc11] text-zinc-200 placeholder:text-neutral-600"
                       : "text-zinc-900 placeholder:text-neutral-400 bg-neutral-50"
@@ -1851,7 +1851,7 @@ const PatentsContent = (props: PatentsContentProps) => {
             <div className="mt-4 flex items-center gap-2 flex-wrap">
               <span className="text-xs text-neutral-500">Active Filters:</span>
               {dateFilterActive && (
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border bg-neutral-100 border-neutral-300 text-neutral-700 dark:text-neutral-300 dark:bg-neutral-900 dark:border-[#27272a]">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xs text-xs border bg-neutral-100 border-neutral-300 text-neutral-700 dark:text-neutral-300 dark:bg-neutral-900 dark:border-[#27272a]">
                   <span>Filed: {getDateFilterLabel()}</span>
                   <button
                     className="hover:text-[#F9B418]"
@@ -1862,7 +1862,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                 </div>
               )}
               {filterOption.map((option) => (
-                <div key={option} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border bg-neutral-100 border-neutral-300 text-neutral-700 dark:text-neutral-300 dark:bg-neutral-900 dark:border-[#27272a]">
+                <div key={option} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xs text-xs border bg-neutral-100 border-neutral-300 text-neutral-700 dark:text-neutral-300 dark:bg-neutral-900 dark:border-[#27272a]">
                   <span>
                     Status:{" "}
                     {PATENT_LEGAL_STATUS_META[option as PatentLegalStatus]
@@ -1898,7 +1898,7 @@ const PatentsContent = (props: PatentsContentProps) => {
               {selectedTags.map((tag) => (
                 <div
                   key={`tag-chip-${tag}`}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs border bg-neutral-100 border-neutral-300 text-neutral-700 dark:text-neutral-300 dark:bg-neutral-900 dark:border-[#27272a]"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xs text-xs border bg-neutral-100 border-neutral-300 text-neutral-700 dark:text-neutral-300 dark:bg-neutral-900 dark:border-[#27272a]"
                 >
                   <span className="max-w-[160px] truncate" title={tag}>
                     Tag: {tag}
@@ -1919,7 +1919,7 @@ const PatentsContent = (props: PatentsContentProps) => {
                   setSelectedTags([]);
                   clearDateFilter();
                 }}
-                className="text-xs px-2.5 py-1 rounded hover:bg-[#F9B418]/10 transition-colors text-neutral-400 hover:text-[#F9B418]"
+                className="text-xs px-2.5 py-1 rounded-sm hover:bg-[#F9B418]/10 transition-colors text-neutral-400 hover:text-[#F9B418]"
               >
                 Clear All
               </button>
@@ -1969,7 +1969,7 @@ const PatentsContent = (props: PatentsContentProps) => {
               </div>
             ) : (
               <div
-                className={`overflow-hidden rounded-2xl ${
+                className={`overflow-hidden rounded-md ${
                   theme === "dark"
                     ? "bg-transparent"
                     : "bg-white border-photon-gray-200 border"

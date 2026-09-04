@@ -887,7 +887,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
     return (
       <div className="ph-no-capture mx-auto w-full max-w-[960px] space-y-6">
         <section
-          className={`overflow-hidden rounded-2xl border [box-shadow:var(--pulse-shadow-card)] ${
+          className={`overflow-hidden rounded-md border [box-shadow:var(--pulse-shadow-card)] ${
             theme === "dark"
               ? "border-white/10 bg-white/5"
               : "border-[var(--pulse-line)] bg-white"
@@ -919,7 +919,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
             <button
               type="button"
               onClick={() => setIsEditMode?.(true)}
-              className={`inline-flex h-10 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium transition-colors ${
+              className={`inline-flex h-10 items-center justify-center gap-2 rounded-sm border px-4 text-sm font-medium transition-colors ${
                 theme === "dark"
                   ? "border-white/10 text-neutral-300 hover:border-[#F9B418]/50 hover:text-[#F9B418]"
                   : "border-[var(--pulse-line)] text-[var(--pulse-ink-secondary)] hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
@@ -936,7 +936,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
         </section>
 
         <div className="grid items-start gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <section className={`rounded-2xl border p-6 [box-shadow:var(--pulse-shadow-card)] ${theme === "dark" ? "border-white/10 bg-white/5" : "border-[var(--pulse-line)] bg-white"}`}>
+          <section className={`rounded-md border p-6 [box-shadow:var(--pulse-shadow-card)] ${theme === "dark" ? "border-white/10 bg-white/5" : "border-[var(--pulse-line)] bg-white"}`}>
             <div className="flex items-center gap-2">
               <IdCard className="h-4 w-4 text-[var(--pulse-ink-muted)]" />
               <h3 className={`text-base font-semibold ${theme === "dark" ? "text-neutral-100" : "text-[var(--pulse-ink)]"}`}>
@@ -960,7 +960,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
           </section>
 
           <div>
-            <section className={`rounded-2xl border p-6 [box-shadow:var(--pulse-shadow-card)] ${theme === "dark" ? "border-white/10 bg-white/5" : "border-[var(--pulse-line)] bg-white"}`}>
+            <section className={`rounded-md border p-6 [box-shadow:var(--pulse-shadow-card)] ${theme === "dark" ? "border-white/10 bg-white/5" : "border-[var(--pulse-line)] bg-white"}`}>
               <div className="flex items-center gap-2">
                 <Bell className="h-4 w-4 text-[var(--pulse-ink-muted)]" />
                 <h3 className={`text-base font-semibold ${theme === "dark" ? "text-neutral-100" : "text-[var(--pulse-ink)]"}`}>
@@ -998,7 +998,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
           </div>
         </div>
 
-        <section className={`overflow-hidden rounded-2xl border [box-shadow:var(--pulse-shadow-card)] ${theme === "dark" ? "border-white/10 bg-white/5" : "border-[var(--pulse-line)] bg-white"}`}>
+        <section className={`overflow-hidden rounded-md border [box-shadow:var(--pulse-shadow-card)] ${theme === "dark" ? "border-white/10 bg-white/5" : "border-[var(--pulse-line)] bg-white"}`}>
           <div className="flex items-center gap-2 border-b border-[var(--pulse-line)] px-6 py-5">
             <ShieldCheck className="h-4 w-4 text-[#1E7B4D]" />
             <h3 className={`text-base font-semibold ${theme === "dark" ? "text-neutral-100" : "text-[var(--pulse-ink)]"}`}>
@@ -1007,7 +1007,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
           </div>
 
           <div className="grid gap-4 p-6 md:grid-cols-2">
-            <div className={`rounded-xl border p-5 ${theme === "dark" ? "border-white/10 bg-white/[0.02]" : "border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]"}`}>
+            <div className={`rounded-md border p-5 ${theme === "dark" ? "border-white/10 bg-white/[0.02]" : "border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]"}`}>
               <div className="flex items-start gap-3">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[var(--pulse-surface)] text-[var(--pulse-ink-muted)]">
                   <KeyRound className="h-4 w-4" />
@@ -1017,7 +1017,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                     <p className={`text-sm font-semibold ${theme === "dark" ? "text-neutral-200" : "text-[var(--pulse-ink)]"}`}>
                       {signInMethod}
                     </p>
-                    <span className="inline-flex h-6 shrink-0 items-center rounded-md bg-[#E9F1EC] px-2 text-[11px] font-semibold text-[#155C3B]">
+                    <span className="inline-flex h-6 shrink-0 items-center rounded-xs bg-[#E9F1EC] px-2 text-[11px] font-semibold text-[#155C3B]">
                       Verified
                     </span>
                   </div>
@@ -1039,7 +1039,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
               </div>
             </div>
 
-            <div className={`rounded-xl border p-5 ${theme === "dark" ? "border-white/10 bg-white/[0.02]" : "border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]"}`}>
+            <div className={`rounded-md border p-5 ${theme === "dark" ? "border-white/10 bg-white/[0.02]" : "border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]"}`}>
               <div className="flex items-start gap-3">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[var(--pulse-surface)] text-[var(--pulse-ink-muted)]">
                   <Laptop className="h-4 w-4" />
@@ -1067,14 +1067,14 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
               <button
                 type="button"
                 onClick={() => signOut(false)}
-                className="inline-flex h-9 items-center gap-2 rounded-xl border border-[var(--pulse-line)] bg-white px-3.5 text-sm font-medium text-[var(--pulse-ink-secondary)] hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
+                className="inline-flex h-9 items-center gap-2 rounded-sm border border-[var(--pulse-line)] bg-white px-3.5 text-sm font-medium text-[var(--pulse-ink-secondary)] hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
               >
                 <LogOut className="h-4 w-4" /> Sign out
               </button>
               <button
                 type="button"
                 onClick={() => setSignOutAllOpen(true)}
-                className="inline-flex h-9 items-center gap-2 rounded-xl border border-[var(--pulse-line)] bg-white px-3.5 text-sm font-medium text-[var(--pulse-danger)] hover:border-[var(--pulse-danger)]"
+                className="inline-flex h-9 items-center gap-2 rounded-sm border border-[var(--pulse-line)] bg-white px-3.5 text-sm font-medium text-[var(--pulse-danger)] hover:border-[var(--pulse-danger)]"
               >
                 Sign out all devices
               </button>
@@ -1147,7 +1147,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
               <button
                 type="button"
                 onClick={() => setChangePasswordOpen(false)}
-                className="h-10 rounded-xl border border-[var(--pulse-line)] px-4 text-sm font-medium"
+                className="h-10 rounded-sm border border-[var(--pulse-line)] px-4 text-sm font-medium"
               >
                 Cancel
               </button>
@@ -1160,7 +1160,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                   !passwordValues.newPassword ||
                   !passwordValues.confirmPassword
                 }
-                className="h-10 rounded-xl bg-[var(--pulse-brand)] px-4 text-sm font-semibold text-[var(--pulse-ink)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-10 rounded-sm bg-[var(--pulse-brand)] px-4 text-sm font-semibold text-[var(--pulse-ink)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isChangingPassword ? "Updating…" : "Update password"}
               </button>
@@ -1193,7 +1193,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
 
   return (
     <div
-      className={`mx-auto mt-5 w-full max-w-4xl rounded-2xl border p-6 backdrop-blur-xl ${
+      className={`mx-auto mt-5 w-full max-w-4xl rounded-md border p-6 backdrop-blur-xl ${
         theme === "dark"
           ? "bg-white/5 border-white/10"
           : "bg-white/80 border-neutral-200"
@@ -1259,7 +1259,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                 <IdCard className="w-4 h-4 inline mr-1.5" aria-hidden="true" />
                 Employee ID
               </label>
-              <div className="px-4 py-3 min-h-[44px] font-sans flex items-center rounded-md border dark:bg-white/5 dark:border-white/10 dark:text-neutral-400 bg-neutral-100 border-neutral-200 text-neutral-600">
+              <div className="px-4 py-3 min-h-[44px] font-sans flex items-center rounded-sm border dark:bg-white/5 dark:border-white/10 dark:text-neutral-400 bg-neutral-100 border-neutral-200 text-neutral-600">
                 {form.getValues("employeeId")}
               </div>
             </div>
@@ -1274,7 +1274,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                 <Mail className="w-4 h-4 inline mr-1.5" aria-hidden="true" />
                 Email ID
               </label>
-              <div className="px-4 py-3 min-h-[44px] flex items-center rounded-md border dark:bg-white/5 dark:border-white/10 dark:text-neutral-400 bg-neutral-100 border-neutral-200 text-neutral-600">
+              <div className="px-4 py-3 min-h-[44px] flex items-center rounded-sm border dark:bg-white/5 dark:border-white/10 dark:text-neutral-400 bg-neutral-100 border-neutral-200 text-neutral-600">
                 {form.getValues("email")}
               </div>
             </div>
@@ -1302,7 +1302,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                         {...field}
                         placeholder="Enter your name here"
                         maxLength={100}
-                        className={`px-4 py-3 min-h-[44px] rounded-md border ${
+                        className={`px-4 py-3 min-h-[44px] rounded-sm border ${
                           theme === "dark"
                             ? "bg-white/5 border-white/10 text-neutral-200"
                             : "bg-white border-neutral-200 text-neutral-800"
@@ -1311,7 +1311,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                     </FormControl>
                   ) : (
                     <div
-                      className={`px-4 py-3 min-h-[44px] flex items-center rounded-md border ${
+                      className={`px-4 py-3 min-h-[44px] flex items-center rounded-sm border ${
                         theme === "dark"
                           ? "bg-white/5 border-white/10 text-neutral-200"
                           : "bg-white border-neutral-200 text-neutral-800"
@@ -1351,7 +1351,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                             value={`${selectedCountry.code}|${selectedCountry.name}`}
                           >
                             <SelectTrigger
-                              className={`w-24 h-11 px-2 rounded-md border ${
+                              className={`w-24 h-11 px-2 rounded-sm border ${
                                 theme === "dark"
                                   ? "bg-white/5 border-white/10 text-neutral-200"
                                   : "bg-white border-neutral-200 text-neutral-800"
@@ -1407,7 +1407,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                           </Select>
                           <Input
                             {...field}
-                            className={`flex-1 h-11 px-4 rounded-md border ${
+                            className={`flex-1 h-11 px-4 rounded-sm border ${
                               theme === "dark"
                                 ? "bg-white/5 border-white/10 text-neutral-200"
                                 : "bg-white border-neutral-200 text-neutral-800"
@@ -1448,7 +1448,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                     </>
                   ) : (
                     <div
-                      className={`px-4 py-3 min-h-[44px] flex items-center rounded-md border ${
+                      className={`px-4 py-3 min-h-[44px] flex items-center rounded-sm border ${
                         theme === "dark"
                           ? "bg-white/5 border-white/10 text-neutral-200"
                           : "bg-white border-neutral-200 text-neutral-800"
@@ -1500,7 +1500,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                         placeholder="Enter your address here"
                         rows={3}
                         maxLength={300}
-                        className={`px-4 py-3 min-h-[44px] rounded-md border ${
+                        className={`px-4 py-3 min-h-[44px] rounded-sm border ${
                           theme === "dark"
                             ? "bg-white/5 border-white/10 text-neutral-200"
                             : "bg-white border-neutral-200 text-neutral-800"
@@ -1509,7 +1509,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
                     </FormControl>
                   ) : (
                     <div
-                      className={`px-4 py-3 min-h-[44px] flex items-center rounded-md border ${
+                      className={`px-4 py-3 min-h-[44px] flex items-center rounded-sm border ${
                         theme === "dark"
                           ? "bg-white/5 border-white/10 text-neutral-200"
                           : "bg-white border-neutral-200 text-neutral-800"

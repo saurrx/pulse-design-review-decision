@@ -67,7 +67,7 @@ const CardError = ({ onRetry, label = "Could not load this" }: {
       <button
         type="button"
         onClick={onRetry}
-        className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--pulse-line)] px-2.5 py-1 text-[12px] font-semibold text-[var(--pulse-ink)] transition-colors hover:bg-[var(--pulse-surface-subtle)]"
+        className="inline-flex items-center gap-1.5 rounded-sm border border-[var(--pulse-line)] px-2.5 py-1 text-[12px] font-semibold text-[var(--pulse-ink)] transition-colors hover:bg-[var(--pulse-surface-subtle)]"
       >
         <RotateCcw className="h-3.5 w-3.5" />
         Retry
@@ -138,7 +138,7 @@ const IdeasAndFilingsTooltip = ({ active, label, payload }: any) => {
   const filings = point?.filings ?? 0;
 
   return (
-    <div className="rounded-md border border-[var(--pulse-line)] bg-white px-3 py-2 font-sans text-xs text-[var(--pulse-ink)] shadow-sm">
+    <div className="rounded-xs border border-[var(--pulse-line)] bg-white px-3 py-2 font-sans text-xs text-[var(--pulse-ink)] shadow-sm">
       Week of {label} · {ideas} idea{ideas === 1 ? "" : "s"} · {filings} filing{filings === 1 ? "" : "s"}
     </div>
   );
@@ -258,7 +258,7 @@ const PortfolioMotion = ({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="inline-flex h-9 min-w-[150px] items-center justify-between gap-3 rounded-lg border border-[var(--pulse-line)] bg-white px-3 text-xs font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
+                className="inline-flex h-9 min-w-[150px] items-center justify-between gap-3 rounded-sm border border-[var(--pulse-line)] bg-white px-3 text-xs font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
                 aria-label={`Filter chart by client: ${selectionLabel}`}
               >
                 <span className="flex min-w-0 items-center gap-2">
@@ -460,7 +460,7 @@ const IdeaPipeline = ({
           <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">Ideas by stage</p>
         </div>
         {periodLabel && (
-          <span className="inline-flex h-8 items-center rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-2.5 text-xs font-medium text-[var(--pulse-ink-secondary)]" title="The window these counts cover">
+          <span className="inline-flex h-8 items-center rounded-xs border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-2.5 text-xs font-medium text-[var(--pulse-ink-secondary)]" title="The window these counts cover">
             {periodLabel}
           </span>
         )}
@@ -469,7 +469,7 @@ const IdeaPipeline = ({
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="inline-flex h-9 min-w-[150px] items-center justify-between gap-3 rounded-lg border border-[var(--pulse-line)] bg-white px-3 text-xs font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
+                className="inline-flex h-9 min-w-[150px] items-center justify-between gap-3 rounded-sm border border-[var(--pulse-line)] bg-white px-3 text-xs font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
                 aria-label={`Filter pipeline by client: ${selectionLabel}`}
               >
                 <span className="flex min-w-0 items-center gap-2">
@@ -510,7 +510,7 @@ const IdeaPipeline = ({
       </div>
       {loading ? (
         <div className="mt-5 flex flex-1 flex-col justify-between gap-3" role="status" aria-busy="true" aria-label="Loading the pipeline">
-          {stages.map((s) => <div key={s.key} className="h-8 animate-pulse rounded-md bg-[var(--pulse-surface-subtle)]" />)}
+          {stages.map((s) => <div key={s.key} className="h-8 animate-pulse rounded-xs bg-[var(--pulse-surface-subtle)]" />)}
         </div>
       ) : (
       <div className="mt-5 flex flex-1 flex-col justify-between">
@@ -546,7 +546,7 @@ const IdeaPipeline = ({
               key={s.key}
               type="button"
               onClick={() => onStageClick(s.key)}
-              className={`${rowCls} rounded-md text-left transition-colors hover:bg-[var(--pulse-surface-subtle)]`}
+              className={`${rowCls} rounded-xs text-left transition-colors hover:bg-[var(--pulse-surface-subtle)]`}
             >
               {inner}
             </button>
@@ -650,7 +650,7 @@ const NeedsReview = ({
   return (
   <div className={`${CARD_CLASS} relative flex h-full min-h-[320px] flex-col overflow-hidden`}>
     {!v0 && <span
-      className="absolute inset-x-0 top-0 h-[3px]"
+      className="absolute inset-x-0 top-0 h-[3px] rounded-t-md"
       style={{
         background:
           "linear-gradient(90deg, var(--pulse-data-accent) 0 34%, var(--pulse-data-risk) 34% 52%, var(--pulse-data-ai) 52% 70%, var(--pulse-data-cyan) 70% 84%, var(--pulse-data-success) 84% 100%)",
@@ -674,7 +674,7 @@ const NeedsReview = ({
         <button
           type="button"
           onClick={onReviewAll}
-          className="inline-flex h-9 shrink-0 items-center gap-2 rounded-lg bg-[var(--pulse-brand)] px-3.5 text-xs font-semibold text-[var(--pulse-ink)] shadow-[0_1px_0_rgba(0,0,0,0.08)] transition-colors hover:bg-[var(--pulse-brand-hover)]"
+          className="inline-flex h-9 shrink-0 items-center gap-2 rounded-sm bg-[var(--pulse-brand)] px-3.5 text-xs font-semibold text-[var(--pulse-ink)] shadow-[0_1px_0_rgba(0,0,0,0.08)] transition-colors hover:bg-[var(--pulse-brand-hover)]"
         >
           {actionLabel === "Review all" ? "Open queue" : actionLabel}
           <ArrowRight className="h-3.5 w-3.5" />
@@ -687,7 +687,7 @@ const NeedsReview = ({
     ) : v0?.loading ? (
       <div className="mt-3 flex flex-1 flex-col gap-3" role="status" aria-busy="true" aria-label="Loading the queue">
         {[0, 1, 2, 3].map((k) => (
-          <div key={k} className="h-9 animate-pulse rounded-md bg-[var(--pulse-surface-subtle)]" />
+          <div key={k} className="h-9 animate-pulse rounded-xs bg-[var(--pulse-surface-subtle)]" />
         ))}
       </div>
     ) : rows.length === 0 && v0 ? (
@@ -762,7 +762,7 @@ const NeedsReview = ({
           <button
             type="button"
             onClick={onViewAll ?? onReviewAll ?? (() => onOpen(rows[0].id))}
-            className="mt-auto flex w-full items-center justify-between gap-3 rounded-lg border-t border-[var(--pulse-line)] px-3 py-2.5 text-left text-[13px] font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:bg-[var(--pulse-surface-subtle)]"
+            className="mt-auto flex w-full items-center justify-between gap-3 rounded-xs border-t border-[var(--pulse-line)] px-3 py-2.5 text-left text-[13px] font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:bg-[var(--pulse-surface-subtle)]"
           >
             <span style={NUMS}>{hiddenCount} more waiting</span>
             <span className="text-xs text-[var(--pulse-ink-muted)]">Review all →</span>
@@ -782,7 +782,7 @@ const NeedsReview = ({
             key={r.id}
             type="button"
             onClick={() => onOpen(r.id)}
-            className={`grid min-h-11 ${rowColumns} w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[var(--pulse-surface-subtle)] ${i > 0 ? "border-t border-[var(--pulse-line)]" : ""}`}
+            className={`grid min-h-11 ${rowColumns} w-full items-center gap-3 rounded-xs px-3 py-2.5 text-left transition-colors hover:bg-[var(--pulse-surface-subtle)] ${i > 0 ? "border-t border-[var(--pulse-line)]" : ""}`}
           >
             <span
               className="min-w-0 truncate text-[13px] font-medium text-[var(--pulse-ink)]"
@@ -803,7 +803,7 @@ const NeedsReview = ({
           <button
             type="button"
             onClick={onViewAll ?? onReviewAll ?? (() => onOpen(rows[0].id))}
-            className="mt-auto flex w-full items-center justify-between gap-3 rounded-lg border-t border-[var(--pulse-line)] px-3 py-2.5 text-left text-[13px] font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:bg-[var(--pulse-surface-subtle)]"
+            className="mt-auto flex w-full items-center justify-between gap-3 rounded-xs border-t border-[var(--pulse-line)] px-3 py-2.5 text-left text-[13px] font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:bg-[var(--pulse-surface-subtle)]"
           >
             <span style={NUMS}>{hiddenCount}+ pending {hiddenCount === 1 ? "action" : "actions"}</span>
             <span className="text-xs text-[var(--pulse-ink-muted)]">{actionLabel} →</span>
@@ -879,7 +879,7 @@ const SubmitIdeaButton = ({
   <button
     type="button"
     onClick={onClick}
-    className={`shrink-0 whitespace-nowrap rounded-[2px] bg-[#F9B418] font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] ${
+    className={`shrink-0 whitespace-nowrap rounded-sm bg-[#F9B418] font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] ${
       large ? "px-5 py-2.5 text-sm" : "px-3.5 py-1.5 text-[13px]"
     }`}
   >
@@ -953,7 +953,7 @@ const MyIdeas = ({
       ) : (
         <>
           {isStale && (
-            <div className="mt-3 rounded-[2px] bg-[#F9B418]/10 px-3 py-2 text-xs text-[#7E5A00]">
+            <div className="mt-3 rounded-xs bg-[#F9B418]/10 px-3 py-2 text-xs text-[#7E5A00]">
               It's been a while since your last idea — got something brewing?
             </div>
           )}
@@ -1000,7 +1000,7 @@ const MyIdeas = ({
                         <button
                           type="button"
                           onClick={() => onSendIdea(idea.id)}
-                          className="shrink-0 rounded-[2px] bg-[#F9B418] px-2.5 py-1 text-xs font-semibold text-[#0C0C0C] hover:bg-[#DA9700]"
+                          className="shrink-0 rounded-sm bg-[#F9B418] px-2.5 py-1 text-xs font-semibold text-[#0C0C0C] hover:bg-[#DA9700]"
                         >
                           Send
                         </button>

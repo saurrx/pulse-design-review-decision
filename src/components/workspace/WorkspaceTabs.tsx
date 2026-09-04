@@ -54,9 +54,9 @@ const WorkspaceTabs: React.FC<WorkspaceTabsProps> = ({
 
   return (
     <div className="space-y-5">
-      <section className="flex flex-col gap-4 rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] p-5 shadow-[var(--pulse-shadow-card)] sm:flex-row sm:items-center sm:justify-between">
+      <section className="flex flex-col gap-4 rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] p-5 shadow-[var(--pulse-shadow-card)] sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-4">
-          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]">
+          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]">
             {clientLogoSrc ? (
               <img
                 src={clientLogoSrc}

@@ -170,7 +170,7 @@ const ConciseEvaluationReport: React.FC<ConciseEvaluationReportProps> = ({
     <Button
       onClick={handleDownload}
       disabled={exporting}
-      className="rounded-xl text-zinc-900 bg-[#F9B418] hover:bg-[#F9B418] shadow-lg shadow-[#F9B41820] hover:bg-[#F9B418]/90"
+      className="rounded-sm text-zinc-900 bg-[#F9B418] hover:bg-[#F9B418] shadow-lg shadow-[#F9B41820] hover:bg-[#F9B418]/90"
     >
       <Download size={15} /> {exporting ? "Generating PDF..." : "Download PDF"}
     </Button>

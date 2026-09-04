@@ -42,7 +42,7 @@ const StatusChip = ({
   const t = TONES[tone ?? STATUS_TONES[status ?? ""] ?? "slate"];
   return (
     <span
-      className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-2.5 py-1.5"
+      className="inline-flex items-center gap-2 whitespace-nowrap rounded-xs border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-2.5 py-1.5"
     >
       <span
         className="h-[7px] w-[7px] shrink-0"

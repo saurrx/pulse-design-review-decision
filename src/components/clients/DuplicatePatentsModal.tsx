@@ -76,7 +76,7 @@ const show = (v: unknown): string => {
 };
 
 const Stat: React.FC<{ label: string; value: number | string; tone: string }> = ({ label, value, tone }) => (
-  <div className={`rounded-lg p-4 ${tone}`}>
+  <div className={`rounded-md p-4 ${tone}`}>
     <div className="text-sm font-medium opacity-80">{label}</div>
     <div className="text-2xl font-bold">{value}</div>
   </div>
@@ -126,7 +126,7 @@ const DuplicatePatentsModal: React.FC<DuplicatePatentsModalProps> = ({
             later. Stated first, and above the "columns not imported" note,
             because this is the part that cost the uploader rows. */}
         {missingRequired.length > 0 && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+          <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
             <span className="font-medium">
               Required information is missing, so some rows could not be imported:
             </span>
@@ -162,7 +162,7 @@ const DuplicatePatentsModal: React.FC<DuplicatePatentsModalProps> = ({
         )}
 
         {unmappedColumns.length > 0 && (
-          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
             <span className="font-medium">Columns not imported:</span>{" "}
             {unmappedColumns.join(", ")}
             <p className="mt-1 text-xs opacity-80">
@@ -172,7 +172,7 @@ const DuplicatePatentsModal: React.FC<DuplicatePatentsModalProps> = ({
         )}
 
         {!hasDetail ? (
-          <div className="rounded-lg border border-dashed p-8 text-center text-sm text-neutral-500">
+          <div className="rounded-md border border-dashed p-8 text-center text-sm text-neutral-500">
             Every row was new — nothing already on file was changed.
           </div>
         ) : (
@@ -198,7 +198,7 @@ const DuplicatePatentsModal: React.FC<DuplicatePatentsModalProps> = ({
                 <ScrollArea className="h-[400px] pr-4">
                   <div className="space-y-4">
                     {duplicatePatents.map((patent) => (
-                      <div key={patent.patent_id} className="rounded-lg border bg-neutral-50 p-4 dark:bg-neutral-800/40">
+                      <div key={patent.patent_id} className="rounded-md border bg-neutral-50 p-4 dark:bg-neutral-800/40">
                         <div className="mb-2 flex items-start justify-between">
                           <div className="font-semibold text-photon-light">
                             {patent.application_number || "No application number"}
@@ -236,7 +236,7 @@ const DuplicatePatentsModal: React.FC<DuplicatePatentsModalProps> = ({
                       allowed to silently overwrite it.
                     </p>
                     {excelDuplicateEntries.map((entry) => (
-                      <div key={entry.application_number} className="rounded-lg border bg-neutral-50 p-4 dark:bg-neutral-800/40">
+                      <div key={entry.application_number} className="rounded-md border bg-neutral-50 p-4 dark:bg-neutral-800/40">
                         <div className="font-semibold text-photon-light">{entry.application_number}</div>
                         <div className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
                           rows {entry.rows.join(", ")} — row {entry.rows[0]} was used

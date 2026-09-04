@@ -913,7 +913,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
       ) : (
         <div className={` w-full`}>
           <div
-            className={`w-full rounded-2xl border px-6 py-5 [box-shadow:var(--pulse-shadow-card)] ${
+            className={`w-full rounded-md border px-6 py-5 [box-shadow:var(--pulse-shadow-card)] ${
               theme === "dark"
                 ? "bg-neutral-950 border-[#cccccc20]"
                 : "bg-white border-[var(--pulse-line)]"
@@ -934,7 +934,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                 <div className="mt-3 flex items-center gap-4">
                   <button
                     onClick={handleGoBack}
-                    className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--pulse-line)] text-[var(--pulse-ink-secondary)] transition-colors hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]"
+                    className="grid h-9 w-9 place-items-center rounded-sm border border-[var(--pulse-line)] text-[var(--pulse-ink-secondary)] transition-colors hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)]"
                     aria-label="Back to patents"
                   >
                     <ArrowLeft
@@ -980,7 +980,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                   {!isEditMode ? (
                     <button
                       onClick={isEditMode ? handleSave : handleEditToggle}
-                      className={`flex items-center gap-2 border rounded-lg text-sm font-sans font-medium ${
+                      className={`flex items-center gap-2 border rounded-sm text-sm font-sans font-medium ${
                         theme === "dark"
                           ? "border-[#cccccc20] text-neutral-300"
                           : "text-neutral-600"
@@ -1026,13 +1026,13 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                           theme === "dark"
                             ? "text-neutral-300 border-[#cccccc20]"
                             : "text-gray-500"
-                        } flex items-center gap-2 border rounded-lg text-sm h-fit py-3 px-4`}
+                        } flex items-center gap-2 border rounded-sm text-sm h-fit py-3 px-4`}
                       >
                         <X size={16} /> Cancel
                       </button>
                       <button
                         onClick={isEditMode ? handleSave : handleEditToggle}
-                        className="flex items-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold bg-[#F9B418] text-neutral-900 h-fit py-3 px-4"
+                        className="flex items-center gap-2 whitespace-nowrap rounded-sm text-sm font-semibold bg-[#F9B418] text-neutral-900 h-fit py-3 px-4"
                       >
                         <Save size={16} /> Save Changes
                       </button>
@@ -1055,7 +1055,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                   <CardHeader
                     className={`${
                       theme === "light" ? "bg-gray-50/5" : "border-[#cccccc20]"
-                    } border-b rounded-t-lg py-5`}
+                    } border-b rounded-t-md py-5`}
                   >
                     <CardTitle
                       className={`${
@@ -1261,7 +1261,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                   <CardHeader
                     className={`${
                       theme === "light" ? "bg-gray-50/5" : "border-[#cccccc20]"
-                    } border-b rounded-t-xl`}
+                    } border-b rounded-t-md`}
                   >
                     <CardTitle
                       className={`${
@@ -1348,7 +1348,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                 <CardHeader
                   className={`${
                     theme === "light" ? "bg-gray-50/5" : ""
-                  } rounded-t-xl`}
+                  } rounded-t-md`}
                 >
                   <CardTitle
                     className={`${
@@ -1384,7 +1384,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                         onChange={(e) =>
                           handleInputChange("abstract", e.target.value)
                         }
-                        className={`rounded-lg border ${
+                        className={`rounded-sm border ${
                           theme === "dark"
                             ? "bg-black text-neutral-300 border-[#cccccc50]"
                             : "bg-transparent"
@@ -1403,7 +1403,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                 <CardHeader
                   className={`${
                     theme === "light" ? "bg-gray-50/5" : ""
-                  } rounded-t-xl`}
+                  } rounded-t-md`}
                 >
                   <CardTitle
                     className={`${
@@ -1433,7 +1433,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                                   1
                                   ? "border-b pb-2"
                                   : ""
-                              } dark:border-[#cccccc20] rounded-md`}
+                              } dark:border-[#cccccc20] rounded-xs`}
                             >
                               <FileText
                                 size={14}
@@ -1464,7 +1464,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                 <CardHeader
                   className={`${
                     theme === "light" ? "bg-gray-50/5" : ""
-                  } rounded-t-xl`}
+                  } rounded-t-md`}
                 >
                   <CardTitle
                     className={`${
@@ -1537,7 +1537,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                                       onClick={() =>
                                         fileInputRef.current?.click()
                                       }
-                                      className="flex-1 p-1 px-4 border rounded-md text-sm cursor-pointer bg-transparent w-full"
+                                      className="flex-1 p-1 px-4 border rounded-sm text-sm cursor-pointer bg-transparent w-full"
                                     />
                                   </div>
                                 )}
@@ -1566,7 +1566,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                                 <div
                                   className={`flex justify-between items-center ${
                                     isEditMode
-                                      ? `border rounded-md ${
+                                      ? `border rounded-sm ${
                                           theme === "dark" ? "bg-black" : ""
                                         } px-3`
                                       : `${
@@ -1668,7 +1668,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                 <CardHeader
                   className={`${
                     theme === "light" ? "bg-gray-50/5" : ""
-                  } rounded-t-xl`}
+                  } rounded-t-md`}
                 >
                   <CardTitle
                     className={`${
@@ -1748,7 +1748,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                                     theme === "dark"
                                       ? "bg-black text-neutral-300 border-[#cccccc50]"
                                       : ""
-                                  } p-1.5 px-2 border rounded-md text-sm w-full`}
+                                  } p-1.5 px-2 border rounded-sm text-sm w-full`}
                                   placeholder="Enter status name"
                                 />
                               ) : (
@@ -1783,7 +1783,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                                   onBlur={(e) =>
                                     validateTimelineDate(index, e.target.value)
                                   }
-                                  className={`w-full p-1.5 px-2 border rounded-md text-sm ${
+                                  className={`w-full p-1.5 px-2 border rounded-sm text-sm ${
                                     theme === "dark"
                                       ? "bg-black text-neutral-300 border-[#cccccc50]"
                                       : ""
@@ -1899,7 +1899,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                                     theme === "dark"
                                       ? "bg-black text-neutral-300 border-[#cccccc50]"
                                       : ""
-                                  } p-1.5 px-2 border rounded-md text-sm w-full`}
+                                  } p-1.5 px-2 border rounded-sm text-sm w-full`}
                                   placeholder="Enter event name"
                                 />
                               ) : (
@@ -1934,7 +1934,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                                   onBlur={(e) =>
                                     validateEventDate(index, e.target.value)
                                   }
-                                  className={`w-full p-1.5 px-2 border rounded-md text-sm ${
+                                  className={`w-full p-1.5 px-2 border rounded-sm text-sm ${
                                     theme === "dark"
                                       ? "bg-black text-neutral-300 border-[#cccccc50]"
                                       : ""
@@ -2002,7 +2002,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                                       e.target.value
                                     )
                                   }
-                                  className="w-full p-2 border rounded-md text-sm"
+                                  className="w-full p-2 border rounded-sm text-sm"
                                   rows={3}
                                 />
                               ) : (
@@ -2027,7 +2027,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                                       e.target.value
                                     )
                                   }
-                                  className="w-full p-2 border rounded-md text-sm"
+                                  className="w-full p-2 border rounded-sm text-sm"
                                   rows={3}
                                 />
                               ) : (
@@ -2076,15 +2076,15 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                               (doc: any, index: number) => (
                                 <div
                                   key={index}
-                                  className="flex justify-between items-center p-2.5 rounded-md border border-gray-100 bg-gray-50/50 hover:bg-gray-100/60 transition-colors group"
+                                  className="flex justify-between items-center p-2.5 rounded-sm border border-gray-100 bg-gray-50/50 hover:bg-gray-100/60 transition-colors group"
                                 >
                                   <div className="flex items-center gap-3">
-                                    <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary/5 text-photon-light">
+                                    <div className="flex items-center justify-center w-8 h-8 rounded-xs bg-primary/5 text-photon-light">
                                       {doc?.file_path ? (
                                         <img
                                           src={assetUrl(doc?.file_path)}
                                           alt={doc?.original_name}
-                                          className="w-full h-full object-cover rounded-md"
+                                          className="w-full h-full object-cover rounded-xs"
                                           onError={(e) => {
                                             // Fallback to FileText icon if image fails to load
                                             e.currentTarget.style.display =
@@ -2117,7 +2117,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                                     <Button
                                       variant="ghost"
                                       size="sm"
-                                      className="h-8 w-8 p-0 opacity-70 hover:opacity-100 hover:bg-white/80 rounded-md"
+                                      className="h-8 w-8 p-0 opacity-70 hover:opacity-100 hover:bg-white/80 rounded-sm"
                                       title="View Document"
                                       onClick={() =>
                                         window.open(
@@ -2134,7 +2134,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                                     <Button
                                     variant="ghost"
                                     size="sm"
-                                    className="h-8 w-8 p-0 opacity-70 hover:opacity-100 hover:bg-white/80 rounded-md"
+                                    className="h-8 w-8 p-0 opacity-70 hover:opacity-100 hover:bg-white/80 rounded-sm"
                                     title="Download Document"
                                     onClick={() => {
                                       const link = document.createElement("a");
@@ -2155,7 +2155,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="h-8 w-8 p-0 opacity-70 hover:opacity-100 hover:bg-white/80 rounded-md"
+                                        className="h-8 w-8 p-0 opacity-70 hover:opacity-100 hover:bg-white/80 rounded-sm"
                                         title="Delete Document"
                                         onClick={() =>
                                           handleDeleteDocument(doc?.id)
@@ -2186,7 +2186,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
               <CardHeader
                 className={`${
                   theme === "light" ? "bg-gray-50/5" : ""
-                } rounded-t-xl`}
+                } rounded-t-md`}
               >
                 <CardTitle
                   className={`${
@@ -2235,7 +2235,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                               theme === "dark"
                                 ? "bg-black text-neutral-300 border-[#cccccc50]"
                                 : ""
-                            } p-1.5 px-2 border rounded-md text-sm w-full`}
+                            } p-1.5 px-2 border rounded-sm text-sm w-full`}
                           />
                         ) : (
                           <p className="flex-1 text-sm text-neutral-700 dark:text-neutral-300 font-sans flex items-center gap-3">
@@ -2302,7 +2302,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                               theme === "dark"
                                 ? "bg-black text-neutral-300 border-[#cccccc50]"
                                 : ""
-                            } p-1.5 px-2 border rounded-md text-sm w-full`}
+                            } p-1.5 px-2 border rounded-sm text-sm w-full`}
                           />
                         ) : (
                           <p className="flex-1 text-sm text-neutral-700 dark:text-neutral-300 flex items-center gap-3 font-sans">
@@ -2342,7 +2342,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
               <CardHeader
                 className={`${
                   theme === "light" ? "bg-gray-50/5" : ""
-                } rounded-t-xl`}
+                } rounded-t-md`}
               >
                 <CardTitle
                   className={`${
@@ -2364,7 +2364,7 @@ const PatentDetailsContent: React.FC<PatentDetailsContentProps> = ({
                       theme === "dark"
                         ? "bg-black text-neutral-400 border-[#cccccc50]"
                         : "bg-transparent"
-                    } w-full p-2 border rounded-md text-sm`}
+                    } w-full p-2 border rounded-sm text-sm`}
                     rows={4}
                     placeholder="Enter additional notes"
                   />

@@ -175,8 +175,8 @@ const WorkspaceAdminOverview = () => {
       {[0, 1, 2, 3, 4].map((k) => (
         <div key={k} className="flex flex-col gap-2">
           {/* The group overline's height, so the boxes land where they will stay. */}
-          <span className="h-[14px] w-24 rounded bg-[var(--pulse-surface-subtle)]" aria-hidden="true" style={{ visibility: k === 0 || k === 3 ? "visible" : "hidden" }} />
-          <div className="min-h-[108px] animate-pulse rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)]" />
+          <span className="h-[14px] w-24 rounded-xs bg-[var(--pulse-surface-subtle)]" aria-hidden="true" style={{ visibility: k === 0 || k === 3 ? "visible" : "hidden" }} />
+          <div className="min-h-[108px] animate-pulse rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)]" />
         </div>
       ))}
     </section>
@@ -189,16 +189,16 @@ const WorkspaceAdminOverview = () => {
       <div className="mx-auto w-full max-w-[1680px] px-6 pb-24 pt-6 lg:px-8 md:pb-8">
         <div className="mb-6">{strip}</div>
         {unavailable && (
-          <div role="status" className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-4 py-3 text-[13px] text-[var(--pulse-ink-secondary)]">
+          <div role="status" className="mb-6 flex items-center justify-between gap-4 rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-4 py-3 text-[13px] text-[var(--pulse-ink-secondary)]">
             <span>The overview numbers could not be loaded. The queue below still loads on its own.</span>
-            <button type="button" onClick={() => refetchDashboard()} className="rounded-lg border border-[var(--pulse-line)] px-2.5 py-1 text-[12px] font-semibold text-[var(--pulse-ink)] hover:bg-[var(--pulse-surface-subtle)]">
+            <button type="button" onClick={() => refetchDashboard()} className="rounded-sm border border-[var(--pulse-line)] px-2.5 py-1 text-[12px] font-semibold text-[var(--pulse-ink)] hover:bg-[var(--pulse-surface-subtle)]">
               Retry
             </button>
           </div>
         )}
         <div className="grid grid-cols-12 gap-6">
           <section aria-label="Patents worldwide" className="col-span-12 h-[384px] xl:col-span-8">
-            <div className="relative z-10 h-full overflow-hidden rounded-2xl">
+            <div className="relative z-10 h-full overflow-hidden rounded-md">
               <PatentWorldMap
                 totalPatents={totalPatents ?? 0}
                 height={384}
@@ -261,7 +261,7 @@ const WorkspaceAdminOverview = () => {
       {isPatentDialogOpen && (
         <Dialog open={isPatentDialogOpen} onOpenChange={setIsPatentDialogOpen}>
           <DialogContentNoClose
-            className={`lg:max-w-[1440px] max-w-[400px] md:max-w-[700px] rounded-xl h-[90vh] backdrop-blur-xl border ${
+            className={`lg:max-w-[1440px] max-w-[400px] md:max-w-[700px] rounded-lg h-[90vh] backdrop-blur-xl border ${
               theme === "dark" ? "bg-black/90 border-[#cccccc20]" : "bg-white/95 border-neutral-200"
             }`}
           >

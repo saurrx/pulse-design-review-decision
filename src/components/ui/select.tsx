@@ -21,7 +21,7 @@ const SelectTrigger = React.forwardRef<
     <SelectPrimitive.Trigger
       ref={ref}
       className={cn(
-        "flex h-10 w-full items-center justify-between rounded-md border px-4 py-2 focus:border focus:border-[#F9B418] text-sm placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+        "flex h-10 w-full items-center justify-between rounded-sm border px-4 py-2 focus:border focus:border-[#F9B418] text-sm placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
         theme === "dark"
           ? "border-white/10 bg-[#cccccc20] text-gray-300"
           : "border-gray-200 bg-white text-neutral-700",
@@ -89,7 +89,7 @@ const SelectContent = React.forwardRef<
       <SelectPrimitive.Content
         ref={ref}
         className={cn(
-          "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out",
+          "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-lg border shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out",
           theme === "dark"
             ? "border-white/10 bg-zinc-900 hover:bg-zinc-800 text-zinc-200"
             : "border-gray-200 bg-popover text-popover-foreground",

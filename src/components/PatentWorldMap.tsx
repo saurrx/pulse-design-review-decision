@@ -544,7 +544,7 @@ const PatentWorldMap = (props: any) => {
   if (isFetchingPatents) {
     return (
       <div
-        className={`relative overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-6 pt-6 [box-shadow:var(--pulse-shadow-card)] ${
+        className={`relative overflow-hidden rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-6 pt-6 [box-shadow:var(--pulse-shadow-card)] ${
           theme === "dark" ? "card-elevated-dark" : "card-elevated-light"
         }`}
         style={{ height: mapHeight }}
@@ -566,7 +566,7 @@ const PatentWorldMap = (props: any) => {
     <motion.div
       ref={rootContainerRef}
       className={`relative border border-[var(--pulse-line)] [box-shadow:var(--pulse-shadow-card)] ${
-        isPatentDialogOpen ? "h-full rounded-2xl" : "rounded-2xl"
+        isPatentDialogOpen ? "h-full rounded-md" : "rounded-md"
       } flex flex-col transition-all overflow-hidden group ${
         isPatentDialogOpen
           ? `${
@@ -619,7 +619,7 @@ const PatentWorldMap = (props: any) => {
             )}
           </div>
           <div
-            className={`inline-flex overflow-hidden rounded-lg border ${
+            className={`inline-flex overflow-hidden rounded-sm border ${
               theme === "dark"
                 ? "border-zinc-700 bg-zinc-800/50"
                 : "border-[var(--pulse-line)] bg-white"
@@ -850,7 +850,7 @@ const PatentWorldMap = (props: any) => {
                 theme === "dark"
                   ? "border-[#cccccc20] bg-[#1b1b1b]"
                   : "border-gray-200 bg-white"
-              } patent-tooltip rounded-lg shadow-lg p-2 border pointer-events-auto`}
+              } patent-tooltip rounded-xs shadow-lg p-2 border pointer-events-auto`}
               style={{
                 filter: "drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))",
                 minWidth: "160px",

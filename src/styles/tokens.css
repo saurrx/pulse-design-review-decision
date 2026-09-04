@@ -36,7 +36,11 @@
   --pl-font-display: "Newsreader", Georgia, serif;
   --pl-font-ui: "Schibsted Grotesk", system-ui, sans-serif;
   --pl-font-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --pl-radius: 2px;
+  --pl-radius-xs: 4px;
+  --pl-radius-sm: 6px;
+  --pl-radius-md: 8px;
+  --pl-radius-lg: 12px;
+  --pl-radius-full: 9999px;
   --pl-shadow-card: none;
   --pl-shadow-elevated: none;
 
@@ -187,5 +191,5 @@
   --sidebar-accent-foreground: 43 100% 25%;
   --sidebar-border: 0 0% 91%;
   --sidebar-ring: 233 50% 51%;
-  --radius: 2px;
+  --radius: 6px;
 }

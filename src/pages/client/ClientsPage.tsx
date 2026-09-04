@@ -415,7 +415,7 @@ const ClientsPage: React.FC = () => {
                 />
                 <Input
                   name="search"
-                  className={`w-full rounded-xl border pl-10 pr-4 h-[42px] text-sm focus:outline-none focus:border-[var(--pulse-brand)] transition-colors ${
+                  className={`w-full rounded-sm border pl-10 pr-4 h-[42px] text-sm focus:outline-none focus:border-[var(--pulse-brand)] transition-colors ${
                     theme === "dark"
                       ? "bg-neutral-900 border-neutral-800 text-neutral-100 placeholder:text-neutral-600"
                       : "bg-neutral-50 border-neutral-200 text-neutral-900 placeholder:text-neutral-400"
@@ -564,7 +564,7 @@ const ClientsPage: React.FC = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="flex items-center font-normal gap-2 rounded py-5 bg-white hover:bg-white dark:bg-zinc-900 border dark:border-[#cccccc20]  hover:border-[#F9B418]  outline-none dark:hover:border-[#f9b51886]"
+                    className="flex items-center font-normal gap-2 rounded-sm py-5 bg-white hover:bg-white dark:bg-zinc-900 border dark:border-[#cccccc20]  hover:border-[#F9B418]  outline-none dark:hover:border-[#f9b51886]"
                   >
                     <Building2
                       className={`w-4 h-4 text-neutral-700 dark:text-neutral-300`}
@@ -656,7 +656,7 @@ const ClientsPage: React.FC = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="flex items-center gap-2 font-normal font-sans rounded py-5 bg-white hover:bg-white dark:bg-zinc-900 border dark:border-[#cccccc20] outline-none dark:hover:border-[#f9b51886] hover:border-[#F9B418]"
+                    className="flex items-center gap-2 font-normal font-sans rounded-sm py-5 bg-white hover:bg-white dark:bg-zinc-900 border dark:border-[#cccccc20] outline-none dark:hover:border-[#f9b51886] hover:border-[#F9B418]"
                   >
                     <ArrowUpDown
                       className={`w-4 h-4 text-neutral-700 dark:text-neutral-300`}
@@ -790,7 +790,7 @@ const ClientsPage: React.FC = () => {
                         <div className="flex items-start justify-between">
                           <div className="flex">
                             <div
-                              className={`mr-3 flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] ${
+                              className={`mr-3 flex h-14 w-14 items-center justify-center overflow-hidden rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] ${
                                 theme === "dark" && "bg-[#00000030]"
                               }`}
                             >
@@ -803,18 +803,18 @@ const ClientsPage: React.FC = () => {
                           </div>
                           <div className="mb-4 flex items-center gap-3 font-sans">
                             {client.type?.toUpperCase() === "POTENTIAL" ? (
-                              <div className="inline-flex rounded-lg border border-[#7057C7]/20 bg-[#7057C7]/10 px-3 py-1 text-xs font-medium text-[#5943A6]">
+                              <div className="inline-flex rounded-xs border border-[#7057C7]/20 bg-[#7057C7]/10 px-3 py-1 text-xs font-medium text-[#5943A6]">
                                 Potential
                               </div>
                             ) : (
-                              <div className="inline-flex rounded-lg border border-[var(--pulse-success)]/20 bg-[var(--pulse-success-soft)] px-3 py-1 text-xs font-medium text-[var(--pulse-success)]">
+                              <div className="inline-flex rounded-xs border border-[var(--pulse-success)]/20 bg-[var(--pulse-success-soft)] px-3 py-1 text-xs font-medium text-[var(--pulse-success)]">
                                 Existing
                               </div>
                             )}
                             {!isCaseOwner && (
                               <button
                                 onClick={(e) => handleDeleteClick(e, client.id)}
-                                className="rounded-lg p-1 text-neutral-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-600 focus:opacity-100 group-hover:opacity-100"
+                                className="rounded-sm p-1 text-neutral-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-600 focus:opacity-100 group-hover:opacity-100"
                                 aria-label={`Delete ${client.name}`}
                               >
                                 <Trash2 size={17} />
@@ -985,7 +985,7 @@ const ClientsPage: React.FC = () => {
                       >
                         <div className="flex items-center justify-center">
                           <div
-                            className={`flex h-10 w-10 items-center justify-center rounded border p-1.5 ${
+                            className={`flex h-10 w-10 items-center justify-center rounded-md border p-1.5 ${
                               theme === "dark" &&
                               "bg-[#00000030] border-zinc-900"
                             }`}
@@ -1011,11 +1011,11 @@ const ClientsPage: React.FC = () => {
                       </td>
                       <td className="p-4" style={{ minWidth: "140px" }}>
                         {client.type?.toUpperCase() === "POTENTIAL" ? (
-                          <div className="inline-flex rounded-lg border border-[#7057C7]/20 bg-[#7057C7]/10 px-3 py-1 text-xs font-medium text-[#5943A6]">
+                          <div className="inline-flex rounded-xs border border-[#7057C7]/20 bg-[#7057C7]/10 px-3 py-1 text-xs font-medium text-[#5943A6]">
                             Potential
                           </div>
                         ) : (
-                          <div className="inline-flex rounded-lg border border-[var(--pulse-success)]/20 bg-[var(--pulse-success-soft)] px-3 py-1 text-xs font-medium text-[var(--pulse-success)]">
+                          <div className="inline-flex rounded-xs border border-[var(--pulse-success)]/20 bg-[var(--pulse-success-soft)] px-3 py-1 text-xs font-medium text-[var(--pulse-success)]">
                             Existing
                           </div>
                         )}
@@ -1069,7 +1069,7 @@ const ClientsPage: React.FC = () => {
         {/* Pagination */}
         {clientsData.length > 0 && totalItems > 0 && (
           <div
-            className={`pulse-pagination-bar !mx-0 !mb-0 !mt-0 rounded-xl border ${
+            className={`pulse-pagination-bar !mx-0 !mb-0 !mt-0 rounded-md border ${
               theme === "dark"
                 ? "bg-transparent border-[#cccccc20]"
                 : "bg-white border-photon-gray-300"
@@ -1091,7 +1091,7 @@ const ClientsPage: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
+                  className={`flex items-center justify-center rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
                     theme === "dark"
                       ? "hover:bg-white/5 text-neutral-400 hover:text-neutral-200"
                       : "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900"
@@ -1105,7 +1105,7 @@ const ClientsPage: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
+                  className={`flex items-center justify-center rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
                     theme === "dark"
                       ? "hover:bg-white/5 text-neutral-400 hover:text-neutral-200"
                       : "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900"
@@ -1154,7 +1154,7 @@ const ClientsPage: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
+                  className={`flex items-center justify-center rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
                     theme === "dark"
                       ? "hover:bg-white/5 text-neutral-400 hover:text-neutral-200"
                       : "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900"
@@ -1170,7 +1170,7 @@ const ClientsPage: React.FC = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
+                  className={`flex items-center justify-center rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
                     theme === "dark"
                       ? "hover:bg-white/5 text-neutral-400 hover:text-neutral-200"
                       : "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900"
@@ -1236,7 +1236,7 @@ const ClientsPage: React.FC = () => {
           <AlertDialogFooter>
             <AlertDialogCancel
               disabled={isDeleting}
-              className={`bg-transparent border font-sans rounded-lg ${
+              className={`bg-transparent border font-sans rounded-sm ${
                 theme === "dark"
                   ? "border-[#cccccc20] text-zinc-300 hover:bg-transparent hover:text-zinc-300 border-white bg-input/30"
                   : ""
@@ -1247,7 +1247,7 @@ const ClientsPage: React.FC = () => {
             <AlertDialogAction
               onClick={handleConfirmDelete}
               disabled={isDeleting}
-              className={`text-zinc-100 font-bold font-sans rounded-lg bg-[#ff0000] hover:bg-[#db0f0f]`}
+              className={`text-zinc-100 font-bold font-sans rounded-sm bg-[#ff0000] hover:bg-[#db0f0f]`}
             >
               {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>

@@ -210,13 +210,13 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
         </Button>
       </div>
 
-      <section className="rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] p-5 shadow-[var(--pulse-shadow-card)] dark:border-[#cccccc20] dark:bg-neutral-900">
+      <section className="rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] p-5 shadow-[var(--pulse-shadow-card)] dark:border-[#cccccc20] dark:bg-neutral-900">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           {inviteLinkData?.active ? (
             <>
               <div className="min-w-0">
                 <div className="flex items-start gap-3">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--pulse-surface-subtle)] text-[var(--pulse-ink-secondary)]">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-sm bg-[var(--pulse-surface-subtle)] text-[var(--pulse-ink-secondary)]">
                     <Link2 className="h-5 w-5" />
                   </span>
                   <div>
@@ -236,7 +236,7 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
                     </p>
                   </div>
                 </div>
-                <div className="mt-4 flex max-w-2xl overflow-hidden rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]">
+                <div className="mt-4 flex max-w-2xl overflow-hidden rounded-sm border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]">
                   <code className="min-w-0 flex-1 truncate px-3 py-2.5 text-xs text-[var(--pulse-ink-secondary)]" title={inviteLink}>
                     {inviteLink}
                   </code>
@@ -250,8 +250,8 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
                   </button>
                 </div>
               </div>
-              <div className="flex shrink-0 items-center gap-3 rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] p-3">
-                <div className="rounded-lg border border-[var(--pulse-line)] bg-white p-1.5">
+              <div className="flex shrink-0 items-center gap-3 rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] p-3">
+                <div className="rounded-sm border border-[var(--pulse-line)] bg-white p-1.5">
                   <QRCodeSVG
                     ref={qrCodeRef}
                     value={inviteLink}
@@ -308,7 +308,7 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
           ) : (
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:col-span-2">
               <div className="flex items-start gap-3">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--pulse-surface-subtle)] text-[var(--pulse-ink-secondary)]">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-sm bg-[var(--pulse-surface-subtle)] text-[var(--pulse-ink-secondary)]">
                   <Link2 className="h-5 w-5" />
                 </span>
                 <div>
@@ -328,7 +328,7 @@ const PeopleTab: React.FC<PeopleTabProps> = ({ users, allowedDomain, clientId, c
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] shadow-[0_18px_45px_-38px_rgba(17,16,60,0.45)] dark:border-[#cccccc20] dark:bg-neutral-900">
+      <section className="overflow-hidden rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] shadow-[0_18px_45px_-38px_rgba(17,16,60,0.45)] dark:border-[#cccccc20] dark:bg-neutral-900">
         <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4 dark:border-[#cccccc20]">
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-[#F9B418]" />

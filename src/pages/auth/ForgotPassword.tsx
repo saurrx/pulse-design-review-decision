@@ -154,7 +154,7 @@ const ForgotPassword = () => {
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-[#F9B418] text-black font-medium hover:bg-[#F9B418]/90 transition-all"
+                className="w-full py-3 rounded-sm bg-[#F9B418] text-black font-medium hover:bg-[#F9B418]/90 transition-all"
                 disabled={isLoading}
                 style={{ boxShadow: "rgba(249, 180, 24, 0.3) 0px 0px 20px" }}
               >
@@ -204,7 +204,7 @@ const ForgotPassword = () => {
               </div>
               <button
                 onClick={() => navigate("/login")}
-                className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all mt-6"
+                className="w-full py-3 rounded-sm bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all mt-6"
               >
                 Back to sign in
               </button>

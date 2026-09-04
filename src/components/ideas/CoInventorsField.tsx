@@ -143,7 +143,7 @@ const CoInventorsField = ({ ideaId }: { ideaId?: string }) => {
         {coInventors.map((x) => (
           <span
             key={x.id}
-            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs ${chip}`}
+            className={`inline-flex items-center gap-1 rounded-xs px-2 py-0.5 text-xs ${chip}`}
             title={x?.inventor?.email}
           >
             {x?.inventor?.name || x?.inventor?.email}
@@ -161,7 +161,7 @@ const CoInventorsField = ({ ideaId }: { ideaId?: string }) => {
           <PopoverTrigger asChild>
             <button
               type="button"
-              className={`inline-flex items-center gap-1 rounded-full border border-dashed px-2 py-0.5 text-xs transition-colors ${
+              className={`inline-flex items-center gap-1 rounded-xs border border-dashed px-2 py-0.5 text-xs transition-colors ${
                 theme === "dark"
                   ? "border-neutral-700 text-neutral-500 hover:text-neutral-300"
                   : "border-neutral-300 text-neutral-500 hover:text-neutral-700"

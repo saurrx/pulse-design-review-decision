@@ -74,7 +74,7 @@ export function SendToOCModal({
         <div className="space-y-6 py-4">
           {/* What's Being Sent */}
           <div
-            className={`rounded-lg p-4 border ${
+            className={`rounded-md p-4 border ${
               theme === "light"
                 ? "bg-gradient-to-br from-gray-50 to-transparent border-gray-200"
                 : "bg-gradient-to-br from-white/5 to-transparent border-white/10"
@@ -119,7 +119,7 @@ export function SendToOCModal({
               onChange={(e) => setInstructions(e.target.value)}
               placeholder="Add any special instructions, filing priorities, or context for the legal team..."
               rows={5}
-              className={`w-full px-4 py-3 rounded-lg border resize-none transition-all focus:outline-none focus:ring-2 focus:ring-[#F9B418]/50 ${
+              className={`w-full px-4 py-3 rounded-sm border resize-none transition-all focus:outline-none focus:ring-2 focus:ring-[#F9B418]/50 ${
                 theme === "light"
                   ? "bg-transparent border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-[#F9B418]"
                   : "bg-transparent border-white/10 text-white placeholder:text-neutral-500 focus:border-[#F9B418]/50"
@@ -129,7 +129,7 @@ export function SendToOCModal({
 
           {/* Info Note */}
           <div
-            className={`rounded-lg p-3 border ${
+            className={`rounded-md p-3 border ${
               theme === "light"
                 ? "bg-blue-50/50 border-blue-200/50"
                 : "bg-blue-500/5 border-blue-500/20"

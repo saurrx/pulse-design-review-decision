@@ -142,7 +142,7 @@ const CountrySelector: React.FC<CountrySelectorProps> = ({
                 {countries.map((code) => (
                   <label
                     key={code}
-                    className={`flex items-center gap-2 p-1.5 rounded text-sm cursor-pointer hover:bg-gray-50 ${
+                    className={`flex items-center gap-2 p-1.5 rounded-sm text-sm cursor-pointer hover:bg-gray-50 ${
                       theme === "dark" ? "hover:bg-zinc-800" : ""
                     }`}
                   >
