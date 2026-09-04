@@ -12,6 +12,12 @@ const Progress = React.forwardRef<
 >(({ className, value, disabled=false, theme="light", ...props }, ref) => (
   <ProgressPrimitive.Root
     ref={ref}
+    // `value` MUST reach the Radix root. The shadcn template destructures it
+    // to drive the indicator's transform and then never forwards it, so the
+    // root rendered role="progressbar" with no aria-valuenow / aria-valuemax —
+    // a bar a screen reader could see but never read. The draft readiness
+    // rail is built on this. Found by the Storybook a11y run, 2026-09-03.
+    value={value}
     className={cn(
       "relative h-4 w-full overflow-hidden rounded-full bg-photon-gray-200",
       className

@@ -52,6 +52,19 @@ export default mergeConfig(
         {
           extends: true,
           plugins: [storybookTest({ configDir: path.join(dirname, ".storybook") })],
+          // ONE copy of React. Vite's dependency optimizer pre-bundles on demand,
+          // and the first story to import a Radix package (dropdown-menu, popover)
+          // made it pre-bundle a SECOND React for that graph — every hook in that
+          // story then threw "Cannot read properties of null (reading 'useState')".
+          // Listing them up front means one pre-bundle, one React.
+          optimizeDeps: {
+            include: [
+              "react", "react-dom", "react/jsx-runtime", "react-dom/client",
+              "@radix-ui/react-dropdown-menu", "@radix-ui/react-popover",
+              "@radix-ui/react-tooltip", "@radix-ui/react-dialog", "@radix-ui/react-label",
+              "lucide-react",
+            ],
+          },
           test: {
             name: "storybook",
             browser: {

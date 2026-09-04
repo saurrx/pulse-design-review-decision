@@ -362,7 +362,7 @@
    "route": "/clients/:clientId",
    "page": "ClientDetailPage",
    "entry": "src/pages/client/ClientDetailPage.tsx",
-   "components": 37,
+   "components": 39,
    "calls": [
     {
      "method": "POST",
@@ -664,7 +664,7 @@
    "route": "/ideas/:id",
    "page": "IdeaDetailsPage",
    "entry": "src/pages/IdeaDetailsPage.tsx",
-   "components": 54,
+   "components": 56,
    "calls": [
     {
      "method": "POST",
@@ -1043,7 +1043,7 @@
    "route": "/patents",
    "page": "PatentsPage",
    "entry": "src/pages/PatentsPage.tsx",
-   "components": 42,
+   "components": 45,
    "calls": [
     {
      "method": "GET",
@@ -1141,7 +1141,7 @@
    "route": "/patents/:patentId",
    "page": "PatentsPage",
    "entry": "src/pages/PatentsPage.tsx",
-   "components": 42,
+   "components": 45,
    "calls": [
     {
      "method": "GET",
@@ -1239,7 +1239,7 @@
    "route": "/due-dates",
    "page": "DueDatesPage",
    "entry": "src/pages/DueDatesPage.tsx",
-   "components": 34,
+   "components": 36,
    "calls": [
     {
      "method": "GET",
@@ -1452,7 +1452,7 @@
    "route": "/actions",
    "page": "ActionsPage",
    "entry": "src/pages/ActionsPage.tsx",
-   "components": 34,
+   "components": 36,
    "calls": [
     {
      "method": "GET",
