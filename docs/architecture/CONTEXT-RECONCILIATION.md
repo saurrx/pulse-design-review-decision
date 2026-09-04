@@ -82,6 +82,34 @@ must change; the record ships as a proposal).
 - Resolution: removed from every dashboard composition. The component stays
   in `src/` until the developer deletes it (production finding: dead code).
 - Impact: `none`.
+- Founder override (DSN-0002, 4 September 2026): the Workspace Admin dashboard
+  keeps the patent world map, titled "Patents worldwide", with a subtitle that
+  states the total and the jurisdiction count, a jurisdiction list as its text
+  alternative, and country clicks that open the Patent Portfolio filtered by
+  jurisdiction. The same record keeps the Top inventors ranking (overriding
+  DESIGN-PHILOSOPHY.md section 9) and labels the queue "Review Inventor Ideas".
+  Founder override, revisit after V0 usage evidence; the product rule itself is
+  not loosened, and the coverage matrix records the exception on that one
+  surface only.
+
+## R-15 Workspace Admin dashboard aggregates
+- Product: the Workspace Admin dashboard answers "what needs me" and "how is
+  the program doing" with five scoped numbers: awaiting review with the oldest
+  wait, Actions due within 30 days with the next date, ideas submitted this
+  calendar quarter with the prior-quarter delta, total patents with the count
+  filed this quarter, and granted with the pending count.
+- Base: `GET /v1/dashboard` returns 30-day and 90-day counts and an eight-week
+  series; `GET /v1/ideas/pipeline` returns the stage counts. No route exposes
+  a calendar-quarter count, a prior-quarter delta, the oldest pending age, the
+  Actions due in a window, or a ranking per period.
+- Resolution: the V0 mock adds the missing aggregates to the `/v1/dashboard`
+  answer under `flags.v0` only, declared in `mock/proposed-fields.json` as
+  backend finding BF-5. The interface reads them through the existing adapter
+  rule, which passes unknown fields through. Nothing is counted in the browser
+  from a paged list. DSN-0002 is `conceptual` until the backend serves them.
+- Impact: `conceptual`; backend finding BF-5: extend `GET /v1/dashboard` with
+  workspace-scoped aggregates that expose the filter parameters each number
+  links to, so every number lands on the identical list.
 
 ## R-08 Due dates by persona
 - Product: Inventor never sees due dates or Actions; Workspace Admin sees dates
