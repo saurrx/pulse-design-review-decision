@@ -1,0 +1,994 @@
+diff --git a/src/components/DashboardLayout.tsx b/src/components/DashboardLayout.tsx
+index 4fbb77a80556f75b3a240d29fba7a5f006df4ca1..be7d6d345ab038a12c5fb1003c3e92111d8f47d3 100644
+--- a/src/components/DashboardLayout.tsx
++++ b/src/components/DashboardLayout.tsx
+@@ -18,7 +18,7 @@ const defaultHeaderForRoute = (
+ ): DashboardHeaderConfig => {
+   if (pathname === "/") {
+     return {
+-      title: role === "INVENTOR" ? "Your invention workspace" : "Portfolio overview",
++      title: role === "INVENTOR" ? "Your invention workspace" : role === "LEGAL_COUNSEL" ? "Overview" : "Portfolio overview",
+     };
+   }
+   if (pathname === "/clients") return { title: "Clients" };
+diff --git a/src/components/PatentWorldMap.tsx b/src/components/PatentWorldMap.tsx
+index a44c28c2f45dbd8a4d5944565d3530b051e37ffc..9b1edfd61dae546ebde9a9b777ca42f8221b3ef0 100644
+--- a/src/components/PatentWorldMap.tsx
++++ b/src/components/PatentWorldMap.tsx
+@@ -375,6 +375,12 @@ const PatentWorldMap = (props: any) => {
+ 
+   const { isPatentDialogOpen, setIsPatentDialogOpen } = props;
+   const mapHeight = Number(props.height) || 480;
++  // DSN-0002 (Workspace Admin dashboard): a title and subtitle that state the
++  // total, a jurisdiction list as the text alternative, and country clicks
++  // that open the Patent Portfolio for that jurisdiction.
++  const v0 = props.v0 as
++    | { title: string; subtitle: string; onOpenJurisdiction?: (jurisdiction: string) => void; heading?: "h2" | "h3" }
++    | undefined;
+ 
+   const { isFetching: isFetchingPatents, data: patentData } = useQuery({
+     queryKey: ["patents", user?.client_id],
+@@ -585,20 +591,32 @@ const PatentWorldMap = (props: any) => {
+           } pt-6 px-6`}
+         >
+           <div>
+-            <h3
+-              className={`font-sans text-[15px] font-semibold tracking-[-0.01em] ${
+-                theme === "dark" ? "text-white" : "text-neutral-900"
+-              }`}
+-            >
+-              Patent World Map
+-            </h3>
++            {v0?.heading === "h2" ? (
++              <h2 className="font-sans text-[16px] font-semibold leading-5 tracking-[-0.015em] text-[var(--pulse-ink)]">{v0.title}</h2>
++            ) : (
++              <h3
++                className={`font-sans text-[15px] font-semibold tracking-[-0.01em] ${
++                  theme === "dark" ? "text-white" : "text-neutral-900"
++                }`}
++              >
++                {v0?.title ?? "Patent World Map"}
++              </h3>
++            )}
+             <p
+               className={`mt-1 font-sans text-xs label-muted ${
+                 theme === "dark" ? "text-zinc-400" : "text-neutral-500"
+               }`}
+             >
+-              Global patent distribution by country
++              {v0?.subtitle ?? "Global patent distribution by country"}
+             </p>
++            {v0 && (
++              <ul className="sr-only" aria-label="Patents by jurisdiction">
++                {countriesWithPatents.map((c: any) => (
++                  <li key={c.id}>{c.country} {c.granted + c.pending}</li>
++                ))}
++                {countriesWithPatents.length === 0 && <li>No patents added yet</li>}
++              </ul>
++            )}
+           </div>
+           <div
+             className={`inline-flex overflow-hidden rounded-lg border ${
+@@ -749,6 +767,11 @@ const PatentWorldMap = (props: any) => {
+                               strokeWidth={stat ? 0.8 : 0.5}
+                               tabIndex={-1}
+                               className="rsm-geography"
++                              onClick={() => {
++                                if (!stat || !v0?.onOpenJurisdiction) return;
++                                const iso2 = Object.entries(ISO2_TO_ISO3).find(([, iso3]) => iso3 === geo.properties?.iso_code)?.[0];
++                                v0.onOpenJurisdiction((iso2 ?? String(geo.properties?.iso_code ?? "")).toUpperCase());
++                              }}
+                               onMouseEnter={(e: React.MouseEvent) => {
+                                 if (!stat) return;
+                                 if (
+@@ -799,8 +822,8 @@ const PatentWorldMap = (props: any) => {
+                 {/* Base layer: no data message */}
+                 {countriesWithPatents.length === 0 && (
+                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+-                    <div className="text-photon-gray-600 text-lg">
+-                      No patent data available
++                    <div className={v0 ? "text-[13px] text-[var(--pulse-ink-muted)]" : "text-photon-gray-600 text-lg"}>
++                      {v0 ? "No patents added yet" : "No patent data available"}
+                     </div>
+                   </div>
+                 )}
+diff --git a/src/components/Sidebar.tsx b/src/components/Sidebar.tsx
+index b4742f87a4dc14ab640bee27070ba55352ba9f0b..9179b87fc29464e3058b52b75cf43e7f163a579d 100644
+--- a/src/components/Sidebar.tsx
++++ b/src/components/Sidebar.tsx
+@@ -100,7 +100,8 @@ const navForRole = (role: Role | undefined, reviewCount: number): NavItem[] => {
+     return [
+       { label: "Overview", path: "/", icon: LayoutDashboard },
+       {
+-        label: "Review queue",
++        // DSN-0002 founder decision: the queue is "Review Inventor Ideas".
++        label: "Review Inventor Ideas",
+         path: "/ideas",
+         icon: ClipboardCheck,
+         badge: reviewCount,
+diff --git a/src/components/TopInventors.tsx b/src/components/TopInventors.tsx
+index 21dcc32e3c5cd916e9ebcbc33a5510ba1d0feed3..d5bb5e24c47ced4115527233058b4745982a5e7c 100644
+--- a/src/components/TopInventors.tsx
++++ b/src/components/TopInventors.tsx
+@@ -34,8 +34,24 @@ type TopInventorsProps = {
+   /** Inventors/teams with zero submissions across all history (up to 3 shown). */
+   notYetActive?: QuietInventor[];
+   onNudge?: (inventor: QuietInventor) => void;
++  /**
++   * DSN-0002, the Workspace Admin dashboard: rows per period with a period
++   * selector that defaults to this quarter (matching the stat strip), the
++   * Ideas | Patents toggle stated by weight, underline and aria-pressed, and
++   * an empty state that points at Workspace › People.
++   */
++  v0?: {
++    periods: { thisQuarter: InventorEntry[]; allTime: InventorEntry[] };
++    empty: { text: string; linkLabel: string; onLink: () => void };
++    /** The ranking has not arrived, or failed: never the empty copy. */
++    loading?: boolean;
++    error?: { onRetry: () => void };
++  };
+ };
+ 
++type Period = "thisQuarter" | "allTime";
++const PERIOD_LABEL: Record<Period, string> = { thisQuarter: "This quarter", allTime: "All time" };
++
+ const NUMS: React.CSSProperties = { fontVariantNumeric: "tabular-nums" };
+ 
+ const SUBTITLES: Record<Metric, string> = {
+@@ -52,11 +68,14 @@ const TopInventors = ({
+   onOpenInventor,
+   notYetActive = [],
+   onNudge,
++  v0,
+ }: TopInventorsProps) => {
+   const { user } = useUserCookie();
+   const navigate = useNavigate();
+   const isOC = isOutsideCounselRole(user?.role);
+-  const hasToggle = !!entries && !isOC;
++  const [period, setPeriod] = React.useState<Period>("thisQuarter");
++  const rows = v0 ? v0.periods[period] : entries;
++  const hasToggle = !!rows && !isOC;
+ 
+   const [metric, setMetric] = React.useState<Metric>(() => {
+     try {
+@@ -86,24 +105,30 @@ const TopInventors = ({
+   };
+ 
+   const ranked = React.useMemo(() => {
+-    if (!entries) return [];
+-    return entries
++    if (!rows) return [];
++    return rows
+       .filter((e) => e[metric] > 0)
+       .sort((a, b) => b[metric] - a[metric])
+       .slice(0, 5);
+-  }, [entries, metric]);
++  }, [rows, metric]);
+ 
+   return (
+     <div className={`${PRODUCT_CARD_CLASS} flex h-full min-h-[320px] flex-col`}>
+-      <div className="flex items-start justify-between gap-3">
+-        <div>
+-          <div className={PRODUCT_CARD_TITLE_CLASS}>
+-            {isOC ? "Top Clients" : "Top Inventors"}
+-          </div>
++      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
++        <div className="min-w-0">
++          {v0 ? (
++            <h2 className={PRODUCT_CARD_TITLE_CLASS}>Top inventors</h2>
++          ) : (
++            <div className={PRODUCT_CARD_TITLE_CLASS}>
++              {isOC ? "Top Clients" : "Top Inventors"}
++            </div>
++          )}
+           <div className={PRODUCT_CARD_DESCRIPTION_CLASS}>
+-            {hasToggle
+-              ? SUBTITLES[metric]
+-              : subtitle ?? (isOC ? "By patent count" : "By ideas · All time")}
++            {v0
++              ? `${metric === "ideas" ? "Ideas submitted" : "Patents filed"} · ${PERIOD_LABEL[period]}`
++              : hasToggle
++                ? SUBTITLES[metric]
++                : subtitle ?? (isOC ? "By patent count" : "By ideas · All time")}
+           </div>
+         </div>
+         {hasToggle && (
+@@ -111,10 +136,12 @@ const TopInventors = ({
+             {(["ideas", "patents"] as Metric[]).map((m) => (
+               <button
+                 key={m}
++                type="button"
++                aria-pressed={metric === m}
+                 onClick={() => pickMetric(m)}
+                 className={`${PRODUCT_SEGMENTED_ITEM_CLASS} capitalize ${
+                   metric === m
+-                    ? "bg-white text-[var(--pulse-ink)] shadow-sm"
++                    ? "bg-white font-semibold text-[var(--pulse-ink)] underline decoration-[var(--pulse-brand)] decoration-2 underline-offset-4 shadow-sm"
+                     : "text-[var(--pulse-ink-muted)] hover:text-[var(--pulse-ink)]"
+                 }`}
+               >
+@@ -133,6 +160,20 @@ const TopInventors = ({
+         )}
+       </div>
+ 
++      {v0 && (
++        <label className="mt-3 flex items-center justify-between gap-2 border-t border-[var(--pulse-line)] pt-3 text-xs text-[var(--pulse-ink-muted)]">
++          <span>Period</span>
++          <select
++            value={period}
++            onChange={(e) => setPeriod(e.target.value as Period)}
++            className="h-8 rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-2 text-xs font-medium text-[var(--pulse-ink-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)]"
++          >
++            <option value="thisQuarter">This quarter</option>
++            <option value="allTime">All time</option>
++          </select>
++        </label>
++      )}
++
+       {/* No inner scroll: the card is a leaderboard, and a five-row list that
+           scrolls inside a fixed card is a list you cannot see. Both branches
+           cap at five, and long names truncate rather than pushing the count
+@@ -140,20 +181,22 @@ const TopInventors = ({
+       <div className="mt-2 flex min-h-0 flex-col justify-start overflow-hidden">
+         {hasToggle ? (
+           <>
+-            {ranked.map((e, index) => (
++            {!(v0?.loading || v0?.error) && ranked.map((e, index) => (
+               <button
+                 key={e.id ?? e.name}
++                type="button"
+                 onClick={() => onOpenInventor?.(e)}
++                aria-label={`${index + 1}. ${e.name}, ${e[metric]} ${metric}`}
+                 className={`group flex min-h-14 w-full items-center justify-between gap-3 rounded-lg py-2 text-left transition-colors hover:bg-[var(--pulse-surface-subtle)] ${
+                   index > 0 ? "border-t border-[var(--pulse-line)]" : ""
+                 }`}
+               >
+                 <div className="flex min-w-0 items-center gap-3">
+-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[var(--pulse-surface-subtle)] text-xs font-semibold text-[var(--pulse-ink-muted)]" style={NUMS}>
++                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[var(--pulse-surface-subtle)] text-xs font-semibold text-[var(--pulse-ink-muted)]" style={NUMS} aria-hidden="true">
+                     {index + 1}
+                   </span>
+                   <div className="min-w-0">
+-                    <div className="truncate text-[13px] font-medium text-[var(--pulse-ink-secondary)] group-hover:text-[var(--pulse-ink)]">
++                    <div className="truncate text-[13px] font-medium text-[var(--pulse-ink-secondary)] group-hover:text-[var(--pulse-ink)]" title={e.name}>
+                       {e.name}
+                     </div>
+                   </div>
+@@ -166,7 +209,26 @@ const TopInventors = ({
+                 </span>
+               </button>
+             ))}
+-            {ranked.length === 0 && (
++            {v0?.loading && (
++              <div className="mt-2 flex flex-col gap-3" role="status" aria-busy="true" aria-label="Loading top inventors">
++                {[0, 1, 2].map((k) => <div key={k} className="h-9 animate-pulse rounded-md bg-[var(--pulse-surface-subtle)]" />)}
++              </div>
++            )}
++            {v0?.error && !v0.loading && (
++              <div role="status" className="flex flex-col items-start gap-2 py-6 text-[13px] text-[var(--pulse-ink-muted)]">
++                <span>Could not load top inventors.</span>
++                <button type="button" onClick={v0.error.onRetry} className="rounded-lg border border-[var(--pulse-line)] px-2.5 py-1 text-[12px] font-semibold text-[var(--pulse-ink)] hover:bg-[var(--pulse-surface-subtle)]">Retry</button>
++              </div>
++            )}
++            {ranked.length === 0 && v0 && !v0.loading && !v0.error && (
++              <div className="flex flex-col items-center gap-1.5 py-6 text-center text-[13px] text-[var(--pulse-ink-muted)]">
++                <span>{v0.empty.text}</span>
++                <button type="button" onClick={v0.empty.onLink} className="font-medium text-[var(--pulse-ink-secondary)] underline underline-offset-2 hover:text-[var(--pulse-ink)]">
++                  {v0.empty.linkLabel}
++                </button>
++              </div>
++            )}
++            {ranked.length === 0 && !v0 && (
+               <div className="py-6 text-center text-[13px] text-[var(--pulse-ink-muted)]">
+                 No {metric} yet.
+               </div>
+diff --git a/src/components/dashboard/DashboardStats.tsx b/src/components/dashboard/DashboardStats.tsx
+index 8c4fa9837f1bf4a03d8d6396de612ffd198fd247..da8b9884a524ae2e57d9c129251286ab0b2d5d20 100644
+--- a/src/components/dashboard/DashboardStats.tsx
++++ b/src/components/dashboard/DashboardStats.tsx
+@@ -381,12 +381,24 @@ const IdeaPipeline = ({
+   onClientSelectionChange,
+   hasError = false,
+   onRetry,
++  periodLabel,
++  oldestWaitingDays,
++  heading = "div",
++  loading = false,
+ }: {
+   submitted: number;
+   reviewPending: number;
+   sentToOC: number;
+   filed: number;
+   granted: number;
++  /** DSN-0002: the window the stages count, shown beside the title ("All time"). */
++  periodLabel?: string;
++  /** DSN-0002: the sublabel under Review pending, "oldest waiting 56d". */
++  oldestWaitingDays?: number | null;
++  /** DSN-0002: render the title as a section heading. */
++  heading?: "div" | "h2";
++  /** DSN-0002: the counts have not arrived; skeleton rows, never zeros. */
++  loading?: boolean;
+   /** The numbers did not arrive. Renders a stated failure, never zeros. */
+   hasError?: boolean;
+   onRetry?: () => void;
+@@ -399,9 +411,9 @@ const IdeaPipeline = ({
+   selectedClientIds?: string[] | null;
+   onClientSelectionChange?: (clientIds: string[] | null) => void;
+ }) => {
+-  const stages = [
++  const stages: Array<{ key: string; label: string; count: number; color: string; sub?: string }> = [
+     { key: "submitted", label: "Submitted", count: submitted, color: "var(--pulse-data-primary)" },
+-    { key: "review", label: "Review Pending", count: reviewPending, color: "var(--pl-amber)" },
++    { key: "review", label: heading === "h2" ? "Review pending" : "Review Pending", count: reviewPending, color: "var(--pl-amber)", sub: oldestWaitingDays ? `oldest waiting ${oldestWaitingDays}d` : undefined },
+     { key: "sent_to_oc", label: "Sent to Photon Legal", count: sentToOC, color: "var(--pulse-data-ai)" },
+     { key: "filed", label: "Filed", count: filed, color: "var(--pulse-data-cyan)" },
+     { key: "granted", label: "Granted", count: granted, color: "var(--pulse-data-success)" },
+@@ -444,9 +456,14 @@ const IdeaPipeline = ({
+     <div className={`${CARD_CLASS} flex h-full min-h-[320px] flex-col`}>
+       <div className="flex flex-wrap items-start justify-between gap-4">
+         <div>
+-          <StatLabel>{title}</StatLabel>
++          {heading === "h2" ? <h2 className={PRODUCT_CARD_TITLE_CLASS}>{title}</h2> : <StatLabel>{title}</StatLabel>}
+           <p className="mt-1 text-xs text-[var(--pulse-ink-muted)]">Ideas by stage</p>
+         </div>
++        {periodLabel && (
++          <span className="inline-flex h-8 items-center rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-2.5 text-xs font-medium text-[var(--pulse-ink-secondary)]" title="The window these counts cover">
++            {periodLabel}
++          </span>
++        )}
+         {clientOptions.length > 1 && onClientSelectionChange && (
+           <DropdownMenu>
+             <DropdownMenuTrigger asChild>
+@@ -491,6 +508,11 @@ const IdeaPipeline = ({
+           </DropdownMenu>
+         )}
+       </div>
++      {loading ? (
++        <div className="mt-5 flex flex-1 flex-col justify-between gap-3" role="status" aria-busy="true" aria-label="Loading the pipeline">
++          {stages.map((s) => <div key={s.key} className="h-8 animate-pulse rounded-md bg-[var(--pulse-surface-subtle)]" />)}
++        </div>
++      ) : (
+       <div className="mt-5 flex flex-1 flex-col justify-between">
+         {stages.map((s, i) => {
+           const inner = (
+@@ -502,6 +524,9 @@ const IdeaPipeline = ({
+                 </span>
+                 <span className="text-base font-semibold text-[var(--pulse-ink)]" style={NUMS}>{s.count}</span>
+               </span>
++              {s.sub && (
++                <span className="mt-0.5 block text-xs text-[var(--pulse-ink-muted)]" style={NUMS}>{s.sub}</span>
++              )}
+               <span className="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-[var(--pulse-surface-subtle)]">
+                 <span
+                   className="block h-full rounded-full transition-[width]"
+@@ -532,6 +557,7 @@ const IdeaPipeline = ({
+           );
+         })}
+       </div>
++      )}
+     </div>
+   );
+ };
+@@ -571,6 +597,7 @@ const NeedsReview = ({
+   waitingLabel = "waiting",
+   hasError = false,
+   onRetry,
++  v0,
+ }: {
+   /** Ideas waiting on the viewer, oldest first. */
+   rows: ReviewQueueRow[];
+@@ -592,13 +619,28 @@ const NeedsReview = ({
+   actionLabel?: string;
+   showScore?: boolean;
+   waitingLabel?: string;
++  /**
++   * The Workspace Admin queue of DSN-0002: titled "Review Inventor Ideas", six
++   * rows then "Review all", age as "56d" and red only past the aging threshold
++   * (with the word "waiting" so colour never carries it alone), a dash with
++   * accessible text for an unevaluated idea, the caught-up state's own copy.
++   */
++  v0?: {
++    /** The rows have not arrived yet: skeleton rows, never the caught-up copy. */
++    loading?: boolean;
++    /** Days after which a wait is overdue. */
++    agingThresholdDays: number;
++    /** Copy for an empty queue, and where its link goes. */
++    empty: { text: string; linkLabel?: string; to?: string };
++    onEmptyLink?: () => void;
++  };
+ }) => {
+   const oldestWait = Math.max(0, ...rows.map((row) => row.waitingDays));
+   // The card sits in a fixed-height dashboard row beside the pipeline. Rendering
+   // every queued idea stretched it — 124 rows tall on a real workspace — which
+   // dragged the whole grid row with it and distorted the pipeline next to it.
+   // Show a card's worth and let the overflow row carry the rest.
+-  const VISIBLE_ROWS = 5;
++  const VISIBLE_ROWS = v0 ? 6 : 5;
+   const visibleRows = rows.slice(0, VISIBLE_ROWS);
+   const hiddenCount = rows.length - visibleRows.length;
+   const rowColumns = showScore
+@@ -607,19 +649,21 @@ const NeedsReview = ({
+ 
+   return (
+   <div className={`${CARD_CLASS} relative flex h-full min-h-[320px] flex-col overflow-hidden`}>
+-    <span
++    {!v0 && <span
+       className="absolute inset-x-0 top-0 h-[3px]"
+       style={{
+         background:
+           "linear-gradient(90deg, var(--pulse-data-accent) 0 34%, var(--pulse-data-risk) 34% 52%, var(--pulse-data-ai) 52% 70%, var(--pulse-data-cyan) 70% 84%, var(--pulse-data-success) 84% 100%)",
+       }}
+       aria-hidden="true"
+-    />
++    />}
+     <div className="flex items-start justify-between gap-5 border-b border-[var(--pulse-line)] pb-4">
+       <div>
+-        <StatLabel>{title === "Needs your review" ? "Review queue" : title}</StatLabel>
++        {v0 ? <h2 className={PRODUCT_CARD_TITLE_CLASS}>{title}</h2> : <StatLabel>{title === "Needs your review" ? "Review queue" : title}</StatLabel>}
+         <p className="mt-1 flex flex-wrap items-center gap-x-2 text-xs text-[var(--pulse-ink-muted)]">
+-          {hasError ? <span>Not loaded</span> : (<>
++          {hasError ? <span>Not loaded</span> : v0 ? (
++            <span>{v0.loading ? "Loading" : `${rows.length} awaiting decision`}</span>
++          ) : (<>
+             <span>{rows.length} awaiting decision</span>
+             <span aria-hidden="true">·</span>
+             <span>Oldest {oldestWait > 0 ? `${oldestWait}d` : "—"}</span>
+@@ -640,6 +684,25 @@ const NeedsReview = ({
+     {hasError ? (
+       // Never "all caught up" for a request that failed.
+       <CardError onRetry={onRetry} label="Could not load the review queue." />
++    ) : v0?.loading ? (
++      <div className="mt-3 flex flex-1 flex-col gap-3" role="status" aria-busy="true" aria-label="Loading the queue">
++        {[0, 1, 2, 3].map((k) => (
++          <div key={k} className="h-9 animate-pulse rounded-md bg-[var(--pulse-surface-subtle)]" />
++        ))}
++      </div>
++    ) : rows.length === 0 && v0 ? (
++      <div className="flex flex-1 flex-col items-center justify-center gap-2 py-6 text-center">
++        <div className="text-[15px] font-semibold text-[var(--pulse-ink)]">{v0.empty.text}</div>
++        {v0.empty.linkLabel && (
++          <button
++            type="button"
++            onClick={v0.onEmptyLink}
++            className="text-[13px] font-medium text-[var(--pulse-ink-secondary)] underline underline-offset-2 hover:text-[var(--pulse-ink)]"
++          >
++            {v0.empty.linkLabel}
++          </button>
++        )}
++      </div>
+     ) : rows.length === 0 ? (
+       <div className="flex flex-1 flex-col items-center justify-center gap-1 py-6 text-center">
+         <div className="text-base font-semibold text-[#0C0C0C]">
+@@ -649,6 +712,63 @@ const NeedsReview = ({
+           {laterCount} idea{laterCount === 1 ? "" : "s"} in later stages
+         </div>
+       </div>
++    ) : v0 ? (
++      <div className="mt-2 flex flex-1 flex-col">
++        <table className="w-full border-collapse">
++          <thead>
++            <tr className="text-left text-xs font-medium text-[var(--pulse-ink-muted)]">
++              <th scope="col" className="px-3 pb-1 pt-1 font-medium">Ideas</th>
++              <th scope="col" className="w-[140px] px-3 pb-1 pt-1 font-medium">Inventor</th>
++              <th scope="col" className="w-[64px] px-3 pb-1 pt-1 text-right font-medium">Score</th>
++              <th scope="col" className="w-[104px] px-3 pb-1 pt-1 text-right font-medium">Age</th>
++            </tr>
++          </thead>
++          <tbody>
++            {visibleRows.map((r) => {
++              const overdue = r.waitingDays > v0.agingThresholdDays;
++              return (
++                <tr
++                  key={r.id}
++                  className="cursor-pointer border-t border-[var(--pulse-line)] transition-colors hover:bg-[var(--pulse-surface-subtle)] focus-within:bg-[var(--pulse-surface-subtle)]"
++                  onClick={() => onOpen(r.id)}
++                >
++                  <td className="max-w-0 px-3 py-2.5">
++                    <a
++                      href="#"
++                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); onOpen(r.id); }}
++                      className="block min-h-6 truncate text-[13px] font-medium text-[var(--pulse-ink)] no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)] focus-visible:ring-offset-1"
++                      title={r.title}
++                    >
++                      {r.title}
++                    </a>
++                  </td>
++                  <td className="max-w-0 truncate px-3 py-2.5 text-xs text-[var(--pulse-ink-secondary)]" title={r.secondary}>{r.secondary}</td>
++                  <td className="px-3 py-2.5 text-right text-[13px] text-[var(--pulse-ink)]" style={NUMS}>
++                    {typeof r.score === "number" ? (
++                      <span className="font-semibold">{(r.score / 10).toFixed(1)}</span>
++                    ) : (
++                      <><span aria-hidden="true">—</span><span className="sr-only">Not evaluated</span></>
++                    )}
++                  </td>
++                  <td className={`whitespace-nowrap px-3 py-2.5 text-right text-xs ${overdue ? "font-semibold text-[var(--pl-red-text)]" : "text-[var(--pulse-ink-muted)]"}`} style={NUMS}>
++                    {overdue ? <>{r.waitingDays}d <span className="font-normal">waiting</span></> : `${r.waitingDays}d`}
++                  </td>
++                </tr>
++              );
++            })}
++          </tbody>
++        </table>
++        {hiddenCount > 0 && (
++          <button
++            type="button"
++            onClick={onViewAll ?? onReviewAll ?? (() => onOpen(rows[0].id))}
++            className="mt-auto flex w-full items-center justify-between gap-3 rounded-lg border-t border-[var(--pulse-line)] px-3 py-2.5 text-left text-[13px] font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:bg-[var(--pulse-surface-subtle)]"
++          >
++            <span style={NUMS}>{hiddenCount} more waiting</span>
++            <span className="text-xs text-[var(--pulse-ink-muted)]">Review all →</span>
++          </button>
++        )}
++      </div>
+     ) : (
+       <div className="mt-2 flex flex-1 flex-col">
+         <div className={`grid ${rowColumns} gap-3 px-3 pb-1 pt-1 text-xs font-medium text-[var(--pulse-ink-muted)]`}>
+diff --git a/src/components/dashboard/StatStrip.tsx b/src/components/dashboard/StatStrip.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..e3717e04ceb237a510bc1ac234d03f9582a689d7
+--- /dev/null
++++ b/src/components/dashboard/StatStrip.tsx
+@@ -0,0 +1,113 @@
++import React from "react";
++import { Link } from "react-router-dom";
++
++/**
++ * The Workspace Admin dashboard's stat strip (DSN-0002).
++ *
++ * Five scoped numbers in one row, grouped under two overlines: what needs the
++ * admin ("Your workspace") and how the program is doing ("Company portfolio").
++ * Every box is one link to the list its number counts; nothing inside a box is
++ * a second control. The top rule's colour is reinforced by the label, and the
++ * accessible name carries the label, the number and the qualifier in words, so
++ * colour and layout never carry meaning alone.
++ *
++ * Kept dashboard-local on purpose: when a second dashboard adopts the same
++ * strip it graduates to `src/components/ui` with its own record.
++ */
++
++export type StatRule = "amber" | "red" | "navy" | "green" | "neutral";
++
++export type StatBoxSpec = {
++  key: string;
++  /** The overline inside the box, e.g. "Awaiting review". */
++  label: string;
++  /** Null while the aggregate is not available; renders a dash, never a zero. */
++  value: number | null;
++  /** One line under the number, e.g. "oldest 56d" or "none due in 30 days". */
++  qualifier: string;
++  /** The same qualifier for the accessible name, spelt out: "oldest 56 days". */
++  qualifierSpoken?: string;
++  rule: StatRule;
++  /** Where the box goes. The list it lands on must be the one the number counts. */
++  to: string;
++  /** The window or population the number describes, as the link's title. */
++  title?: string;
++};
++
++export type StatGroupSpec = {
++  key: string;
++  /** Small-caps overline over the group, e.g. "Your workspace". */
++  overline: string;
++  boxes: StatBoxSpec[];
++};
++
++const NUMS: React.CSSProperties = { fontVariantNumeric: "tabular-nums" };
++// Type from the token source (PL-TKN-004): metric label, metric value, caption, kicker.
++const LABEL: React.CSSProperties = { font: "var(--pl-type-metric-label)", letterSpacing: "var(--pl-tracking-metric-label)" };
++const VALUE: React.CSSProperties = { ...NUMS, font: "var(--pl-type-metric-value)", letterSpacing: "var(--pl-tracking-metric-value)" };
++const QUALIFIER: React.CSSProperties = { ...NUMS, font: "var(--pl-type-caption)", letterSpacing: "var(--pl-tracking-caption)" };
++const KICKER: React.CSSProperties = { font: "var(--pl-type-kicker)", letterSpacing: "var(--pl-tracking-kicker)" };
++
++const RULE: Record<StatRule, string> = {
++  amber: "var(--pl-amber)",
++  red: "var(--pl-red)",
++  navy: "var(--pl-navy-2)",
++  green: "var(--pl-green)",
++  neutral: "var(--pl-border-strong)",
++};
++
++const spoken = (b: StatBoxSpec) =>
++  `${b.label}, ${b.value === null ? "not available" : b.value}, ${b.qualifierSpoken ?? b.qualifier}`;
++
++// Entrance: a one-time rise of a few pixels (transform only, 240 ms, staggered),
++// declared as `pulse-rise` in src/index.css and disabled there under
++// prefers-reduced-motion. Opacity never animates, so text contrast is always
++// the final contrast and nothing is faded when a reader or a checker arrives.
++const StatBox = ({ box, index }: { box: StatBoxSpec; index: number }) => (
++  <div className="min-w-0 flex-1 pulse-rise" style={{ animationDelay: `${index * 40}ms` }}>
++    <Link
++      to={box.to}
++      title={box.title}
++      aria-label={spoken(box)}
++      className="group relative flex h-full min-h-[108px] flex-col overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-4 pb-4 pt-5 no-underline transition-colors hover:bg-[var(--pulse-surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pulse-canvas)]"
++    >
++      <span className="absolute inset-x-0 top-0 h-[3px]" style={{ background: RULE[box.rule] }} aria-hidden="true" />
++      <span className="truncate text-[var(--pulse-ink-muted)]" style={LABEL}>
++        {box.label}
++      </span>
++      <span className="mt-2 block text-[var(--pulse-ink)]" style={VALUE}>
++        {box.value === null ? <span aria-hidden="true">—</span> : box.value}
++      </span>
++      <span className="mt-1.5 block text-[var(--pulse-ink-secondary)]" style={QUALIFIER}>
++        {box.qualifier}
++      </span>
++    </Link>
++  </div>
++);
++
++export const StatStrip = ({ groups, ariaLabel = "Overview" }: { groups: StatGroupSpec[]; ariaLabel?: string }) => {
++  let index = 0;
++  return (
++    // One row of five from 1280 CSS pixels; below that (200% zoom on a laptop)
++    // each group takes its own row so nothing scrolls sideways.
++    <section aria-label={ariaLabel} className="flex flex-col gap-4 xl:grid xl:grid-cols-5">
++      {groups.map((g) => (
++        <div
++          key={g.key}
++          role="group"
++          aria-label={g.overline}
++          className={`flex min-w-0 flex-col gap-2 ${g.boxes.length >= 3 ? "xl:col-span-3" : "xl:col-span-2"}`}
++        >
++          <span className="px-1 uppercase text-[var(--pulse-ink-muted)]" style={KICKER} aria-hidden="true">
++            {g.overline}
++          </span>
++          <div className="flex min-w-0 gap-4">
++            {g.boxes.map((b) => <StatBox key={b.key} box={b} index={index++} />)}
++          </div>
++        </div>
++      ))}
++    </section>
++  );
++};
++
++export default StatStrip;
+diff --git a/src/components/dashboard/WorkspaceAdminOverview.tsx b/src/components/dashboard/WorkspaceAdminOverview.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..1ff16e3785574491b8d29eef1aa40c92a88a40ad
+--- /dev/null
++++ b/src/components/dashboard/WorkspaceAdminOverview.tsx
+@@ -0,0 +1,293 @@
++import React, { useState } from "react";
++import { useNavigate } from "react-router-dom";
++import { useQuery } from "@tanstack/react-query";
++import API_CONFIG from "@/lib/apiConfig";
++import useUserCookie from "@/hooks/use-auth";
++import { useTheme } from "@/hooks/useTheme";
++import { Dialog, DialogContentNoClose } from "@/components/ui/dialog";
++import PatentWorldMap from "@/components/PatentWorldMap";
++import TopInventors, { type InventorEntry } from "@/components/TopInventors";
++import { IdeaPipeline, NeedsReview } from "@/components/dashboard/DashboardStats";
++import { StatStrip, type StatGroupSpec } from "@/components/dashboard/StatStrip";
++
++/**
++ * The Workspace Admin's Overview (DSN-0002, product-context/surfaces/workspace-admin-dashboard.md).
++ *
++ * Two jobs in one glance: what needs a decision, and whether the invention
++ * program is moving. Row 1 is five scoped numbers, each a link to the list it
++ * counts. Row 2 is the company portfolio (Patents worldwide, kept by founder
++ * override) and Top inventors (kept by founder override). Row 3 is the queue,
++ * Review Inventor Ideas, with the page's only primary button, and the pipeline.
++ *
++ * The strip's aggregates come from /v1/dashboard as backend finding BF-5; the
++ * mock serves them for V0 scenarios and the record is conceptual until the
++ * backend does. Nothing here is counted in the browser from a paged list: when
++ * an aggregate is missing the box shows a dash and says it is not available.
++ */
++
++const DAY_MS = 86400000;
++const AGING_THRESHOLD_DAYS = 30;
++// The review statuses in the old dialect the adapter translates; the same
++// literal the Review queue link and the sidebar badge use.
++const REVIEW_STATUS = "UNDER_REVIEW,SENT_TO_IHC";
++const DATE = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
++const LONG_DATE = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
++
++type Aggregates = {
++  awaiting_review?: number;
++  oldest_waiting_days?: number | null;
++  actions_due_30_days?: number;
++  next_action_due_at?: string | null;
++  submitted_this_quarter?: number;
++  submitted_last_quarter?: number;
++  quarter_start?: string;
++  quarter_end?: string;
++  patents_filed_this_quarter?: number;
++};
++
++const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
++const delta = (now: number | null, before: number | null) => {
++  if (now === null || before === null) return { text: "not available yet", spoken: "not available yet" };
++  const d = now - before;
++  if (d === 0) return { text: "no change vs last quarter", spoken: "no change against last quarter" };
++  return { text: `${d > 0 ? "+" : "−"}${Math.abs(d)} vs last quarter`, spoken: `${d > 0 ? "up" : "down"} ${Math.abs(d)} against last quarter` };
++};
++
++const WorkspaceAdminOverview = () => {
++  const navigate = useNavigate();
++  const { user } = useUserCookie();
++  const { theme } = useTheme();
++  const [isPatentDialogOpen, setIsPatentDialogOpen] = useState(false);
++
++  const scope = user ? `${user.id}:${user.role}:${user.client_id ?? "none"}` : null;
++  const ready = !!scope;
++
++  const { isLoading: isDashboardLoading, isError: isDashboardError, data, refetch: refetchDashboard } = useQuery({
++    queryKey: ["dashboard", scope],
++    enabled: ready,
++    queryFn: async () => (await API_CONFIG.get("/api/v1/dashboard"))?.data,
++  });
++  const { data: pipelineData, isLoading: isPipelineLoading, isError: isPipelineError, refetch: refetchPipeline } = useQuery({
++    queryKey: ["dashboard_pipeline", scope],
++    enabled: ready,
++    queryFn: async () => (await API_CONFIG.get("/api/v1/idea/pipeline"))?.data,
++  });
++  const { isLoading: isQueueLoading, isError: isQueueError, data: ideasData, refetch: refetchIdeas } = useQuery({
++    queryKey: ["dashboard_ideas", scope, false],
++    enabled: ready,
++    queryFn: async () => (await API_CONFIG.get(`/api/v1/idea/fetch-by-user?page=1&limit=100&status=${REVIEW_STATUS}`))?.data,
++  });
++
++  const d = data?.data ?? {};
++  const w: Aggregates = d.workspace ?? {};
++  const pipeline = pipelineData?.data;
++
++  const reviewQueue = React.useMemo(() => {
++    const ideas: any[] = Array.isArray(ideasData?.data) ? ideasData.data : [];
++    return ideas
++      .filter((i) => ["UNDER_REVIEW", "SENT_TO_IHC"].includes(i.status))
++      .sort((a, b) => new Date(a.submission_date || 0).getTime() - new Date(b.submission_date || 0).getTime())
++      .map((i) => ({
++        id: i.id,
++        title: i.title,
++        secondary: typeof i.created_by === "string" ? i.created_by : i.created_by?.name,
++        score: i.score,
++        waitingDays: Math.max(0, Math.floor((Date.now() - new Date(i.submission_date).getTime()) / DAY_MS)),
++      }));
++  }, [ideasData]);
++
++  /* ------------------------------ the strip ------------------------------ */
++  const awaiting = num(w.awaiting_review) ?? num(pipeline?.reviewPending) ?? (ideasData ? reviewQueue.length : null);
++  const oldest = num(w.oldest_waiting_days) ?? (reviewQueue.length ? Math.max(...reviewQueue.map((r) => r.waitingDays)) : null);
++  const actionsDue = num(w.actions_due_30_days);
++  const nextDue = w.next_action_due_at ? new Date(w.next_action_due_at) : null;
++  const submittedQ = num(w.submitted_this_quarter);
++  const submittedPrev = num(w.submitted_last_quarter);
++  const trend = delta(submittedQ, submittedPrev);
++  const totalPatents = num(d.total_patents);
++  const granted = num(d.granted_patents);
++  const pendingPatents = num(d.pending_patents);
++  const filedQ = num(w.patents_filed_this_quarter);
++  const quarterTitle = w.quarter_start && w.quarter_end
++    ? `Calendar quarter, ${LONG_DATE.format(new Date(w.quarter_start))} to ${LONG_DATE.format(new Date(w.quarter_end))}`
++    : "Calendar quarter";
++  const unavailable = isDashboardError;
++
++  const groups: StatGroupSpec[] = [
++    {
++      key: "workspace",
++      overline: "Your workspace",
++      boxes: [
++        {
++          key: "awaiting", label: "Awaiting review", rule: awaiting ? "amber" : "neutral",
++          value: unavailable ? null : awaiting,
++          qualifier: unavailable ? "not available" : awaiting ? `oldest ${oldest ?? 0}d` : "nothing waiting",
++          qualifierSpoken: unavailable ? "not available" : awaiting ? `oldest ${oldest ?? 0} days` : "nothing waiting",
++          to: `/ideas?status=${REVIEW_STATUS}`, title: "Ideas awaiting your decision, oldest first",
++        },
++        {
++          key: "actions", label: "Actions due · 30 days", rule: actionsDue ? "red" : "neutral",
++          value: unavailable ? null : actionsDue,
++          qualifier: unavailable ? "not available" : actionsDue === null ? "not available yet" : actionsDue && nextDue ? `next ${DATE.format(nextDue)}` : "None due in 30 days",
++          qualifierSpoken: unavailable ? "not available" : actionsDue === null ? "not available yet" : actionsDue && nextDue ? `next due ${LONG_DATE.format(nextDue)}` : "none due in 30 days",
++          to: "/due-dates", title: "Actions with a date in the next 30 days",
++        },
++        {
++          key: "submitted", label: "Submitted this quarter", rule: "navy",
++          value: unavailable ? null : submittedQ,
++          qualifier: unavailable ? "not available" : submittedQ === 0 ? (submittedPrev ? trend.text : "No submissions yet this quarter") : trend.text,
++          qualifierSpoken: unavailable ? "not available" : submittedQ === 0 ? (submittedPrev ? trend.spoken : "no submissions yet this quarter") : trend.spoken,
++          to: "/ideas?date=quarter", title: quarterTitle,
++        },
++      ],
++    },
++    {
++      key: "portfolio",
++      overline: "Company portfolio",
++      boxes: [
++        {
++          key: "patents", label: "Total patents", rule: totalPatents ? "green" : "neutral",
++          value: unavailable ? null : totalPatents,
++          qualifier: unavailable ? "not available" : totalPatents ? (filedQ === null ? "company portfolio" : `${filedQ} filed this quarter`) : "No patents added yet",
++          qualifierSpoken: unavailable ? "not available" : totalPatents ? (filedQ === null ? "company portfolio" : `${filedQ} filed this quarter`) : "no patents added yet",
++          to: "/patents", title: "The company patent portfolio",
++        },
++        {
++          key: "granted", label: "Granted", rule: "neutral",
++          value: unavailable ? null : granted,
++          qualifier: unavailable ? "not available" : totalPatents ? `${pendingPatents ?? 0} pending` : "No patents added yet",
++          qualifierSpoken: unavailable ? "not available" : totalPatents ? `${pendingPatents ?? 0} pending` : "no patents added yet",
++          to: "/patents?status=ACTIVE_GRANTED", title: "Granted patents; pending are applied or in examination",
++        },
++      ],
++    },
++  ];
++
++  /* ------------------------------ the panels ------------------------------ */
++  // The jurisdiction list is a BF-5 aggregate; without it the subtitle states the total alone.
++  const jurisdictions: Array<{ jurisdiction: string; count: number }> | null = Array.isArray(d.patents_by_jurisdiction) ? d.patents_by_jurisdiction : null;
++  const mapSubtitle = unavailable
++    ? "Not loaded"
++    : totalPatents
++      ? `${totalPatents} patent${totalPatents === 1 ? "" : "s"}${jurisdictions ? ` · ${jurisdictions.length} jurisdiction${jurisdictions.length === 1 ? "" : "s"}` : ""}`
++      : "No patents added yet";
++
++  const topInventors = d.top_inventors as { this_quarter?: InventorEntry[]; all_time?: InventorEntry[] } | undefined;
++  const periods = { thisQuarter: topInventors?.this_quarter ?? [], allTime: topInventors?.all_time ?? [] };
++
++  const goToPipelineStage = (stage: string) => {
++    if (stage === "granted") { navigate("/patents?status=ACTIVE_GRANTED"); return; }
++    const map: Record<string, string | null> = { submitted: null, review: REVIEW_STATUS, sent_to_oc: "SEND_TO_OC", filed: "FILED" };
++    const status = map[stage];
++    navigate(status ? `/ideas?status=${status}` : "/ideas");
++  };
++
++  const strip = isDashboardLoading && !unavailable ? (
++    <section aria-label="Overview" aria-busy="true" className="flex flex-col gap-4 xl:grid xl:grid-cols-5">
++      {[0, 1, 2, 3, 4].map((k) => (
++        <div key={k} className="flex flex-col gap-2">
++          {/* The group overline's height, so the boxes land where they will stay. */}
++          <span className="h-[14px] w-24 rounded bg-[var(--pulse-surface-subtle)]" aria-hidden="true" style={{ visibility: k === 0 || k === 3 ? "visible" : "hidden" }} />
++          <div className="min-h-[108px] animate-pulse rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)]" />
++        </div>
++      ))}
++    </section>
++  ) : (
++    <StatStrip groups={groups} />
++  );
++
++  return (
++    <>
++      <div className="mx-auto w-full max-w-[1680px] px-6 pb-24 pt-6 lg:px-8 md:pb-8">
++        <div className="mb-6">{strip}</div>
++        {unavailable && (
++          <div role="status" className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-4 py-3 text-[13px] text-[var(--pulse-ink-secondary)]">
++            <span>The overview numbers could not be loaded. The queue below still loads on its own.</span>
++            <button type="button" onClick={() => refetchDashboard()} className="rounded-lg border border-[var(--pulse-line)] px-2.5 py-1 text-[12px] font-semibold text-[var(--pulse-ink)] hover:bg-[var(--pulse-surface-subtle)]">
++              Retry
++            </button>
++          </div>
++        )}
++        <div className="grid grid-cols-12 gap-6">
++          <section aria-label="Patents worldwide" className="col-span-12 h-[384px] xl:col-span-8">
++            <div className="relative z-10 h-full overflow-hidden rounded-2xl">
++              <PatentWorldMap
++                totalPatents={totalPatents ?? 0}
++                height={384}
++                isPatentDialogOpen={isPatentDialogOpen}
++                setIsPatentDialogOpen={() => setIsPatentDialogOpen(!isPatentDialogOpen)}
++                v0={{ title: "Patents worldwide", subtitle: mapSubtitle, heading: "h2", onOpenJurisdiction: (j: string) => navigate(`/patents?jurisdiction=${encodeURIComponent(j)}`) }}
++              />
++            </div>
++          </section>
++          <section aria-label="Top inventors" className="col-span-12 h-[384px] xl:col-span-4">
++            <TopInventors
++              onOpenInventor={(e) => navigate(`/ideas?search=${encodeURIComponent(e.name)}`)}
++              v0={{
++                periods,
++                empty: topInventors
++                  ? { text: "No submissions this quarter yet.", linkLabel: "Workspace › People", onLink: () => navigate("/workspace") }
++                  : { text: "Not available yet.", linkLabel: "Workspace › People", onLink: () => navigate("/workspace") },
++                loading: isDashboardLoading || !ready,
++                error: unavailable ? { onRetry: () => refetchDashboard() } : undefined,
++              }}
++            />
++          </section>
++          <section aria-label="Review Inventor Ideas" className="col-span-12 xl:col-span-8">
++            <NeedsReview
++              rows={reviewQueue}
++              laterCount={0}
++              title="Review Inventor Ideas"
++              onOpen={(id) => navigate(`/ideas/${id}`)}
++              onReviewAll={() => navigate(`/ideas?status=${REVIEW_STATUS}`)}
++              onViewAll={() => navigate(`/ideas?status=${REVIEW_STATUS}`)}
++              hasError={isQueueError}
++              onRetry={() => refetchIdeas()}
++              v0={{
++                loading: isQueueLoading || !ready,
++                agingThresholdDays: AGING_THRESHOLD_DAYS,
++                empty: { text: "Nothing waiting for your review.", linkLabel: "Workspace › People" },
++                onEmptyLink: () => navigate("/workspace"),
++              }}
++            />
++          </section>
++          <section aria-label="Idea pipeline" className="col-span-12 xl:col-span-4">
++            <IdeaPipeline
++              heading="h2"
++              periodLabel="All time"
++              submitted={Number(pipeline?.submitted) || 0}
++              reviewPending={Number(pipeline?.reviewPending) || 0}
++              sentToOC={Number(pipeline?.sentToPhoton) || 0}
++              filed={Number(pipeline?.filed) || 0}
++              granted={Number(pipeline?.granted) || 0}
++              oldestWaitingDays={oldest}
++              loading={isPipelineLoading || !ready}
++              onStageClick={goToPipelineStage}
++              hasError={isPipelineError}
++              onRetry={() => refetchPipeline()}
++            />
++          </section>
++        </div>
++      </div>
++
++      {isPatentDialogOpen && (
++        <Dialog open={isPatentDialogOpen} onOpenChange={setIsPatentDialogOpen}>
++          <DialogContentNoClose
++            className={`lg:max-w-[1440px] max-w-[400px] md:max-w-[700px] rounded-xl h-[90vh] backdrop-blur-xl border ${
++              theme === "dark" ? "bg-black/90 border-[#cccccc20]" : "bg-white/95 border-neutral-200"
++            }`}
++          >
++            <PatentWorldMap
++              totalPatents={totalPatents ?? 0}
++              isPatentDialogOpen={isPatentDialogOpen}
++              setIsPatentDialogOpen={() => setIsPatentDialogOpen(!isPatentDialogOpen)}
++              v0={{ title: "Patents worldwide", subtitle: mapSubtitle, heading: "h2", onOpenJurisdiction: (j: string) => navigate(`/patents?jurisdiction=${encodeURIComponent(j)}`) }}
++            />
++          </DialogContentNoClose>
++        </Dialog>
++      )}
++    </>
++  );
++};
++
++export default WorkspaceAdminOverview;
+diff --git a/src/index.css b/src/index.css
+index 099b62de6861b54876c6f75e904f1895e99c72d8..1c6eea2c81b38afdeb1258b92835b9eadbf91319 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -86,6 +86,19 @@
+     }
+   }
+ 
++  /* A one-time entrance for dashboard numbers: transform only, no fade, so
++     contrast is final from the first frame. Static under reduced motion. */
++  @keyframes pulse-rise {
++    from { transform: translateY(6px); }
++    to { transform: translateY(0); }
++  }
++  .pulse-rise {
++    animation: pulse-rise 240ms cubic-bezier(0.2, 0, 0, 1) both;
++  }
++  @media (prefers-reduced-motion: reduce) {
++    .pulse-rise { animation: none; }
++  }
++
+   :focus-visible {
+     outline: 2px solid var(--pulse-focus);
+     outline-offset: 2px;
+diff --git a/src/pages/Index.tsx b/src/pages/Index.tsx
+index 092c35733ab5134ea69bbf5e4ca3b811c8b6616d..b91cc3487fd90a7e68deb49beac5a595fb358b75 100644
+--- a/src/pages/Index.tsx
++++ b/src/pages/Index.tsx
+@@ -20,10 +20,22 @@ import { useTheme } from "@/hooks/useTheme";
+ import { toast } from "@/lib/toast";
+ import { motion } from "framer-motion";
+ import { isOutsideCounselRole } from "@/lib/roleAccess";
++import WorkspaceAdminOverview from "../components/dashboard/WorkspaceAdminOverview";
+ 
+ const DAY_MS = 86400000;
+ 
++/**
++ * The dashboard at "/". A Workspace Admin (LEGAL_COUNSEL in the backend's
++ * vocabulary) gets the V0 Overview of DSN-0002; every other role keeps the
++ * composition below. Branching in a wrapper keeps each body's hook order fixed.
++ */
+ const Index = () => {
++  const { user } = useUserCookie();
++  if (user?.role === "LEGAL_COUNSEL") return <WorkspaceAdminOverview />;
++  return <LegacyIndex />;
++};
++
++const LegacyIndex = () => {
+   const { theme } = useTheme();
+   const { user } = useUserCookie();
+   const navigate = useNavigate();

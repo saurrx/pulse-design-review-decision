@@ -13,9 +13,10 @@ import { StatStrip, type StatGroupSpec } from "@/components/dashboard/StatStrip"
 /**
  * The Workspace Admin's Overview (DSN-0002, product-context/surfaces/workspace-admin-dashboard.md).
  *
- * Two jobs in one glance: what needs a decision, and whether the invention
- * program is moving. Row 1 is five scoped numbers, each a link to the list it
- * counts. Row 2 is the company portfolio (Patents worldwide, kept by founder
+ * Two jobs in one glance: what needs a decision, and how the portfolio stands.
+ * Row 1 is five scoped numbers, each a link to the list it counts: awaiting
+ * review and Actions due for the workspace; total, granted and pending
+ * patents for the company portfolio. Row 2 is the company portfolio (Patents worldwide, kept by founder
  * override) and Top inventors (kept by founder override). Row 3 is the queue,
  * Review Inventor Ideas, with the page's only primary button, and the pipeline.
  *
@@ -46,13 +47,6 @@ type Aggregates = {
 };
 
 const num = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
-const delta = (now: number | null, before: number | null) => {
-  if (now === null || before === null) return { text: "not available yet", spoken: "not available yet" };
-  const d = now - before;
-  if (d === 0) return { text: "no change vs last quarter", spoken: "no change against last quarter" };
-  return { text: `${d > 0 ? "+" : "−"}${Math.abs(d)} vs last quarter`, spoken: `${d > 0 ? "up" : "down"} ${Math.abs(d)} against last quarter` };
-};
-
 const WorkspaceAdminOverview = () => {
   const navigate = useNavigate();
   const { user } = useUserCookie();
@@ -101,16 +95,10 @@ const WorkspaceAdminOverview = () => {
   const oldest = num(w.oldest_waiting_days) ?? (reviewQueue.length ? Math.max(...reviewQueue.map((r) => r.waitingDays)) : null);
   const actionsDue = num(w.actions_due_30_days);
   const nextDue = w.next_action_due_at ? new Date(w.next_action_due_at) : null;
-  const submittedQ = num(w.submitted_this_quarter);
-  const submittedPrev = num(w.submitted_last_quarter);
-  const trend = delta(submittedQ, submittedPrev);
   const totalPatents = num(d.total_patents);
   const granted = num(d.granted_patents);
   const pendingPatents = num(d.pending_patents);
   const filedQ = num(w.patents_filed_this_quarter);
-  const quarterTitle = w.quarter_start && w.quarter_end
-    ? `Calendar quarter, ${LONG_DATE.format(new Date(w.quarter_start))} to ${LONG_DATE.format(new Date(w.quarter_end))}`
-    : "Calendar quarter";
   const unavailable = isDashboardError;
 
   const groups: StatGroupSpec[] = [
@@ -132,13 +120,6 @@ const WorkspaceAdminOverview = () => {
           qualifierSpoken: unavailable ? "not available" : actionsDue === null ? "not available yet" : actionsDue && nextDue ? `next due ${LONG_DATE.format(nextDue)}` : "none due in 30 days",
           to: "/due-dates", title: "Actions with a date in the next 30 days",
         },
-        {
-          key: "submitted", label: "Submitted this quarter", rule: "navy",
-          value: unavailable ? null : submittedQ,
-          qualifier: unavailable ? "not available" : submittedQ === 0 ? (submittedPrev ? trend.text : "No submissions yet this quarter") : trend.text,
-          qualifierSpoken: unavailable ? "not available" : submittedQ === 0 ? (submittedPrev ? trend.spoken : "no submissions yet this quarter") : trend.spoken,
-          to: "/ideas?date=quarter", title: quarterTitle,
-        },
       ],
     },
     {
@@ -155,9 +136,16 @@ const WorkspaceAdminOverview = () => {
         {
           key: "granted", label: "Granted", rule: "neutral",
           value: unavailable ? null : granted,
-          qualifier: unavailable ? "not available" : totalPatents ? `${pendingPatents ?? 0} pending` : "No patents added yet",
-          qualifierSpoken: unavailable ? "not available" : totalPatents ? `${pendingPatents ?? 0} pending` : "no patents added yet",
-          to: "/patents?status=ACTIVE_GRANTED", title: "Granted patents; pending are applied or in examination",
+          qualifier: unavailable ? "not available" : totalPatents ? `of ${totalPatents} patents` : "No patents added yet",
+          qualifierSpoken: unavailable ? "not available" : totalPatents ? `of ${totalPatents} patents` : "no patents added yet",
+          to: "/patents?status=ACTIVE_GRANTED", title: "Granted patents in the company portfolio",
+        },
+        {
+          key: "pending", label: "Pending patents", rule: "navy",
+          value: unavailable ? null : pendingPatents,
+          qualifier: unavailable ? "not available" : totalPatents ? "applied or in examination" : "No patents added yet",
+          qualifierSpoken: unavailable ? "not available" : totalPatents ? "applied or in examination" : "no patents added yet",
+          to: "/patents?status=ACTIVE_APPLIED,ACTIVE_EXAMINATION", title: "Patents applied for or in examination",
         },
       ],
     },

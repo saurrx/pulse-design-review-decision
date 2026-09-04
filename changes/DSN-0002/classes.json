@@ -1,8 +1,8 @@
 {
   "id": "DSN-0002",
-  "designBase": "15dc92caed19ef397b1d3f1dcd96447db6a4f441",
+  "designBase": "649b06b3a4a3bfc53bee00458545806af4681eed",
   "productionBase": "a14da2ed0707e0be435c67a6e526fe5f7b5c0dd1",
-  "head": "2bc25bc8cfb48282d9eed6b96019c950c98e7fa0",
+  "head": "129a3b861b31654200945cd7b4d17080bf5c6a1f",
   "upstreamHead": "a14da2ed0707e0be435c67a6e526fe5f7b5c0dd1",
   "classes": {
     "reviewSupport": [
@@ -25,7 +25,10 @@
       "changes/DSN-0002/shots/before-legacy-reference-screens-dashboard--legal-counsel.png",
       "design/a11y-baseline.json",
       "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx",
+      "design/v0/COVERAGE.md",
+      "design/v0/coverage.json",
       "mock/handlers/dashboard.ts",
+      "mock/proposed-fields.json",
       "mock/scenarios/build.ts",
       "mock/scenarios/v0/index.ts",
       "mock/scenarios/v0/personas.ts",
@@ -57,11 +60,6 @@
       "qa/visual/baselines/surfaces-workspace-admin-dashboard--width-1920--at-1920x1080.png",
       "qa/visual/baselines/surfaces-workspace-admin-dashboard--zoom-200--at-640x360@2.png"
     ],
-    "unclassified": [
-      "design/v0/COVERAGE.md",
-      "design/v0/coverage.json",
-      "mock/proposed-fields.json"
-    ],
     "portable": [
       "src/components/DashboardLayout.tsx",
       "src/components/PatentWorldMap.tsx",
@@ -77,10 +75,7 @@
   "flags": [
     "behaviour-impact approval required (fingerprint changed)"
   ],
-  "refused": [
-    "unclassified paths, add them to tools/design/paths.mjs: design/v0/COVERAGE.md, design/v0/coverage.json, mock/proposed-fields.json",
-    "changed components covered by no story: src/components/DashboardLayout.tsx, src/components/Sidebar.tsx"
-  ],
+  "refused": [],
   "behaviour": {
     "src/components/DashboardLayout.tsx": {
       "permission": {

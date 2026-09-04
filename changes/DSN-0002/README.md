@@ -3,14 +3,16 @@
 **Status:** proposed
 **Production base:** `a14da2e` (upstream/main at the sync) · **Design head:** see `classes.json` after export
 **Backend impact:** conceptual (BF-5, `docs/architecture/CONTEXT-RECONCILIATION.md` R-15)
-**Approvals raised by the export:** behaviour-impact expected: a role condition moves in `src/pages/Index.tsx`, `src/components/Sidebar.tsx` and `src/components/DashboardLayout.tsx`; the Workspace Admin page adds two navigation targets (`/ideas?date=quarter`, `/patents?jurisdiction=…`) and drops five queries (due dates, inventor roster, patents, the cumulative series filters)
+**Approvals raised by the export:** behaviour-impact (see `behaviour.md`): a role condition moves in `src/pages/Index.tsx` and `src/components/DashboardLayout.tsx`; the new `WorkspaceAdminOverview.tsx` carries the three dashboard reads, their query keys and six navigation targets (two of them new: `/patents?jurisdiction=…` and `/workspace`; `/ideas?date=quarter` is the third new target); `TopInventors` gains the `v0` props
 
 ## Intent
 The Workspace Admin opens Home to see what needs a decision and to read program
 and portfolio health in one glance. Today program health is spread across
 three panels (pipeline bars, cumulative chart, portfolio donut) and never lands
 as a single answer, and seven containers compete. This record puts five scoped
-numbers in one row, every number a link to the list it counts, drops the panel
+numbers in one row (awaiting review, Actions due, total, granted and pending
+patents; the founder dropped the "submitted this quarter" box on 4 September
+2026 after the first render), every number a link to the list it counts, drops the panel
 count from seven to five, and makes **Open queue** on the Review Inventor Ideas
 panel the only primary button on the page. Emotional target: focused and
 decisive first, then informed. Calm, not busy.
@@ -93,7 +95,8 @@ once V0 usage evidence exists.
 
 ## Copy
 Overview · Your workspace / Company portfolio · Awaiting review · Actions due ·
-30 days · Submitted this quarter · Total patents · Granted · Patents worldwide
+30 days · Total patents · Granted (of N patents) · Pending patents (applied or
+in examination) · Patents worldwide
 · Top inventors · Review Inventor Ideas · Open queue → · Review all → · Idea
 pipeline · Nothing waiting for your review. · None due in 30 days · No
 submissions yet this quarter · No patents added yet. Trend reads `+4 vs last
@@ -131,10 +134,11 @@ names of the five boxes, the six-row cap, the overdue marker and the absence
 of the removed panels.
 
 ## Known compromises
-- **Quarter link.** The Ideas list honours `status`, `search`, `client` and a
-  `date` window, but the adapter does not translate `date`, so
-  `/ideas?date=quarter` lands on the unfiltered list today. Recorded as part
-  of BF-5: the list must accept the same window the aggregate uses.
+- **Pending link.** The Patent Portfolio takes one `status` value; the
+  pending box links to `ACTIVE_APPLIED,ACTIVE_EXAMINATION` and lands on the
+  unfiltered list until the page accepts a list. The quarter aggregates
+  (`submitted_this_quarter`, `submitted_last_quarter`) stay in BF-5 for the
+  Top inventors period selector; the strip no longer shows them.
 - **Jurisdiction link.** The Patent Portfolio has no jurisdiction filter
   parameter yet; `/patents?jurisdiction=US` lands on the full portfolio. The
   portfolio brief already places jurisdiction filters there; the parameter is

@@ -26,9 +26,9 @@ const strip = async (canvas: ReturnType<typeof within>) => {
   return {
     awaiting: canvas.getByRole("link", { name: /^Awaiting review,/ }),
     actions: canvas.getByRole("link", { name: /^Actions due · 30 days,/ }),
-    submitted: canvas.getByRole("link", { name: /^Submitted this quarter,/ }),
     patents: canvas.getByRole("link", { name: /^Total patents,/ }),
     granted: canvas.getByRole("link", { name: /^Granted,/ }),
+    pending: canvas.getByRole("link", { name: /^Pending patents,/ }),
   };
 };
 
@@ -104,7 +104,7 @@ export const NoSubmissionsThisQuarter: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const boxes = await strip(canvas);
-    await expect(boxes.submitted).toHaveAccessibleName(/Submitted this quarter, 0, down 4 against last quarter/);
+    await expect(boxes.awaiting).toHaveAccessibleName(/Awaiting review, 2,/);
     await expect(await canvas.findByText("No submissions this quarter yet.")).toBeVisible();
   },
 };
@@ -116,6 +116,7 @@ export const EmptyPortfolio: Story = {
     const boxes = await strip(canvas);
     await expect(boxes.patents).toHaveAccessibleName(/Total patents, 0, no patents added yet/);
     await expect(boxes.granted).toHaveAccessibleName(/Granted, 0, no patents added yet/);
+    await expect(boxes.pending).toHaveAccessibleName(/Pending patents, 0, no patents added yet/);
     await expect(await canvas.findByText("No patents added yet", { selector: "p" })).toBeVisible();
   },
 };

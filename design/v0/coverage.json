@@ -637,8 +637,8 @@
       ],
       "states": {
         "loading": "stat strip skeleton at final size, then the queue; the map loads last",
-        "empty": "no pending reviews; no Actions due; no submissions this quarter; empty portfolio; one inventor",
-        "success": "five scoped stat boxes (awaiting review with oldest wait, Actions due in 30 days, submitted this quarter with delta, total patents, granted), Patents worldwide, Top inventors by period, Review Inventor Ideas oldest first, Idea pipeline",
+        "empty": "no pending reviews; no Actions due; no submissions this quarter in Top inventors; empty portfolio; one inventor",
+        "success": "five scoped stat boxes (awaiting review with oldest wait, Actions due in 30 days, total patents, granted, pending patents), Patents worldwide, Top inventors by period, Review Inventor Ideas oldest first, Idea pipeline",
         "error": "overview numbers unavailable with retry; the queue still loads independently",
         "permission": "Workspace Admin only; dates appear only in the Actions box",
         "specific": [
