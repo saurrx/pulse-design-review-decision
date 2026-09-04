@@ -285,7 +285,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
         </div>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {metrics.map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className={`rounded-2xl border p-5 ${panelClass}`}>
+            <div key={label} className={`rounded-md border p-5 ${panelClass}`}>
               <div className="mb-3 flex items-center gap-2 text-xs font-medium text-neutral-500"><Icon className={`h-4 w-4 ${color}`} />{label}</div>
               <p className={`text-3xl font-semibold tracking-[-0.03em] ${color}`}>{value}</p>
             </div>
@@ -293,7 +293,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
         </div>
       </section>
 
-      <section className={`rounded-2xl border p-6 ${panelClass}`}>
+      <section className={`rounded-md border p-6 ${panelClass}`}>
         <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-2xl">
             <div className="flex items-center gap-2">
@@ -328,7 +328,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
             </label>
             <div className="grid gap-1.5 text-xs font-medium text-neutral-600 dark:text-neutral-400">
               Next reference preview
-              <div className="flex h-9 min-w-28 items-center rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-3 font-mono text-sm font-semibold text-[var(--pulse-ink)]">
+              <div className="flex h-9 min-w-28 items-center rounded-sm border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-3 font-mono text-sm font-semibold text-[var(--pulse-ink)]">
                 {(referencePrefix || "IRN")}
                 {String(clientData?.idea_reference_next_number || 1).padStart(2, "0")}
               </div>
@@ -352,7 +352,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
       </section>
 
       <div className="grid items-start gap-6 lg:grid-cols-3">
-        <section className={`rounded-2xl border p-6 lg:col-span-2 ${panelClass}`}>
+        <section className={`rounded-md border p-6 lg:col-span-2 ${panelClass}`}>
           <div className="mb-5 space-y-4">
             <div>
               <h3 className="text-sm font-semibold text-[var(--pulse-ink)] dark:text-zinc-300">Patent data</h3>
@@ -371,9 +371,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
           </div>
 
           {importHistory.length > 0 ? (
-            <div className="flex items-center justify-between gap-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-[#cccccc20] dark:bg-neutral-800">
+            <div className="flex items-center justify-between gap-4 rounded-md border border-neutral-200 bg-neutral-50 p-4 dark:border-[#cccccc20] dark:bg-neutral-800">
               <div className="flex min-w-0 items-center gap-3">
-                <div className="rounded-lg bg-white p-2 shadow-sm dark:bg-neutral-900"><FileText className="h-5 w-5 text-neutral-500" /></div>
+                <div className="rounded-sm bg-white p-2 shadow-sm dark:bg-neutral-900"><FileText className="h-5 w-5 text-neutral-500" /></div>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{importHistory[0]?.created ?? 0} patents imported</p>
                   <p className="mt-1 truncate text-xs text-neutral-500">Latest import · {formatDate(importHistory[0]?.at)} · {importHistory[0]?.by}{importHistory[0]?.failed ? ` · ${importHistory[0].failed} row(s) failed` : ""}</p>
@@ -381,11 +381,11 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
               </div>
             </div>
           ) : (
-            <div className="rounded-lg border border-dashed border-neutral-300 px-5 py-8 text-center dark:border-neutral-700"><FileText className="mx-auto mb-2 h-6 w-6 text-neutral-400" /><p className="text-sm font-medium">{(metricsData?.data?.total_patents ?? 0) > 0 ? "No import on record for these patents" : "No portfolio file imported"}</p><p className="mt-1 text-xs text-neutral-500">{(metricsData?.data?.total_patents ?? 0) > 0 ? "This client’s patents predate import tracking. New uploads are recorded here." : "Upload Excel or CSV to add this client’s patent records."}</p></div>
+            <div className="rounded-md border border-dashed border-neutral-300 px-5 py-8 text-center dark:border-neutral-700"><FileText className="mx-auto mb-2 h-6 w-6 text-neutral-400" /><p className="text-sm font-medium">{(metricsData?.data?.total_patents ?? 0) > 0 ? "No import on record for these patents" : "No portfolio file imported"}</p><p className="mt-1 text-xs text-neutral-500">{(metricsData?.data?.total_patents ?? 0) > 0 ? "This client’s patents predate import tracking. New uploads are recorded here." : "Upload Excel or CSV to add this client’s patent records."}</p></div>
           )}
         </section>
 
-        <aside className={`rounded-2xl border p-6 ${panelClass}`}>
+        <aside className={`rounded-md border p-6 ${panelClass}`}>
           <h3 className="text-sm font-semibold text-[var(--pulse-ink)] dark:text-zinc-300">Client details</h3>
           <dl className="mt-5 space-y-5">
             <div><dt className="flex items-center gap-2 text-xs text-neutral-500"><Globe2 className="h-4 w-4" />Email domain</dt><dd className="mt-1 text-sm font-medium">{clientData?.allowed_domain?.split("@").pop() || "—"}</dd></div>
@@ -396,7 +396,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
         </aside>
       </div>
 
-      <section className={`overflow-hidden rounded-2xl border ${panelClass}`}>
+      <section className={`overflow-hidden rounded-md border ${panelClass}`}>
         <div className="flex items-center justify-between border-b border-neutral-200 px-6 py-5 dark:border-[#cccccc20]">
           <div><h3 className="text-sm font-semibold text-[var(--pulse-ink)] dark:text-zinc-300">Client team</h3><p className="mt-1 text-xs text-neutral-500">People with access to this client workspace</p></div>
           <div className="flex items-center gap-2">
@@ -429,16 +429,16 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
             <DialogTitle>Invite people</DialogTitle>
             <DialogDescription>Add people to the {clientData?.name} client workspace.</DialogDescription>
           </DialogHeader>
-          <div className="mt-2 grid grid-cols-2 rounded-lg border border-neutral-200 bg-neutral-50 p-1 dark:border-neutral-700 dark:bg-neutral-900">
-            <button onClick={() => setInviteMode("email")} className={`rounded-md px-3 py-2 text-sm font-medium transition-all ${inviteMode === "email" ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-800 dark:text-white" : "text-neutral-500"}`}>Email invitation</button>
-            <button onClick={() => setInviteMode("share")} className={`rounded-md px-3 py-2 text-sm font-medium transition-all ${inviteMode === "share" ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-800 dark:text-white" : "text-neutral-500"}`}>Share link</button>
+          <div className="mt-2 grid grid-cols-2 rounded-sm border border-neutral-200 bg-neutral-50 p-1 dark:border-neutral-700 dark:bg-neutral-900">
+            <button onClick={() => setInviteMode("email")} className={`rounded-xs px-3 py-2 text-sm font-medium transition-all ${inviteMode === "email" ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-800 dark:text-white" : "text-neutral-500"}`}>Email invitation</button>
+            <button onClick={() => setInviteMode("share")} className={`rounded-xs px-3 py-2 text-sm font-medium transition-all ${inviteMode === "share" ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-800 dark:text-white" : "text-neutral-500"}`}>Share link</button>
           </div>
 
           {inviteMode === "email" ? (
             <div className="space-y-5 pt-3">
               <div>
                 <label htmlFor="team-email" className="text-sm font-medium">Email address</label>
-                <input id="team-email" autoFocus type="email" value={inviteEmail} onChange={(event) => setInviteEmail(event.target.value)} placeholder={`name@${clientData?.allowed_domain?.split("@").pop() || "company.com"}`} className="mt-2 h-10 w-full rounded-md border border-neutral-300 bg-transparent px-3 text-sm outline-none transition-colors focus:border-[#F9B418] focus:ring-2 focus:ring-[#F9B418]/20 dark:border-neutral-700" />
+                <input id="team-email" autoFocus type="email" value={inviteEmail} onChange={(event) => setInviteEmail(event.target.value)} placeholder={`name@${clientData?.allowed_domain?.split("@").pop() || "company.com"}`} className="mt-2 h-10 w-full rounded-sm border border-neutral-300 bg-transparent px-3 text-sm outline-none transition-colors focus:border-[#F9B418] focus:ring-2 focus:ring-[#F9B418]/20 dark:border-neutral-700" />
               </div>
               <div>
                 <p className="text-sm font-medium">Access role</p>
@@ -447,34 +447,34 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
                     role was to invite someone as an inventor and change it
                     afterwards. */}
                 <div className="mt-2 grid grid-cols-3 gap-2">
-                  <button type="button" onClick={() => setInviteRole("INVENTOR")} className={`rounded-lg border p-3 text-left transition-colors ${inviteRole === "INVENTOR" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Inventor</span><span className="mt-1 block text-xs text-neutral-500">Submit and track ideas</span></button>
-                  <button type="button" onClick={() => setInviteRole("TECH_COMMITTEE")} className={`rounded-lg border p-3 text-left transition-colors ${inviteRole === "TECH_COMMITTEE" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Tech Committee</span><span className="mt-1 block text-xs text-neutral-500">Review before legal</span></button>
-                  <button type="button" onClick={() => setInviteRole("LEGAL_COUNSEL")} className={`rounded-lg border p-3 text-left transition-colors ${inviteRole === "LEGAL_COUNSEL" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Administrator</span><span className="mt-1 block text-xs text-neutral-500">Manage the client workspace</span></button>
+                  <button type="button" onClick={() => setInviteRole("INVENTOR")} className={`rounded-md border p-3 text-left transition-colors ${inviteRole === "INVENTOR" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Inventor</span><span className="mt-1 block text-xs text-neutral-500">Submit and track ideas</span></button>
+                  <button type="button" onClick={() => setInviteRole("TECH_COMMITTEE")} className={`rounded-md border p-3 text-left transition-colors ${inviteRole === "TECH_COMMITTEE" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Tech Committee</span><span className="mt-1 block text-xs text-neutral-500">Review before legal</span></button>
+                  <button type="button" onClick={() => setInviteRole("LEGAL_COUNSEL")} className={`rounded-md border p-3 text-left transition-colors ${inviteRole === "LEGAL_COUNSEL" ? "border-[#F9B418] bg-[#F9B418]/10" : "border-neutral-200 dark:border-neutral-700"}`}><span className="block text-sm font-semibold">Administrator</span><span className="mt-1 block text-xs text-neutral-500">Manage the client workspace</span></button>
                 </div>
               </div>
-              {inviteRole === "LEGAL_COUNSEL" && <p className="rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-800">Administrator invitations are email-only so the recipient’s identity can be verified before privileged access is granted.</p>}
+              {inviteRole === "LEGAL_COUNSEL" && <p className="rounded-md bg-amber-50 p-3 text-xs leading-5 text-amber-800">Administrator invitations are email-only so the recipient’s identity can be verified before privileged access is granted.</p>}
               <Button onClick={() => inviteMutation.mutate()} disabled={!inviteEmail.trim() || inviteMutation.isPending} className="w-full bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]">{inviteMutation.isPending ? "Sending invitation…" : `Send ${inviteRole === "LEGAL_COUNSEL" ? "administrator" : "inventor"} invitation`}</Button>
             </div>
           ) : (
             <div className="pt-4">
               {inviteLinkData?.active ? <>
-                <div className="mb-4 flex items-start justify-between gap-4 rounded-lg border border-emerald-200 bg-emerald-50/70 p-3 dark:border-emerald-900 dark:bg-emerald-950/30">
+                <div className="mb-4 flex items-start justify-between gap-4 rounded-md border border-emerald-200 bg-emerald-50/70 p-3 dark:border-emerald-900 dark:bg-emerald-950/30">
                   <div><p className="text-sm font-semibold text-emerald-900 dark:text-emerald-300">Inventor access</p><p className="mt-1 text-xs text-emerald-800 dark:text-emerald-400">Anyone with this link can join as an inventor. Administrator access is never granted through shared links.</p></div>
                   <Badge className="shrink-0 bg-emerald-100 text-emerald-800 hover:bg-emerald-100">Active</Badge>
                 </div>
                 <div className="grid gap-5 sm:grid-cols-[190px_1fr] sm:items-center">
-                  <div className="mx-auto rounded-2xl border border-neutral-200 bg-white p-3 shadow-sm">
+                  <div className="mx-auto rounded-md border border-neutral-200 bg-white p-3 shadow-sm">
                     <QRCodeSVG ref={qrCodeRef} value={inventorInviteLink} size={164} level="M" marginSize={4} bgColor="#ffffff" fgColor="#171717" title={`QR code for ${clientData?.name} inventor invitation`} />
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-semibold">Shareable invite link</p>
                     <p className="mt-1 text-xs text-neutral-500">Restricted to {clientData?.allowed_domain?.split("@").pop() || "the client’s approved domain"}.</p>
-                    <div className="mt-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-900"><code className="block break-all text-xs leading-5 text-neutral-700 dark:text-neutral-300">{inventorInviteLink}</code></div>
+                    <div className="mt-3 rounded-md border border-neutral-200 bg-neutral-50 p-3 dark:border-neutral-700 dark:bg-neutral-900"><code className="block break-all text-xs leading-5 text-neutral-700 dark:text-neutral-300">{inventorInviteLink}</code></div>
                     <Button onClick={copyInventorInvite} className="mt-3 w-full bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]">{inviteLinkCopied ? <Check className="mr-1.5 h-4 w-4" /> : <Copy className="mr-1.5 h-4 w-4" />}{inviteLinkCopied ? "Invite link copied" : "Copy invite link"}</Button>
                     <div className="mt-2 grid grid-cols-2 gap-2"><Button onClick={copyQrCode} variant="outline"><Copy className="mr-1.5 h-4 w-4" />Copy QR</Button><Button onClick={downloadQrCode} variant="outline"><Download className="mr-1.5 h-4 w-4" />Download QR</Button></div>
                   </div>
                 </div>
-                <div className="mt-5 grid grid-cols-3 divide-x rounded-lg border border-neutral-200 py-3 text-center dark:border-neutral-700">
+                <div className="mt-5 grid grid-cols-3 divide-x rounded-md border border-neutral-200 py-3 text-center dark:border-neutral-700">
                   <div><p className="text-xs uppercase tracking-wider text-neutral-500">Validity</p><p className="mt-1 text-xs font-semibold">{inviteLinkData.expires_at ? `Until ${new Date(inviteLinkData.expires_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}` : "14 days"}</p></div>
                   <div><p className="text-xs uppercase tracking-wider text-neutral-500">Joined</p><p className="mt-1 text-xs font-semibold">{typeof inviteLinkData.uses === "number" ? inviteLinkData.uses : "—"}</p></div>
                   <div><p className="text-xs uppercase tracking-wider text-neutral-500">Created by</p><p className="mt-1 truncate px-2 text-xs font-semibold">{inviteLinkData.createdBy || "—"}</p></div>
@@ -482,7 +482,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
                 <div className="mt-4 flex flex-wrap items-center justify-end gap-3 border-t border-neutral-200 pt-4 dark:border-neutral-700">
                   <div className="flex gap-2"><Button size="sm" variant="outline" onClick={() => window.confirm("Generate a new link? The current QR code and link will stop working immediately.") && regenerateInviteMutation.mutate()} disabled={regenerateInviteMutation.isPending}><RefreshCw className="mr-1.5 h-3.5 w-3.5" />Regenerate</Button><Button size="sm" variant="ghost" onClick={() => window.confirm("Deactivate this invite link? Anyone who has it will no longer be able to join.") && deactivateInviteMutation.mutate()} disabled={deactivateInviteMutation.isPending} className="text-red-600 hover:bg-red-50 hover:text-red-700"><Ban className="mr-1.5 h-3.5 w-3.5" />Deactivate</Button></div>
                 </div>
-              </> : <div className="rounded-xl border border-dashed border-neutral-300 px-6 py-10 text-center dark:border-neutral-700"><Ban className="mx-auto h-7 w-7 text-neutral-400" /><p className="mt-3 text-sm font-semibold">Invite link is inactive</p><p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-neutral-500">Generate a new opaque link before sharing. The previous link can no longer be redeemed.</p><div className="mx-auto mt-4 flex w-fit items-center gap-2"><Button onClick={() => regenerateInviteMutation.mutate()} className="bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]">Generate new link</Button></div></div>}
+              </> : <div className="rounded-md border border-dashed border-neutral-300 px-6 py-10 text-center dark:border-neutral-700"><Ban className="mx-auto h-7 w-7 text-neutral-400" /><p className="mt-3 text-sm font-semibold">Invite link is inactive</p><p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-neutral-500">Generate a new opaque link before sharing. The previous link can no longer be redeemed.</p><div className="mx-auto mt-4 flex w-fit items-center gap-2"><Button onClick={() => regenerateInviteMutation.mutate()} className="bg-[#F9B418] text-neutral-950 hover:bg-[#e5a310]">Generate new link</Button></div></div>}
             </div>
           )}
         </DialogContent>
@@ -493,14 +493,14 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ clientTeam = [], clientId, cl
           <DialogHeader><DialogTitle>Portfolio import history</DialogTitle><DialogDescription>Previous patent portfolio uploads for this client.</DialogDescription></DialogHeader>
           <div className="mt-3 max-h-[380px] space-y-3 overflow-auto">
             {importHistory.length === 0 && (
-              <div className="rounded-lg border border-dashed border-neutral-300 px-5 py-8 text-center dark:border-neutral-700">
+              <div className="rounded-md border border-dashed border-neutral-300 px-5 py-8 text-center dark:border-neutral-700">
                 <FileText className="mx-auto mb-2 h-6 w-6 text-neutral-400" />
                 <p className="text-sm font-medium">No imports recorded yet</p>
                 <p className="mt-1 text-xs text-neutral-500">Patents added before import tracking do not appear here. Every upload from now on is recorded with who ran it and how many rows landed.</p>
               </div>
             )}
             {importHistory.map((row) => (
-              <div key={row?.id} className="flex items-start gap-3 rounded-lg border p-4">
+              <div key={row?.id} className="flex items-start gap-3 rounded-md border p-4">
                 <FileText className="mt-0.5 h-5 w-5 shrink-0 text-neutral-400" />
                 <div className="min-w-0 flex-1">
                   {/* The spreadsheet itself, kept in storage. A portfolio is

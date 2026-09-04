@@ -200,7 +200,7 @@ const ClientDetailPage: React.FC = () => {
               <>
                 <button
                   onClick={() => setIsEditMode(false)}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-[var(--pulse-line)] px-3 text-sm font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-sm border border-[var(--pulse-line)] px-3 text-sm font-medium text-[var(--pulse-ink-secondary)] transition-colors hover:border-[var(--pulse-line-strong)] hover:text-[var(--pulse-ink)]"
                 >
                   <X className="h-4 w-4" />
                   <span className="hidden sm:inline">Cancel</span>
@@ -209,7 +209,7 @@ const ClientDetailPage: React.FC = () => {
                   onClick={async () => {
                     await clientDetailsRef.current?.saveChanges();
                   }}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-[var(--pulse-brand)] px-3 text-sm font-semibold text-[var(--pulse-ink)] transition-colors hover:bg-[var(--pulse-brand-hover)]"
+                  className="inline-flex h-9 items-center justify-center gap-2 rounded-sm bg-[var(--pulse-brand)] px-3 text-sm font-semibold text-[var(--pulse-ink)] transition-colors hover:bg-[var(--pulse-brand-hover)]"
                 >
                   <Save className="h-4 w-4" />
                   <span className="hidden sm:inline">Save changes</span>
@@ -221,7 +221,7 @@ const ClientDetailPage: React.FC = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-9 rounded-lg"
+                    className="h-9 rounded-sm"
                     disabled={requestAccessMutation.isPending}
                     onClick={() => requestAccessMutation.mutate()}
                   >
@@ -234,7 +234,7 @@ const ClientDetailPage: React.FC = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-9 rounded-lg"
+                  className="h-9 rounded-sm"
                   onClick={() => {
                     // The confirmation opened, not the session — the pair with
                     // view_as_entered is what shows how often an admin thinks
@@ -252,7 +252,7 @@ const ClientDetailPage: React.FC = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-9 rounded-lg"
+                  className="h-9 rounded-sm"
                   onClick={() => setIsEditMode(true)}
                 >
                   <Pen className="h-4 w-4" />
@@ -273,9 +273,9 @@ const ClientDetailPage: React.FC = () => {
           }`}
         >
           <div className="mx-auto w-full max-w-[1440px] px-5 pt-6 md:px-8">
-            <div className="rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] p-4">
+            <div className="rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] p-4">
               <div className="flex min-w-0 items-center gap-4">
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-white p-2 text-lg font-bold text-amber-700">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md border border-[var(--pulse-line)] bg-white p-2 text-lg font-bold text-amber-700">
                 <ClientLogo
                   client={clientData?.data}
                   className="max-h-11 max-w-12 object-contain"
@@ -285,7 +285,7 @@ const ClientDetailPage: React.FC = () => {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <div className={`font-sans text-lg font-semibold tracking-[-0.015em] ${theme === "dark" ? "text-zinc-200" : "text-[var(--pulse-ink)]"}`}>{!isFetching && clientData?.data?.name}</div>
-                  <span className="rounded-lg border border-[var(--pulse-success)]/20 bg-[var(--pulse-success-soft)] px-2.5 py-1 text-xs font-medium text-[var(--pulse-success)]">Active client</span>
+                  <span className="rounded-xs border border-[var(--pulse-success)]/20 bg-[var(--pulse-success-soft)] px-2.5 py-1 text-xs font-medium text-[var(--pulse-success)]">Active client</span>
                 </div>
                 <p className="mt-1 max-w-2xl truncate text-sm text-neutral-500">{clientData?.data?.about}</p>
                 <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-neutral-500">
@@ -348,7 +348,7 @@ const ClientDetailPage: React.FC = () => {
                   key={owner.id}
                   onClick={() => ownerMutation.mutate(owner)}
                   disabled={ownerMutation.isPending}
-                  className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors ${assignedOwner?.id === owner.id ? "border-[#F9B418] bg-amber-50" : "border-neutral-200 hover:border-neutral-300"}`}
+                  className={`flex w-full items-center gap-3 rounded-md border p-3 text-left transition-colors ${assignedOwner?.id === owner.id ? "border-[#F9B418] bg-amber-50" : "border-neutral-200 hover:border-neutral-300"}`}
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-sm font-semibold text-amber-700">{owner.name?.charAt(0) || owner.email?.charAt(0)}</span>
                   <span className="flex-1"><span className="block text-sm font-semibold text-neutral-900">{owner.name}</span><span className="block text-xs text-neutral-500">{owner.email}</span></span>
@@ -392,7 +392,7 @@ const ClientDetailPage: React.FC = () => {
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 <div
-                  className={`p-4 rounded-lg border bg-[#F9B418]/10 border-[#F9B418]/30 ${
+                  className={`p-4 rounded-md border bg-[#F9B418]/10 border-[#F9B418]/30 ${
                     theme === "dark" ? "text-zinc-200" : "text-neutral-800"
                   }`}
                 >
@@ -424,7 +424,7 @@ const ClientDetailPage: React.FC = () => {
                 <div className="flex gap-3 pt-2">
                   <button
                     onClick={() => setIsClientModeModalOpen(false)}
-                    className={`flex-1 px-4 py-2.5 rounded-md text-sm transition-all border ${
+                    className={`flex-1 px-4 py-2.5 rounded-sm text-sm transition-all border ${
                       theme === "dark"
                         ? "bg-zinc-900 border-[#cccccc20] text-zinc-200 hover:bg-[#cccccc30]"
                         : "bg-neutral-100 border-neutral-200 text-neutral-700 hover:bg-neutral-200"
@@ -436,7 +436,7 @@ const ClientDetailPage: React.FC = () => {
                   <button
                     onClick={handleProceedToClientMode}
                     disabled={isLoggingInAsClient}
-                    className="flex-1 px-4 py-2.5 rounded-md text-sm font-medium transition-all bg-[#F9B418] hover:bg-[#F9B418]/90 text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2.5 rounded-sm text-sm font-medium transition-all bg-[#F9B418] hover:bg-[#F9B418]/90 text-black disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoggingInAsClient ? "Processing..." : "Proceed"}
                   </button>

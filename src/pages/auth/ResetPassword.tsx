@@ -275,7 +275,7 @@ const ResetPassword: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full font-sans py-3 rounded-xl bg-[#F9B418] text-black font-medium hover:bg-[#F9B418]/90 transition-all"
+                className="w-full font-sans py-3 rounded-sm bg-[#F9B418] text-black font-medium hover:bg-[#F9B418]/90 transition-all"
                 disabled={isPending}
                 style={{ boxShadow: "rgba(249, 180, 24, 0.3) 0px 0px 20px" }}
               >

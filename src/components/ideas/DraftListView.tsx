@@ -173,7 +173,7 @@ const DraftListView: React.FC<DraftListViewProps> = ({
                     theme === "dark"
                       ? "bg-black/40 border-[#cccccc20] hover:border-white/20"
                       : "bg-white/80 border-slate-200 hover:border-gray-300 hover:shadow-lg"
-                  } rounded-xl ${
+                  } rounded-md ${
                     selectedDraftId === draft.id
                       ? `!border-[#F9B418] shadow-lg ring-2 ring-[#F9B418]/20 ${theme === "dark" ? "bg-[#F5A623]/5" : "bg-orange-50/80"}`
                       : submittedDraftId === draft.id
@@ -294,7 +294,7 @@ const DraftListView: React.FC<DraftListViewProps> = ({
                         draft?.CheckDraftSoreLog?.length > 0 &&
                         (draft?.CheckDraftSoreLog?.[0]?.score !== null || draft?.CheckDraftSoreLog?.[0]?.score_meta_data !== null) ? (
                           <div
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg border flex-shrink-0 ${
+                            className={`flex items-center gap-2 px-3 py-2 rounded-sm border flex-shrink-0 ${
                               theme === "light"
                                 ? "bg-orange-50/50 border-[#F5A623]/20"
                                 : "bg-[#F5A623]/5 border-[#F5A623]/20"
@@ -315,7 +315,7 @@ const DraftListView: React.FC<DraftListViewProps> = ({
                           </div>
                         ) : isCalculating ? (
                           <button
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded-md border flex-shrink-0 transition-opacity hover:opacity-70 ${
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-sm border flex-shrink-0 transition-opacity hover:opacity-70 ${
                               theme === "light"
                                 ? "bg-gray-50 border-gray-200 text-gray-500"
                                 : "bg-white/5 border-white/10 text-neutral-400"
@@ -361,7 +361,7 @@ const DraftListView: React.FC<DraftListViewProps> = ({
                               variant="outline"
                               size="sm"
                               onClick={() => handleEditDraft(draft.id)}
-                              className={`rounded-lg border font-sans ${
+                              className={`rounded-sm border font-sans ${
                                 theme === "dark"
                                   ? "bg-transparent hover:bg-white/5 hover:text-white text-gray-300 border-[#cccccc20]"
                                   : "bg-transparent hover:bg-white text-gray-700 border-slate-300 hover:text-gray-700"
@@ -377,7 +377,7 @@ const DraftListView: React.FC<DraftListViewProps> = ({
                               variant="outline"
                               size="sm"
                               onClick={() => handleEditDraft(draft.id)}
-                              className={`rounded-lg border font-sans ${
+                              className={`rounded-sm border font-sans ${
                                 theme === "dark"
                                   ? "bg-transparent hover:bg-white/5 hover:text-white text-gray-300 border-[#cccccc20]"
                                   : "bg-transparent hover:bg-white/10 text-gray-700 border-slate-300"
@@ -411,7 +411,7 @@ const DraftListView: React.FC<DraftListViewProps> = ({
                                 });
                                 setShowPatentReportModal(true);
                               }}
-                              className={`rounded-lg border font-medium font-sans ${
+                              className={`rounded-sm border font-medium font-sans ${
                                 theme === "dark"
                                   ? "bg-transparent hover:bg-white/5 hover:text-white text-gray-300 border-[#cccccc20]"
                                   : "bg-transparent hover:bg-white/10 text-gray-700 border-slate-300"
@@ -492,7 +492,7 @@ const DraftListView: React.FC<DraftListViewProps> = ({
                                   }
                                 }}
                                 disabled={!canSend}
-                                className={`rounded-lg font-semibold font-sans gap-2 ${
+                                className={`rounded-sm font-semibold font-sans gap-2 ${
                                   canSend
                                     ? theme === "dark"
                                       ? "bg-[#F9B418] text-neutral-900 hover:bg-[#F9B418]"

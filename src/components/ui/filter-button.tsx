@@ -42,7 +42,7 @@ const FilterButton = React.forwardRef<HTMLButtonElement, FilterButtonProps>(
       type="button"
       variant="outline"
       className={cn(
-        "flex shrink-0 items-center gap-2 rounded border px-4 font-sans text-sm font-normal transition-colors",
+        "flex shrink-0 items-center gap-2 rounded-sm border px-4 font-sans text-sm font-normal transition-colors",
         "border-neutral-200 bg-transparent text-neutral-700 hover:border-[#F9B418] hover:bg-transparent hover:text-[#494949]",
         "dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:border-[#F9B418]/50 dark:hover:bg-white/5 dark:hover:text-neutral-300",
         toolbar && "h-[42px] whitespace-nowrap",

@@ -249,7 +249,13 @@ export const type = {
     "transform": "uppercase"
   }
 } as const;
-export const radius = "2px";
+export const radius = {
+  "xs": "4px",
+  "sm": "6px",
+  "md": "8px",
+  "lg": "12px",
+  "full": "9999px"
+} as const;
 export const shadow = {
   "card": "none",
   "elevated": "none"

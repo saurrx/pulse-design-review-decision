@@ -25,7 +25,7 @@ const NotFound = () => {
       <GradientBlobs />
 
       <div
-        className={`text-center max-w-md p-8 rounded-xl shadow-sm border relative z-10 ${
+        className={`text-center max-w-md p-8 rounded-md shadow-sm border relative z-10 ${
           theme === "dark"
             ? "bg-[#0a0a0a] border-neutral-900"
             : "bg-white border-neutral-200"
@@ -59,7 +59,7 @@ const NotFound = () => {
         </p>
         <a
           href="/"
-          className="inline-block bg-[#F9B418] hover:bg-[#F9B418]/90 text-black font-medium px-6 py-3 rounded-lg transition-colors font-sans"
+          className="inline-block bg-[#F9B418] hover:bg-[#F9B418]/90 text-black font-medium px-6 py-3 rounded-sm transition-colors font-sans"
         >
           Return to Dashboard
         </a>

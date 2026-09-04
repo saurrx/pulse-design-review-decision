@@ -23,7 +23,7 @@ const injectGlobalStyles = () => {
         overflow-y: auto;
         text-align: left;
         padding: 8px;
-        border-radius: 4px;
+        border-radius: var(--pl-radius-xs);
         background-color: #f9fafb;
         display: block;
         line-height: 1.4;
@@ -43,7 +43,7 @@ const injectGlobalStyles = () => {
       
       .abstract-cell::-webkit-scrollbar-thumb {
         background-color: #ddd;
-        border-radius: 6px;
+        border-radius: var(--pl-radius-xs);
       }
       
       .abstract-cell::-webkit-scrollbar-thumb:hover {
@@ -162,7 +162,7 @@ const injectGlobalStyles = () => {
         align-items: center;
         justify-content: center;
         padding: 0.15rem 0.5rem;
-        border-radius: 9999px;
+        border-radius: var(--pl-radius-xs);
         font-size: 0.75rem;
         font-weight: 500;
         background-color: #e0f2fe;
@@ -174,7 +174,7 @@ const injectGlobalStyles = () => {
         align-items: center;
         justify-content: center;
         padding: 0.25rem 0.5rem;
-        border-radius: 9999px;
+        border-radius: var(--pl-radius-xs);
         font-size: 0.75rem;
         font-weight: 500;
         letter-spacing: 0.025em;
@@ -214,7 +214,7 @@ const injectGlobalStyles = () => {
         align-items: center;
         justify-content: center;
         padding: 0.25rem;
-        border-radius: 0.375rem;
+        border-radius: var(--pl-radius-sm);
         background-color: transparent;
         color: #6b7280;
         transition: background-color 0.15s ease, color 0.15s ease;
@@ -268,7 +268,7 @@ const injectGlobalStyles = () => {
       
       .patent-mobile-card {
         border: 1px solid #eee;
-        border-radius: 8px;
+        border-radius: var(--pl-radius-md);
         padding: 12px;
         margin-bottom: 12px;
         background-color: white;
@@ -316,7 +316,7 @@ const injectGlobalStyles = () => {
         flex-direction: column;
         padding: 1rem;
         background-color: white;
-        border-radius: 0.5rem;
+        border-radius: var(--pl-radius-md);
         border: 1px solid #e2e8f0;
         box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         transition: all 0.2s ease;

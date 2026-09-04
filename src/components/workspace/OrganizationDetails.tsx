@@ -191,10 +191,10 @@ const OrganizationDetails: React.FC<OrganizationDetailsProps> = ({
   );
   
   return (
-    <div className={`border rounded-2xl p-6 ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-[var(--pulse-surface)] border-[var(--pulse-line)] shadow-[0_18px_45px_-38px_rgba(17,16,60,0.45)]'}`}>
+    <div className={`border rounded-md p-6 ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-[var(--pulse-surface)] border-[var(--pulse-line)] shadow-[0_18px_45px_-38px_rgba(17,16,60,0.45)]'}`}>
       <div className="mb-6">
         <div className="flex flex-col gap-4">
-          <div className="relative mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]">
+          <div className="relative mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)]">
             {clientLogoSrc ? (
               <img
                 src={clientLogoSrc}
@@ -321,7 +321,7 @@ const OrganizationDetails: React.FC<OrganizationDetailsProps> = ({
                 
                 <button
                   onClick={() => handleCopyEmail(u?.email)}
-                  className={`absolute right-0 top-1/2 -translate-y-1/2 p-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity ${theme === 'dark' ? 'hover:bg-white/10 text-neutral-500 hover:text-[#F5A623]' : 'hover:bg-neutral-100 text-neutral-400 hover:text-[#F5A623]'}`}
+                  className={`absolute right-0 top-1/2 -translate-y-1/2 p-1.5 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity ${theme === 'dark' ? 'hover:bg-white/10 text-neutral-500 hover:text-[#F5A623]' : 'hover:bg-neutral-100 text-neutral-400 hover:text-[#F5A623]'}`}
                   title="Copy email"
                 >
                   <svg
@@ -388,7 +388,7 @@ const OrganizationDetails: React.FC<OrganizationDetailsProps> = ({
               textarea.style.height = "auto";
               textarea.style.height = `${textarea.scrollHeight}px`;
             }}
-            className={`overflow-hidden flex w-full resize-none rounded-md border px-3 py-2 text-base placeholder:text-muted-foreground outline-none font-sans focus-visible:border-ring focus-visible:ring-offset-0 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 disabled:opacity-50 md:text-sm ${theme === 'dark' ? 'border-white/10 bg-white/5 text-neutral-100' : 'border-neutral-200 bg-white text-neutral-900'}`}
+            className={`overflow-hidden flex w-full resize-none rounded-sm border px-3 py-2 text-base placeholder:text-muted-foreground outline-none font-sans focus-visible:border-ring focus-visible:ring-offset-0 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 disabled:opacity-50 md:text-sm ${theme === 'dark' ? 'border-white/10 bg-white/5 text-neutral-100' : 'border-neutral-200 bg-white text-neutral-900'}`}
             onMouseDown={(e) => {
               // Prevent text position disturbance by ensuring height is correct before interaction
               const textarea = e.target as HTMLTextAreaElement;

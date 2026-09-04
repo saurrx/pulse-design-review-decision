@@ -84,7 +84,7 @@ const PatentPaperView = ({
   })).filter((g) => g.questions.length > 0);
 
   return (
-    <div className="w-full rounded-2xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] font-sans">
+    <div className="w-full rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] font-sans">
       {/* Panel header — title/ref/date/inventor live in the page header,
           so the panel keeps only its label (screen view; export templates
           keep the full caption block). */}

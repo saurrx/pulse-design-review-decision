@@ -103,7 +103,7 @@ const SubmitActionsDialog: React.FC<SubmitActionsDialogProps> = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel
-            className={`bg-transparent border font-sans rounded-lg ${
+            className={`bg-transparent border font-sans rounded-sm ${
               theme === "dark"
                 ? "border-white text-zinc-300 hover:bg-transparent hover:text-zinc-300"
                 : ""
@@ -114,7 +114,7 @@ const SubmitActionsDialog: React.FC<SubmitActionsDialogProps> = ({
           <AlertDialogAction
             onClick={onConfirm}
             disabled={isSubmitting}
-            className="text-zinc-900 font-medium rounded-lg font-sans bg-[#F9B418] hover:bg-[#F9B418]"
+            className="text-zinc-900 font-medium rounded-sm font-sans bg-[#F9B418] hover:bg-[#F9B418]"
           >
             {isSubmitting ? "Submitting..." : "Submit to OC"}
           </AlertDialogAction>

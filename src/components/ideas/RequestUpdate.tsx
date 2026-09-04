@@ -553,7 +553,7 @@ export default function RequestUpdateModal({
               onChange={handleNoteChange}
               placeholder="Describe what updates are needed (e.g., 'Please provide more details on the technical implementation of the AI algorithm...')"
               rows={6}
-              className={`ph-no-capture w-full px-4 py-3 rounded-lg border resize-none transition-all focus:outline-none focus:ring-2 focus:ring-[#F9B418]/50 ${
+              className={`ph-no-capture w-full px-4 py-3 rounded-sm border resize-none transition-all focus:outline-none focus:ring-2 focus:ring-[#F9B418]/50 ${
                 theme === "light"
                   ? "bg-transparent border-gray-200 text-gray-900 placeholder:text-gray-400 focus:border-[#F9B418]"
                   : "bg-transparent border-white/10 text-white placeholder:text-neutral-500 focus:border-[#F9B418]/50"
@@ -584,7 +584,7 @@ export default function RequestUpdateModal({
             <div className="relative">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className={`w-full px-4 py-3 rounded-lg border flex items-center justify-between ${
+                className={`w-full px-4 py-3 rounded-sm border flex items-center justify-between ${
                   theme === "light"
                     ? "bg-transparent border-gray-200 text-gray-900"
                     : "bg-transparent border-white/10 text-white"
@@ -628,7 +628,7 @@ export default function RequestUpdateModal({
                     >
                       {/* Checkbox */}
                       <div
-                        className={`w-5 h-5 rounded border flex items-center justify-center ${
+                        className={`w-5 h-5 rounded-xs border flex items-center justify-center ${
                           inventor.checked
                             ? "bg-[#F9B418] border-[#F9B418]"
                             : theme === "light"

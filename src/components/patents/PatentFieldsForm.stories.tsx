@@ -76,11 +76,11 @@ export const ChipsDedupeCaseInsensitively: Story = {
     await userEvent.type(input, "ada lovelace{enter}");
     await userEvent.type(input, "Grace Hopper,");
     const field = c.getByTestId("chip-field-inventors");
-    await expect(field.querySelectorAll("span.rounded-full")).toHaveLength(2);
+    await expect(field.querySelectorAll("span.rounded-xs")).toHaveLength(2);
     await expect(JSON.parse(c.getByTestId("payload").textContent!).inventors).toEqual(["Ada Lovelace", "Grace Hopper"]);
     // Backspace on an empty input pops the last chip.
     await userEvent.type(input, "{backspace}");
-    await expect(field.querySelectorAll("span.rounded-full")).toHaveLength(1);
+    await expect(field.querySelectorAll("span.rounded-xs")).toHaveLength(1);
   },
 };
 

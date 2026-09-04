@@ -21,13 +21,13 @@ type ProductChipProps = React.HTMLAttributes<HTMLSpanElement> & {
 
 const KIND_CLASSES: Record<ProductChipKind, string> = {
   status:
-    "h-6 gap-1.5 rounded-md border px-2 text-[12px] font-semibold leading-none",
+    "h-6 gap-1.5 rounded-xs border px-2 text-[12px] font-semibold leading-none",
   metadata:
-    "h-6 gap-1.5 rounded-md border px-2 text-[11px] font-semibold uppercase leading-none tracking-[0.06em]",
+    "h-6 gap-1.5 rounded-xs border px-2 text-[11px] font-semibold uppercase leading-none tracking-[0.06em]",
   tag:
-    "h-6 gap-1 rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-2 text-[12px] font-normal leading-none text-[var(--pulse-ink-muted)]",
+    "h-6 gap-1 rounded-xs border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-2 text-[12px] font-normal leading-none text-[var(--pulse-ink-muted)]",
   count:
-    "h-5 min-w-5 justify-center rounded-md border border-transparent bg-[var(--pulse-surface-subtle)] px-1.5 text-[11px] font-semibold leading-none tabular-nums text-[var(--pulse-ink-secondary)]",
+    "h-5 min-w-5 justify-center rounded-full border border-transparent bg-[var(--pulse-surface-subtle)] px-1.5 text-[11px] font-semibold leading-none tabular-nums text-[var(--pulse-ink-secondary)]",
 };
 
 const TONE_CLASSES: Record<ProductChipTone, string> = {

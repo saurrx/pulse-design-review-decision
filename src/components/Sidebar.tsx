@@ -60,7 +60,7 @@ const initials = (name?: string, email?: string) =>
 const ClientInitials = ({ name }: { name: string }) => {
   return (
     <span
-      className="grid h-6 w-6 shrink-0 place-items-center rounded-[5px] border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] text-[10px] font-semibold text-[var(--pulse-ink-secondary)]"
+      className="grid h-6 w-6 shrink-0 place-items-center rounded-xs border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] text-[10px] font-semibold text-[var(--pulse-ink-secondary)]"
       aria-hidden="true"
     >
       {initials(name)}
@@ -233,7 +233,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
         <button
           type="button"
           onClick={() => navigate("/")}
-          className="flex min-w-0 items-center rounded-md text-left"
+          className="flex min-w-0 items-center rounded-sm text-left"
           aria-label="Go to overview"
         >
           <img
@@ -280,7 +280,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
                   to={item.path}
                   onClick={() => track("nav_item_clicked", { item: item.path })}
                   title={collapsed ? item.label : undefined}
-                  className={`group flex h-10 items-center rounded-lg text-sm font-medium transition-colors ${
+                  className={`group flex h-10 items-center rounded-md text-sm font-medium transition-colors ${
                     collapsed ? "justify-center px-2" : "gap-3 px-2"
                   } ${
                     active
@@ -328,7 +328,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className={`flex w-full items-center rounded-lg p-2 text-left hover:bg-[var(--pulse-surface-subtle)] ${
+              className={`flex w-full items-center rounded-sm p-2 text-left hover:bg-[var(--pulse-surface-subtle)] ${
                 collapsed ? "justify-center" : "gap-3"
               }`}
             >
@@ -350,12 +350,12 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
           <DropdownMenuContent
             align="start"
             side="top"
-            className="w-60 rounded-xl border-[var(--pulse-line)] p-1.5 shadow-xl"
+            className="w-60 rounded-lg border-[var(--pulse-line)] p-1.5 shadow-xl"
           >
             {sessionStorage.getItem("pl_client_mode") === "true" && (
               <DropdownMenuItem
                 onClick={exitClientView}
-                className="cursor-pointer rounded-lg px-2 py-2 text-sm font-medium text-amber-700"
+                className="cursor-pointer rounded-sm px-2 py-2 text-sm font-medium text-amber-700"
               >
                 <ArrowLeftRight className="mr-2 h-4 w-4" />
                 Exit client view
@@ -363,7 +363,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
             )}
             <DropdownMenuItem
               onClick={() => navigate("/profile")}
-              className="cursor-pointer rounded-lg px-2 py-2 text-sm"
+              className="cursor-pointer rounded-sm px-2 py-2 text-sm"
             >
               <UserRound className="mr-2 h-4 w-4" />
               My profile
@@ -371,7 +371,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, toggleSidebar }) => {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={logout}
-              className="cursor-pointer rounded-lg px-2 py-2 text-sm text-[var(--pulse-danger)]"
+              className="cursor-pointer rounded-sm px-2 py-2 text-sm text-[var(--pulse-danger)]"
             >
               <LogOut className="mr-2 h-4 w-4" />
               Sign out

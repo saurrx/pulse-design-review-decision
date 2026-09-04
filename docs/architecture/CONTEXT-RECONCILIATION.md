@@ -180,6 +180,26 @@ must change; the record ships as a proposal).
   removed. Decision pending in the report.
 - Impact: review support only.
 
+## R-16 Radius scale
+- Product: product-context names ~0–2px corners and inconsistent radii as
+  anti-patterns (old enterprise software, generic SaaS); PL-TKN-004 defines one
+  2px radius, "the squared system", and permits token-structure improvements
+  while the core brand colours stay untouched.
+- Base: production's Tailwind theme resolved every `rounded-*` utility to 2px
+  and the pages carried ~640 radius utilities across nine steps plus raw
+  pixel values in css strings.
+- Resolution: founder direction (DSN-0003, 4 September 2026) replaces the
+  single 2px value with a five-step scale in `src/styles/tokens.json`
+  (`xs` 4, `sm` 6, `md` 8, `lg` 12, `full`), one token per element class,
+  marked with a `_note` because it departs from the specification's value.
+  Tailwind's `borderRadius` theme is exactly the scale; `qa/v0/radius.test.ts`
+  refuses `rounded`, `rounded-xl` and every raw or arbitrary radius in `src/`.
+  The specification's checksum and every other token stay as PL-TKN-004
+  records them; the specification document itself is not edited.
+- Impact: `none`; build-impact approval (`tailwind.config.ts`,
+  `tools/tokens.mjs`). Finding for the specification owner: PL-TKN-004 should
+  carry the radius scale in its next release.
+
 ## Agreements worth naming
 - Copilot rules match: production's autofill and Suggest refuse to author
   novelty and report a state, not a grade; V0 says never invent technical

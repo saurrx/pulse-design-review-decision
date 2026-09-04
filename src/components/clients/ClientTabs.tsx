@@ -62,7 +62,7 @@ const ClientTabs: React.FC<ClientTabsProps> = ({
       className="w-full min-w-0"
     >
       <TabsList
-        className={`text-muted-foreground items-center flex w-full sm:w-fit sm:min-w-[300px] justify-start p-1 rounded-xl h-auto mb-5 border ${
+        className={`text-muted-foreground items-center flex w-full sm:w-fit sm:min-w-[300px] justify-start p-1 rounded-sm h-auto mb-5 border ${
           theme === "dark"
             ? "bg-zinc-900 border border-[#cccccc20]"
             : "bg-black/[0.02] border border-black/[0.08]"
@@ -74,7 +74,7 @@ const ClientTabs: React.FC<ClientTabsProps> = ({
             theme === "dark"
               ? "data-[state=active]:!bg-[#F9B418] data-[state=active]:!text-zinc-900 data-[state=active]:!border-transparent text-zinc-400 hover:text-zinc-400 hover:bg-[#cccccc20]"
               : "data-[state=active]:!bg-black/[0.08] data-[state=active]:!text-zinc-600 data-[state=active]:!border-transparent text-zinc-600 hover:text-zinc-700 hover:bg-black/[0.05]"
-          } inline-flex flex-1 items-center justify-center gap-1.5 border border-transparent py-1 whitespace-nowrap h-9 px-4 rounded-lg transition-all text-sm font-medium focus-visible:ring-0 focus-visible:ring-offset-0  min-w-0`}
+          } inline-flex flex-1 items-center justify-center gap-1.5 border border-transparent py-1 whitespace-nowrap h-9 px-4 rounded-xs transition-all text-sm font-medium focus-visible:ring-0 focus-visible:ring-offset-0  min-w-0`}
         >
           Overview
         </TabsTrigger>
@@ -84,7 +84,7 @@ const ClientTabs: React.FC<ClientTabsProps> = ({
             theme === "dark"
               ? "data-[state=active]:!bg-[#F9B418] data-[state=active]:!text-zinc-900 data-[state=active]:!border-transparent text-zinc-400 hover:text-zinc-400 hover:bg-[#cccccc20]"
               : "data-[state=active]:!bg-black/[0.08] data-[state=active]:!text-zinc-600 data-[state=active]:!border-transparent text-zinc-600 hover:text-zinc-700 hover:bg-black/[0.05]"
-          } inline-flex flex-1 items-center justify-center gap-1.5 border border-transparent py-1 whitespace-nowrap h-9 px-4 rounded-lg transition-all text-sm font-medium focus-visible:ring-0 focus-visible:ring-offset-0  min-w-0`}
+          } inline-flex flex-1 items-center justify-center gap-1.5 border border-transparent py-1 whitespace-nowrap h-9 px-4 rounded-xs transition-all text-sm font-medium focus-visible:ring-0 focus-visible:ring-offset-0  min-w-0`}
         >
           Patents
         </TabsTrigger>

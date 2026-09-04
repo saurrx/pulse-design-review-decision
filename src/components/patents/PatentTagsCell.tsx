@@ -165,7 +165,7 @@ const PatentTagsCell = ({
         <button
           type="button"
           onClick={(e) => e.stopPropagation()}
-          className={`flex w-full flex-wrap items-center gap-1 rounded p-1 text-left transition-colors ${
+          className={`flex w-full flex-wrap items-center gap-1 rounded-xs p-1 text-left transition-colors ${
             theme === "dark" ? "hover:bg-neutral-900" : "hover:bg-neutral-50"
           }`}
         >

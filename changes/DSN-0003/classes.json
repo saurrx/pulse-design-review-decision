@@ -1,0 +1,742 @@
+{
+  "id": "DSN-0003",
+  "designBase": "7b775fca115c510e7f49d318b25f9534716ad467",
+  "productionBase": "a14da2ed0707e0be435c67a6e526fe5f7b5c0dd1",
+  "head": "501c023e96f7519017e5515364d058f4cf0d6b07",
+  "upstreamHead": "a14da2ed0707e0be435c67a6e526fe5f7b5c0dd1",
+  "classes": {
+    "reviewSupport": [
+      "changes/DSN-0003/README.md",
+      "changes/DSN-0003/shots/after/foundations-tokens--buttons-and-inputs--at-1440x900.png",
+      "changes/DSN-0003/shots/after/foundations-tokens--radius-and-borders--at-1440x900.png",
+      "changes/DSN-0003/shots/after/legacy-reference-screens-draft-workspace--inventor-nearly-done.png",
+      "changes/DSN-0003/shots/after/legacy-reference-screens-ideas--case-owner-table.png",
+      "changes/DSN-0003/shots/after/legacy-reference-screens-patents--counsel.png",
+      "changes/DSN-0003/shots/after/legacy-reference-screens-review-queue--counsel.png",
+      "changes/DSN-0003/shots/after/surfaces-workspace-admin-dashboard--typical.png",
+      "changes/DSN-0003/shots/before/foundations-tokens--buttons-and-inputs--at-1440x900.png",
+      "changes/DSN-0003/shots/before/foundations-tokens--radius-and-borders--at-1440x900.png",
+      "changes/DSN-0003/shots/before/legacy-reference-screens-draft-workspace--inventor-nearly-done.png",
+      "changes/DSN-0003/shots/before/legacy-reference-screens-ideas--case-owner-table.png",
+      "changes/DSN-0003/shots/before/legacy-reference-screens-patents--counsel.png",
+      "changes/DSN-0003/shots/before/legacy-reference-screens-review-queue--counsel.png",
+      "changes/DSN-0003/shots/before/surfaces-workspace-admin-dashboard--typical.png",
+      "design/stories/foundations/Radius.stories.tsx",
+      "design/stories/foundations/Tokens.stories.tsx",
+      "design/stories/legacy/screens/NotFound.stories.tsx",
+      "qa/visual/baselines/foundations-radius--scale--at-1280x720.png",
+      "qa/visual/baselines/foundations-radius--scale--at-1366x768.png",
+      "qa/visual/baselines/foundations-radius--scale--at-1440x900.png",
+      "qa/visual/baselines/foundations-radius--scale--at-1920x1080.png",
+      "qa/visual/baselines/foundations-radius--scale--at-640x360@2.png",
+      "qa/visual/baselines/foundations-tokens--buttons-and-inputs--at-1280x720.png",
+      "qa/visual/baselines/foundations-tokens--buttons-and-inputs--at-1366x768.png",
+      "qa/visual/baselines/foundations-tokens--buttons-and-inputs--at-1440x900.png",
+      "qa/visual/baselines/foundations-tokens--buttons-and-inputs--at-1920x1080.png",
+      "qa/visual/baselines/foundations-tokens--buttons-and-inputs--at-640x360@2.png",
+      "qa/visual/baselines/foundations-tokens--color--at-1280x720.png",
+      "qa/visual/baselines/foundations-tokens--color--at-1366x768.png",
+      "qa/visual/baselines/foundations-tokens--color--at-1440x900.png",
+      "qa/visual/baselines/foundations-tokens--color--at-1920x1080.png",
+      "qa/visual/baselines/foundations-tokens--color--at-640x360@2.png",
+      "qa/visual/baselines/foundations-tokens--dense-tables--at-1280x720.png",
+      "qa/visual/baselines/foundations-tokens--dense-tables--at-1366x768.png",
+      "qa/visual/baselines/foundations-tokens--dense-tables--at-1440x900.png",
+      "qa/visual/baselines/foundations-tokens--dense-tables--at-1920x1080.png",
+      "qa/visual/baselines/foundations-tokens--dense-tables--at-640x360@2.png",
+      "qa/visual/baselines/foundations-tokens--radius-and-borders--at-1280x720.png",
+      "qa/visual/baselines/foundations-tokens--radius-and-borders--at-1366x768.png",
+      "qa/visual/baselines/foundations-tokens--radius-and-borders--at-1440x900.png",
+      "qa/visual/baselines/foundations-tokens--radius-and-borders--at-1920x1080.png",
+      "qa/visual/baselines/foundations-tokens--radius-and-borders--at-640x360@2.png",
+      "qa/visual/baselines/foundations-tokens--spacing--at-1280x720.png",
+      "qa/visual/baselines/foundations-tokens--spacing--at-1366x768.png",
+      "qa/visual/baselines/foundations-tokens--spacing--at-1440x900.png",
+      "qa/visual/baselines/foundations-tokens--spacing--at-1920x1080.png",
+      "qa/visual/baselines/foundations-tokens--states--at-1280x720.png",
+      "qa/visual/baselines/foundations-tokens--states--at-1366x768.png",
+      "qa/visual/baselines/foundations-tokens--states--at-1440x900.png",
+      "qa/visual/baselines/foundations-tokens--states--at-1920x1080.png",
+      "qa/visual/baselines/foundations-tokens--states--at-640x360@2.png",
+      "qa/visual/baselines/foundations-tokens--status-semantics--at-1280x720.png",
+      "qa/visual/baselines/foundations-tokens--status-semantics--at-1366x768.png",
+      "qa/visual/baselines/foundations-tokens--status-semantics--at-1440x900.png",
+      "qa/visual/baselines/foundations-tokens--status-semantics--at-1920x1080.png",
+      "qa/visual/baselines/foundations-tokens--status-semantics--at-640x360@2.png",
+      "qa/visual/baselines/legacy-reference-foundations-tokens--status-vocabulary.png",
+      "qa/visual/baselines/legacy-reference-primitives-button--sizes.png",
+      "qa/visual/baselines/legacy-reference-primitives-button--states.png",
+      "qa/visual/baselines/legacy-reference-primitives-button--variants.png",
+      "qa/visual/baselines/legacy-reference-primitives-button--with-icons.png",
+      "qa/visual/baselines/legacy-reference-primitives-chips--kinds.png",
+      "qa/visual/baselines/legacy-reference-primitives-chips--status-codes.png",
+      "qa/visual/baselines/legacy-reference-primitives-chips--status-tones.png",
+      "qa/visual/baselines/legacy-reference-primitives-form-controls--choices.png",
+      "qa/visual/baselines/legacy-reference-primitives-form-controls--select-closed.png",
+      "qa/visual/baselines/legacy-reference-primitives-form-controls--text-input-error.png",
+      "qa/visual/baselines/legacy-reference-primitives-form-controls--text-inputs.png",
+      "qa/visual/baselines/legacy-reference-primitives-form-controls--textarea-states.png",
+      "qa/visual/baselines/legacy-reference-primitives-overlays--confirmation.png",
+      "qa/visual/baselines/legacy-reference-primitives-overlays--dialog-open.png",
+      "qa/visual/baselines/legacy-reference-primitives-overlays--menu.png",
+      "qa/visual/baselines/legacy-reference-primitives-overlays--popover-open.png",
+      "qa/visual/baselines/legacy-reference-primitives-overlays--side-sheet.png",
+      "qa/visual/baselines/legacy-reference-primitives-overlays--toasts.png",
+      "qa/visual/baselines/legacy-reference-primitives-overlays--tooltip-hover.png",
+      "qa/visual/baselines/legacy-reference-primitives-surfaces--badges.png",
+      "qa/visual/baselines/legacy-reference-primitives-surfaces--cards.png",
+      "qa/visual/baselines/legacy-reference-primitives-surfaces--command-palette.png",
+      "qa/visual/baselines/legacy-reference-primitives-surfaces--separators-and-scroll.png",
+      "qa/visual/baselines/legacy-reference-primitives-surfaces--tabs-and-segments.png",
+      "qa/visual/baselines/legacy-reference-screens-actions--case-owner-queue.png",
+      "qa/visual/baselines/legacy-reference-screens-actions--counsel-selection.png",
+      "qa/visual/baselines/legacy-reference-screens-actions--photon-queue-empty.png",
+      "qa/visual/baselines/legacy-reference-screens-actions--photon-queue.png",
+      "qa/visual/baselines/legacy-reference-screens-assistant--placeholder.png",
+      "qa/visual/baselines/legacy-reference-screens-authentication--forgot.png",
+      "qa/visual/baselines/legacy-reference-screens-authentication--invite-landing.png",
+      "qa/visual/baselines/legacy-reference-screens-authentication--reset.png",
+      "qa/visual/baselines/legacy-reference-screens-authentication--saml-landing.png",
+      "qa/visual/baselines/legacy-reference-screens-authentication--share-link.png",
+      "qa/visual/baselines/legacy-reference-screens-authentication--signup-form.png",
+      "qa/visual/baselines/legacy-reference-screens-clients--case-owner.png",
+      "qa/visual/baselines/legacy-reference-screens-clients--detail-case-owner.png",
+      "qa/visual/baselines/legacy-reference-screens-clients--detail.png",
+      "qa/visual/baselines/legacy-reference-screens-clients--photon-admin.png",
+      "qa/visual/baselines/legacy-reference-screens-dashboard--case-owner.png",
+      "qa/visual/baselines/legacy-reference-screens-dashboard--inventor-first-run.png",
+      "qa/visual/baselines/legacy-reference-screens-dashboard--inventor.png",
+      "qa/visual/baselines/legacy-reference-screens-dashboard--large-portfolio.png",
+      "qa/visual/baselines/legacy-reference-screens-dashboard--legal-counsel.png",
+      "qa/visual/baselines/legacy-reference-screens-dashboard--photon-admin.png",
+      "qa/visual/baselines/legacy-reference-screens-dashboard--superadmin.png",
+      "qa/visual/baselines/legacy-reference-screens-dashboard--tech-committee.png",
+      "qa/visual/baselines/legacy-reference-screens-draft-workspace--committee-read-view.png",
+      "qa/visual/baselines/legacy-reference-screens-draft-workspace--counsel-read-view.png",
+      "qa/visual/baselines/legacy-reference-screens-draft-workspace--inventor-early-draft.png",
+      "qa/visual/baselines/legacy-reference-screens-draft-workspace--inventor-evaluation-running.png",
+      "qa/visual/baselines/legacy-reference-screens-draft-workspace--inventor-nearly-done.png",
+      "qa/visual/baselines/legacy-reference-screens-draft-workspace--inventor-submitted.png",
+      "qa/visual/baselines/legacy-reference-screens-draft-workspace--photon-read-view.png",
+      "qa/visual/baselines/legacy-reference-screens-due-dates--case-owner.png",
+      "qa/visual/baselines/legacy-reference-screens-due-dates--committee.png",
+      "qa/visual/baselines/legacy-reference-screens-due-dates--counsel.png",
+      "qa/visual/baselines/legacy-reference-screens-due-dates--empty.png",
+      "qa/visual/baselines/legacy-reference-screens-due-dates--large.png",
+      "qa/visual/baselines/legacy-reference-screens-due-dates--photon-admin.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--committee-decision.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--committee-failed-evaluation.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--committee-partial-evaluation.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--counsel-at-committee-stage.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--counsel-decision.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--inventor-changes-requested.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--inventor-evaluation-running.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--inventor-filed.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--inventor-rejected.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--inventor-sent-to-photon.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--inventor-under-review.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--photon-admin-filed.png",
+      "qa/visual/baselines/legacy-reference-screens-idea-details--photon-admin-sent-to-photon.png",
+      "qa/visual/baselines/legacy-reference-screens-ideas--case-owner-table.png",
+      "qa/visual/baselines/legacy-reference-screens-ideas--inventor-cards.png",
+      "qa/visual/baselines/legacy-reference-screens-ideas--inventor-empty.png",
+      "qa/visual/baselines/legacy-reference-screens-ideas--photon-admin-table.png",
+      "qa/visual/baselines/legacy-reference-screens-login--default.png",
+      "qa/visual/baselines/legacy-reference-screens-login--invalid-credentials.png",
+      "qa/visual/baselines/legacy-reference-screens-login--signs-in.png",
+      "qa/visual/baselines/legacy-reference-screens-login--validation-errors.png",
+      "qa/visual/baselines/legacy-reference-screens-not-found--missing.png",
+      "qa/visual/baselines/legacy-reference-screens-patents--counsel.png",
+      "qa/visual/baselines/legacy-reference-screens-patents--detail-counsel.png",
+      "qa/visual/baselines/legacy-reference-screens-patents--detail.png",
+      "qa/visual/baselines/legacy-reference-screens-patents--empty.png",
+      "qa/visual/baselines/legacy-reference-screens-patents--inventor.png",
+      "qa/visual/baselines/legacy-reference-screens-patents--large.png",
+      "qa/visual/baselines/legacy-reference-screens-patents--photon-admin.png",
+      "qa/visual/baselines/legacy-reference-screens-review-queue--committee.png",
+      "qa/visual/baselines/legacy-reference-screens-review-queue--counsel.png",
+      "qa/visual/baselines/legacy-reference-screens-review-queue--empty.png",
+      "qa/visual/baselines/legacy-reference-screens-review-queue--request-changes-dialog.png",
+      "qa/visual/baselines/legacy-reference-screens-workspace-and-profile--counsel-people.png",
+      "qa/visual/baselines/legacy-reference-screens-workspace-and-profile--photon-admin-case-owners.png",
+      "qa/visual/baselines/legacy-reference-screens-workspace-and-profile--profile-inventor.png",
+      "qa/visual/baselines/legacy-reference-screens-workspace-and-profile--profile-photon-admin.png",
+      "qa/visual/baselines/legacy-reference-states-network-and-permissions--failing-writes.png",
+      "qa/visual/baselines/legacy-reference-states-network-and-permissions--loading.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--data-unavailable.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--empty-portfolio.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--large-aging-queue.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--loading.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--long-titles.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--no-actions-due.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--no-pending-reviews.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--no-submissions-this-quarter.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--one-urgent-review.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--reduced-motion--at-1440x900.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--single-inventor.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--typical.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--width-1280--at-1280x720.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--width-1366--at-1366x768.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--width-1440--at-1440x900.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--width-1920--at-1920x1080.png",
+      "qa/visual/baselines/surfaces-workspace-admin-dashboard--zoom-200--at-640x360@2.png"
+    ],
+    "portable": [
+      "src/components/Header.tsx",
+      "src/components/PatentWorldMap.tsx",
+      "src/components/Sidebar.tsx",
+      "src/components/TimelineAndEvents.tsx",
+      "src/components/TopInventors.tsx",
+      "src/components/actions/CountrySelector.tsx",
+      "src/components/actions/IHCActionsContent.tsx",
+      "src/components/actions/OCActionsContent.tsx",
+      "src/components/actions/SubmitActionsDialog.tsx",
+      "src/components/clients/ClientDetails.tsx",
+      "src/components/clients/ClientInviteDialog.tsx",
+      "src/components/clients/ClientTabs.tsx",
+      "src/components/clients/DuplicatePatentsModal.tsx",
+      "src/components/clients/OnboardClientModal.tsx",
+      "src/components/clients/OverviewTab.tsx",
+      "src/components/clients/PatentsTab.tsx",
+      "src/components/dashboard/DashboardStats.tsx",
+      "src/components/dashboard/StatStrip.tsx",
+      "src/components/dashboard/WorkspaceAdminOverview.tsx",
+      "src/components/due-dates/DueDatesCalendar.tsx",
+      "src/components/due-dates/DueDatesContent.tsx",
+      "src/components/ideas/CoInventorsField.tsx",
+      "src/components/ideas/DownloadReport.tsx",
+      "src/components/ideas/DraftListView.tsx",
+      "src/components/ideas/DraftWorkspace.tsx",
+      "src/components/ideas/EmptyDraftsView.tsx",
+      "src/components/ideas/EvaluationProgress.tsx",
+      "src/components/ideas/IdeaDetailsContent.tsx",
+      "src/components/ideas/IdeaSubmissionModal.tsx",
+      "src/components/ideas/IdeasContent.tsx",
+      "src/components/ideas/OCDraftView.tsx",
+      "src/components/ideas/PatentPaperView.tsx",
+      "src/components/ideas/RejectIdeaModal.tsx",
+      "src/components/ideas/RequestUpdate.tsx",
+      "src/components/ideas/SendToOCModal.tsx",
+      "src/components/ideas/ShowScoreReport.tsx",
+      "src/components/ideas/ViewRequestUpdate.tsx",
+      "src/components/patents/DateRangeFilter.tsx",
+      "src/components/patents/PatentDetailsContent.tsx",
+      "src/components/patents/PatentFieldsForm.stories.tsx",
+      "src/components/patents/PatentFieldsForm.tsx",
+      "src/components/patents/PatentTagsCell.tsx",
+      "src/components/patents/PatentsContent.tsx",
+      "src/components/review/ReviewQueueWorkspace.tsx",
+      "src/components/ui/StatusChip.tsx",
+      "src/components/ui/alert-dialog.tsx",
+      "src/components/ui/badge.tsx",
+      "src/components/ui/button.tsx",
+      "src/components/ui/card.tsx",
+      "src/components/ui/checkbox.tsx",
+      "src/components/ui/command.tsx",
+      "src/components/ui/dialog.tsx",
+      "src/components/ui/dropdown-menu.tsx",
+      "src/components/ui/filter-button.tsx",
+      "src/components/ui/input.tsx",
+      "src/components/ui/popover.tsx",
+      "src/components/ui/product-chip.tsx",
+      "src/components/ui/product-surfaces.ts",
+      "src/components/ui/select.tsx",
+      "src/components/ui/tabs.tsx",
+      "src/components/ui/textarea.tsx",
+      "src/components/ui/toast.tsx",
+      "src/components/ui/tooltip.tsx",
+      "src/components/workspace/CaseOwnersTab.tsx",
+      "src/components/workspace/OrganizationDetails.tsx",
+      "src/components/workspace/PeopleTab.tsx",
+      "src/components/workspace/ProfileTab.tsx",
+      "src/components/workspace/WorkspaceTabs.tsx",
+      "src/index.css",
+      "src/pages/DueDatesPage.tsx",
+      "src/pages/Index.tsx",
+      "src/pages/NotFound.tsx",
+      "src/pages/PatentsPage.tsx",
+      "src/pages/ProfilePage.tsx",
+      "src/pages/auth/AuthField.tsx",
+      "src/pages/auth/ForgotPassword.tsx",
+      "src/pages/auth/Invite.tsx",
+      "src/pages/auth/Login.tsx",
+      "src/pages/auth/ResetPassword.tsx",
+      "src/pages/auth/Signup.tsx",
+      "src/pages/auth/SsoPanel.tsx",
+      "src/pages/client/AssistantPage.tsx",
+      "src/pages/client/ClientDetailPage.tsx",
+      "src/pages/client/ClientsPage.tsx",
+      "src/styles/tokens.css",
+      "src/styles/tokens.json",
+      "src/styles/tokens.tailwind.ts"
+    ],
+    "behaviourImpact": [
+      "src/contexts/BackgroundAnalysisContext.tsx"
+    ],
+    "buildImpact": [
+      "tailwind.config.ts",
+      "tools/tokens.mjs"
+    ]
+  },
+  "flags": [
+    "build-impact approval required",
+    "behaviour-impact approval required",
+    "behaviour-impact approval required (fingerprint changed)"
+  ],
+  "refused": [],
+  "behaviour": {
+    "src/components/clients/ClientInviteDialog.tsx": {
+      "permission": {
+        "added": [
+          "<button type=\"button\" onClick={() => setRole(\"INVENTOR\")} className={`rounded-md border p-3 text-left transition-colors ",
+          "<button type=\"button\" onClick={() => setRole(\"LEGAL_COUNSEL\")} className={`rounded-md border p-3 text-left transition-co",
+          "{(adminOnly || role === \"LEGAL_COUNSEL\") && <p className=\"rounded-md bg-amber-50 p-3 text-xs leading-5 text-amber-800\">A"
+        ],
+        "removed": [
+          "<button type=\"button\" onClick={() => setRole(\"INVENTOR\")} className={`rounded-lg border p-3 text-left transition-colors ",
+          "<button type=\"button\" onClick={() => setRole(\"LEGAL_COUNSEL\")} className={`rounded-lg border p-3 text-left transition-co",
+          "{(adminOnly || role === \"LEGAL_COUNSEL\") && <p className=\"rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-800\">A"
+        ]
+      }
+    },
+    "src/components/workspace/CaseOwnersTab.tsx": {
+      "permission": {
+        "added": [
+          "<span className={`shrink-0 rounded-xs px-2.5 py-1 text-xs font-medium ${caseOwner.role === \"PHOTON_ADMIN\" ? \"bg-purple-5",
+          "<td className=\"px-5 py-4\"><span className={`rounded-xs px-2.5 py-1 text-xs font-medium ${caseOwner.role === \"PHOTON_ADMI",
+          "{caseOwner.role === \"CASE_OWNER\" && caseOwner.clients.length > 2 && <span className=\"rounded-xs bg-neutral-100 px-2.5 py",
+          "{caseOwner.role === \"PHOTON_ADMIN\" ? <span className=\"rounded-xs border border-purple-200 bg-purple-50 px-2.5 py-1 text-"
+        ],
+        "removed": [
+          "<span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${caseOwner.role === \"PHOTON_ADMIN\" ? \"bg-purple",
+          "<td className=\"px-5 py-4\"><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${caseOwner.role === \"PHOTON_AD",
+          "{caseOwner.role === \"CASE_OWNER\" && caseOwner.clients.length > 2 && <span className=\"rounded-full bg-neutral-100 px-2.5 ",
+          "{caseOwner.role === \"PHOTON_ADMIN\" ? <span className=\"rounded-full border border-purple-200 bg-purple-50 px-2.5 py-1 tex"
+        ]
+      }
+    }
+  },
+  "coveredBy": {
+    "src/components/Header.tsx": [
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/screens/DueDates.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx",
+      "design/stories/legacy/screens/Workspace.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/PatentWorldMap.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/Sidebar.tsx": [],
+    "src/components/TimelineAndEvents.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/TopInventors.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/actions/CountrySelector.tsx": [
+      "design/stories/legacy/screens/Actions.stories.tsx"
+    ],
+    "src/components/actions/IHCActionsContent.tsx": [
+      "design/stories/legacy/screens/Actions.stories.tsx"
+    ],
+    "src/components/actions/OCActionsContent.tsx": [
+      "design/stories/legacy/screens/Actions.stories.tsx"
+    ],
+    "src/components/actions/SubmitActionsDialog.tsx": [
+      "design/stories/legacy/screens/Actions.stories.tsx"
+    ],
+    "src/components/clients/ClientDetails.tsx": [
+      "design/stories/legacy/screens/Clients.stories.tsx"
+    ],
+    "src/components/clients/ClientInviteDialog.tsx": [
+      "design/stories/legacy/screens/Workspace.stories.tsx"
+    ],
+    "src/components/clients/ClientTabs.tsx": [
+      "design/stories/legacy/screens/Clients.stories.tsx"
+    ],
+    "src/components/clients/DuplicatePatentsModal.tsx": [
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/clients/OnboardClientModal.tsx": [
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/clients/OverviewTab.tsx": [
+      "design/stories/legacy/screens/Clients.stories.tsx"
+    ],
+    "src/components/clients/PatentsTab.tsx": [
+      "design/stories/legacy/screens/Clients.stories.tsx"
+    ],
+    "src/components/dashboard/DashboardStats.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/dashboard/StatStrip.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/dashboard/WorkspaceAdminOverview.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/due-dates/DueDatesCalendar.tsx": [
+      "design/stories/legacy/screens/DueDates.stories.tsx"
+    ],
+    "src/components/due-dates/DueDatesContent.tsx": [
+      "design/stories/legacy/screens/DueDates.stories.tsx"
+    ],
+    "src/components/ideas/CoInventorsField.tsx": [
+      "design/stories/legacy/screens/DraftWorkspace.stories.tsx"
+    ],
+    "src/components/ideas/DownloadReport.tsx": [
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ideas/DraftListView.tsx": [
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx"
+    ],
+    "src/components/ideas/DraftWorkspace.tsx": [
+      "design/stories/legacy/screens/DraftWorkspace.stories.tsx"
+    ],
+    "src/components/ideas/EmptyDraftsView.tsx": [
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx"
+    ],
+    "src/components/ideas/EvaluationProgress.tsx": [
+      "design/stories/legacy/screens/DraftWorkspace.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ideas/IdeaDetailsContent.tsx": [
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx"
+    ],
+    "src/components/ideas/IdeaSubmissionModal.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/ideas/IdeasContent.tsx": [
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ideas/OCDraftView.tsx": [
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx"
+    ],
+    "src/components/ideas/PatentPaperView.tsx": [
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx"
+    ],
+    "src/components/ideas/RejectIdeaModal.tsx": [
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx"
+    ],
+    "src/components/ideas/RequestUpdate.tsx": [
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx"
+    ],
+    "src/components/ideas/SendToOCModal.tsx": [
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx"
+    ],
+    "src/components/ideas/ShowScoreReport.tsx": [
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ideas/ViewRequestUpdate.tsx": [
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx"
+    ],
+    "src/components/patents/DateRangeFilter.tsx": [
+      "design/stories/legacy/screens/Patents.stories.tsx"
+    ],
+    "src/components/patents/PatentDetailsContent.tsx": [
+      "design/stories/legacy/screens/Patents.stories.tsx"
+    ],
+    "src/components/patents/PatentFieldsForm.stories.tsx": [],
+    "src/components/patents/PatentFieldsForm.tsx": [
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx"
+    ],
+    "src/components/patents/PatentTagsCell.tsx": [
+      "design/stories/legacy/screens/Patents.stories.tsx"
+    ],
+    "src/components/patents/PatentsContent.tsx": [
+      "design/stories/legacy/screens/Patents.stories.tsx"
+    ],
+    "src/components/review/ReviewQueueWorkspace.tsx": [
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ui/StatusChip.tsx": [
+      "design/stories/legacy/primitives/Chips.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ui/alert-dialog.tsx": [
+      "design/stories/legacy/primitives/Overlays.stories.tsx",
+      "design/stories/legacy/screens/Actions.stories.tsx",
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/screens/Workspace.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ui/badge.tsx": [
+      "design/stories/foundations/Radius.stories.tsx",
+      "design/stories/legacy/primitives/Surfaces.stories.tsx",
+      "design/stories/legacy/screens/Actions.stories.tsx",
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/screens/DueDates.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Workspace.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ui/button.tsx": [
+      "design/stories/foundations/Radius.stories.tsx",
+      "design/stories/legacy/primitives/Button.stories.tsx",
+      "design/stories/legacy/primitives/Overlays.stories.tsx",
+      "design/stories/legacy/primitives/Surfaces.stories.tsx",
+      "design/stories/legacy/screens/Actions.stories.tsx",
+      "design/stories/legacy/screens/Auth.stories.tsx",
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/legacy/screens/DueDates.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/screens/Workspace.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/ui/card.tsx": [
+      "design/stories/foundations/Radius.stories.tsx",
+      "design/stories/legacy/primitives/Surfaces.stories.tsx",
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/screens/Workspace.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ui/checkbox.tsx": [
+      "design/stories/legacy/primitives/Inputs.stories.tsx",
+      "design/stories/legacy/screens/Actions.stories.tsx",
+      "design/stories/legacy/screens/DueDates.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ui/command.tsx": [
+      "design/stories/legacy/primitives/Surfaces.stories.tsx",
+      "design/stories/legacy/screens/DraftWorkspace.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx"
+    ],
+    "src/components/ui/dialog.tsx": [
+      "design/stories/legacy/primitives/Overlays.stories.tsx",
+      "design/stories/legacy/primitives/Surfaces.stories.tsx",
+      "design/stories/legacy/screens/Actions.stories.tsx",
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/legacy/screens/DraftWorkspace.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/screens/Workspace.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/ui/dropdown-menu.tsx": [
+      "design/stories/legacy/primitives/Overlays.stories.tsx",
+      "design/stories/legacy/screens/Actions.stories.tsx",
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/legacy/screens/DueDates.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/ui/filter-button.tsx": [
+      "design/stories/legacy/screens/Actions.stories.tsx",
+      "design/stories/legacy/screens/DueDates.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx"
+    ],
+    "src/components/ui/input.tsx": [
+      "design/stories/foundations/Radius.stories.tsx",
+      "design/stories/legacy/primitives/Inputs.stories.tsx",
+      "design/stories/legacy/screens/Actions.stories.tsx",
+      "design/stories/legacy/screens/Auth.stories.tsx",
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/legacy/screens/DueDates.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/Login.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/screens/Workspace.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/ui/popover.tsx": [
+      "design/stories/legacy/primitives/Overlays.stories.tsx",
+      "design/stories/legacy/screens/Actions.stories.tsx",
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/legacy/screens/DraftWorkspace.stories.tsx",
+      "design/stories/legacy/screens/DueDates.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/ui/product-chip.tsx": [
+      "design/stories/legacy/foundations/Foundations.stories.tsx",
+      "design/stories/legacy/primitives/Chips.stories.tsx",
+      "design/stories/legacy/screens/Actions.stories.tsx",
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/legacy/screens/DueDates.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/ui/product-surfaces.ts": [
+      "design/stories/legacy/primitives/Surfaces.stories.tsx",
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/components/ui/select.tsx": [
+      "design/stories/legacy/primitives/Inputs.stories.tsx",
+      "design/stories/legacy/screens/Actions.stories.tsx",
+      "design/stories/legacy/screens/DueDates.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/screens/Workspace.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ui/tabs.tsx": [
+      "design/stories/legacy/primitives/Surfaces.stories.tsx",
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ui/textarea.tsx": [
+      "design/stories/legacy/primitives/Inputs.stories.tsx",
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/screens/Workspace.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/ui/toast.tsx": [],
+    "src/components/ui/tooltip.tsx": [
+      "design/stories/legacy/primitives/Overlays.stories.tsx",
+      "design/stories/legacy/screens/DueDates.stories.tsx",
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx",
+      "design/stories/legacy/screens/Ideas.stories.tsx",
+      "design/stories/legacy/screens/Patents.stories.tsx",
+      "design/stories/legacy/screens/ReviewQueue.stories.tsx",
+      "design/stories/legacy/screens/Workspace.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/components/workspace/CaseOwnersTab.tsx": [
+      "design/stories/legacy/screens/Workspace.stories.tsx"
+    ],
+    "src/components/workspace/OrganizationDetails.tsx": [
+      "design/stories/legacy/screens/Workspace.stories.tsx"
+    ],
+    "src/components/workspace/PeopleTab.tsx": [
+      "design/stories/legacy/screens/Workspace.stories.tsx"
+    ],
+    "src/components/workspace/ProfileTab.tsx": [
+      "design/stories/legacy/screens/Workspace.stories.tsx"
+    ],
+    "src/components/workspace/WorkspaceTabs.tsx": [
+      "design/stories/legacy/screens/Workspace.stories.tsx"
+    ],
+    "src/contexts/BackgroundAnalysisContext.tsx": [
+      "design/stories/legacy/screens/IdeaDetails.stories.tsx"
+    ],
+    "src/index.css": [],
+    "src/pages/DueDatesPage.tsx": [
+      "design/stories/legacy/screens/DueDates.stories.tsx"
+    ],
+    "src/pages/Index.tsx": [
+      "design/stories/legacy/screens/Dashboard.stories.tsx",
+      "design/stories/surfaces/WorkspaceAdminDashboard.stories.tsx"
+    ],
+    "src/pages/NotFound.tsx": [
+      "design/stories/legacy/screens/NotFound.stories.tsx"
+    ],
+    "src/pages/PatentsPage.tsx": [
+      "design/stories/legacy/screens/Patents.stories.tsx"
+    ],
+    "src/pages/ProfilePage.tsx": [
+      "design/stories/legacy/screens/Workspace.stories.tsx"
+    ],
+    "src/pages/auth/AuthField.tsx": [
+      "design/stories/legacy/screens/Auth.stories.tsx",
+      "design/stories/legacy/screens/Login.stories.tsx"
+    ],
+    "src/pages/auth/ForgotPassword.tsx": [
+      "design/stories/legacy/screens/Auth.stories.tsx"
+    ],
+    "src/pages/auth/Invite.tsx": [
+      "design/stories/legacy/screens/Auth.stories.tsx"
+    ],
+    "src/pages/auth/Login.tsx": [
+      "design/stories/legacy/screens/Auth.stories.tsx",
+      "design/stories/legacy/screens/Login.stories.tsx"
+    ],
+    "src/pages/auth/ResetPassword.tsx": [
+      "design/stories/legacy/screens/Auth.stories.tsx"
+    ],
+    "src/pages/auth/Signup.tsx": [
+      "design/stories/legacy/screens/Auth.stories.tsx",
+      "design/stories/legacy/screens/Login.stories.tsx"
+    ],
+    "src/pages/auth/SsoPanel.tsx": [
+      "design/stories/legacy/screens/Auth.stories.tsx",
+      "design/stories/legacy/screens/Login.stories.tsx"
+    ],
+    "src/pages/client/AssistantPage.tsx": [
+      "design/stories/legacy/screens/Assistant.stories.tsx"
+    ],
+    "src/pages/client/ClientDetailPage.tsx": [
+      "design/stories/legacy/screens/Clients.stories.tsx"
+    ],
+    "src/pages/client/ClientsPage.tsx": [
+      "design/stories/legacy/screens/Clients.stories.tsx",
+      "design/stories/legacy/states/States.stories.tsx"
+    ],
+    "src/styles/tokens.css": [],
+    "src/styles/tokens.json": [],
+    "src/styles/tokens.tailwind.ts": [
+      "design/stories/foundations/Radius.stories.tsx",
+      "design/stories/foundations/Tokens.stories.tsx"
+    ]
+  }
+}

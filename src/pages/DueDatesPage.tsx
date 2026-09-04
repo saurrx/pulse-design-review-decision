@@ -24,11 +24,11 @@ const DueDatesPage: React.FC = () => {
       <PageHeader
         actions={(
           <>
-            <div className="hidden h-9 items-center gap-1 rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] p-1 sm:flex">
+            <div className="hidden h-9 items-center gap-1 rounded-sm border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] p-1 sm:flex">
               <button
                 type="button"
                 onClick={() => headerState.onViewChange('list')}
-                className={`grid h-7 w-7 place-items-center rounded-md transition-colors ${
+                className={`grid h-7 w-7 place-items-center rounded-xs transition-colors ${
                   headerState.viewType === 'list'
                     ? 'bg-[var(--pulse-surface)] text-[var(--pulse-ink)] shadow-sm'
                     : 'text-[var(--pulse-ink-muted)] hover:text-[var(--pulse-ink)]'
@@ -41,7 +41,7 @@ const DueDatesPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => headerState.onViewChange('calendar')}
-                className={`grid h-7 w-7 place-items-center rounded-md transition-colors ${
+                className={`grid h-7 w-7 place-items-center rounded-xs transition-colors ${
                   headerState.viewType === 'calendar'
                     ? 'bg-[var(--pulse-surface)] text-[var(--pulse-ink)] shadow-sm'
                     : 'text-[var(--pulse-ink-muted)] hover:text-[var(--pulse-ink)]'
@@ -52,7 +52,7 @@ const DueDatesPage: React.FC = () => {
                 <CalendarDays className="h-4 w-4" />
               </button>
             </div>
-            <div className="hidden h-9 items-center rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-3 text-xs text-[var(--pulse-ink-muted)] md:flex">
+            <div className="hidden h-9 items-center rounded-sm border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] px-3 text-xs text-[var(--pulse-ink-muted)] md:flex">
               Deliverables due
               <strong className="ml-2 font-semibold tabular-nums text-[var(--pulse-ink)]">
                 {headerState.total}

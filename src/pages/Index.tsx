@@ -574,7 +574,7 @@ const LegacyIndex = () => {
             />
           </div>
           <div className="col-span-12 h-[384px] xl:col-span-8">
-            <div className="relative z-10 h-full overflow-hidden rounded-2xl">
+            <div className="relative z-10 h-full overflow-hidden rounded-md">
               <PatentWorldMap
                 totalPatents={totalPatents}
                 height={384}
@@ -617,7 +617,7 @@ const LegacyIndex = () => {
       {isPatentDialogOpen && (
         <Dialog open={isPatentDialogOpen} onOpenChange={setIsPatentDialogOpen}>
           <DialogContentNoClose
-            className={`lg:max-w-[1440px] max-w-[400px] md:max-w-[700px] rounded-xl h-[90vh] backdrop-blur-xl border ${
+            className={`lg:max-w-[1440px] max-w-[400px] md:max-w-[700px] rounded-lg h-[90vh] backdrop-blur-xl border ${
               theme === "dark"
                 ? "bg-black/90 border-[#cccccc20]"
                 : "bg-white/95 border-neutral-200"

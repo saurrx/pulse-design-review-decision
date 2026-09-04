@@ -183,7 +183,7 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
       <DialogContent
         className={`${
           dark ? "bg-[#080808] border-[#cccccc20]" : "bg-white"
-        } max-h-[88vh] overflow-hidden rounded-2xl p-0 font-sans sm:max-w-[600px]`}
+        } max-h-[88vh] overflow-hidden rounded-lg p-0 font-sans sm:max-w-[600px]`}
       >
         <DialogHeader className="px-7 pb-5 pt-7">
           <DialogTitle
@@ -210,7 +210,7 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
                 name="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className={`h-12 w-full rounded-xl border bg-transparent px-3.5 text-[15px] outline-none focus-visible:border-[#4351C0] focus-visible:ring-2 focus-visible:ring-[#4351C0]/10 ${fieldBorder} ${
+                className={`h-12 w-full rounded-sm border bg-transparent px-3.5 text-[15px] outline-none focus-visible:border-[#4351C0] focus-visible:ring-2 focus-visible:ring-[#4351C0]/10 ${fieldBorder} ${
                   dark
                     ? "text-neutral-100 placeholder:text-neutral-500"
                     : "text-neutral-900 placeholder:text-neutral-400"
@@ -240,7 +240,7 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
                   type="button"
                   aria-pressed={contextMode === "files"}
                   onClick={() => setContextMode(contextMode === "files" ? null : "files")}
-                  className={`flex h-10 items-center justify-center gap-2 rounded-xl border text-[13px] font-medium transition-colors ${
+                  className={`flex h-10 items-center justify-center gap-2 rounded-sm border text-[13px] font-medium transition-colors ${
                     contextMode === "files"
                       ? dark
                         ? "border-white/30 bg-white/10 text-white"
@@ -256,7 +256,7 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
                   type="button"
                   aria-pressed={contextMode === "text"}
                   onClick={() => setContextMode(contextMode === "text" ? null : "text")}
-                  className={`flex h-10 items-center justify-center gap-2 rounded-xl border text-[13px] font-medium transition-colors ${
+                  className={`flex h-10 items-center justify-center gap-2 rounded-sm border text-[13px] font-medium transition-colors ${
                     contextMode === "text"
                       ? dark
                         ? "border-white/30 bg-white/10 text-white"
@@ -297,7 +297,7 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
                       setIsDragOver(false);
                       acceptFiles(e.dataTransfer.files);
                     }}
-                    className={`flex w-full items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-5 text-sm transition-colors ${
+                    className={`flex w-full items-center justify-center gap-2 rounded-md border border-dashed px-4 py-5 text-sm transition-colors ${
                       isDragOver
                         ? "border-[#4351C0] bg-[#4351C0]/5 text-[#4351C0]"
                         : dark
@@ -312,7 +312,7 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
                   {sourceFiles.map((file) => (
                     <div
                       key={file.name}
-                      className={`flex h-10 items-center gap-2 rounded-xl border px-3 text-sm ${fieldBorder} ${ink}`}
+                      className={`flex h-10 items-center gap-2 rounded-sm border px-3 text-sm ${fieldBorder} ${ink}`}
                     >
                       <FileText className={`h-4 w-4 shrink-0 ${muted}`} />
                       <span className="min-w-0 flex-1 truncate">{file.name}</span>
@@ -340,7 +340,7 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
                   value={sourceText}
                   onChange={(e) => setSourceText(e.target.value)}
                   placeholder="Paste an email, meeting notes, or a rough description…"
-                  className={`mt-3 w-full resize-none rounded-xl border bg-transparent px-3.5 py-3 text-sm outline-none focus-visible:border-[#4351C0] focus-visible:ring-2 focus-visible:ring-[#4351C0]/10 ${fieldBorder} ${
+                  className={`mt-3 w-full resize-none rounded-sm border bg-transparent px-3.5 py-3 text-sm outline-none focus-visible:border-[#4351C0] focus-visible:ring-2 focus-visible:ring-[#4351C0]/10 ${fieldBorder} ${
                     dark
                       ? "text-neutral-100 placeholder:text-neutral-500"
                       : "text-neutral-900 placeholder:text-neutral-400"
@@ -357,7 +357,7 @@ const IdeaSubmissionModal: React.FC<IdeaSubmissionModalProps> = ({
             </p>
             <button
               type="submit"
-              className="inline-flex h-11 min-w-[150px] items-center justify-center gap-2 rounded-xl bg-[#F9B418] px-5 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:cursor-not-allowed disabled:bg-[#FDF3DC] disabled:text-[#9C9C9C]"
+              className="inline-flex h-11 min-w-[150px] items-center justify-center gap-2 rounded-sm bg-[#F9B418] px-5 text-sm font-semibold text-[#0C0C0C] transition-colors hover:bg-[#DA9700] disabled:cursor-not-allowed disabled:bg-[#FDF3DC] disabled:text-[#9C9C9C]"
               disabled={!title.trim() || isCreatingIdea}
             >
               {isCreatingIdea ? "Saving…" : "Save Idea"}

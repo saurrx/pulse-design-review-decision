@@ -166,7 +166,7 @@ const TopInventors = ({
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value as Period)}
-            className="h-8 rounded-lg border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-2 text-xs font-medium text-[var(--pulse-ink-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)]"
+            className="h-8 rounded-sm border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-2 text-xs font-medium text-[var(--pulse-ink-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)]"
           >
             <option value="thisQuarter">This quarter</option>
             <option value="allTime">All time</option>
@@ -187,7 +187,7 @@ const TopInventors = ({
                 type="button"
                 onClick={() => onOpenInventor?.(e)}
                 aria-label={`${index + 1}. ${e.name}, ${e[metric]} ${metric}`}
-                className={`group flex min-h-14 w-full items-center justify-between gap-3 rounded-lg py-2 text-left transition-colors hover:bg-[var(--pulse-surface-subtle)] ${
+                className={`group flex min-h-14 w-full items-center justify-between gap-3 rounded-xs py-2 text-left transition-colors hover:bg-[var(--pulse-surface-subtle)] ${
                   index > 0 ? "border-t border-[var(--pulse-line)]" : ""
                 }`}
               >
@@ -211,13 +211,13 @@ const TopInventors = ({
             ))}
             {v0?.loading && (
               <div className="mt-2 flex flex-col gap-3" role="status" aria-busy="true" aria-label="Loading top inventors">
-                {[0, 1, 2].map((k) => <div key={k} className="h-9 animate-pulse rounded-md bg-[var(--pulse-surface-subtle)]" />)}
+                {[0, 1, 2].map((k) => <div key={k} className="h-9 animate-pulse rounded-xs bg-[var(--pulse-surface-subtle)]" />)}
               </div>
             )}
             {v0?.error && !v0.loading && (
               <div role="status" className="flex flex-col items-start gap-2 py-6 text-[13px] text-[var(--pulse-ink-muted)]">
                 <span>Could not load top inventors.</span>
-                <button type="button" onClick={v0.error.onRetry} className="rounded-lg border border-[var(--pulse-line)] px-2.5 py-1 text-[12px] font-semibold text-[var(--pulse-ink)] hover:bg-[var(--pulse-surface-subtle)]">Retry</button>
+                <button type="button" onClick={v0.error.onRetry} className="rounded-sm border border-[var(--pulse-line)] px-2.5 py-1 text-[12px] font-semibold text-[var(--pulse-ink)] hover:bg-[var(--pulse-surface-subtle)]">Retry</button>
               </div>
             )}
             {ranked.length === 0 && v0 && !v0.loading && !v0.error && (

@@ -318,7 +318,7 @@ const topPriorArt = sortedPriorArt.slice(0, 5);
               onChange={(e) => setPatentInput(e.target.value)}
               disabled={isReEvalLoading}
               name="patent_numbers"
-              className="resize-y min-h-[80px] flex h-9 w-full rounded-md border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
+              className="resize-y min-h-[80px] flex h-9 w-full rounded-sm border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
             />
             {reEvalError && (
               <div className="text-red-500 text-sm">
@@ -867,7 +867,7 @@ const topPriorArt = sortedPriorArt.slice(0, 5);
                         {Array.isArray(rec.basis) && rec.basis.length > 0 ? (
                           <p className="mt-1 flex flex-wrap gap-1.5">
                             {rec.basis.map((b: string) => (
-                              <span key={b} className="rounded bg-blue-100 px-1.5 py-0.5 font-mono text-[11px] text-blue-800">{b}</span>
+                              <span key={b} className="rounded-xs bg-blue-100 px-1.5 py-0.5 font-mono text-[11px] text-blue-800">{b}</span>
                             ))}
                           </p>
                         ) : null}

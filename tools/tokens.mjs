@@ -49,7 +49,7 @@ function css() {
   lines.push("  /* Primitives: the sheet, verbatim */");
   for (const [k, v] of entries(t.color)) lines.push(`  --pl-${k}: ${v.value};${v._note ? " /* " + v._note + " */" : ""}`);
   for (const [k, v] of entries(t.font)) lines.push(`  --pl-font-${k}: ${v.family};`);
-  lines.push(`  --pl-radius: ${t.radius.value};`);
+  for (const [k, v] of entries(t.radius)) lines.push(`  --pl-radius-${k}: ${v.value};`);
   for (const [k, v] of entries(t.shadow)) lines.push(`  --pl-shadow-${k}: ${v.value};`);
   lines.push("", "  /* Spacing, paddings and sizes from the specification's specimens */");
   for (const [k, v] of entries(t.space)) lines.push(`  --pl-space-${k.replace(".", "-")}: ${v};`);
@@ -66,7 +66,7 @@ function css() {
   for (const [k, v] of entries(t.aliases)) lines.push(`  --${k}: ${resolve(v)};`);
   lines.push("", "  /* shadcn theme, derived */");
   for (const [k, v] of entries(t.shadcn)) lines.push(`  --${k}: ${hsl(resolve(v))};`);
-  lines.push(`  --radius: ${t.radius.value};`);
+  lines.push(`  --radius: ${t.radius.sm.value};`);
   lines.push("}", "");
   return lines.join("\n");
 }
@@ -84,7 +84,7 @@ function tailwind() {
     `export const colors = ${JSON.stringify({ pl, photon }, null, 2)} as const;`,
     `export const fontFamily = ${JSON.stringify(fontFamily, null, 2)} as const;`,
     `export const type = ${JSON.stringify(type, null, 2)} as const;`,
-    `export const radius = ${JSON.stringify(t.radius.value)};`,
+    `export const radius = ${JSON.stringify(Object.fromEntries(entries(t.radius).map(([k, v]) => [k, v.value])), null, 2)} as const;`,
     `export const shadow = ${JSON.stringify(Object.fromEntries(entries(t.shadow).map(([k, v]) => [k, v.value])), null, 2)} as const;`,
     `export const roles = ${JSON.stringify(Object.fromEntries(entries(t.color).map(([k, v]) => [k, v.role])), null, 2)} as const;`,
     `export const space = ${JSON.stringify(Object.fromEntries(entries(t.space)), null, 2)} as const;`,

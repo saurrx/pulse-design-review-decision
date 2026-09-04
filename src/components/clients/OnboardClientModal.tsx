@@ -45,7 +45,7 @@ export function FormError({ message }: FormErrorProps) {
 
   return (
     <div
-      className={`flex items-start gap-2 text-sm mt-2 px-3 py-2 rounded-lg border ${
+      className={`flex items-start gap-2 text-sm mt-2 px-3 py-2 rounded-md border ${
         theme === "dark"
           ? "text-red-400 bg-red-500/5 border-red-500/20"
           : "text-red-600 bg-red-50 border-red-200"
@@ -319,7 +319,7 @@ const OnboardClientModal: React.FC<OnboardClientModalProps> = ({
               </span>
             </Label>
             <div
-              className={`border-2 border-dashed rounded-lg p-8 transition-colors ${
+              className={`border-2 border-dashed rounded-md p-8 transition-colors ${
                 theme === "dark"
                   ? "border-white/10 hover:border-white/20 bg-white/5"
                   : "border-neutral-200 hover:border-neutral-300 bg-neutral-50"
@@ -462,7 +462,7 @@ const OnboardClientModal: React.FC<OnboardClientModalProps> = ({
                       theme === "dark"
                         ? "text-zinc-200 border-[#cccccc20]"
                         : "text-zinc-900"
-                    } text-gray-500 border rounded-lg p-3.5`}
+                    } text-gray-500 border rounded-md p-3.5`}
                   >
                     <Trash2 size={17} />
                   </button>
@@ -559,7 +559,7 @@ const OnboardClientModal: React.FC<OnboardClientModalProps> = ({
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className={`px-5 py-2.5 rounded-md text-xs uppercase tracking-wider border transition-colors ${
+              className={`px-5 py-2.5 rounded-sm text-xs uppercase tracking-wider border transition-colors ${
                 theme === "dark"
                   ? "border-white/10 text-neutral-300 hover:border-white/20 hover:bg-white/5"
                   : "border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50"
@@ -570,7 +570,7 @@ const OnboardClientModal: React.FC<OnboardClientModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2.5 rounded-md text-xs uppercase tracking-wider bg-[#F9B418] text-black hover:bg-[#F9B418]/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2.5 rounded-sm text-xs uppercase tracking-wider bg-[#F9B418] text-black hover:bg-[#F9B418]/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? "Onboarding..." : "Onboard Client"}
             </button>
@@ -669,7 +669,7 @@ const OnboardClientModal: React.FC<OnboardClientModalProps> = ({
                     .map((email: string, index: number) => (
                       <div
                         key={index}
-                        className="bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-full flex items-center"
+                        className="bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-xs flex items-center"
                       >
                         <span>{email}</span>
                         <Button
@@ -734,7 +734,7 @@ const OnboardClientModal: React.FC<OnboardClientModalProps> = ({
           <div className="border-t px-6 py-4 flex justify-end gap-2">
             <Button
               type="submit"
-              className="rounded-lg bg-primary text-primary-foreground"
+              className="rounded-sm bg-primary text-primary-foreground"
               disabled={
                 !isValid ||
                 isSubmitting ||

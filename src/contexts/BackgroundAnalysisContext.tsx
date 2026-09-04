@@ -536,7 +536,7 @@ const BackgroundAnalysisIndicator: React.FC<
                   <button
                     onClick={backgroundAnalysis.onGoToIdea}
                     className={cn(
-                      "p-1 rounded transition-colors",
+                      "p-1 rounded-sm transition-colors",
                       theme === "dark"
                         ? "text-zinc-400 hover:bg-zinc-800 hover:text-[#F9B418]"
                         : "text-neutral-600 hover:bg-neutral-100 hover:text-[#F9B418]",
@@ -549,7 +549,7 @@ const BackgroundAnalysisIndicator: React.FC<
                 <button
                   onClick={handleHide}
                   className={cn(
-                    "p-1 rounded transition-colors",
+                    "p-1 rounded-sm transition-colors",
                     theme === "dark"
                       ? "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
                       : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900",
@@ -580,7 +580,7 @@ const BackgroundAnalysisIndicator: React.FC<
               <button
                 onClick={backgroundAnalysis.onGoToIdea}
                 className={cn(
-                  "mt-3 w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors flex items-center justify-center gap-2",
+                  "mt-3 w-full py-2 px-4 rounded-sm text-sm font-semibold transition-colors flex items-center justify-center gap-2",
                   theme === "dark"
                     ? "bg-[#F9B418] hover:bg-[#F9B418]/90 text-zinc-900"
                     : "bg-[#F9B418] hover:bg-[#F9B418]/90 text-zinc-900",
@@ -631,7 +631,7 @@ const BackgroundAnalysisIndicator: React.FC<
                   <button
                     onClick={openModal}
                     className={cn(
-                      "p-1 rounded transition-colors",
+                      "p-1 rounded-sm transition-colors",
                       theme === "dark"
                         ? "text-zinc-400 hover:bg-zinc-800 hover:text-[#F9B418]"
                         : "text-neutral-600 hover:bg-neutral-100 hover:text-[#F9B418]",
@@ -644,7 +644,7 @@ const BackgroundAnalysisIndicator: React.FC<
                 <button
                   onClick={handleHide}
                   className={cn(
-                    "p-1 rounded transition-colors",
+                    "p-1 rounded-sm transition-colors",
                     theme === "dark"
                       ? "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
                       : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900",
@@ -1142,7 +1142,7 @@ const BackgroundAnalysisPopup = ({
           <div className="mt-6 space-y-6">
             <div
               className={cn(
-                "p-4 rounded-lg border",
+                "p-4 rounded-md border",
                 theme === "dark"
                   ? "bg-blue-900/30 border-blue-700"
                   : "bg-blue-50 border-blue-200",
@@ -1204,7 +1204,7 @@ const BackgroundAnalysisPopup = ({
                   <div
                     key={step.id}
                     className={cn(
-                      "flex items-center gap-4 p-4 rounded-lg border transition-all",
+                      "flex items-center gap-4 p-4 rounded-md border transition-all",
                       step.status === "active"
                         ? theme === "dark"
                           ? "border-[#F9B418]/30 bg-[#F9B418]/10"
@@ -1301,7 +1301,7 @@ const BackgroundAnalysisPopup = ({
                 variant="outline"
                 onClick={handleCancelAnalysis}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2.5 rounded-md border transition-colors",
+                  "flex items-center gap-2 px-4 py-2.5 rounded-sm border transition-colors",
                   theme === "dark"
                     ? "border-red-600/50 text-red-400 hover:text-red-400 hover:border-red-600 hover:bg-red-900/20 bg-transparent"
                     : "border-red-300 text-red-600 hover:border-red-400 hover:bg-red-50 bg-transparent",
@@ -1314,7 +1314,7 @@ const BackgroundAnalysisPopup = ({
                 variant="outline"
                 onClick={handleRunInBackground}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2.5 rounded-md border transition-colors",
+                  "flex items-center gap-2 px-4 py-2.5 rounded-sm border transition-colors",
                   theme === "dark"
                     ? "border-zinc-700 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800 bg-transparent hover:text-zinc-100"
                     : "border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50 bg-transparent",
@@ -1383,7 +1383,7 @@ const BackgroundAnalysisPopup = ({
           </DialogHeader>
 
           <div className="mt-6 space-y-6">
-            <div className="p-6 rounded-xl border text-center space-y-4 bg-green-50 border-green-200">
+            <div className="p-6 rounded-md border text-center space-y-4 bg-green-50 border-green-200">
               <div className="flex justify-center">
                 <div className="p-3 bg-green-500/20 rounded-full">
                   <svg
@@ -1409,7 +1409,7 @@ const BackgroundAnalysisPopup = ({
                   Your Idea Score
                 </h3>
                 <div className="flex items-center justify-center gap-3">
-                  <div className="flex items-center justify-center w-20 h-20 bg-[#F9B418]/20 border-2 border-[#F9B418] rounded-xl">
+                  <div className="flex items-center justify-center w-20 h-20 bg-[#F9B418]/20 border-2 border-[#F9B418] rounded-md">
                     <span className="text-3xl font-bold text-[#F9B418]">
                       {ideaScore?.toFixed(2) || "0.0"}
                     </span>
@@ -1426,7 +1426,7 @@ const BackgroundAnalysisPopup = ({
               <button
                 data-slot="button"
                 onClick={() => handleGoToIdea()}
-                className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive h-9 py-2 has-[&gt;svg]:px-3 bg-[#F9B418] hover:bg-[#F9B418]/90 text-black px-3 rounded-xl"
+                className="inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive h-9 py-2 has-[&gt;svg]:px-3 bg-[#F9B418] hover:bg-[#F9B418]/90 text-black px-3 rounded-sm"
               >
                 Go to Your Idea
                 <svg

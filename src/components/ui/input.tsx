@@ -47,7 +47,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             type={inputType}
             className={cn(
-              "flex h-11 w-full rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-3 py-2 text-sm text-[var(--pulse-ink)] ring-offset-background transition-[border-color,box-shadow] file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[var(--pulse-ink-muted)] focus-visible:border-[var(--pulse-brand)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-brand)]/20 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50",
+              "flex h-11 w-full rounded-sm border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-3 py-2 text-sm text-[var(--pulse-ink)] ring-offset-background transition-[border-color,box-shadow] file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-[var(--pulse-ink-muted)] focus-visible:border-[var(--pulse-brand)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-brand)]/20 focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50",
               isPasswordField && "pr-10",
               touched &&
                 props.errors &&

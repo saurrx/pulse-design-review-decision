@@ -31,7 +31,7 @@ export const HeaderPrimaryAction = ({ action }: { action: DashboardHeaderAction 
     type="button"
     onClick={action.onClick}
     disabled={action.disabled}
-    className="inline-flex h-9 items-center gap-2 rounded-lg bg-[var(--pulse-brand)] px-3.5 text-sm font-semibold text-[var(--pulse-ink)] shadow-[0_8px_18px_-14px_rgba(17,16,60,0.6)] transition-[background-color,box-shadow,transform] hover:brightness-[0.97] hover:shadow-[0_10px_22px_-14px_rgba(17,16,60,0.7)] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-brand)]/40 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+    className="inline-flex h-9 items-center gap-2 rounded-sm bg-[var(--pulse-brand)] px-3.5 text-sm font-semibold text-[var(--pulse-ink)] shadow-[0_8px_18px_-14px_rgba(17,16,60,0.6)] transition-[background-color,box-shadow,transform] hover:brightness-[0.97] hover:shadow-[0_10px_22px_-14px_rgba(17,16,60,0.7)] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-brand)]/40 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
   >
     {action.icon}
     <span className="hidden sm:inline">{action.label}</span>
@@ -72,7 +72,7 @@ const Header = ({
           {back && (
             <Link
               to={back.to}
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[var(--pulse-ink-muted)] transition-colors hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-brand)]/40"
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-sm text-[var(--pulse-ink-muted)] transition-colors hover:bg-[var(--pulse-surface-subtle)] hover:text-[var(--pulse-ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-brand)]/40"
               aria-label={back.label}
               title={back.label}
             >

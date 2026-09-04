@@ -34,7 +34,7 @@ export interface AuthFieldProps
 }
 
 const BASE =
-  "flex h-11 w-full min-w-0 rounded-md border px-3 py-1 text-base md:text-sm font-sans " +
+  "flex h-11 w-full min-w-0 rounded-sm border px-3 py-1 text-base md:text-sm font-sans " +
   "outline-none transition-[color,box-shadow,border-color] " +
   "bg-white/5 text-white placeholder:text-neutral-600 " +
   "focus-visible:ring-[0.5px] focus-visible:ring-offset-0 " +

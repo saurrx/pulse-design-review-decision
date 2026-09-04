@@ -62,11 +62,11 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
         }
         .scrollbar-light::-webkit-scrollbar-track {
           background: #f1f5f9;
-          border-radius: 4px;
+          border-radius: var(--pl-radius-xs);
         }
         .scrollbar-light::-webkit-scrollbar-thumb {
           background: #cbd5e1;
-          border-radius: 4px;
+          border-radius: var(--pl-radius-xs);
         }
         .scrollbar-light::-webkit-scrollbar-thumb:hover {
           background: #94a3b8;
@@ -77,11 +77,11 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
         }
         .scrollbar-dark::-webkit-scrollbar-track {
           background: #1a1a1a;
-          border-radius: 4px;
+          border-radius: var(--pl-radius-xs);
         }
         .scrollbar-dark::-webkit-scrollbar-thumb {
           background: #404040;
-          border-radius: 4px;
+          border-radius: var(--pl-radius-xs);
         }
         .scrollbar-dark::-webkit-scrollbar-thumb:hover {
           background: #525252;
@@ -329,7 +329,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleToday}
-              className={`px-3 py-1.5 font-sans border rounded text-sm transition-colors flex items-center gap-2 ${
+              className={`px-3 py-1.5 font-sans border rounded-sm text-sm transition-colors flex items-center gap-2 ${
                 theme === "dark"
                   ? "bg-neutral-900 border-neutral-800 text-neutral-300 hover:border-[#F9B418]/50 hover:text-[#F9B418]"
                   : "bg-white border-neutral-200 text-neutral-700 hover:border-[#F9B418] hover:text-[#F9B418]"
@@ -339,7 +339,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
             </button>
             <button
               onClick={handlePrevMonth}
-              className={`p-2 border rounded transition-colors ${
+              className={`p-2 border rounded-sm transition-colors ${
                 theme === "dark"
                   ? "bg-neutral-900 border-neutral-800 text-neutral-400 hover:border-[#F9B418]/50 hover:text-[#F9B418]"
                   : "bg-white border-neutral-200 text-neutral-600 hover:border-[#F9B418] hover:text-[#F9B418]"
@@ -349,7 +349,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
             </button>
             <button
               onClick={handleNextMonth}
-              className={`p-2 border rounded transition-colors ${
+              className={`p-2 border rounded-sm transition-colors ${
                 theme === "dark"
                   ? "bg-neutral-900 border-neutral-800 text-neutral-400 hover:border-[#F9B418]/50 hover:text-[#F9B418]"
                   : "bg-white border-neutral-200 text-neutral-600 hover:border-[#F9B418] hover:text-[#F9B418]"
@@ -399,7 +399,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
                 <button
                   key={`day-${date.toISOString()}`}
                   disabled={!isCurrentMonth}
-                  className={`relative min-w-0 min-h-[120px] overflow-hidden p-3 border rounded-lg transition-all max-h-[120px] flex justify-start ${
+                  className={`relative min-w-0 min-h-[120px] overflow-hidden p-3 border rounded-md transition-all max-h-[120px] flex justify-start ${
                     !isCurrentMonth
                       ? "invisible"
                       : isSelected
@@ -457,7 +457,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
         }`}>
           <div className="flex items-center justify-center gap-6 flex-wrap">
             <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded border ${
+              <div className={`w-3 h-3 rounded-xs border ${
                 theme === "dark" 
                   ? "bg-red-500/30 border-red-500/50" 
                   : "bg-red-500/20 border-red-500/40"
@@ -467,7 +467,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
               }`}>Overdue</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded border ${
+              <div className={`w-3 h-3 rounded-xs border ${
                 theme === "dark" 
                   ? "bg-orange-500/30 border-orange-500/50" 
                   : "bg-orange-500/20 border-orange-500/40"
@@ -477,7 +477,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
               }`}>Due Today</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded border ${
+              <div className={`w-3 h-3 rounded-xs border ${
                 theme === "dark" 
                   ? "bg-[#F9B418]/30 border-[#F9B418]/50" 
                   : "bg-[#F9B418]/20 border-[#F9B418]/40"
@@ -487,7 +487,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
               }`}>Upcoming</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded border ${
+              <div className={`w-3 h-3 rounded-xs border ${
                 theme === "dark" 
                   ? "bg-blue-500/30 border-blue-500/50" 
                   : "bg-blue-500/20 border-blue-500/40"
@@ -497,7 +497,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
               }`}>Future</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="h-3 w-3 rounded border border-emerald-500/50 bg-emerald-500/25"></div>
+              <div className="h-3 w-3 rounded-xs border border-emerald-500/50 bg-emerald-500/25"></div>
               <span className={`text-xs ${
                 theme === "dark" ? "text-neutral-500" : "text-neutral-600"
               }`}>Completed</span>
@@ -506,7 +506,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
         </div>
       </div>
   
-      <div className={`w-full lg:w-96 flex flex-col border rounded-xl overflow-y-auto backdrop-blur-xl max-h-[250px] mb-[60px] md:mb-[0] md:pb-5 md:max-h-[600px] ${
+      <div className={`w-full lg:w-96 flex flex-col border rounded-md overflow-y-auto backdrop-blur-xl max-h-[250px] mb-[60px] md:mb-[0] md:pb-5 md:max-h-[600px] ${
         theme === "dark"
           ? "bg-neutral-900/50 border-neutral-800"
           : "bg-white/50 border-neutral-200"
@@ -612,7 +612,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="dark:bg-neutral-900 rounded-lg dark:text-neutral-500 dark:hover:bg-[#F9B418] dark:hover:text-neutral-900  dark:border-neutral-800 w-full mt-4   hover:border-[#F9B418] hover:bg-transparent bg-white text-neutral-700 hover:text-neutral-700 border-neutral-200"
+                className="dark:bg-neutral-900 rounded-sm dark:text-neutral-500 dark:hover:bg-[#F9B418] dark:hover:text-neutral-900  dark:border-neutral-800 w-full mt-4   hover:border-[#F9B418] hover:bg-transparent bg-white text-neutral-700 hover:text-neutral-700 border-neutral-200"
                 onClick={() => setSelectedEvent(null)}
               >
                 Back to events
@@ -646,7 +646,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
                       </span>
                     </div>
                     <div
-                      className={`p-3 border rounded-lg backdrop-blur-sm cursor-pointer transition-colors ${
+                      className={`p-3 border rounded-sm backdrop-blur-sm cursor-pointer transition-colors ${
                         theme === "dark"
                           ? "bg-neutral-800/50 border-neutral-700"
                           : "bg-white/80 border-neutral-200 hover:bg-neutral-50"
@@ -731,7 +731,7 @@ const DueDatesCalendar: React.FC<DueDatesCalendarProps> = ({
                       {events.map((event: DueDate) => (
                         <div
                           key={event.id}
-                          className={`p-3 border rounded-lg backdrop-blur-sm cursor-pointer transition-colors ${
+                          className={`p-3 border rounded-sm backdrop-blur-sm cursor-pointer transition-colors ${
                             theme === "dark"
                               ? "bg-neutral-800/50 border-neutral-700 hover:bg-neutral-800"
                               : "bg-white/80 border-neutral-200 hover:bg-transparent"

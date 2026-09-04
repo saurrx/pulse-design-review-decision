@@ -255,7 +255,7 @@ const OCActionsContent: React.FC = () => {
             <Input
               type="text"
               placeholder="Search by application number or title..."
-              className={`w-full border rounded pl-10 pr-10 h-[42px] text-sm focus:outline-none transition-colors ${
+              className={`w-full border rounded-sm pl-10 pr-10 h-[42px] text-sm focus:outline-none transition-colors ${
                 theme === "dark"
                   ? "bg-neutral-900 border-neutral-800 text-neutral-100 placeholder:text-neutral-600"
                   : "bg-neutral-50 border-neutral-200 text-neutral-900 placeholder:text-neutral-400"
@@ -320,7 +320,7 @@ const OCActionsContent: React.FC = () => {
 
         {/* Status filter - keep existing */}
         <Select value={statusFilter} onValueChange={(s) => { setStatusFilter(s); setCurrentPage(1); }}>
-          <SelectTrigger className={`w-[150px] h-[42px] text-sm border rounded ${
+          <SelectTrigger className={`w-[150px] h-[42px] text-sm border rounded-sm ${
             theme === "dark"
               ? "bg-neutral-900 border-neutral-800 text-neutral-300"
               : "bg-transparent border-neutral-200 text-[#494949]"
@@ -704,7 +704,7 @@ const OCActionsContent: React.FC = () => {
 
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
-        <div className="pulse-pagination-bar !mx-0 !mb-0 flex items-center justify-between rounded-xl">
+        <div className="pulse-pagination-bar !mx-0 !mb-0 flex items-center justify-between rounded-md">
           <p
             className={`text-sm ${
               theme === "dark" ? "text-zinc-400" : "text-zinc-500"

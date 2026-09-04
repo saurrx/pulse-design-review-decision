@@ -453,7 +453,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
     return (
       <div
         key={dueDate.id}
-        className="bg-white p-4 rounded-lg border border-gray-200 mb-3 shadow-sm"
+        className="bg-white p-4 rounded-md border border-gray-200 mb-3 shadow-sm"
       >
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-medium text-base truncate max-w-[200px]">
@@ -821,7 +821,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
 
     return (
       <div
-        className={`pulse-pagination-bar relative z-20 !mx-0 !mb-0 !mt-0 flex-shrink-0 rounded-xl border ${
+        className={`pulse-pagination-bar relative z-20 !mx-0 !mb-0 !mt-0 flex-shrink-0 rounded-md border ${
           theme === "dark"
             ? "bg-neutral-950 border-[#cccccc20]"
             : "bg-white border-neutral-200"
@@ -845,7 +845,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
               <select
                 value={itemsPerPage.toString()}
                 onChange={(e) => handleItemsPerPageChange(e.target.value)}
-                className={`border rounded pl-3 pr-6 py-1.5 text-sm appearance-none focus:outline-none focus:border-[#F9B418] transition-colors ${
+                className={`border rounded-sm pl-3 pr-6 py-1.5 text-sm appearance-none focus:outline-none focus:border-[#F9B418] transition-colors ${
                   theme === "dark"
                     ? "bg-neutral-900 border-neutral-800 text-neutral-300"
                     : "bg-white border-neutral-200 text-neutral-700"
@@ -866,7 +866,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
           </div>
           <div className="flex items-center gap-2">
             <button
-              className={`flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
+              className={`flex items-center justify-center rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
                 theme === "dark"
                   ? "hover:bg-white/5 text-neutral-400 hover:text-neutral-200"
                   : "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900"
@@ -880,7 +880,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
               </div>
             </button>
             <button
-              className={`flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
+              className={`flex items-center justify-center rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
                 theme === "dark"
                   ? "hover:bg-white/5 text-neutral-400 hover:text-neutral-200"
                   : "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900"
@@ -907,7 +907,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
               return (
                 <button
                   key={pageNum}
-                  className={`px-3 py-1.5 rounded text-sm transition-colors ${
+                  className={`px-3 py-1.5 rounded-sm text-sm transition-colors ${
                     currentPageFromApi === pageNum
                       ? "bg-[#F9B418] text-black"
                       : `${
@@ -923,7 +923,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
               );
             })}
             <button
-              className={`flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
+              className={`flex items-center justify-center rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
                 theme === "dark"
                   ? "hover:bg-white/5 text-neutral-400 hover:text-neutral-200"
                   : "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900"
@@ -939,7 +939,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
               </div>
             </button>
             <button
-              className={`flex items-center justify-center rounded transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
+              className={`flex items-center justify-center rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-[#F9B418] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed p-1 w-7 h-7 ${
                 theme === "dark"
                   ? "hover:bg-white/5 text-neutral-400 hover:text-neutral-200"
                   : "hover:bg-neutral-100 text-neutral-600 hover:text-neutral-900"
@@ -985,7 +985,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                       name="search"
                       type="text"
                       placeholder="Search by event, application number, client..."
-                      className={`w-full border rounded pl-10 pr-4 pb-2 h-[42px] text-sm focus:outline-none focus:border-[#F9B418]/10 transition-colors ${
+                      className={`w-full border rounded-sm pl-10 pr-4 pb-2 h-[42px] text-sm focus:outline-none focus:border-[#F9B418]/10 transition-colors ${
                         theme === "dark"
                           ? "bg-neutral-900 border-neutral-800 text-neutral-100 placeholder:text-neutral-600"
                           : "bg-neutral-50 border-neutral-200 text-neutral-900 placeholder:text-neutral-400"
@@ -1163,7 +1163,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                               return (
                                 <div
                                   key={client.id}
-                                  className={`flex items-center gap-2 cursor-pointer p-1.5 rounded ${
+                                  className={`flex items-center gap-2 cursor-pointer p-1.5 rounded-sm ${
                                     theme === "dark"
                                       ? "hover:bg-white/5"
                                       : "hover:bg-[#fafafa]"
@@ -1406,7 +1406,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                       name="search"
                       type="text"
                       placeholder="Search by event, application number, client..."
-                      className={`w-full border rounded pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-[#F9B418]/10 transition-colors ${
+                      className={`w-full border rounded-sm pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-[#F9B418]/10 transition-colors ${
                         theme === "dark"
                           ? "bg-neutral-900 border-neutral-800 text-neutral-100 placeholder:text-neutral-600"
                           : "bg-neutral-50 border-neutral-200 text-neutral-900 placeholder:text-neutral-400"
@@ -1424,7 +1424,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                   >
                     <PopoverTrigger asChild>
                       <Button
-                        className={`flex font-sans items-center gap-2 px-4 py-2.5 border rounded text-sm transition-colors ${
+                        className={`flex font-sans items-center gap-2 px-4 py-2.5 border rounded-sm text-sm transition-colors ${
                           theme === "dark"
                             ? "bg-neutral-900 hover:bg-[#171717] border-neutral-800 text-[#d4d4d4] hover:border-[#F9B418]/50"
                             : "bg-white border-neutral-200 text-neutral-700 hover:bg-transparent hover:border-[#F9B418]"
@@ -1539,7 +1539,7 @@ const DueDatesContent: React.FC<DueDatesContentProps> = ({
                               return (
                                 <div
                                   key={client.id}
-                                  className={`flex items-center gap-2 p-1.5 rounded ${
+                                  className={`flex items-center gap-2 p-1.5 rounded-sm ${
                                     theme === "dark"
                                       ? "hover:bg-white/5"
                                       : "hover:bg-[#fafafa]"

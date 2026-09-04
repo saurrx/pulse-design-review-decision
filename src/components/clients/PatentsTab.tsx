@@ -44,7 +44,7 @@ const PatentsTab: React.FC = () => {
 
   return (
     <div
-      className={`border rounded-xl backdrop-blur-xl ${
+      className={`border rounded-md backdrop-blur-xl ${
         theme === "dark"
           ? "bg-neutral-900 border-[#cccccc20]"
           : "bg-white/80 border-neutral-200"

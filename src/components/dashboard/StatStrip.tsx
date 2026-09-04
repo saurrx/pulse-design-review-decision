@@ -68,9 +68,9 @@ const StatBox = ({ box, index }: { box: StatBoxSpec; index: number }) => (
       to={box.to}
       title={box.title}
       aria-label={spoken(box)}
-      className="group relative flex h-full min-h-[132px] flex-col overflow-hidden rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-5 pb-5 pt-6 no-underline transition-colors hover:bg-[var(--pulse-surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pulse-canvas)]"
+      className="group relative flex h-full min-h-[132px] flex-col overflow-hidden rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface)] px-5 pb-5 pt-6 no-underline transition-colors hover:bg-[var(--pulse-surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulse-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--pulse-canvas)]"
     >
-      <span className="absolute inset-x-0 top-0 h-[3px]" style={{ background: RULE[box.rule] }} aria-hidden="true" />
+      <span className="absolute inset-x-0 top-0 h-[3px] rounded-t-md" style={{ background: RULE[box.rule] }} aria-hidden="true" />
       <span className="truncate text-[var(--pulse-ink-muted)]" style={LABEL}>
         {box.label}
       </span>

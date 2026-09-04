@@ -151,7 +151,7 @@
   }
 
   .pulse-toolbar {
-    @apply mx-6 my-5 flex min-h-[66px] flex-wrap items-center gap-3 rounded-2xl border p-3;
+    @apply mx-6 my-5 flex min-h-[66px] flex-wrap items-center gap-3 rounded-md border p-3;
     background: var(--pulse-surface);
     border-color: var(--pulse-line);
     box-shadow: var(--pulse-shadow-card);
@@ -176,7 +176,7 @@
   }
 
   .pulse-table-frame {
-    @apply mx-6 mb-6 overflow-hidden rounded-2xl border;
+    @apply mx-6 mb-6 overflow-hidden rounded-md border;
     background: var(--pulse-surface);
     border-color: var(--pulse-line);
     box-shadow: var(--pulse-shadow-card);
@@ -185,7 +185,7 @@
   .pulse-table-page input:not([type="checkbox"]):not([type="radio"]),
   .pulse-table-page select,
   .pulse-table-page [role="combobox"] {
-    border-radius: 10px !important;
+    border-radius: var(--pl-radius-sm) !important;
     border-color: var(--pulse-line) !important;
     background: var(--pulse-surface) !important;
     color: var(--pulse-ink) !important;
@@ -244,7 +244,7 @@
   }
 
   .pulse-filter-control {
-    @apply inline-flex h-10 items-center gap-2 rounded-xl border px-3.5 text-sm font-medium transition-colors;
+    @apply inline-flex h-10 items-center gap-2 rounded-sm border px-3.5 text-sm font-medium transition-colors;
     border-color: var(--pulse-line) !important;
     background: var(--pulse-surface) !important;
     color: var(--pulse-ink-secondary) !important;
@@ -256,7 +256,7 @@
   }
 
   .pulse-content-card {
-    @apply rounded-2xl border;
+    @apply rounded-md border;
     background: var(--pulse-surface);
     border-color: var(--pulse-line);
     box-shadow: var(--pulse-shadow-card);
@@ -296,7 +296,7 @@
     max-width: 480px;
     padding: 32px;
     border: 1px solid #e3e2e8;
-    border-radius: 6px;
+    border-radius: var(--pl-radius-md);
     background: #ffffff;
     box-shadow: var(--pulse-shadow-elevated);
   }
@@ -351,17 +351,17 @@
   }
 
   .metric-card {
-    @apply bg-white rounded-xl p-5 border border-photon-gray-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col;
+    @apply bg-white rounded-md p-5 border border-photon-gray-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col;
   }
 
   /* Card elevated light style from Figma */
   .card-elevated-light {
-    @apply bg-white rounded-xl border border-zinc-200 shadow-sm hover:shadow-md transition-all duration-300;
+    @apply bg-white rounded-md border border-zinc-200 shadow-sm hover:shadow-md transition-all duration-300;
   }
 
   /* Card elevated dark style */
   .card-elevated-dark {
-    @apply bg-[linear-gradient(135deg,#1e1e1eb3_0%,#1a1a1a99_100%)] rounded-xl border border-zinc-800 shadow-sm hover:shadow-md hover:bg-[#1a1a1a99] transition-all duration-300;
+    @apply bg-[linear-gradient(135deg,#1e1e1eb3_0%,#1a1a1a99_100%)] rounded-md border border-zinc-800 shadow-sm hover:shadow-md hover:bg-[#1a1a1a99] transition-all duration-300;
   }
 
   /* Label muted style */
@@ -387,7 +387,7 @@
 
   .scrollbar-modern-light::-webkit-scrollbar-thumb {
     background-color: rgba(156, 163, 175, 0.3);
-    border-radius: 3px;
+    border-radius: var(--pl-radius-full);
   }
 
   .scrollbar-modern-light::-webkit-scrollbar-thumb:hover {

@@ -103,7 +103,7 @@ export function EvaluationProgress({
 
   return (
     <div
-      className={compact ? "flex items-start gap-2.5" : "rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] p-4"}
+      className={compact ? "flex items-start gap-2.5" : "rounded-md border border-[var(--pulse-line)] bg-[var(--pulse-surface-subtle)] p-4"}
       role="status"
       aria-live="polite"
     >

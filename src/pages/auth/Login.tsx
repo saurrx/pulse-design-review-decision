@@ -281,7 +281,7 @@ const Login = () => {
                 handleLogin();
               }}
               disabled={isLoading || isPending}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-5 rounded-sm border border-white/10 bg-white/5 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <GoogleIcon />
               <span className="text-white font-sans">Google</span>
@@ -302,7 +302,7 @@ const Login = () => {
               style={{ transformOrigin: "center" }}
               onClick={() => microsoftLogin()}
               disabled={isLoading || isPending}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3 mb-5 rounded-sm border border-white/10 bg-white/5 hover:bg-white/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <MicrosoftIcon />
 
@@ -377,7 +377,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isLoadingLogin}
-              className="w-full py-3 rounded-xl bg-[#F9B418] text-black font-medium hover:bg-[#F9B418]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-sans"
+              className="w-full py-3 rounded-sm bg-[#F9B418] text-black font-medium hover:bg-[#F9B418]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-sans"
               style={{ boxShadow: "rgba(249, 180, 24, 0.3) 0px 0px 20px" }}
             >
               {isLoadingLogin ? "Please wait..." : "Sign In"}
