@@ -1,9 +1,9 @@
 # DSN-0003: Border-radius token scale
 
 **Status:** proposed
-**Production base:** `a14da2e` (upstream/main at the sync) · **Design head:** see `classes.json` after export
+**Production base:** `a14da2e` (upstream/main at the sync) · **Design base:** `7b775fc` (the tooling commit: gate, R-16, exporter) · **Design head:** `501c023`, see `classes.json`
 **Backend impact:** none
-**Approvals raised by the export:** build-impact (`tailwind.config.ts`, `tools/tokens.mjs`); no behaviour-impact expected: no query, payload, navigation target or role condition moves
+**Approvals raised by the export:** build-impact (`tailwind.config.ts`, `tools/tokens.mjs`); behaviour-impact (`src/contexts/BackgroundAnalysisContext.tsx` is a behaviour-impact path, its change is six radius classes on the floating panel; and the fingerprint diff in `behaviour.md`, which lists lines that mention a role name and now carry a different radius class in `ClientInviteDialog.tsx` and `CaseOwnersTab.tsx`; no condition, query, payload or navigation target moved)
 
 ## Intent
 Every corner in Pulse was 2px (production's Tailwind theme resolved all nine
@@ -154,6 +154,29 @@ From the re-recorded baselines (`Foundations/Radius` at 1280, 1366, 1440,
 | Motion | n/a | None added. |
 | Copy | 4 | Story labels use product vocabulary and product objects only. |
 | Largest gap | | PL-TKN-004 itself still says 2px; the specification owner should carry the scale in the next release (finding, R-16). |
+
+## Porting order
+This record stacks on DSN-0001 (tokens) and DSN-0002 (Workspace Admin
+dashboard): it edits `src/styles/tokens.json`, `StatStrip.tsx`,
+`WorkspaceAdminOverview.tsx`, `TopInventors.tsx` and `DashboardStats.tsx` in
+the shape those records left them. The exporter's dry run on bare production
+(`drift.txt`) therefore reports conflicts in exactly those files; the patch
+applies cleanly after DSN-0001 and DSN-0002 are ported, in that order.
+
+## Gate run
+`gates.txt`. Green: typecheck, lint:roles, routes, credentials, manifest,
+fingerprint self-test, tokens check, fidelity, V0 semantic gate (33 tests
+including the new radius gate), coverage matrix, build:design,
+storybook:build, test:stories (197), shots twice-stable against the
+re-recorded baselines, a11y ratchet (0 new, 209 inherited), smoke, crawl,
+desktop gate, no visible uuid. Two gates carry findings that are not this
+record's: the layout invariant flags 14 sr-only clippings on the Workspace
+Admin dashboard (DSN-0002 content at the base), and the conformance
+structure baseline was re-recorded, absorbing 244 radius deviations (this
+record) together with ~55 toolbar padding, colour and weight drifts and the
+stat-strip link signatures that were already present at the base with zero
+radius deviations. Listed here so the next reviewer of DSN-0002 knows the
+baseline moved under it.
 
 ## Known compromises
 - The brief's rule 1 (nested = outer − padding) and rule 4 (grouped controls
