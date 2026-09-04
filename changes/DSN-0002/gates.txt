@@ -1,0 +1,38 @@
+ok   typecheck (4s) 
+ok   lint:roles (0s) 
+ok   routes: every handler is real, every reachable route served (0s) 
+ok   credentials and inert hosts (0s) 
+ok   manifest and graph parity (1s) 
+ok   fingerprint self-test (bites) (0s) 
+ok   tokens: generated outputs match src/styles/tokens.json (0s) 
+ok   fidelity: adapter boundary, OpenAPI bodies, state machine (1s) 
+ok   v0 semantic gate (four personas, one stage, coverage, exclusions, optional evaluation, badges, declared contracts) (2s) 
+ok   v0 coverage matrix rendered and current (0s) 
+ok   build:design (6s) 
+ok   storybook:build (12s) 
+ok   test:stories (interaction, serial) (32s) 
+FAIL shots (stable across two clean renders, no egress, matches baselines) (397s) same   legacy-reference-states-network-and-permissions--permission-denied | shots: 46 failure(s) | full output: node_modules/.cache/gates/shots-stable-across-two-clean-renders-no-egress-matches-base.log
+ok   a11y ratchet (no new fingerprints, zero in redesigned content) (50s) 
+info isolation probe (parallel stories safe?) (7s) isolation: data isolated (frame-local persona holds); chrome identity CONTAMINATED through the shared cookie | isolation: keep story tests serial | full output: node_modules/.cache/gates/isolation-probe-parallel-stories-safe-.log
+ok   smoke (full app on mock) (14s) 
+FAIL crawl (every persona, every page and detail route) (95s) ok   PHOTON_SUPERADMIN /profile text=913 | crawl: 1 problem(s) | full output: node_modules/.cache/gates/crawl-every-persona-every-page-and-detail-route-.log
+ok   qa invariant: desktop gate (0s) 
+FAIL qa invariant: layout rules, 6 roles x 2 viewports (133s)   ok   /profile @1440x900 | 76 page-viewport combinations · 14 violation(s) · 24 suppressed | full output: node_modules/.cache/gates/qa-invariant-layout-rules-6-roles-x-2-viewports.log
+ok   qa invariant: no visible uuid (191s) 
+FAIL qa conformance: structure against baseline-mock (159s)   ok   /profile | 31 surface(s) checked - 111 deviation(s) - 0 suppressed | full output: node_modules/.cache/gates/qa-conformance-structure-against-baseline-mock.log
+node:internal/process/per_thread:277
+      throw new ErrnoException(err, 'kill');
+            ^
+
+Error: kill ESRCH
+    at process.kill (node:internal/process/per_thread:277:13)
+    at file:///Users/saurabh/PL/pulsemain/pulse-design/tools/design/gates.mjs:64:18
+    at ModuleJob.run (node:internal/modules/esm/module_job:413:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:654:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  errno: -3,
+  code: 'ESRCH',
+  syscall: 'kill'
+}
+
+Node.js v25.2.1

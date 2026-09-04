@@ -173,7 +173,7 @@ const WorkspaceAdminOverview = () => {
   const strip = isDashboardLoading && !unavailable ? (
     <section aria-label="Overview" aria-busy="true" className="flex flex-col gap-4 xl:grid xl:grid-cols-5">
       {[0, 1, 2, 3, 4].map((k) => (
-        <div key={k} className="min-h-[108px] animate-pulse rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)]" />
+        <div key={k} className="min-h-[132px] animate-pulse rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)]" />
       ))}
     </section>
   ) : (
