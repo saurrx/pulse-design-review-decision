@@ -609,13 +609,16 @@ const PatentWorldMap = (props: any) => {
             >
               {v0?.subtitle ?? "Global patent distribution by country"}
             </p>
-            {v0 && (
-              <ul className="sr-only" aria-label="Patents by jurisdiction">
-                {countriesWithPatents.map((c: any) => (
-                  <li key={c.id}>{c.country} {c.granted + c.pending}</li>
-                ))}
-                {countriesWithPatents.length === 0 && <li>No patents added yet</li>}
-              </ul>
+            {v0 && countriesWithPatents.length > 0 && (
+              // The text alternative to the map: the same counts as a list, one line until opened.
+              <details className="mt-1 font-sans text-xs text-[var(--pulse-ink-muted)]">
+                <summary className="cursor-pointer select-none hover:text-[var(--pulse-ink)]">By jurisdiction</summary>
+                <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5" aria-label="Patents by jurisdiction">
+                  {[...countriesWithPatents].sort((a: any, b: any) => (b.granted + b.pending) - (a.granted + a.pending)).map((c: any) => (
+                    <li key={c.id} className="text-[var(--pulse-ink-secondary)]">{c.country} <span className="font-semibold text-[var(--pulse-ink)]">{c.granted + c.pending}</span></li>
+                  ))}
+                </ul>
+              </details>
             )}
           </div>
           <div

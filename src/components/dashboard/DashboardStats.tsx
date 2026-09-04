@@ -747,7 +747,7 @@ const NeedsReview = ({
                     {typeof r.score === "number" ? (
                       <span className="font-semibold">{(r.score / 10).toFixed(1)}</span>
                     ) : (
-                      <><span aria-hidden="true">—</span><span className="sr-only">Not evaluated</span></>
+                      <span role="img" aria-label="Not evaluated">—</span>
                     )}
                   </td>
                   <td className={`whitespace-nowrap px-3 py-2.5 text-right text-xs ${overdue ? "font-semibold text-[var(--pl-red-text)]" : "text-[var(--pulse-ink-muted)]"}`} style={NUMS}>
