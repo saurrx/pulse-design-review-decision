@@ -1,0 +1,46 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/kill-switch.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/verify-gate.mjs"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/track-read.mjs"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Hook input: $ARGUMENTS. Read the conversation at transcript_path (and last_assistant_message) and judge from it only. You are the completion gate for the Pulse V0 autonomous run (see RUN-GOALS.md). The turn may end (respond ok) only if ONE of these is demonstrated in the transcript: (A) the surface this session is working on is complete: its intended stories exist and `npm run test:stories` output shows them passing, `npm run test:v0`, `npm run typecheck` and `node tools/tokens.mjs --check` passed with output shown, screenshots under changes/DSN-NNNN/shots/ were opened with the Read tool, the evaluator subagent returned VERDICT: PASS pasted verbatim (or three NEEDS_WORK rounds happened and the surface was marked needs-founder in PROGRESS.md), design/v0/coverage.json has its dsn set and COVERAGE.md was re-rendered, everything is committed and merged to main and pushed, `git status` is clean, and PROGRESS.md has a recap naming the next surface; (B) the whole run is finished: no surface in design/v0/coverage.json has dsn null and the needs-founder sweep in PROGRESS.md is done; (C) a file named AGENT_STOP exists at the repo root, or STEER.md told the session to stop; (D) another session holds the surface (a dsn/ branch or main had a commit by another session within the last 25 minutes, checked with git log) and this session recorded that and exited; (E) the session is blocked by rate limits, an authentication failure or a missing tool after at least two retries, and PROGRESS.md records exactly where it stopped. Otherwise block, and give as the reason the single most useful next action (for example: 'run the evaluator subagent on changes/DSN-0006', 'test:stories output has not been shown', 'the last message was a plan, not work'). Never accept a description of work as evidence of work.",
+            "timeout": 90
+          }
+        ]
+      }
+    ]
+  }
+}

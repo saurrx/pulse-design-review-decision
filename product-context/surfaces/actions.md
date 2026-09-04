@@ -33,6 +33,8 @@ Workspace Admin, Case Owner, Photon Admin. Never Inventor.
 - Due dates live here and in patent detail for Workspace Admin.
 - No separate client Due Dates navigation.
 - No navigation badge; use contextual alerts on relevant dashboards.
+- Full redesign: no `Select action…` dropdown per row, no horizontal scroll;
+  the next event, its date and the one allowed action lead each row.
 - No purchasing, checkout, pricing, or invoice controls.
 - Do not expose Actions to Inventors.
 - Every status update clearly states who owns the next step.

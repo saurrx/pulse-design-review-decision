@@ -69,11 +69,12 @@ Most of the product remains stable and calm. Motion and emphasis appear when
 the system acknowledges input, reveals transformation, communicates progress,
 or confirms a meaningful completion.
 
-### 9. Social proof without unhealthy ranking
+### 9. Social proof, ranked only for the admin
 
 Encourage invention through collective company momentum: submissions, progress,
-and ideas reaching filing. Avoid ranking named employees by default; leaderboards
-can discourage participation or create the wrong incentives.
+and ideas reaching filing. The Workspace Admin Overview shows a Top inventors
+list so the admin knows who is contributing; Inventors see collective momentum
+and never a ranking of named colleagues.
 
 ### 10. The product serves the business through the user
 
@@ -84,8 +85,11 @@ improve.
 ## Brand direction
 
 Pulse is a Photon Legal product and uses the same core brand identity. The
-Photon navy and amber/yellow remain recognizable. PL-TKN-004 is the binding V0
-starting point. Typography and semantic token organization may improve, but
+Photon navy and amber/yellow remain recognizable. PL-TKN-004 is the token
+source; the Workspace Admin Overview and the Workspace Admin Ideas queue, as
+built, are the visual reference every other screen matches: stat strip with
+a coloured top rule, navy metrics, 36px actions, small radius scale, hairline
+separation, two-pane list/detail where a list feeds a decision. Typography and semantic token organization may improve, but
 core brand color changes require explicit approval.
 
 The visual system favors strong typography, disciplined hierarchy, hairline

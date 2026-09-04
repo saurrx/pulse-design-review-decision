@@ -23,10 +23,19 @@ current next step.
 - Activity and status timeline
 - Related patent after filing
 
+## Direction (1.1.0)
+
+This screen needs substantial cleaning. Lead with status and the next step
+for the persona; the score appears once with its band; the disclosure is
+sectioned and collapsible; evidence and history are behind disclosure. When
+the idea is still a draft, the detail routes into the disclosure workspace
+whose first prompt is upload or paste.
+
 ## Avoid
 
 Rendering the entire questionnaire as one undifferentiated wall, repeating the
-same score in several places, internal IDs, or actions unavailable to the role.
+same score in several places, a lifecycle stepper that shows stages the idea
+has not reached as if done, internal IDs, or actions unavailable to the role.
 
 ## States
 

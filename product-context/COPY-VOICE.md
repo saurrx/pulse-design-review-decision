@@ -35,12 +35,14 @@ conclusion. Do not imply certainty, objectivity, or a guarantee.
 - Introduce as few product terms as possible.
 - Use one noun for one object across every surface.
 - Use sentence case unless the design system explicitly defines otherwise.
-- Prefer specific actions: `Approve for filing`, not `Continue`.
+- Prefer specific actions: `Send to Photon Legal`, not `Continue`.
 - Explain errors beside the affected field and state the recovery action.
 - Keep headings informative rather than motivational filler.
 - Never expose internal enums, IDs, endpoint language, or implementation terms.
 - Use `prior art`, never `prior arts`.
-- Do not describe a novelty score as a probability of receiving a patent.
+- Do not describe the patentability score as a probability of receiving a
+  patent. Band labels (Highly novel, Moderately novel, Marginally novel,
+  Closely matched) describe distance from prior art, not odds of grant.
 
 ## Evaluation example
 

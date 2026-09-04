@@ -33,8 +33,12 @@ For each direction explain:
 - Business hypothesis
 - Main risk
 
-Human direction selects, combines, and rejects. The agent does not choose the
-product direction by itself.
+In the V0 run the agent selects the direction with the lowest cognitive load
+for the persona and screen (design/v0/COGNITIVE-LOAD.md) and records all
+three with the tradeoff in the change record; the founder has pre-authorised
+this and reviews the record. The agent stops for human direction only when a
+direction would change product behaviour, scope, permissions, vocabulary or a
+reference screen.
 
 ## Phase 3: Build
 
@@ -85,8 +89,9 @@ Before writing code, state the persona, job, stakes, primary object, current
 problem, desired outcome, primary action, consequence, success signal,
 guardrails, and required states.
 
-Then propose three coherent design directions. Do not implement until I choose
-one. After implementation, render the result, inspect it, and review it against
-product-context/DESIGN-SCORECARD.md.
+Then propose three coherent design directions, select the one with the lowest
+cognitive load under design/v0/COGNITIVE-LOAD.md, and record the tradeoff.
+After implementation, render the result, inspect it, and review it against
+product-context/DESIGN-SCORECARD.md and design/v0/COGNITIVE-LOAD.md.
 ```
 

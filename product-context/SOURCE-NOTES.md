@@ -62,7 +62,8 @@ are the later founder validations recorded in this package:
 - No cutoff applies.
 - Evaluation is advisory and optional.
 - Inventor evidence is progressively disclosed.
-- World maps are removed from V0 dashboards.
+- World maps were removed from V0 dashboards in 1.0.0 and restored on every
+  dashboard in 1.1.0 (see VALIDATION.md).
 - Cost visibility is later.
 - Full V0 visual/UX redesign is authorized.
 

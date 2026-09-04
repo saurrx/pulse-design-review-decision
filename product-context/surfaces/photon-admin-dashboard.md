@@ -21,8 +21,9 @@ without losing client ownership or data quality.
 ## Rules
 
 - Work and exceptions lead; vanity totals do not.
-- No world map.
+- The patent world map appears below the work, firm-wide scope, never leading.
 - No cost or revenue analytics in V0.
+- No navigation badge; awaiting-action counts live on the dashboard.
 - Every cross-client number drills into a useful scoped list.
 - Client boundaries, owners, and scope remain visible.
 

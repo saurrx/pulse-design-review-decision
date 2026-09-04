@@ -21,12 +21,13 @@ Pulse is free with Photon Legal services. It is not sold as SaaS. Its primary
 commercial purpose is to help more inventors start, complete, and submit good
 ideas so that more approved ideas become paid patent matters for Photon Legal.
 
-## How to install
+## Where this lives
 
-Copy this directory into the design repository as `product-context/`. Point the
-repository's root `AGENTS.md` or `CLAUDE.md` to
-`product-context/AGENTS.md`. Keep this package versioned with the designs it
-governs.
+This directory is `product-context/` in the Pulse V0 repository. The
+repository's `CLAUDE.md` routes agents here. Every product decision that
+changes is recorded in `VALIDATION.md` with a version bump in
+`CONTEXT-MANIFEST.json`; the same text is mirrored in the PL-Pulse-Design
+Claude Project.
 
 ## Required reading order for an agent
 
@@ -50,12 +51,13 @@ When guidance conflicts, use this order:
 2. The product truths in this package
 3. The relevant surface brief
 4. Accepted design principles and vocabulary
-5. Existing V0 component and technical constraints
+5. The reference screens (Workspace Admin Overview and Ideas queue) and
+   existing V0 component constraints
 6. External references
 7. General model preferences
 
-Repository code proves what exists. It does not automatically prove that the
-existing product or design decision is correct.
+Repository code proves what exists. Except for the two reference screens, it
+does not prove that the existing design is correct.
 
 ## Source basis
 

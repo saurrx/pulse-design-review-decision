@@ -22,7 +22,9 @@ Reduce coordination delay between client approval and Photon service delivery.
 - Work leads; aggregate metrics recede.
 - Every item identifies client, object, age/urgency, and next step.
 - Client view is accessible but visibly distinct and easy to exit.
-- Do not show a global client ranking or world map.
+- The patent world map appears below the work, assigned-client scope, never
+  leading. Do not show a global client ranking.
+- No navigation badge; awaiting-action counts live on My Work.
 
 ## States
 

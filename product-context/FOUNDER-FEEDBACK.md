@@ -35,8 +35,10 @@ The call questioned why maps, pipelines, portfolios, and personal/company
 metrics occupied particular locations. The top-left and primary real estate
 must reflect the persona's most important task, not the availability of data.
 
-Design response: remove world maps from dashboards; separate metric scope;
-lead with submission, pending review, assigned work, or firm exceptions.
+Design response (1.0.0): remove world maps from dashboards; separate metric
+scope; lead with submission, pending review, assigned work, or firm exceptions.
+Superseded (1.1.0): the world map returns to every dashboard, below the
+persona's work, never leading. The placement rationale still stands.
 
 ## Motivation
 
@@ -44,8 +46,9 @@ Company patent activity can show that invention is normal and valued. Collective
 peer momentum may encourage participation more effectively than a geographic
 portfolio visualization.
 
-Design response: show collective submissions and progress without default
-individual ranking.
+Design response (1.0.0): show collective submissions and progress without
+default individual ranking. Superseded (1.1.0): the Workspace Admin Overview
+keeps a Top inventors list; Inventors still see no named ranking.
 
 ## Product value
 

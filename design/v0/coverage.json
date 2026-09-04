@@ -1,5 +1,5 @@
 {
-  "_doc": "V0 coverage matrix. One entry per brief in product-context/surfaces. tools/design/v0-gate.mjs fails when a brief is missing, a persona is outside the four, a badge appears outside Workspace Admin review, or a route or story id names an excluded feature. Story ids are the intended ids of future V0 stories; a V0 story exists only when its DSN record creates the production-shaped component, so `dsn` stays null until then.",
+  "_doc": "V0 coverage matrix. One entry per brief in product-context/surfaces. tools/design/v0-gate.mjs fails when a brief is missing, a persona is outside the four, a badge appears outside Workspace Admin review, or a route or story id names an excluded feature. The `dsn` column is the ledger of the V0 run. Story ids are the intended ids of future V0 stories; a V0 story exists only when its DSN record creates the production-shaped component, so `dsn` stays null until then.",
   "contextVersion": "1.0.0",
   "personas": {
     "INVENTOR": {
@@ -60,7 +60,6 @@
     }
   },
   "excludedFeatures": [
-    "world map",
     "checkout",
     "purchasing",
     "billing",
@@ -132,7 +131,6 @@
         "surfaces-inventor-home--error"
       ],
       "excludes": [
-        "world map",
         "due dates",
         "Actions",
         "firm administration",
@@ -762,7 +760,6 @@
         "surfaces-patent-portfolio--error"
       ],
       "excludes": [
-        "world map",
         "every field at once",
         "import for client personas"
       ],
@@ -1136,8 +1133,7 @@
         "surfaces-case-owner-my-work--loading"
       ],
       "excludes": [
-        "global client ranking",
-        "world map"
+        "global client ranking"
       ],
       "dsn": null
     },
@@ -1265,7 +1261,6 @@
         "surfaces-photon-admin-dashboard--loading"
       ],
       "excludes": [
-        "world map",
         "cost or revenue analytics",
         "vanity totals before work"
       ],

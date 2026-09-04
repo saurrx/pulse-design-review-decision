@@ -11,7 +11,7 @@ Generated from `design/v0/coverage.json` by `tools/design/v0-coverage.mjs`; do n
 | Case Owner | CASE_OWNER | My Work · Clients · Ideas · Patents · Due Dates · Actions · Profile | none |
 | Photon Admin | PHOTON_ADMIN | Dashboard · Clients · Ideas · Patents · Due Dates · Actions · Workspace · Profile | none |
 
-Excluded from V0 everywhere: world map, checkout, purchasing, billing, price selection, invoice, notification centre, notification bell, general assistant, trademark, cost visibility, score cutoff.
+Excluded from V0 everywhere: checkout, purchasing, billing, price selection, invoice, notification centre, notification bell, general assistant, trademark, cost visibility, score cutoff.
 
 ## Summary
 
@@ -51,7 +51,7 @@ Brief: `product-context/surfaces/inventor-home.md` · Storybook title: `Surfaces
 - **Navigation badge:** none
 - **Backend impact:** unwired — Collective momentum (submissions this quarter, ideas that reached filing) needs workspace counts by period; GET /v1/dashboard-style aggregates exist for pipeline counts, a period breakdown is not exposed today.
 - **Intended story ids:** `surfaces-inventor-home--first-run`, `surfaces-inventor-home--invited-inactive`, `surfaces-inventor-home--no-ideas`, `surfaces-inventor-home--active-draft`, `surfaces-inventor-home--several-statuses`, `surfaces-inventor-home--requested-changes`, `surfaces-inventor-home--recent-submission`, `surfaces-inventor-home--evaluation-available`, `surfaces-inventor-home--loading`, `surfaces-inventor-home--error`
-- **Excluded here:** world map, due dates, Actions, firm administration, generic patent totals, equal-weight card grid, named inventor ranking
+- **Excluded here:** due dates, Actions, firm administration, generic patent totals, equal-weight card grid, named inventor ranking
 
 ## Start an idea
 
@@ -179,7 +179,7 @@ Brief: `product-context/surfaces/patent-portfolio.md` · Storybook title: `Surfa
 - **Navigation badge:** none
 - **Backend impact:** none — GET /v1/patents with paging, stats, tags, export and import exist.
 - **Intended story ids:** `surfaces-patent-portfolio--inventor`, `surfaces-patent-portfolio--workspace-admin`, `surfaces-patent-portfolio--case-owner`, `surfaces-patent-portfolio--photon-admin`, `surfaces-patent-portfolio--empty-imported-portfolio`, `surfaces-patent-portfolio--thousands-of-records`, `surfaces-patent-portfolio--long-titles`, `surfaces-patent-portfolio--multiple-jurisdictions`, `surfaces-patent-portfolio--filtered-empty`, `surfaces-patent-portfolio--import-result`, `surfaces-patent-portfolio--loading`, `surfaces-patent-portfolio--error`
-- **Excluded here:** world map, every field at once, import for client personas
+- **Excluded here:** every field at once, import for client personas
 
 ## Patent detail
 
@@ -259,7 +259,7 @@ Brief: `product-context/surfaces/case-owner-my-work.md` · Storybook title: `Sur
 - **Navigation badge:** none
 - **Backend impact:** unwired — Composed from ideas, actions, due dates and clients lists that exist; no dedicated aggregate.
 - **Intended story ids:** `surfaces-case-owner-my-work--no-assigned-clients`, `surfaces-case-owner-my-work--newly-assigned-client`, `surfaces-case-owner-my-work--new-approved-idea`, `surfaces-case-owner-my-work--urgent-action`, `surfaces-case-owner-my-work--overdue-date`, `surfaces-case-owner-my-work--onboarding-incomplete`, `surfaces-case-owner-my-work--access-expired`, `surfaces-case-owner-my-work--data-error`, `surfaces-case-owner-my-work--loading`
-- **Excluded here:** global client ranking, world map
+- **Excluded here:** global client ranking
 
 ## Clients and onboarding
 
@@ -291,7 +291,7 @@ Brief: `product-context/surfaces/photon-admin-dashboard.md` · Storybook title: 
 - **Navigation badge:** none
 - **Backend impact:** unwired — Composed from lists that exist; firm totals and trends have no dedicated aggregate.
 - **Intended story ids:** `surfaces-photon-admin-dashboard--healthy-operations`, `surfaces-photon-admin-dashboard--unassigned-client`, `surfaces-photon-admin-dashboard--aging-approved-ideas`, `surfaces-photon-admin-dashboard--urgent-actions`, `surfaces-photon-admin-dashboard--failed-import`, `surfaces-photon-admin-dashboard--missing-client-configuration`, `surfaces-photon-admin-dashboard--no-exceptions`, `surfaces-photon-admin-dashboard--partial-data`, `surfaces-photon-admin-dashboard--loading`
-- **Excluded here:** world map, cost or revenue analytics, vanity totals before work
+- **Excluded here:** cost or revenue analytics, vanity totals before work
 
 ## Authentication and access
 

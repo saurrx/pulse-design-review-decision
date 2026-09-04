@@ -99,8 +99,8 @@ Screens:
 - Only pending Workspace Admin reviews receive a navigation badge.
 - Actions receive contextual alerts but no navigation badge.
 - There is no notification center or bell.
-- There is no world map on any V0 dashboard.
-- Jurisdiction counts and filtering belong in Patent Portfolio.
+- The patent world map appears on every V0 dashboard, below the persona's work; it never leads.
+- Jurisdiction counts and filtering also belong in Patent Portfolio.
 - Every dashboard begins with work or momentum relevant to that persona.
 - Internal IDs never appear.
 

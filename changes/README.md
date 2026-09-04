@@ -1,31 +1,32 @@
-# Design records
+# Change records
 
-One folder per design change, `DSN-0001` onward. A record is the unit of handoff:
-the branch is the source, the folder is the intent and the evidence, and the
-exported patch is what the developer applies. The full contract is in the
-published proposal "Pulse Design Fork"; this file is the working summary.
+One folder per change, `DSN-0001` onward. A record is the audit trail for a
+surface: what was intended, which directions were considered, what was built,
+what it looks like, and how it scored. The branch and its pull request carry
+the code; the folder carries the evidence.
 
 ## Lifecycle
-`proposed` -> `in review` -> `approved` -> `ported` -> `verified`.
-A record that declares a route the backend lacks (`backendImpact: conceptual`)
-stops at `approved` while the backend is frozen. A record that uses a backend
-route the frontend never wired (`unwired`) needs the developer's approval.
+`proposed` -> `in review` -> `approved` -> `merged`.
 
 ## Making one
-1. `git checkout -b dsn/0007-short-name main` (the design main: production plus tooling).
-2. Work under the rules in AGENTS.md. Change portable product files; add or
-   extend scenarios, handlers and stories as review support.
-3. `node tools/design/export.mjs DSN-0007` writes the folder: the patch built
-   from portable paths only, the class report, the behavioural fingerprint diff,
-   the drift check in a disposable production worktree.
-4. Fill README.md from TEMPLATE. Record the story ids, the before and after
-   commits, and the approval flags the export raised.
-5. Open the merge request. CI runs the gates; the previews are the review surface.
+1. `git checkout -b dsn/0007-short-name main`.
+2. Work under the rules in AGENTS.md: change `src/`, extend the mock, add or
+   update the V0 stories for the surface, delete the legacy stories it replaces.
+3. Render the surface at the five review widths, run the scorecard and
+   `design/v0/COGNITIVE-LOAD.md`, run the gates.
+4. Create `changes/DSN-0007/` from TEMPLATE: README.md plus `shots/`.
+5. Set the surface's `dsn` in `design/v0/coverage.json`, re-render `COVERAGE.md`.
+6. Open the pull request. The README is the review surface; the reviewer
+   opens Storybook for the rest.
 
-## What travels and what does not
-- In the patch: `src/components`, `src/pages`, the stylesheets, `src/styles`, `public/assets`, `public/fonts`;
-  `index.html`, the Vite, Tailwind and PostCSS configs and the token generator only with build-impact approval;
-  role labels, the status map, context UI and hooks only with behaviour-impact approval.
-- Beside the patch, never inside it: stories, scenarios, handlers, screenshots, baselines, this folder.
-- Never on a design branch: the mock runtime, the harness, Storybook config, the QA corpus,
-  the contract pins, the instruction files, the manifest and lockfile.
+## What a record contains
+- `README.md` — intent, the three directions and the chosen one with its
+  tradeoff, what moved, what stayed, story ids, scorecard, cognitive-load
+  check, mock additions, known compromises.
+- `shots/` — one screenshot per story per viewport that matters for the
+  decision (at minimum 1280×720 and 1440×900 of the default state).
+
+## History
+DSN-0001 to DSN-0003 were made under the earlier design-fork model and carry
+patch, class, drift and fingerprint files. Those files are historical; the
+export machinery is retired (see CLAUDE.md, History).
