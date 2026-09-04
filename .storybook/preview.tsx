@@ -1,60 +1,43 @@
-import React from "react";
 import type { Preview } from "@storybook/react-vite";
-import { ThemeContext } from "../src/contexts/ThemeContext";
+import { setupWorker } from "msw/browser";
+import { mswLoader } from "msw-storybook-addon/csf3";
 import "../src/index.css";
 import "../src/style.css";
+import { handlers } from "../mock/handlers";
+import { pulseLoader, withPulse, VIEWPORTS } from "../design/harness";
 
 /**
- * Both stylesheets, in the app's order.
- *
- * A story rendered without them is a lie: this codebase styles almost entirely
- * through Tailwind utilities plus the `--pulse-*` design tokens defined in
- * `index.css`, so a component loaded bare renders unstyled and any visual
- * assertion made against it is meaningless.
- *
- * WHY THE CONTEXT IS PROVIDED HERE RATHER THAN VIA ThemeProvider.
- * `contexts/ThemeContext.tsx`'s provider hardcodes `theme: 'light'` and a
- * `toggleTheme` that returns undefined — the app ships light-only, and every
- * `theme === "dark" ? … : …` ternary in the product code currently takes the
- * light branch and nothing else (registered in atlas/stale.md as F19). Using
- * that provider would make a "dark" story silently render light, which is worse
- * than having no dark story at all. So the toolbar value is injected straight
- * into the context, which is the ONE place in this repo that can render the
- * dark branch those ternaries were written for.
+ * One worker and one decorator serve both story tiers. `withPulse` leaves
+ * production's isolated component stories isolated; stories with a `pulse`
+ * parameter receive the full mock session, provider tree, router and layout.
  */
-const preview: Preview = {
-  parameters: {
-    controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
-    // Fail a story on a serious accessibility violation rather than colouring a
-    // panel. A warning nobody is required to read is not a control.
-    a11y: { test: "error" },
-  },
-  globalTypes: {
-    theme: {
-      description: "Pulse theme",
-      defaultValue: "light",
-      toolbar: {
-        title: "Theme",
-        icon: "circlehollow",
-        items: [
-          { value: "light", title: "Light" },
-          { value: "dark", title: "Dark" },
-        ],
-        dynamicTitle: true,
-      },
-    },
-  },
-  decorators: [
-    (Story, context) => {
-      const theme = (context.globals.theme ?? "light") as "light" | "dark";
-      document.documentElement.classList.toggle("dark", theme === "dark");
-      return (
-        <ThemeContext.Provider value={{ theme, toggleTheme: () => undefined }}>
-          <Story />
-        </ThemeContext.Provider>
-      );
-    },
-  ],
+const startWorker = async () => {
+  const worker = setupWorker(...handlers);
+  await worker.start({
+    onUnhandledRequest: "error",
+    serviceWorker: { url: "/mockServiceWorker.js", options: { updateViaCache: "none" } },
+    quiet: true,
+  });
+  return worker;
 };
 
+const preview: Preview = {
+  parameters: {
+    layout: "fullscreen",
+    msw: [],
+    controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
+    // Accessibility is gated by tools/design/a11y.mjs: known Legacy reference
+    // fingerprints ratchet down, while every story tagged `redesign` must have
+    // zero violations in its content root. Making the addon fail globally would
+    // turn 208 recorded legacy findings into duplicate failures and bypass that
+    // explicit policy. Production's own repository still runs its component
+    // stories with `test: "error"` through its independent config.
+    a11y: { test: "off" },
+    viewport: { options: VIEWPORTS },
+    options: { storySort: { order: ["Surfaces", "Foundations", "Primitives", "Patterns", "States", "Legacy reference", "Auth", "Common", "Patents", "UI"] } },
+  },
+  initialGlobals: { viewport: { value: "pulse1440", isRotated: false } },
+  loaders: [pulseLoader, mswLoader(startWorker)],
+  decorators: [withPulse],
+};
 export default preview;

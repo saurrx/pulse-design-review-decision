@@ -3,7 +3,7 @@ import type { Decorator, Loader } from "@storybook/react-vite";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeContext, ThemeProvider } from "@/contexts/ThemeContext";
 import { BackgroundAnalysisProvider } from "@/contexts/BackgroundAnalysisContext";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
@@ -67,9 +67,15 @@ function restoreDialogs() {
 }
 
 export const pulseLoader: Loader = async ({ parameters }) => {
+  const hasPulse = Object.prototype.hasOwnProperty.call(parameters, "pulse");
   const p = (parameters.pulse ?? {}) as PulseParams;
   // Fonts first: a component that measures text before the face arrives lays out a subpixel differently.
   try { await Promise.all([...[400, 500, 600, 700].map((w) => document.fonts.load(`${w} 15px "Schibsted Grotesk"`)), ...[400, 500, 600].map((w) => document.fonts.load(`${w} 28px "Newsreader"`)), ...[400, 600].map((w) => document.fonts.load(`${w} 13px "IBM Plex Mono"`))]); } catch { /* fallback faces are fine */ }
+  if (!hasPulse) {
+    document.body.removeAttribute("data-story-ready");
+    stubDialogs();
+    return { componentStory: true };
+  }
   const scenario = SCENARIOS[p.scenario ?? DEFAULT_SCENARIO] ?? SCENARIOS[DEFAULT_SCENARIO];
   clock.set(p.clock ?? scenario.clock);
   installFakeDate();
@@ -109,6 +115,10 @@ const ReadyMarker = () => {
 };
 
 export const withPulse: Decorator = (Story, ctx) => {
+  if (!Object.prototype.hasOwnProperty.call(ctx.parameters, "pulse")) {
+    document.documentElement.classList.remove("dark");
+    return <ThemeContext.Provider value={{ theme: "light", toggleTheme: () => undefined }}><ReadyMarker /><Story /></ThemeContext.Provider>;
+  }
   const p = (ctx.parameters.pulse ?? {}) as PulseParams;
   const route = (ctx.loaded as { route?: string }).route ?? (typeof p.route === "string" ? p.route : "/");
   const pattern = p.path ?? (typeof p.route === "string" ? route.split("?")[0] : route.split("?")[0]);

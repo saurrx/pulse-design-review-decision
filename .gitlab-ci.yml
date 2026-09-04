@@ -22,6 +22,7 @@ build:
     - node qa/cli.mjs contract
     - node qa/cli.mjs exceptions
     - node qa/contract/adapter-coverage.qa.mjs
+    - node qa/contract/social-login-mapping.qa.mjs
     - node qa/contract/auth-field-contract.qa.mjs
     # Scores are stored 0-100 and shown out of 10. They used to be shown both
     # ways at once — the same idea read 72 to the inventor and 7.2 to the
@@ -62,44 +63,19 @@ browser:
       when: manual
       allow_failure: false
   script:
-    - |
-      failed=""
-      # Storybook FIRST, and deliberately before anything that logs in.
-      #
-      # These are the only browser tests here that do not touch the deployed
-      # demo: `vitest --project=storybook` renders each story in this repo's own
-      # Chromium, runs its play function, and fails on an axe violation because
-      # .storybook/preview.tsx sets `a11y: { test: "error" }`. So it costs no
-      # demo login, cannot be flaked by a Vercel deploy race, and if a shared
-      # component is broken there is no point spending five logins to find out
-      # from a screen.
-      #
-      # It lives in THIS job rather than a per-MR one because it needs a browser
-      # image, and a second Playwright job on every push does not fit a
-      # 400-minute month. The marginal cost here is seconds: the image and
-      # `npm ci` are already paid for.
-      echo "=== storybook component tests"
-      npm run test-storybook || failed="$failed storybook"
-      # Invariants next: it logs in as all five roles and populates the cache
-      # the journeys then reuse.
-      echo "=== layout invariants"
-      node qa/invariant/layout.qa.mjs || failed="$failed invariants"
-      # Same story as desktop-gate: registered, tagged, listed by `qa/cli.mjs
-      # list`, and run by nobody. It is the gate for "no screen shows a uuid",
-      # which is exactly what shipped on the draft workspace and the evaluation
-      # strip (F-078).
-      echo "=== no visible uuid"
-      node qa/invariant/no-visible-uuid.qa.mjs || failed="$failed no-visible-uuid"
-      echo "=== structural conformance"
-      node qa/conformance/structure.qa.mjs || failed="$failed conformance"
-      for f in qa/journey/*.qa.mjs; do
-        echo "=== $f"
-        node "$f" || failed="$failed $f"
-      done
-      # After the tiers: now the hit files exist, so a suppression that
-      # matched nothing can be told from one that is merely dormant.
-      echo "=== exception register (strict)"
-      node qa/cli.mjs exceptions --strict || failed="$failed exceptions--strict"
-      if [ -n "$failed" ]; then echo "FAILED:$failed"; exit 1; fi
-  # No artifacts: qa/.sessions/ holds live authentication cookies. The log is
-  # the output.
+    - npm ci --no-audit --no-fund
+    - npm run test:stories
+    - node tools/design/shots.mjs --twice
+    - node tools/design/a11y.mjs
+    - (npx vite preview --config vite.design.config.ts --port 3700 --strictPort &) && sleep 4
+    - node tools/design/smoke.mjs
+    - node tools/design/crawl.mjs
+    - node qa/invariant/desktop-gate.qa.mjs
+    - node qa/invariant/layout.qa.mjs --base http://localhost:3700
+    - node qa/invariant/no-visible-uuid.qa.mjs --base http://localhost:3700
+    - node qa/conformance/structure.qa.mjs --base http://localhost:3700
+    - node qa/cli.mjs exceptions --strict
+  artifacts:
+    when: on_failure
+    paths: [qa/visual/baselines/*.actual.png]
+    expire_in: 3 days

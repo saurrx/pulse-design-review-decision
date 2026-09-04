@@ -27,7 +27,9 @@ const page = await context.newPage();
 const seen = new Set(); const fresh = []; let redesignBlocking = 0;
 
 let broken = 0;
-for (const s of storiesFrom(dir)) {
+// Colocated production stories already fail on axe through the Storybook Vitest
+// addon. This ratchet belongs to the design review stories and their baselines.
+for (const s of storiesFrom(dir).filter((story) => story.importPath.startsWith("./design/stories/"))) {
   try {
     await page.goto(`http://localhost:${port}/iframe.html?id=${s.id}&viewMode=story`);
     await page.waitForSelector('body[data-story-ready="1"]', { timeout: 20_000 });

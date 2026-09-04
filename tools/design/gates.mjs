@@ -8,6 +8,7 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { createRequire } from "node:module";
 
 const results = [];
 // --only <substring> (repeatable) runs the matching gates and skips the rest; the inline checks at the end always run.
@@ -62,15 +63,20 @@ run("qa invariant: no visible uuid", "node", ["qa/invariant/no-visible-uuid.qa.m
 run("qa conformance: structure against baseline-mock", "node", ["qa/conformance/structure.qa.mjs", "--base", "http://localhost:3700"], { env: qaEnv });
 if (pid) process.kill(pid);
 
-// Lockfile: a clean install reproduces the tree; one copy of react, react-dom and vite.
+// Lockfile: a clean install reproduces the tree; one React runtime. Vitest 4
+// carries test-only Vite 8, while the app and Storybook must resolve root Vite 5.
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "pulse-lock-"));
 fs.copyFileSync("package.json", path.join(tmp, "package.json")); fs.copyFileSync("package-lock.json", path.join(tmp, "package-lock.json"));
 run("lockfile reproduces with npm ci", "npm", ["ci", "--no-audit", "--no-fund", "--ignore-scripts"], { cwd: tmp });
 fs.rmSync(tmp, { recursive: true, force: true });
 const copies = (p) => spawnSync("sh", ["-c", `find node_modules -type d -name '${p}' | grep -E '(^|/)node_modules/${p}$' | wc -l`], { encoding: "utf8" }).stdout.trim();
-const single = ["react", "react-dom", "vite"].map((p) => [p, copies(p)]);
-results.push({ name: "single runtime copies", ok: single.every(([, n]) => n === "1"), secs: "0", tail: single.map(([p, n]) => `${p}=${n}`).join(" ") });
-console.log(`${results.at(-1).ok ? "ok  " : "FAIL"} single runtime copies ${results.at(-1).tail}`);
+const single = ["react", "react-dom"].map((p) => [p, copies(p)]);
+const req = createRequire(import.meta.url);
+const rootVite = JSON.parse(fs.readFileSync(req.resolve("vite/package.json"), "utf8")).version;
+const viteFrom = (pkg) => { const entry = req.resolve(pkg); const local = createRequire(path.join(path.dirname(entry), "design-vite-probe.cjs")); return JSON.parse(fs.readFileSync(local.resolve("vite/package.json"), "utf8")).version; };
+const vitePaths = [["root", rootVite], ["react-vite", viteFrom("@storybook/react-vite")], ["builder-vite", viteFrom("@storybook/builder-vite")]];
+results.push({ name: "runtime graph", ok: single.every(([, n]) => n === "1") && vitePaths.every(([, v]) => v === rootVite), secs: "0", tail: [...single.map(([p, n]) => `${p}=${n}`), ...vitePaths.map(([p, v]) => `${p}=${v}`)].join(" ") });
+console.log(`${results.at(-1).ok ? "ok  " : "FAIL"} runtime graph ${results.at(-1).tail}`);
 
 // Path classes: the exporter's rule table classifies the paths it must.
 const cls = spawnSync("node", ["-e", `import("./tools/design/paths.mjs").then(m=>{const t={"src/components/x.tsx":"portable","src/lib/realAdapter.ts":"offLimits","mock/runtime/db.ts":"protected","mock/handlers/a.ts":"reviewSupport","design/stories/a.stories.tsx":"reviewSupport","qa/visual/baselines/a.png":"reviewSupport","index.html":"buildImpact","src/lib/roles.ts":"behaviourImpact","package.json":"protected"};const bad=Object.entries(t).filter(([f,c])=>m.classify(f)!==c);if(bad.length){console.error(bad);process.exit(1)}})`], { encoding: "utf8" });

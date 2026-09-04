@@ -17,10 +17,10 @@ export function serveStatic(dir, port) {
   return new Promise((resolve) => server.listen(port, "127.0.0.1", () => resolve(() => new Promise((r) => server.close(r)))));
 }
 
-/** Story ids from Storybook's index, type "story" only, with their tags. */
+/** Story ids from Storybook's index, type "story" only, with source and tags. */
 export function storiesFrom(dir) {
   const index = JSON.parse(fs.readFileSync(path.join(dir, "index.json"), "utf8"));
-  return Object.values(index.entries).filter((e) => e.type === "story").map((e) => ({ id: e.id, title: e.title, name: e.name, tags: e.tags ?? [] }));
+  return Object.values(index.entries).filter((e) => e.type === "story").map((e) => ({ id: e.id, title: e.title, name: e.name, tags: e.tags ?? [], importPath: e.importPath ?? "" }));
 }
 
 /** Abort any request that would leave the machine; return the list of blocked hosts. */

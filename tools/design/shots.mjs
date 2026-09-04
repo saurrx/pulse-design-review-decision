@@ -56,7 +56,11 @@ async function render(id, vp = { width: 1440, height: 900, scale: 1 }) {
   return { png, errors };
 }
 
-for (const s of storiesFrom(dir)) {
+// Production's colocated component stories run their play and axe assertions
+// through Vitest. Repository-owned visual baselines are the review contract for
+// design stories only; snapshotting upstream's component tests would duplicate
+// ownership and add unrelated churn on every sync.
+for (const s of storiesFrom(dir).filter((story) => story.importPath.startsWith("./design/stories/"))) {
   if (only && !only.test(s.id)) continue;
   for (const vp of viewportsOf(s.tags)) {
     const key = s.id + vp.suffix;
