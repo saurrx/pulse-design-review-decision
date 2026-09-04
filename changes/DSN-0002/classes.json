@@ -2,7 +2,7 @@
   "id": "DSN-0002",
   "designBase": "649b06b3a4a3bfc53bee00458545806af4681eed",
   "productionBase": "a14da2ed0707e0be435c67a6e526fe5f7b5c0dd1",
-  "head": "2c493261f0c7c21fe3b44a4848dcd131e2f0f8b3",
+  "head": "af94defdcd4142c0f253d4ce74f5c0d31f001900",
   "upstreamHead": "a14da2ed0707e0be435c67a6e526fe5f7b5c0dd1",
   "classes": {
     "reviewSupport": [

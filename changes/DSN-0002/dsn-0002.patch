@@ -525,18 +525,18 @@ index 8c4fa9837f1bf4a03d8d6396de612ffd198fd247..da8b9884a524ae2e57d9c129251286ab
          <div className={`grid ${rowColumns} gap-3 px-3 pb-1 pt-1 text-xs font-medium text-[var(--pulse-ink-muted)]`}>
 diff --git a/src/components/dashboard/StatStrip.tsx b/src/components/dashboard/StatStrip.tsx
 new file mode 100644
-index 0000000000000000000000000000000000000000..e3717e04ceb237a510bc1ac234d03f9582a689d7
+index 0000000000000000000000000000000000000000..015e5fd3c4f7aa5ab3bc6f49b8311c0ac08435f4
 --- /dev/null
 +++ b/src/components/dashboard/StatStrip.tsx
-@@ -0,0 +1,113 @@
+@@ -0,0 +1,109 @@
 +import React from "react";
 +import { Link } from "react-router-dom";
 +
 +/**
 + * The Workspace Admin dashboard's stat strip (DSN-0002).
 + *
-+ * Five scoped numbers in one row, grouped under two overlines: what needs the
-+ * admin ("Your workspace") and how the program is doing ("Company portfolio").
++ * Five scoped numbers in one row in two groups, what needs the admin and how
++ * the portfolio stands; the groups are named for assistive technology only.
 + * Every box is one link to the list its number counts; nothing inside a box is
 + * a second control. The top rule's colour is reinforced by the label, and the
 + * accessible name carries the label, the number and the qualifier in words, so
@@ -567,7 +567,7 @@ index 0000000000000000000000000000000000000000..e3717e04ceb237a510bc1ac234d03f95
 +
 +export type StatGroupSpec = {
 +  key: string;
-+  /** Small-caps overline over the group, e.g. "Your workspace". */
++  /** The group's accessible name, e.g. "Your workspace". Not rendered: the founder dropped the visible overlines on 4 September 2026. */
 +  overline: string;
 +  boxes: StatBoxSpec[];
 +};
@@ -577,7 +577,6 @@ index 0000000000000000000000000000000000000000..e3717e04ceb237a510bc1ac234d03f95
 +const LABEL: React.CSSProperties = { font: "var(--pl-type-metric-label)", letterSpacing: "var(--pl-tracking-metric-label)" };
 +const VALUE: React.CSSProperties = { ...NUMS, font: "var(--pl-type-metric-value)", letterSpacing: "var(--pl-tracking-metric-value)" };
 +const QUALIFIER: React.CSSProperties = { ...NUMS, font: "var(--pl-type-caption)", letterSpacing: "var(--pl-tracking-caption)" };
-+const KICKER: React.CSSProperties = { font: "var(--pl-type-kicker)", letterSpacing: "var(--pl-tracking-kicker)" };
 +
 +const RULE: Record<StatRule, string> = {
 +  amber: "var(--pl-amber)",
@@ -627,11 +626,8 @@ index 0000000000000000000000000000000000000000..e3717e04ceb237a510bc1ac234d03f95
 +          key={g.key}
 +          role="group"
 +          aria-label={g.overline}
-+          className={`flex min-w-0 flex-col gap-2 ${g.boxes.length >= 3 ? "xl:col-span-3" : "xl:col-span-2"}`}
++          className={`flex min-w-0 flex-col ${g.boxes.length >= 3 ? "xl:col-span-3" : "xl:col-span-2"}`}
 +        >
-+          <span className="px-1 uppercase text-[var(--pulse-ink-muted)]" style={KICKER} aria-hidden="true">
-+            {g.overline}
-+          </span>
 +          <div className="flex min-w-0 gap-4">
 +            {g.boxes.map((b) => <StatBox key={b.key} box={b} index={index++} />)}
 +          </div>
@@ -644,10 +640,10 @@ index 0000000000000000000000000000000000000000..e3717e04ceb237a510bc1ac234d03f95
 +export default StatStrip;
 diff --git a/src/components/dashboard/WorkspaceAdminOverview.tsx b/src/components/dashboard/WorkspaceAdminOverview.tsx
 new file mode 100644
-index 0000000000000000000000000000000000000000..40f22454ea7ba60f7b05ad735a55da1da2c8c6fa
+index 0000000000000000000000000000000000000000..76bfacbba7727dee4e8e76f0c549d1e281a3a143
 --- /dev/null
 +++ b/src/components/dashboard/WorkspaceAdminOverview.tsx
-@@ -0,0 +1,281 @@
+@@ -0,0 +1,277 @@
 +import React, { useState } from "react";
 +import { useNavigate } from "react-router-dom";
 +import { useQuery } from "@tanstack/react-query";
@@ -823,11 +819,7 @@ index 0000000000000000000000000000000000000000..40f22454ea7ba60f7b05ad735a55da1d
 +  const strip = isDashboardLoading && !unavailable ? (
 +    <section aria-label="Overview" aria-busy="true" className="flex flex-col gap-4 xl:grid xl:grid-cols-5">
 +      {[0, 1, 2, 3, 4].map((k) => (
-+        <div key={k} className="flex flex-col gap-2">
-+          {/* The group overline's height, so the boxes land where they will stay. */}
-+          <span className="h-[14px] w-24 rounded bg-[var(--pulse-surface-subtle)]" aria-hidden="true" style={{ visibility: k === 0 || k === 3 ? "visible" : "hidden" }} />
-+          <div className="min-h-[108px] animate-pulse rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)]" />
-+        </div>
++        <div key={k} className="min-h-[108px] animate-pulse rounded-xl border border-[var(--pulse-line)] bg-[var(--pulse-surface)]" />
 +      ))}
 +    </section>
 +  ) : (
