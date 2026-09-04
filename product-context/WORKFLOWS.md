@@ -43,7 +43,7 @@ Evaluation must never become a hidden submission requirement.
 ```text
 Inventor clicks Evaluate idea
 → Running/progress feedback
-→ Assessment (0–10 novelty score plus meaning)
+→ Assessment (0–10 patentability score, band label, plus meaning)
 → What appears different
 → How to strengthen
 → Detailed prior art on demand
@@ -58,15 +58,15 @@ not be confused with the current disclosure version.
 Submitted
 → Awaiting Workspace Admin review
 → Workspace Admin opens one decision workspace
-→ Approve for filing / Request changes / Reject
+→ Send to Photon Legal / Request changes / Reject
 ```
 
 Approve:
 
 ```text
-Approve for filing
+Send to Photon Legal
 → Confirmation: Send to Photon Legal for filing?
-→ Approve & send
+→ Send to Photon Legal (confirm)
 → Status: Sent to Photon Legal
 ```
 

@@ -37,7 +37,7 @@ reconsidered and redesigned.
 - Structured invention disclosure with prefilled answers
 - Copilot follow-up questions and answer-improvement suggestions
 - Optional prior-art evaluation and re-evaluation
-- Numeric novelty score with evidence
+- Numeric 0–10 patentability score with a band label and evidence
 - Workspace Admin review
 - Request changes, reject, approve for filing, and resubmission
 - Company patent portfolio and patent details

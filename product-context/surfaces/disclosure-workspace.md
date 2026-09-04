@@ -18,7 +18,10 @@ Increase draft completion and completed-to-submitted conversion.
 
 ## Structure
 
-- Clear completion overview
+- **Start from what you already have** — upload a document or paste text —
+  is the first thing an empty or thin draft shows; sections appear filled
+  from it
+- Clear completion overview (submission readiness)
 - Sections matching the invention narrative
 - Prefilled answers distinguished without visual noise
 - Gaps and unsupported fields
@@ -26,7 +29,8 @@ Increase draft completion and completed-to-submitted conversion.
 - Co-inventors
 - Source material
 - Autosave/last-saved state
-- Optional evaluation card
+- Optional evaluation card with the live patentability signal; **Evaluate
+  idea** stays visibly optional
 
 ## Draft model
 
@@ -42,6 +46,9 @@ revision in history.
 - Show AI-drafted/edited/human provenance where required.
 - Do not warn or nag when the inventor submits without evaluation.
 - Preserve work through errors and navigation.
+- Show only the lifecycle stepper that applies: a draft is not "Submitted".
+- Reduce: one column of sections, one side panel; anything the inventor does
+  not need while writing goes behind disclosure.
 
 ## States
 

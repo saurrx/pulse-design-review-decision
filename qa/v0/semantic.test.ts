@@ -4,6 +4,7 @@
  * technical review stage, a surface brief missing from the coverage matrix,
  * an Inventor who can reach Actions or due dates, an excluded feature, an
  * evaluation that gates submission, or a badge outside Workspace Admin review.
+ * (1.1.0: the world map and the Workspace Admin Top inventors list are authorised.)
  * Conceptual behaviours the mock models must be declared as future contracts.
  * @tier:v0
  */
@@ -23,7 +24,7 @@ import { render } from "../../tools/design/v0-coverage.mjs";
 const FOUR = ["INVENTOR", "LEGAL_COUNSEL", "CASE_OWNER", "PHOTON_ADMIN"].sort();
 const LABELS = ["Inventor", "Workspace Admin", "Case Owner", "Photon Admin"].sort();
 const PERSONA_KEYS = ["INVENTOR", "WORKSPACE_ADMIN", "CASE_OWNER", "PHOTON_ADMIN"].sort();
-const EXCLUDED = /assistant|world[ -]?map|checkout|billing|purchas|pricing|price[ -]selection|invoice|notification[ -](center|centre)|notification[ -]bell|trademark|cost[ -]visibility|leaderboard|score[ -]cutoff/i;
+const EXCLUDED = /assistant|checkout|billing|purchas|pricing|price[ -]selection|invoice|notification[ -](center|centre)|notification[ -]bell|trademark|cost[ -]visibility|score[ -]cutoff/i;
 const IMPACT = ["none", "unwired", "conceptual"];
 
 type Coverage = {
@@ -156,7 +157,7 @@ describe("excluded features stay out", () => {
     const files: string[] = [];
     const walk = (dir: string) => { if (!existsSync(dir)) return; for (const f of readdirSync(dir, { withFileTypes: true })) { const p = path.join(dir, f.name); if (f.isDirectory()) walk(p); else if (/\.(ts|tsx)$/.test(f.name)) files.push(p); } };
     walk("mock/scenarios/v0"); walk("design/stories/surfaces");
-    const CODE = /worldMap|WorldMap|checkout|billing|invoice|priceSelection|pricing|notificationCenter|NotificationBell|AssistantPage|assistant|trademark|leaderboard/;
+    const CODE = /checkout|billing|invoice|priceSelection|pricing|notificationCenter|NotificationBell|AssistantPage|assistant|trademark/;
     for (const f of files) {
       const code = readFileSync(f, "utf8").split("\n").filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l)).join("\n");
       expect(code, f).not.toMatch(CODE);

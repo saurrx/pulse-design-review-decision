@@ -74,6 +74,9 @@ must change; the record ships as a proposal).
 - Resolution: badge only for Workspace Admin; labels per SCREENS.md (Home,
   My Work, Dashboard). Portable change in the sidebar.
 - Impact: `none`, with a fingerprint escalation because a role condition moves.
+- Status (4 September 2026): the code still badges Ideas for Photon Admin and
+  Case Owner; confirmed a defect under context 1.1.0, fixed before the V0 run
+  (RUN-GOALS.md).
 
 ## R-07 World map on dashboards
 - Product: no world map on any V0 dashboard; jurisdiction summaries and
@@ -91,6 +94,12 @@ must change; the record ships as a proposal).
   Founder override, revisit after V0 usage evidence; the product rule itself is
   not loosened, and the coverage matrix records the exception on that one
   surface only.
+- Context update 1.1.0 (4 September 2026): the product rule is loosened. The
+  world map is part of every V0 dashboard, below the persona's work, never
+  leading (product-context/AGENTS.md, SCREENS.md, the four dashboard briefs).
+  The Top inventors ranking is authorised on the Workspace Admin Overview
+  only; Inventors never see a named ranking. The semantic gate and the
+  coverage matrix no longer list "world map" or "leaderboard" as excluded.
 
 ## R-15 Workspace Admin dashboard aggregates
 - Product: the Workspace Admin dashboard answers "what needs me" and "how is
@@ -199,6 +208,18 @@ must change; the record ships as a proposal).
 - Impact: `none`; build-impact approval (`tailwind.config.ts`,
   `tools/tokens.mjs`). Finding for the specification owner: PL-TKN-004 should
   carry the radius scale in its next release.
+
+## R-17 Repository model (context 1.1.0)
+- Earlier: design fork of production; changes exported as portable patches;
+  routes the backend lacked were `conceptual` and stopped at approved.
+- Now: this repository is the V0 codebase and the mock is its backend. What
+  the API lacks is modelled in the mock and declared in
+  `mock/proposed-routes.json` / `mock/proposed-fields.json`; the
+  `conceptual` / `unwired` labels in the coverage matrix remain as a note of
+  what the real backend will need, not as a stop.
+- Impact: export, sync, path-class and fingerprint tooling retired (CLAUDE.md,
+  History). The V0 semantic gate, tokens gate, story tests, shots and a11y
+  ratchet remain.
 
 ## Agreements worth naming
 - Copilot rules match: production's autofill and Suggest refuse to author

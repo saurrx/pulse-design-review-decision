@@ -27,12 +27,16 @@ Understand the company's patent assets and find a specific record quickly.
 
 ## Portfolio summary
 
-Use compact totals and jurisdiction distribution. Prefer counts, filters, and
-clear status groupings over a world map.
+Use compact totals and jurisdiction distribution: counts, filters and clear
+status groupings. The world map lives on the dashboards; here it is optional
+and secondary to the filterable list.
 
 ## Rules
 
-- Do not recreate a spreadsheet by showing every field at once.
+- Do not recreate a spreadsheet by showing every field at once: no S.No
+  column, no flag icons as data, no horizontal scroll at the review widths.
+  Default columns are the ones the persona's decision needs; the rest sit
+  behind Columns.
 - Column configuration may exist for operational Photon roles.
 - Preserve export where currently required.
 - Import belongs only to Case Owner and Photon Admin.

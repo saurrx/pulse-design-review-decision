@@ -2,7 +2,7 @@
 
 ## Job
 
-Understand the advisory novelty assessment and strengthen the disclosure.
+Understand the advisory patentability assessment and strengthen the disclosure.
 
 ## Business outcome
 
@@ -12,8 +12,12 @@ Help inventors submit stronger disclosures without reducing submission volume.
 
 ### 1. Assessment
 
-Numeric 0–10 novelty score and one plain-language interpretation. No cutoff and
-no implication that the score predicts patent grant.
+Numeric 0–10 patentability score (`7.4 / 10`), its band label (Highly,
+Moderately or Marginally novel; Closely matched) and one plain-language
+interpretation. No cutoff and no implication that the score predicts patent
+grant. Inside the draft, before a full evaluation exists, a patentability
+signal may read the written sections back; it is labelled as a signal, not a
+score.
 
 ### 2. What appears different
 

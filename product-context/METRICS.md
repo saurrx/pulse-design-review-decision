@@ -47,7 +47,7 @@ filing. Revenue is realized outside Pulse through paid patent matters.
 - Wrong turns and abandoned steps
 - Recovery from errors
 - Confidence after submission and review
-- Perceived clarity of novelty score
+- Perceived clarity of the patentability score and its band
 - Ability to identify what makes the idea different
 - Support contacts per completed submission
 

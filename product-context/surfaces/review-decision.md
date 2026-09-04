@@ -16,7 +16,7 @@ Faster review and more suitable ideas sent to Photon Legal.
 
 1. Invention brief and current state
 2. Inventor and attribution
-3. Novelty assessment and meaning
+3. Patentability score, band and meaning
 4. What appears different
 5. Key disclosure answers and attachments
 6. Detailed prior art on demand
@@ -24,15 +24,19 @@ Faster review and more suitable ideas sent to Photon Legal.
 
 ## Decisions
 
-- Primary: **Approve for filing**
+- Primary: **Send to Photon Legal**
 - Secondary: **Request changes**
-- Destructive/negative: **Reject**
+- Destructive/negative: **Reject** (behind the overflow menu)
 
 Approval confirmation:
 
 - Title: **Send to Photon Legal for filing?**
-- Primary action: **Approve & send**
+- Primary action: **Send to Photon Legal**
 - Result: **Sent to Photon Legal**
+
+This surface is built: the two-pane Ideas queue (list left, brief and
+activity right, decision footer) is the reference. Remaining work is state
+coverage, not redesign.
 
 ## Rules
 
