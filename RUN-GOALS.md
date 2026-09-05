@@ -31,9 +31,11 @@ make it not stop:
    one in `mock/scenarios/v0/`. Remove the Ideas navigation badge for Photon
    Admin and Case Owner (Workspace Admin only). Run `npm run storybook:build`
    and `node tools/design/shots.mjs --twice` once so the baselines are trusted.
-3. Cloud environment (claude.ai/code → environment settings): setup script
-   `npm ci --no-audit --no-fund && npx playwright install chromium`;
-   network access **Trusted**; `CI=1`. Default permission mode **auto**.
+3. Cloud environment `pulse-v0` (claude.ai/code → environment settings):
+   network access **Trusted**; variables `CI=1`, `QA_MOCK=1`; setup script
+   installs only system-level pieces (Chromium's OS libraries). The repo's
+   `SessionStart` hook (`.claude/hooks/session-start.sh`) runs `npm ci` and
+   installs the Playwright Chromium inside the clone on every session.
    Model Fable, effort **high** (raise to xhigh only if a surface scores
    below 4 on hierarchy twice).
 4. Create the routine from `ROUTINE-PROMPT.md`. Turn push notifications on.
