@@ -9,7 +9,7 @@ the code; the folder carries the evidence.
 `proposed` -> `in review` -> `approved` -> `merged`.
 
 ## Making one
-1. `git checkout -b dsn/0007-short-name main`.
+1. `git checkout -b claude/dsn-0007-short-name main`.
 2. Work under the rules in AGENTS.md: change `src/`, extend the mock, add or
    update the V0 stories for the surface, delete the legacy stories it replaces.
 3. Render the surface at the five review widths, run the scorecard and

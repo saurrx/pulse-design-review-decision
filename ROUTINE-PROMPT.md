@@ -3,8 +3,7 @@
 Create this as a Claude Code routine (cloud): from a terminal in the repo run
 `/schedule`, or on claude.ai/code choose the repository, branch `main`,
 model Fable, effort high, permission mode auto, and paste the prompt below.
-Fire every 30 minutes if the plan allows it (`*/30 * * * *`); if the
-scheduler refuses, hourly (`0 * * * *`). Turn push notifications on. The
+Fire hourly — the platform minimum; more frequent expressions are rejected. Turn push notifications on. The
 cloud environment must have the setup script and Trusted network from
 RUN-GOALS.md. Run `.claude/settings.json` hooks are committed, so every
 firing gets the completion gate, the evidence gate and the kill switch.
@@ -17,13 +16,13 @@ halts on its next tool call) or by pausing the routine.
 ```
 You are one firing of the Pulse V0 autonomous screen run. Read CLAUDE.md, AGENTS.md, .claude/rules/autonomous-run.md, RUN-GOALS.md, PROGRESS.md and STEER.md first. Then:
 
-1. Concurrency: run `git fetch --all` and `git log --all --since='25 minutes ago' --format='%h %cr %s'`. If any commit in the last 25 minutes came from another run session (a dsn/ branch or main with a DSN-numbered message you did not write), another firing is working: append one line to PROGRESS.md saying you yielded, commit, push, and stop. Otherwise continue.
+1. Concurrency: run `git fetch --all` and `git log --all --since='25 minutes ago' --format='%h %cr %s'`. If any commit in the last 25 minutes came from another run session (a claude/dsn-* branch or main with a DSN-numbered message you did not write), another firing is working: append one line to PROGRESS.md saying you yielded, commit, push, and stop. Otherwise continue.
 
-2. Pick the surface: if STEER.md names a DSN to reopen, do that first on its branch (delete the STEER line when acted on, say so in PROGRESS.md). Else if PROGRESS.md names a surface in progress on a dsn/ branch, check that branch out and resume from its last entry and its changes/DSN-NNNN/README.md. Otherwise take the first surface in RUN-GOALS.md lane A whose dsn in design/v0/coverage.json is null (lane B surfaces after lane A is done), create branch dsn/NNNN-<slug> from main, and write the persona frame into PROGRESS.md before touching code.
+2. Pick the surface: if STEER.md names a DSN to reopen, do that first on its branch (delete the STEER line when acted on, say so in PROGRESS.md). Else if PROGRESS.md names a surface in progress on a claude/dsn-* branch, check that branch out and resume from its last entry and its changes/DSN-NNNN/README.md. Before the first surface, if `npm run test:v0` is red on main or the Ideas navigation badge still renders for Photon Admin or Case Owner, fix those first on branch claude/dsn-0000-preflight, merge to main, push, and record it in PROGRESS.md. Otherwise take the first surface in RUN-GOALS.md lane A whose dsn in design/v0/coverage.json is null (lane B surfaces after lane A is done), create branch claude/dsn-NNNN-<slug> from main, and write the persona frame into PROGRESS.md before touching code.
 
 3. Complete that surface exactly as the condition template in RUN-GOALS.md defines complete: three directions and the chosen one by cognitive load recorded in the DSN README; built in place to the reference screens' language; every intended story id present and passing; legacy stories, journeys and baselines it replaces deleted; screenshots re-baselined and copied into changes/DSN-NNNN/shots/ and opened with the Read tool; typecheck, lint:roles, tokens check, test:v0 and test:stories shown green; the evaluator subagent (.claude/agents/evaluator.md) run in a fresh context until VERDICT: PASS, at most three rounds, then mark needs-founder in PROGRESS.md and move on; dsn set in coverage.json and COVERAGE.md re-rendered; scorecard and cognitive-load check in the README.
 
-4. Commit at every checkpoint on the dsn/ branch and push it (so the next firing can resume if this one is cut off). When the surface is complete, merge the branch into main with --no-ff, push main, append the recap to PROGRESS.md naming the next surface, and continue immediately with the next surface in the same session until you are stopped.
+4. Commit at every checkpoint on the claude/dsn-* branch and push it (so the next firing can resume if this one is cut off). When the surface is complete, merge the branch into main with --no-ff, push main, append the recap to PROGRESS.md naming the next surface, and continue immediately with the next surface in the same session until you are stopped.
 
 5. If every surface has a dsn, run the sweep: for each surface marked needs-founder in PROGRESS.md, re-run the evaluator with its findings, fix what can be fixed without a founder decision, and record the rest under "Needs the founder". Then write "RUN COMPLETE" at the end of PROGRESS.md, push, and stop.
 
