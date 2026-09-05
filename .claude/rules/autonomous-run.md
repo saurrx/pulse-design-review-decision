@@ -41,3 +41,9 @@ results, the evaluator verdict, and what is next. Commit at every checkpoint
 with a message that names the DSN and the surface. Open with one line saying
 what you are about to do; close each surface with a short recap that stands
 on its own.
+
+Never write, edit or create anything under `.claude/` during a run: Claude
+Code stops for approval on that path and nobody is there to approve. Put
+environment fixes (browser shims, host binds, install workarounds) in
+`tools/design/env-shim.sh` (created on demand; the SessionStart hook runs
+it) or in the repo's ordinary config files, and record them in PROGRESS.md.
